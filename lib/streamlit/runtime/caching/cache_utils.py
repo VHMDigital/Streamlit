@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import functools
 import hashlib
 import inspect
@@ -126,12 +127,10 @@ class CachedFuncInfo:
         self,
         func: FunctionType,
         show_spinner: bool | str,
-        allow_widgets: bool,
         hash_funcs: HashFuncsDict | None,
     ):
         self.func = func
         self.show_spinner = show_spinner
-        self.allow_widgets = allow_widgets
         self.hash_funcs = hash_funcs
 
     @property
@@ -235,12 +234,11 @@ class CachedFunc:
             hash_funcs=self._info.hash_funcs,
         )
 
-        try:
+        with contextlib.suppress(CacheKeyNotFoundError):
             cached_result = cache.read_result(value_key)
             return self._handle_cache_hit(cached_result)
-        except CacheKeyNotFoundError:
-            pass
         return await self._handle_cache_miss(cache, value_key, func_args, func_kwargs)
+
     def _handle_cache_hit(self, result: CachedResult) -> Any:
         """Handle a cache hit: replay the result's cached messages, and return its value."""
         replay_cached_messages(
@@ -283,22 +281,19 @@ class CachedFunc:
             # We've acquired the lock - but another thread may have acquired it first
             # and already computed the value. So we need to test for a cache hit again,
             # before computing.
-            try:
+            with contextlib.suppress(CacheKeyNotFoundError):
                 cached_result = cache.read_result(value_key)
                 # Another thread computed the value before us. Early exit!
                 return self._handle_cache_hit(cached_result)
 
-            except CacheKeyNotFoundError:
-                pass
-
             # We acquired the lock before any other thread. Compute the value!
             with self._info.cached_message_replay_ctx.calling_cached_function(
-                self._info.func, self._info.allow_widgets
+                self._info.func
             ):
                 if asyncio.iscoroutinefunction(self._info.func):
-                  computed_value = await self._info.func(*func_args, **func_kwargs)
+                    computed_value = await self._info.func(*func_args, **func_kwargs)
                 else:
-                  computed_value = self._info.func(*func_args, **func_kwargs)
+                    computed_value = self._info.func(*func_args, **func_kwargs)
 
             # We've computed our value, and now we need to write it back to the cache
             # along with any "replay messages" that were generated during value computation.
@@ -336,8 +331,10 @@ class CachedFunc:
 
         Parameters
         ----------
+
         *args: Any
             Arguments of the cached functions.
+
         **kwargs: Any
             Keyword arguments of the cached function.
 
@@ -478,8 +475,7 @@ def _make_function_key(cache_type: CacheType, func: FunctionType) -> str:
         source_code, hasher=func_hasher, cache_type=cache_type, hash_source=func
     )
 
-    cache_key = func_hasher.hexdigest()
-    return cache_key
+    return func_hasher.hexdigest()
 
 
 def _get_positional_arg_name(func: FunctionType, arg_index: int) -> str | None:
