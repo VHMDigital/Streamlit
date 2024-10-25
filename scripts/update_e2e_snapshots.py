@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Update e2e snapshots"""
+"""Update e2e snapshots."""
 
 import os
 import sys
@@ -25,14 +25,20 @@ import zipfile
 import argparse
 from typing import Any, Dict, List
 
+
 SNAPSHOT_UPDATE_FOLDER = "snapshot-updates"
 GITHUB_OWNER = "streamlit"
 GITHUB_REPO = "streamlit"
 GITHUB_WORKFLOW_FILE_NAME = "playwright.yml"
 PLAYWRIGHT_RESULT_ARTIFACT_NAME = "playwright_test_results"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+E2E_SNAPSHOTS_DIR = os.path.join(BASE_DIR, "e2e_playwright", "__snapshots__")
 
 
 def get_token_from_credential_manager() -> str:
+    """Get the GitHub token from the git credential manager.
+    The token can also be provided via the --token argument.
+    """
     cmd = ["git", "credential", "fill"]
     input_data = "protocol=https\nhost=github.com\n\n"
     result = subprocess.run(
@@ -44,7 +50,7 @@ def get_token_from_credential_manager() -> str:
         )
         return ""
     output = result.stdout
-    # Parse the output to get the password (token)
+    # Parse the output to get the token
     for line in output.splitlines():
         if line.startswith("password="):
             return line[len("password=") :]
@@ -52,6 +58,7 @@ def get_token_from_credential_manager() -> str:
 
 
 def get_last_commit_sha() -> str:
+    """Get the last commit SHA of the local branch."""
     cmd = ["git", "rev-parse", "HEAD"]
     result = subprocess.run(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
@@ -64,6 +71,7 @@ def get_last_commit_sha() -> str:
 def get_workflow_run(
     owner: str, repo: str, workflow_file_name: str, commit_sha: str, token: str
 ) -> Dict[str, Any]:
+    """Get the latest completed workflow run for a given workflow file name and commit SHA."""
     url = f"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflow_file_name}/runs"
     params = {"head_sha": commit_sha, "status": "completed"}
     headers = {
@@ -89,6 +97,7 @@ def get_workflow_run(
 def get_artifacts(
     owner: str, repo: str, run_id: int, token: str
 ) -> List[Dict[str, Any]]:
+    """Get the artifacts for a given workflow run ID."""
     url = f"https://api.github.com/repos/{owner}/{repo}/actions/runs/{run_id}/artifacts"
     headers = {
         "Accept": "application/vnd.github.v3+json",
@@ -105,6 +114,7 @@ def get_artifacts(
 
 
 def download_artifact(artifact_url: str, token: str, download_path: str) -> None:
+    """Download an artifact from a given URL."""
     headers = {
         "Accept": "application/vnd.github.v3+json",
         "Authorization": f"token {token}",
@@ -120,6 +130,7 @@ def download_artifact(artifact_url: str, token: str, download_path: str) -> None
 
 
 def extract_and_merge_snapshots(zip_path: str, destination_folder: str) -> None:
+    """Extract and merge the 'snapshot-updates/' folder from an artifact into the destination folder."""
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
         namelist = zip_ref.namelist()
         snapshot_files = [
@@ -142,6 +153,7 @@ def extract_and_merge_snapshots(zip_path: str, destination_folder: str) -> None:
 
 
 def copy_tree(src: str, dst: str) -> None:
+    """Copy a directory tree from src to dst."""
     for root, _, files in os.walk(src):
         rel_path = os.path.relpath(root, src)
         dest_dir = os.path.join(dst, rel_path)
@@ -210,13 +222,10 @@ def main() -> None:
             download_artifact(download_url, token, zip_path)
 
             # Extract and merge 'snapshot-updates' folder
-            destination_folder = os.path.join(
-                os.getcwd(), "e2e_playwright", "__snapshots__"
-            )
             print(
-                f"Extracting '{SNAPSHOT_UPDATE_FOLDER}' and merging into {destination_folder}"
+                f"Extracting '{SNAPSHOT_UPDATE_FOLDER}' and merging into {E2E_SNAPSHOTS_DIR}"
             )
-            extract_and_merge_snapshots(zip_path, destination_folder)
+            extract_and_merge_snapshots(zip_path, E2E_SNAPSHOTS_DIR)
 
         print("Artifact downloaded and snapshots merged successfully.")
 
