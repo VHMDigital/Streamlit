@@ -54,6 +54,7 @@ const getProps = (
     elementId: "1",
     ...elementProps,
   }),
+  width: 700,
 })
 
 describe("GraphVizChart Element", () => {
