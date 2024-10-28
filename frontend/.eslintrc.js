@@ -127,7 +127,9 @@ module.exports = {
       "error",
       {
         name: "localStorage",
-        message: "Please use window.localStorage instead.",
+        message:
+          "Please use window.localStorage instead since localStorage is not " +
+          "supported in some browsers (e.g. Android WebView).",
       },
     ],
     // Allow foo.hasOwnProperty("bar")
