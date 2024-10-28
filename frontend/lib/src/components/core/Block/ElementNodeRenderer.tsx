@@ -686,11 +686,13 @@ const RawElementNodeRenderer = (
     case "plotlyChart": {
       const plotlyProto = node.element.plotlyChart as PlotlyChartProto
       return (
-        <PlotlyChart
-          key={plotlyProto.id}
-          element={plotlyProto}
-          {...widgetProps}
-        />
+        <ElementFullscreenWrapper width={widgetProps.width}>
+          <PlotlyChart
+            key={plotlyProto.id}
+            element={plotlyProto}
+            {...widgetProps}
+          />
+        </ElementFullscreenWrapper>
       )
     }
 

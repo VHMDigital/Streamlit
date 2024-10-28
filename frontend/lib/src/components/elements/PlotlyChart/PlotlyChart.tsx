@@ -27,13 +27,14 @@ import Plot, { Figure as PlotlyFigureType } from "react-plotly.js"
 
 import { EmotionTheme } from "@streamlit/lib/src/theme"
 import { PlotlyChart as PlotlyChartProto } from "@streamlit/lib/src/proto"
-import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import {
   keysToSnakeCase,
   notNullOrUndefined,
 } from "@streamlit/lib/src/util/utils"
 import { FormClearHelper } from "@streamlit/lib/src/components/widgets/Form/FormClearHelper"
+import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
+import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
 
 import {
   applyStreamlitTheme,
@@ -358,31 +359,28 @@ export function sendEmptySelection(
 }
 
 export interface PlotlyChartProps {
-  width: number
   element: PlotlyChartProto
-  height?: number
   widgetMgr: WidgetStateManager
   disabled: boolean
   fragmentId?: string
-  isFullScreen: boolean
-  expand?: () => void
-  collapse?: () => void
   disableFullscreenMode?: boolean
 }
 
 export function PlotlyChart({
   element,
-  width,
-  height,
   widgetMgr,
   disabled,
   fragmentId,
-  isFullScreen,
-  expand,
-  collapse,
   disableFullscreenMode,
 }: Readonly<PlotlyChartProps>): ReactElement {
   const theme: EmotionTheme = useTheme()
+  const {
+    expanded: isFullScreen,
+    width,
+    height,
+    expand,
+    collapse,
+  } = useRequiredContext(ElementFullscreenContext)
 
   // Load the initial figure spec from the element message
   const initialFigureSpec = useMemo<PlotlyFigureType>(() => {
@@ -779,4 +777,4 @@ export function PlotlyChart({
   )
 }
 
-export default withFullScreenWrapper(PlotlyChart, true)
+export default PlotlyChart
