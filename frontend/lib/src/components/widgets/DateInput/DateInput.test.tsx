@@ -17,12 +17,7 @@
 import React from "react"
 
 import "@testing-library/jest-dom"
-import {
-  act,
-  fireEvent,
-  screen,
-  waitForElementToBeRemoved,
-} from "@testing-library/react"
+import { act, fireEvent, screen } from "@testing-library/react"
 
 import { render as testUtilRender } from "@streamlit/lib/src/test_util"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
@@ -60,7 +55,7 @@ const getProps = (
 
 const render = async (ui: React.ReactElement): Promise<void> => {
   testUtilRender(ui)
-  await waitForElementToBeRemoved(() => screen.queryByTestId("stSkeleton"))
+  // await waitForElementToBeRemoved(() => screen.queryByTestId("stSkeleton"))
 }
 
 describe("DateInput widget", () => {

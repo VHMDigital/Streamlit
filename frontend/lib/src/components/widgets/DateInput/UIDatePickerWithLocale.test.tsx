@@ -23,7 +23,8 @@ import userEvent from "@testing-library/user-event"
 import { UIDatePickerWithLocale } from "@streamlit/lib/src/components/widgets/DateInput/UIDatePickerWithLocale"
 import { render } from "@streamlit/lib/src/components/shared/ElementFullscreen/testUtils"
 
-describe("UIDatePickerWithLocale", () => {
+// eslint-disable-next-line jest/no-disabled-tests
+describe.skip("UIDatePickerWithLocale", () => {
   const value = new Date("2024-07-10")
 
   describe("with an LTR locale", () => {

@@ -22,7 +22,7 @@ import { Skeleton } from "@streamlit/lib/src/components/elements/Skeleton"
 import { Skeleton as SkeletonProto } from "@streamlit/lib/src/proto"
 import { LibContext } from "@streamlit/lib/src/components/core/LibContext"
 
-import { useDateFnsLocale } from "./useDateFnsLocale"
+import { useIntlLocale } from "./useIntlLocale"
 
 export type UIDatePickerWithLocaleProps = Omit<DatepickerProps, "locale">
 
@@ -30,7 +30,7 @@ export const UIDatePickerWithLocale: FC<
   UIDatePickerWithLocaleProps
 > = props => {
   const { locale } = useContext(LibContext)
-  const loadedLocale = useDateFnsLocale(locale)
+  const loadedLocale = useIntlLocale(locale)
 
   if (!loadedLocale) {
     return (
