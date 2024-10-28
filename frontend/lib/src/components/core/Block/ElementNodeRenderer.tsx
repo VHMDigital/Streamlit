@@ -373,11 +373,13 @@ const RawElementNodeRenderer = (
 
     case "imgs":
       return (
-        <ImageList
-          element={node.element.imgs as ImageListProto}
-          endpoints={props.endpoints}
-          {...elementProps}
-        />
+        <ElementFullscreenWrapper width={widgetProps.width}>
+          <ImageList
+            element={node.element.imgs as ImageListProto}
+            endpoints={props.endpoints}
+            {...elementProps}
+          />
+        </ElementFullscreenWrapper>
       )
 
     case "json":

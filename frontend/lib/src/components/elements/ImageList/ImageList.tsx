@@ -20,21 +20,22 @@ import {
   ImageList as ImageListProto,
   Image as ImageProto,
 } from "@streamlit/lib/src/proto"
-import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
 import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
+import Toolbar from "@streamlit/lib/src/components/shared/Toolbar"
+import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
+import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
 
 import {
   StyledCaption,
   StyledImageContainer,
   StyledImageList,
+  StyledImageListContainer,
 } from "./styled-components"
 
 export interface ImageListProps {
   endpoints: StreamlitEndpoints
   width: number
-  isFullScreen: boolean
   element: ImageListProto
-  height?: number
 }
 
 /**
@@ -55,12 +56,18 @@ enum WidthBehavior {
  * Functional element for a horizontal list of images.
  */
 export function ImageList({
-  width,
-  isFullScreen,
   element,
-  height,
+  width,
   endpoints,
 }: Readonly<ImageListProps>): ReactElement {
+  const {
+    expanded: isFullScreen,
+    width: fullScreenWidth,
+    height,
+    expand,
+    collapse,
+  } = useRequiredContext(ElementFullscreenContext)
+
   // The width field in the proto sets the image width, but has special
   // cases the values in the WidthBehavior enum.
   let containerWidth: number | undefined
@@ -81,7 +88,7 @@ export function ImageList({
     )
   ) {
     // Use the column width
-    containerWidth = width
+    containerWidth = isFullScreen ? fullScreenWidth : width
   } else if (protoWidth > 0) {
     // Set the image width explicitly.
     containerWidth = protoWidth
@@ -101,30 +108,42 @@ export function ImageList({
   }
 
   return (
-    <StyledImageList
-      className="stImage"
-      data-testid="stImage"
-      style={{ width }}
+    <StyledImageListContainer
+      width={containerWidth}
+      height={height}
+      useContainerWidth={isFullScreen}
     >
-      {element.imgs.map((iimage, idx): ReactElement => {
-        const image = iimage as ImageProto
-        return (
-          <StyledImageContainer data-testid="stImageContainer" key={idx}>
-            <img
-              style={imgStyle}
-              src={endpoints.buildMediaURL(image.url)}
-              alt={idx.toString()}
-            />
-            {image.caption && (
-              <StyledCaption data-testid="stImageCaption" style={imgStyle}>
-                {` ${image.caption} `}
-              </StyledCaption>
-            )}
-          </StyledImageContainer>
-        )
-      })}
-    </StyledImageList>
+      <Toolbar
+        target={StyledImageListContainer}
+        isFullScreen={isFullScreen}
+        onExpand={expand}
+        onCollapse={collapse}
+      ></Toolbar>
+      <StyledImageList
+        className="stImage"
+        data-testid="stImage"
+        style={{ width: containerWidth }}
+      >
+        {element.imgs.map((iimage, idx): ReactElement => {
+          const image = iimage as ImageProto
+          return (
+            <StyledImageContainer data-testid="stImageContainer" key={idx}>
+              <img
+                style={imgStyle}
+                src={endpoints.buildMediaURL(image.url)}
+                alt={idx.toString()}
+              />
+              {image.caption && (
+                <StyledCaption data-testid="stImageCaption" style={imgStyle}>
+                  {` ${image.caption} `}
+                </StyledCaption>
+              )}
+            </StyledImageContainer>
+          )
+        })}
+      </StyledImageList>
+    </StyledImageListContainer>
   )
 }
 
-export default withFullScreenWrapper(ImageList)
+export default ImageList
