@@ -35,6 +35,7 @@ import {
 import { FormClearHelper } from "@streamlit/lib/src/components/widgets/Form/FormClearHelper"
 import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
 import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
+import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
 
 import {
   applyStreamlitTheme,
@@ -364,6 +365,7 @@ export interface PlotlyChartProps {
   disabled: boolean
   fragmentId?: string
   disableFullscreenMode?: boolean
+  width: number
 }
 
 export function PlotlyChart({
@@ -777,4 +779,4 @@ export function PlotlyChart({
   )
 }
 
-export default PlotlyChart
+export default withFullScreenWrapper(PlotlyChart)

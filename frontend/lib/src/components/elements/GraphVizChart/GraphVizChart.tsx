@@ -24,6 +24,7 @@ import { GraphVizChart as GraphVizChartProto } from "@streamlit/lib/src/proto"
 import Toolbar from "@streamlit/lib/src/components/shared/Toolbar"
 import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
 import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
+import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
 
 import {
   StyledGraphVizChart,
@@ -32,6 +33,7 @@ import {
 
 export interface GraphVizChartProps {
   element: GraphVizChartProto
+  width: number
   disableFullscreenMode?: boolean
 }
 
@@ -99,4 +101,4 @@ export function GraphVizChart({
   )
 }
 
-export default GraphVizChart
+export default withFullScreenWrapper(GraphVizChart)

@@ -989,4 +989,4 @@ function DataFrame({
   )
 }
 
-export default withFullScreenWrapper(DataFrame, true)
+export default withFullScreenWrapper(DataFrame)

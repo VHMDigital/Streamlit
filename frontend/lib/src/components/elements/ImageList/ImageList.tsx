@@ -24,6 +24,7 @@ import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
 import Toolbar from "@streamlit/lib/src/components/shared/Toolbar"
 import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
 import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
+import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
 
 import {
   StyledCaption,
@@ -149,4 +150,4 @@ export function ImageList({
   )
 }
 
-export default ImageList
+export default withFullScreenWrapper(ImageList)

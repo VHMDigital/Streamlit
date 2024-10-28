@@ -66,7 +66,6 @@ import {
   Video as VideoProto,
 } from "@streamlit/lib/src/proto"
 import { ElementNode } from "@streamlit/lib/src/AppNode"
-import ElementFullscreenWrapper from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenWrapper"
 import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
 // Load (non-lazy) elements.
 import AlertElement from "@streamlit/lib/src/components/elements/AlertElement"
@@ -320,12 +319,10 @@ const RawElementNodeRenderer = (
 
     case "deckGlJsonChart":
       return (
-        <ElementFullscreenWrapper width={widgetProps.width}>
-          <DeckGlJsonChart
-            element={node.element.deckGlJsonChart as DeckGlJsonChartProto}
-            {...widgetProps}
-          />
-        </ElementFullscreenWrapper>
+        <DeckGlJsonChart
+          element={node.element.deckGlJsonChart as DeckGlJsonChartProto}
+          {...widgetProps}
+        />
       )
 
     case "docString":
@@ -349,12 +346,10 @@ const RawElementNodeRenderer = (
 
     case "graphvizChart":
       return (
-        <ElementFullscreenWrapper width={widgetProps.width}>
-          <GraphVizChart
-            element={node.element.graphvizChart as GraphVizChartProto}
-            {...elementProps}
-          />
-        </ElementFullscreenWrapper>
+        <GraphVizChart
+          element={node.element.graphvizChart as GraphVizChartProto}
+          {...elementProps}
+        />
       )
 
     case "heading":
@@ -375,13 +370,11 @@ const RawElementNodeRenderer = (
 
     case "imgs":
       return (
-        <ElementFullscreenWrapper width={widgetProps.width}>
-          <ImageList
-            element={node.element.imgs as ImageListProto}
-            endpoints={props.endpoints}
-            {...elementProps}
-          />
-        </ElementFullscreenWrapper>
+        <ImageList
+          element={node.element.imgs as ImageListProto}
+          endpoints={props.endpoints}
+          {...elementProps}
+        />
       )
 
     case "json":
@@ -480,37 +473,33 @@ const RawElementNodeRenderer = (
       const arrowProto = node.element.arrowDataFrame as ArrowProto
       widgetProps.disabled = widgetProps.disabled || arrowProto.disabled
       return (
-        <ElementFullscreenWrapper width={widgetProps.width}>
-          <ArrowDataFrame
-            element={arrowProto}
-            data={node.quiverElement as Quiver}
-            // Arrow dataframe can be used as a widget (data_editor) or
-            // an element (dataframe). We only want to set the key in case of
-            // it being used as a widget. For the non-widget usage, the id will
-            // be undefined.
-            {...(arrowProto.id && {
-              key: arrowProto.id,
-            })}
-            {...widgetProps}
-          />
-        </ElementFullscreenWrapper>
+        <ArrowDataFrame
+          element={arrowProto}
+          data={node.quiverElement as Quiver}
+          // Arrow dataframe can be used as a widget (data_editor) or
+          // an element (dataframe). We only want to set the key in case of
+          // it being used as a widget. For the non-widget usage, the id will
+          // be undefined.
+          {...(arrowProto.id && {
+            key: arrowProto.id,
+          })}
+          {...widgetProps}
+        />
       )
     }
 
     case "arrowVegaLiteChart":
       const vegaLiteElement = node.vegaLiteChartElement as VegaLiteChartElement
       return (
-        <ElementFullscreenWrapper width={widgetProps.width}>
-          <ArrowVegaLiteChart
-            element={vegaLiteElement}
-            // Vega-lite chart can be used as a widget (when selections are activated) or
-            // an element. We only want to set the key in case of it being used as a widget
-            // since otherwise it might break some apps that show the same charts multiple times.
-            // So we only compute an element ID if it's a widget, otherwise its an empty string.
-            key={vegaLiteElement.id || undefined}
-            {...widgetProps}
-          />
-        </ElementFullscreenWrapper>
+        <ArrowVegaLiteChart
+          element={vegaLiteElement}
+          // Vega-lite chart can be used as a widget (when selections are activated) or
+          // an element. We only want to set the key in case of it being used as a widget
+          // since otherwise it might break some apps that show the same charts multiple times.
+          // So we only compute an element ID if it's a widget, otherwise its an empty string.
+          key={vegaLiteElement.id || undefined}
+          {...widgetProps}
+        />
       )
 
     case "audioInput": {
@@ -688,13 +677,11 @@ const RawElementNodeRenderer = (
     case "plotlyChart": {
       const plotlyProto = node.element.plotlyChart as PlotlyChartProto
       return (
-        <ElementFullscreenWrapper width={widgetProps.width}>
-          <PlotlyChart
-            key={plotlyProto.id}
-            element={plotlyProto}
-            {...widgetProps}
-          />
-        </ElementFullscreenWrapper>
+        <PlotlyChart
+          key={plotlyProto.id}
+          element={plotlyProto}
+          {...widgetProps}
+        />
       )
     }
 

@@ -41,6 +41,7 @@ import { FormClearHelper } from "@streamlit/lib/src/components/widgets/Form"
 import Toolbar from "@streamlit/lib/src/components/shared/Toolbar"
 import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
 import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
+import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
 
 import {
   dataIsAnAppendOfPrev,
@@ -650,4 +651,4 @@ const ArrowVegaLiteChartWrapper = (props: Props): React.ReactElement => {
   )
 }
 
-export default ArrowVegaLiteChartWrapper
+export default withFullScreenWrapper(ArrowVegaLiteChartWrapper)
