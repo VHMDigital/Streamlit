@@ -237,6 +237,7 @@ export type MetricsConfig = {
    * URL to send metrics data to via POST request.
    * Setting to "postMessage" sends metrics events via postMessage to host.
    * Setting to "off" disables metrics collection.
+   * If undefined, metricsUrl requested from centralized config file.
    */
   metricsUrl?: string | "postMessage" | "off"
 }

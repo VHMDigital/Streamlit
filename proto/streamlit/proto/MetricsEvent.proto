@@ -77,9 +77,14 @@ message MetricsEvent {
   string page_script_hash = 37;
   string active_theme = 38;
   int64 total_load_time = 39;
-  string browser_name = 40;
-  string browser_version = 41;
-  string device_type = 42;
+  BrowserInfo browser_info = 40;
 
-  // Next ID: 43
+  // Next ID: 41
+}
+
+message BrowserInfo {
+  string browser_name = 1;
+  string browser_version = 2;
+  string device_type = 3;
+  string os = 4;
 }

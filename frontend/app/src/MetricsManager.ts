@@ -16,12 +16,13 @@
 
 import pick from "lodash/pick"
 import { v4 as uuidv4 } from "uuid"
-import { IGuestToHostMessage } from "lib/src/hostComm/types"
 
 import { initializeSegment } from "@streamlit/app/src/vendor/Segment"
 import {
   DeployedAppMetadata,
   getCookie,
+  IGuestToHostMessage,
+  IMetricsEvent,
   IS_DEV_ENV,
   localStorageAvailable,
   logAlways,
@@ -41,15 +42,8 @@ export const DEFAULT_METRICS_CONFIG = "https://data.streamlit.io/metrics.json"
  * */
 declare const analytics: any
 
-type Event = [string, Record<string, unknown>]
-
-/**
- * A mapping of [component instance name] -> [count] which is used to upload
- * custom component stats when the app is idle.
- */
-export interface CustomComponentCounter {
-  [name: string]: number
-}
+type EventName = "viewReport" | "updateReport" | "pageProfile" | "menuClick"
+type Event = [EventName, Partial<IMetricsEvent>]
 
 export class MetricsManager {
   /** The app's SessionInfo instance. */
@@ -116,7 +110,7 @@ export class MetricsManager {
 
       // If metricsUrl still undefined, deactivate metrics
       if (!this.metricsUrl) {
-        logError("Undefined metrics config")
+        logError("Undefined metrics config - deactivating metrics tracking.")
         this.actuallySendMetrics = false
       }
     }
@@ -130,7 +124,10 @@ export class MetricsManager {
     logAlways("Gather usage stats: ", this.actuallySendMetrics)
   }
 
-  public enqueue(evName: string, evData: Record<string, any> = {}): void {
+  public enqueue(
+    evName: EventName,
+    evData: Partial<IMetricsEvent> = {}
+  ): void {
     if (!this.initialized || !this.sessionInfo.isSet) {
       this.pendingEvents.push([evName, evData])
       return
@@ -175,25 +172,30 @@ export class MetricsManager {
       }
     }
 
-    const response = await fetch(DEFAULT_METRICS_CONFIG, {
-      signal: AbortSignal.timeout(5000),
-    })
-    if (!response.ok) {
-      this.metricsUrl = undefined
-      logError("Failed to fetch metrics config: ", response.status)
-    } else {
-      const data = await response.json()
-      this.metricsUrl = data.url ?? undefined
-      if (isLocalStoreAvailable && this.metricsUrl) {
-        localStorage.setItem("stMetricsConfig", this.metricsUrl)
+    try {
+      const response = await fetch(DEFAULT_METRICS_CONFIG, {
+        signal: AbortSignal.timeout(5000),
+      })
+
+      if (!response.ok) {
+        this.metricsUrl = undefined
+        logError("Failed to fetch metrics config: ", response.status)
+      } else {
+        const data = await response.json()
+        this.metricsUrl = data.url ?? undefined
+        if (isLocalStoreAvailable && this.metricsUrl) {
+          localStorage.setItem("stMetricsConfig", this.metricsUrl)
+        }
       }
+    } catch (err) {
+      logError("Failed to fetch metrics config:", err)
     }
   }
 
   // The schema of metrics events (including key names and value types) should
   // only be changed when requested by the data team. This is why `reportHash`
   // retains its old name.
-  private send(evName: string, evData: Record<string, unknown> = {}): void {
+  private send(evName: EventName, evData: Partial<IMetricsEvent> = {}): void {
     const data = {
       ...evData,
       ...this.getHostTrackingData(),
@@ -235,8 +237,8 @@ export class MetricsManager {
 
   // eslint-disable-next-line class-methods-use-this
   private async track(
-    evName: string,
-    data: Record<string, unknown>,
+    evName: EventName,
+    data: Partial<IMetricsEvent>,
     context: Record<string, unknown>
   ): Promise<void> {
     // Send the event to Segment
@@ -258,8 +260,8 @@ export class MetricsManager {
 
   // Helper to send metrics events to host
   private postMessageEvent(
-    eventName: string,
-    eventData: Record<string, unknown>
+    eventName: EventName,
+    eventData: Partial<IMetricsEvent>
   ): void {
     const eventProto = this.buildEventProto(eventName, eventData)
     this.sendMessageToHost({
@@ -271,8 +273,8 @@ export class MetricsManager {
 
   // Helper to build the event proto
   private buildEventProto(
-    evName: string,
-    data: Record<string, unknown>
+    evName: EventName,
+    data: Partial<IMetricsEvent>
   ): MetricsEvent {
     const eventProto = new MetricsEvent({
       event: evName,
@@ -297,7 +299,7 @@ export class MetricsManager {
   }
 
   // Get the installation IDs from the session
-  private getInstallationData(): Record<string, unknown> {
+  private getInstallationData(): Partial<IMetricsEvent> {
     return {
       machineIdV3: this.sessionInfo.current.installationIdV3,
     }
@@ -319,7 +321,7 @@ export class MetricsManager {
   }
 
   // Get context data for events
-  private getContextData(): Record<string, unknown> {
+  private getContextData(): Partial<IMetricsEvent> {
     return {
       contextPageUrl: window.location.href,
       contextPageTitle: document.title,
