@@ -21,7 +21,9 @@ import {
   Image as ImageProto,
 } from "@streamlit/lib/src/proto"
 import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
-import Toolbar from "@streamlit/lib/src/components/shared/Toolbar"
+import Toolbar, {
+  StyledToolbarElementContainer,
+} from "@streamlit/lib/src/components/shared/Toolbar"
 import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
 import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
 import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
@@ -30,7 +32,6 @@ import {
   StyledCaption,
   StyledImageContainer,
   StyledImageList,
-  StyledImageListContainer,
 } from "./styled-components"
 
 export interface ImageListProps {
@@ -111,13 +112,13 @@ function ImageList({
   }
 
   return (
-    <StyledImageListContainer
+    <StyledToolbarElementContainer
       width={containerWidth}
       height={height}
       useContainerWidth={isFullScreen}
     >
       <Toolbar
-        target={StyledImageListContainer}
+        target={StyledToolbarElementContainer}
         isFullScreen={isFullScreen}
         onExpand={expand}
         onCollapse={collapse}
@@ -146,7 +147,7 @@ function ImageList({
           )
         })}
       </StyledImageList>
-    </StyledImageListContainer>
+    </StyledToolbarElementContainer>
   )
 }
 

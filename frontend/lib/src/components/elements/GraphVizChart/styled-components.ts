@@ -40,13 +40,3 @@ export const StyledGraphVizChart = styled.div<StyledGraphVizChartProps>(
     height: isFullScreen ? "100%" : "auto",
   })
 )
-
-export const StyledGraphVizChartContainer = styled.div<{
-  width?: number
-  height?: number
-  useContainerWidth: boolean
-}>(({ width, height, useContainerWidth }) => ({
-  position: "relative",
-  height: useContainerWidth ? height : "fit-content",
-  width: useContainerWidth ? width : "fit-content",
-}))

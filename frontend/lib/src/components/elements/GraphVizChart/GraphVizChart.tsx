@@ -21,15 +21,14 @@ import { Engine, graphviz } from "d3-graphviz"
 
 import { logError } from "@streamlit/lib/src/util/log"
 import { GraphVizChart as GraphVizChartProto } from "@streamlit/lib/src/proto"
-import Toolbar from "@streamlit/lib/src/components/shared/Toolbar"
+import Toolbar, {
+  StyledToolbarElementContainer,
+} from "@streamlit/lib/src/components/shared/Toolbar"
 import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
 import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
 import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
 
-import {
-  StyledGraphVizChart,
-  StyledGraphVizChartContainer,
-} from "./styled-components"
+import { StyledGraphVizChart } from "./styled-components"
 
 export interface GraphVizChartProps {
   element: GraphVizChartProto
@@ -79,13 +78,13 @@ function GraphVizChart({
   ])
 
   return (
-    <StyledGraphVizChartContainer
+    <StyledToolbarElementContainer
       width={width}
       height={height}
       useContainerWidth={isFullScreen}
     >
       <Toolbar
-        target={StyledGraphVizChartContainer}
+        target={StyledToolbarElementContainer}
         isFullScreen={isFullScreen}
         onExpand={expand}
         onCollapse={collapse}
@@ -97,7 +96,7 @@ function GraphVizChart({
         id={chartId}
         isFullScreen={isFullScreen}
       />
-    </StyledGraphVizChartContainer>
+    </StyledToolbarElementContainer>
   )
 }
 

@@ -42,14 +42,3 @@ export const StyledCaption = styled.div(({ theme }) => ({
   wordWrap: "break-word",
   padding: theme.spacing.threeXS,
 }))
-
-export const StyledImageListContainer = styled.div<{
-  width?: number
-  height?: number
-  useContainerWidth: boolean
-}>(({ width, height, useContainerWidth }) => ({
-  position: "relative",
-  height: useContainerWidth ? height : "fit-content",
-  width: useContainerWidth ? width : "fit-content",
-  maxWidth: "100%",
-}))

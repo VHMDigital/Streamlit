@@ -38,7 +38,9 @@ import { ensureError } from "@streamlit/lib/src/util/ErrorHandling"
 import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
 import { EmotionTheme } from "@streamlit/lib/src/theme"
 import { FormClearHelper } from "@streamlit/lib/src/components/widgets/Form"
-import Toolbar from "@streamlit/lib/src/components/shared/Toolbar"
+import Toolbar, {
+  StyledToolbarElementContainer,
+} from "@streamlit/lib/src/components/shared/Toolbar"
 import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
 import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
 import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
@@ -53,7 +55,6 @@ import {
 } from "./arrowUtils"
 import { applyStreamlitTheme, applyThemeDefaults } from "./CustomTheme"
 import {
-  StyledChartWrapper,
   StyledVegaLiteChartContainer,
   StyledVegaLiteChartTooltips,
 } from "./styled-components"
@@ -601,13 +602,13 @@ export class ArrowVegaLiteChart extends PureComponent<
     // To style the Vega tooltip, we need to apply global styles since
     // the tooltip element is drawn outside of this component.
     return (
-      <StyledChartWrapper
+      <StyledToolbarElementContainer
         width={this.props.width}
         height={this.props.height}
         useContainerWidth={this.props.element.useContainerWidth}
       >
         <Toolbar
-          target={StyledChartWrapper}
+          target={StyledToolbarElementContainer}
           isFullScreen={this.props.isFullScreen}
           onExpand={this.props.expand}
           onCollapse={this.props.collapse}
@@ -623,7 +624,7 @@ export class ArrowVegaLiteChart extends PureComponent<
             this.element = c
           }}
         />
-      </StyledChartWrapper>
+      </StyledToolbarElementContainer>
     )
   }
 }
