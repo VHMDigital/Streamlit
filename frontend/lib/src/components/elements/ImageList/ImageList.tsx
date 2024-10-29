@@ -91,7 +91,7 @@ function ImageList({
       protoWidth
     )
   ) {
-    // Use the column width
+    // Use the column width unless the image is currently fullscreen, then use the fullscreen width
     containerWidth = isFullScreen ? fullScreenWidth : width
   } else if (protoWidth > 0) {
     // Set the image width explicitly.
