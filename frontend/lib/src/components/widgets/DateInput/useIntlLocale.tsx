@@ -60,7 +60,7 @@ const getWeekInfo = (intlLocale: Intl.Locale): IntlWeekInfo | null => {
  * @returns The augmented locale, or en-US if the week information could not be
  * retrieved.
  */
-export const useIntlLocale = (locale: string): Locale | null => {
+export const useIntlLocale = (locale: string): Locale => {
   const weekInfo = useMemo(() => {
     try {
       return getWeekInfo(new Intl.Locale(locale))

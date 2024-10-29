@@ -18,8 +18,6 @@ import React, { FC, useContext } from "react"
 
 import { DatepickerProps, Datepicker as UIDatePicker } from "baseui/datepicker"
 
-import { Skeleton } from "@streamlit/lib/src/components/elements/Skeleton"
-import { Skeleton as SkeletonProto } from "@streamlit/lib/src/proto"
 import { LibContext } from "@streamlit/lib/src/components/core/LibContext"
 
 import { useIntlLocale } from "./useIntlLocale"
@@ -32,20 +30,5 @@ export const UIDatePickerWithLocale: FC<
   const { locale } = useContext(LibContext)
   const loadedLocale = useIntlLocale(locale)
 
-  if (!loadedLocale) {
-    return (
-      <Skeleton
-        element={SkeletonProto.create({
-          style: SkeletonProto.SkeletonStyle.ELEMENT,
-        })}
-      />
-    )
-  }
-
-  const usableLocale =
-    // If the locale could not be loaded, match the previous behavior by
-    // rendering the date picker without a defined locale.
-    loadedLocale instanceof Error ? undefined : loadedLocale
-
-  return <UIDatePicker {...props} locale={usableLocale} />
+  return <UIDatePicker {...props} locale={loadedLocale} />
 }
