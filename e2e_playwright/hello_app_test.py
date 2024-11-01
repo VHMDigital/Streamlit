@@ -26,7 +26,9 @@ def navigate_to_page(app: Page, index: int):
 
 
 def check_page_title(app: Page, title: str) -> None:
-    expect(app.get_by_test_id("stMarkdownContainer").locator("h1").nth(0)).to_contain_text(title)
+    expect(
+        app.get_by_test_id("stMarkdownContainer").locator("h1").nth(0)
+    ).to_contain_text(title)
 
 
 def check_page_icon(app: Page, icon: str, index: int = 0) -> None:
