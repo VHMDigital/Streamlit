@@ -69,7 +69,6 @@ class HtmlMixin:
         """
         html_proto = HtmlProto()
 
-
         # Check if the body is a file path. If it's a Path object, open it directly.
         if os.path.isfile(body) or isinstance(body, Path):
             with open(body, encoding="utf-8") as f:
