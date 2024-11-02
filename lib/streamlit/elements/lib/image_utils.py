@@ -304,10 +304,7 @@ def image_to_url(
 
     # Numpy Arrays (ie opencv)
     elif isinstance(image, np.ndarray):
-        image = _clip_image(
-            _verify_np_shape(image),
-            clamp,
-        )
+        image = _clip_image(_verify_np_shape(image), clamp)
 
         if channels == "BGR":
             if len(cast(NumpyShape, image.shape)) == 3:
