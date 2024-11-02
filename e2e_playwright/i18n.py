@@ -12,8 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from datetime import date
+
 import streamlit as st
 
-st.write("Page 16 - dynamic layout")
-st.button("wide button", on_click=lambda: st.set_page_config(layout="wide"))
-st.button("centered button", on_click=lambda: st.set_page_config(layout="centered"))
+st.date_input(
+    "Single date",
+    date(1970, 1, 1),
+    min_value=date(1970, 1, 1),
+)
