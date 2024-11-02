@@ -37,6 +37,7 @@ def test_audio_has_correct_properties(app: Page):
 def test_audio_end_time(app: Page):
     """Test that `st.audio` end_time property works correctly."""
     audio_element = app.get_by_test_id("stAudio").nth(1)
+    expect(audio_element).to_be_visible()
     audio_element.evaluate("el => el.play()")
     app.wait_for_timeout(5000)
     expect(audio_element).to_have_js_property("paused", True)

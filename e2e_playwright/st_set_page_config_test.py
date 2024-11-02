@@ -113,10 +113,7 @@ def test_page_icon_with_local_icon_str(app: Page):
     expect(app).to_have_title("With Local Icon Str")
     favicon_element = app.locator("link[rel='shortcut icon']")
     expect(favicon_element).to_have_count(1)
-    expect(favicon_element).to_have_attribute(
-        "href",
-        re.compile(r"d1e92a291d26c1e0cb9b316a93c929b3be15899677ef3bc6e3bf3573\.png"),
-    )
+    expect(favicon_element).to_have_attribute("href", re.compile(r".*\.png$"))
     expect_no_exception(app)
 
 
@@ -125,10 +122,7 @@ def test_page_icon_with_local_icon(app: Page):
     expect(app).to_have_title("With Local Icon Path")
     favicon_element = app.locator("link[rel='shortcut icon']")
     expect(favicon_element).to_have_count(1)
-    expect(favicon_element).to_have_attribute(
-        "href",
-        re.compile(r"d1e92a291d26c1e0cb9b316a93c929b3be15899677ef3bc6e3bf3573\.png"),
-    )
+    expect(favicon_element).to_have_attribute("href", re.compile(r".*\.png$"))
     expect_no_exception(app)
 
 

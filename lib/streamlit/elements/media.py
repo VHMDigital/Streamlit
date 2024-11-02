@@ -86,7 +86,7 @@ class MediaMixin:
         Parameters
         ----------
         data : str, Path, bytes, BytesIO, numpy.ndarray, or file
-            Raw audio data, filename (str or Path object), or a URL pointing to the file to load.
+            Raw audio data, file path (str or Path object), or a URL pointing to the file to load.
             Raw data formats must include all necessary file headers to match the file
             format specified via ``format``.
             If ``data`` is a numpy array, it must either be a 1D array of the waveform
@@ -220,7 +220,7 @@ class MediaMixin:
         Parameters
         ----------
         data : str, Path, bytes, io.BytesIO, numpy.ndarray, or file
-            Raw video data, filename (str or Path object), or URL pointing to a video to load.
+            Raw video data, file path (str or Path object), or URL pointing to a video to load.
             Includes support for YouTube URLs.
             Numpy arrays and raw data formats must include all necessary file
             headers to match specified file format.
