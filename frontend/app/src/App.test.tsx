@@ -65,7 +65,7 @@ import {
   SessionEvent,
   SessionStatus,
 } from "@streamlit/lib/src/proto"
-import { SegmentMetricsManager } from "@streamlit/app/src/SegmentMetricsManager"
+import { MetricsManager } from "@streamlit/app/src/MetricsManager"
 import { ConnectionManager } from "@streamlit/app/src/connection/ConnectionManager"
 import { ConnectionState } from "@streamlit/app/src/connection/ConnectionState"
 import {
@@ -166,7 +166,11 @@ jest.mock("@streamlit/lib/src/WidgetStateManager", () => {
   )
 
   const MockedClass = jest.fn().mockImplementation((...props) => {
-    return new actualModule.WidgetStateManager(...props)
+    const widgetStateManager = new actualModule.WidgetStateManager(...props)
+
+    jest.spyOn(widgetStateManager, "sendUpdateWidgetsMessage")
+
+    return widgetStateManager
   })
 
   return {
@@ -175,20 +179,18 @@ jest.mock("@streamlit/lib/src/WidgetStateManager", () => {
   }
 })
 
-jest.mock("@streamlit/app/src/SegmentMetricsManager", () => {
-  const actualModule = jest.requireActual(
-    "@streamlit/app/src/SegmentMetricsManager"
-  )
+jest.mock("@streamlit/app/src/MetricsManager", () => {
+  const actualModule = jest.requireActual("@streamlit/app/src/MetricsManager")
 
   const MockedClass = jest.fn().mockImplementation((...props) => {
-    const metricsMgr = new actualModule.SegmentMetricsManager(...props)
+    const metricsMgr = new actualModule.MetricsManager(...props)
     jest.spyOn(metricsMgr, "enqueue")
     return metricsMgr
   })
 
   return {
     ...actualModule,
-    SegmentMetricsManager: MockedClass,
+    MetricsManager: MockedClass,
   }
 })
 
@@ -221,6 +223,7 @@ const getProps = (extend?: Partial<Props>): Props => ({
     addThemes: jest.fn(),
     setImportedTheme: jest.fn(),
   },
+  streamlitExecutionStartedAt: 100,
   ...extend,
 })
 
@@ -347,7 +350,12 @@ function sendForwardMessage(
 }
 
 function openCacheModal(): void {
-  fireEvent.keyPress(screen.getByTestId("stApp"), {
+  fireEvent.keyDown(document.body, {
+    key: "c",
+    which: 67,
+  })
+
+  fireEvent.keyUp(document.body, {
     key: "c",
     which: 67,
   })
@@ -486,13 +494,28 @@ describe("App", () => {
   it("sends updateReport to our metrics manager", () => {
     renderApp(getProps())
 
-    const metricsManager = getStoredValue<SegmentMetricsManager>(
-      SegmentMetricsManager
-    )
+    const metricsManager = getStoredValue<MetricsManager>(MetricsManager)
 
     sendForwardMessage("newSession", NEW_SESSION_JSON)
 
     expect(metricsManager.enqueue).toHaveBeenCalledWith("updateReport")
+  })
+
+  it("reruns when the user presses 'r'", () => {
+    renderApp(getProps())
+
+    getMockConnectionManager(true)
+
+    const widgetStateManager =
+      getStoredValue<WidgetStateManager>(WidgetStateManager)
+    expect(widgetStateManager.sendUpdateWidgetsMessage).not.toHaveBeenCalled()
+
+    fireEvent.keyDown(document.body, {
+      key: "r",
+      which: 82,
+    })
+
+    expect(widgetStateManager.sendUpdateWidgetsMessage).toHaveBeenCalled()
   })
 
   describe("App.handleNewSession", () => {
@@ -2429,6 +2452,7 @@ describe("App", () => {
           disableFullscreenMode: false,
           enableCustomParentMessages: false,
           mapboxToken: "",
+          metricsUrl: "test.streamlit.io",
           ...options,
         })
       })
@@ -2800,6 +2824,59 @@ describe("App", () => {
           widgetStates: {},
         },
       })
+    })
+
+    it("clears fragment auto rerun intervals when page changes", async () => {
+      prepareHostCommunicationManager()
+
+      // autoRerun uses setInterval under-the-hood, so use fake timers
+      jest.useFakeTimers()
+      sendForwardMessage("autoRerun", {
+        interval: 1, // in seconds
+        fragmentId: "fragmentId",
+      })
+
+      // advance timer X times to trigger the interval-function
+      const times = 3
+      for (let i = 0; i < times; i++) {
+        jest.advanceTimersByTime(1000) // in milliseconds
+      }
+
+      const connectionManager = getMockConnectionManager()
+      expect(connectionManager.sendMessage).toBeCalledTimes(times)
+      // ensure that all calls came from the autoRerun by checking the fragment id
+      for (let i = 0; i < times; i++) {
+        expect(
+          // @ts-expect-error
+          connectionManager.sendMessage.mock.calls[i][0].rerunScript
+        ).toEqual(
+          expect.objectContaining({
+            isAutoRerun: true,
+            fragmentId: "fragmentId",
+          })
+        )
+      }
+
+      // trigger a page change. we use a post message instead
+      // of triggering a pange change via a newSession message,
+      // because a new session also clears the autoRerun intervals
+      fireWindowPostMessage({
+        type: "REQUEST_PAGE_CHANGE",
+        pageScriptHash: "hash1",
+      })
+
+      for (let i = 0; i < times; i++) {
+        jest.advanceTimersByTime(1000) // in milliseconds
+      }
+
+      // make sure that no new messages were sent after switching the page
+      // despite advancing the timer. We could check whether clearInterval
+      // was called, but this check is more observing the behavior than checking
+      // the exact interals.
+      const oldCallCountPlusPageChangeRequest = times + 1
+      expect(connectionManager.sendMessage).toBeCalledTimes(
+        oldCallCountPlusPageChangeRequest
+      )
     })
 
     it("shows hostMenuItems", async () => {

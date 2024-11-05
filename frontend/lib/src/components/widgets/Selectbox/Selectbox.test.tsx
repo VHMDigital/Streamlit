@@ -17,14 +17,13 @@
 import React from "react"
 
 import "@testing-library/jest-dom"
-import { fireEvent, screen } from "@testing-library/react"
+import { act, fireEvent, screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib/src/test_util"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import { Selectbox as SelectboxProto } from "@streamlit/lib/src/proto"
-import { mockTheme } from "@streamlit/lib/src/mocks/mockTheme"
 
-import { Props, Selectbox } from "./Selectbox"
+import Selectbox, { Props } from "./Selectbox"
 
 const getProps = (
   elementProps: Partial<SelectboxProto> = {},
@@ -39,7 +38,6 @@ const getProps = (
   }),
   width: 0,
   disabled: false,
-  theme: mockTheme.emotion,
   widgetMgr: new WidgetStateManager({
     sendRerunBackMsg: jest.fn(),
     formsDataChanged: jest.fn(),
@@ -127,7 +125,9 @@ describe("Selectbox widget", () => {
     )
 
     // "Submit" the form
-    props.widgetMgr.submitForm("form", undefined)
+    act(() => {
+      props.widgetMgr.submitForm("form", undefined)
+    })
 
     // Our widget should be reset, and the widgetMgr should be updated
     expect(screen.getByText("a")).toBeInTheDocument()

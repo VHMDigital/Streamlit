@@ -17,7 +17,7 @@
 import React from "react"
 
 import "@testing-library/jest-dom"
-import { fireEvent, screen } from "@testing-library/react"
+import { act, fireEvent, screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib/src/test_util"
 import { ColorPicker as ColorPickerProto } from "@streamlit/lib/src/proto"
@@ -146,8 +146,10 @@ describe("ColorPicker widget", () => {
       undefined
     )
 
-    // "Submit" the form
-    props.widgetMgr.submitForm("form", undefined)
+    act(() => {
+      // "Submit" the form
+      props.widgetMgr.submitForm("form", undefined)
+    })
 
     // Our widget should be reset, and the widgetMgr should be updated
     expect(colorBlock).toHaveStyle("background-color: #000000")

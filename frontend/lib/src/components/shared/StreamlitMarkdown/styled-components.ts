@@ -34,6 +34,7 @@ function sharedMarkdownStyle(theme: Theme): any {
   return {
     a: {
       color: theme.colors.linkText,
+      textDecoration: "underline",
     },
   }
 }
@@ -68,12 +69,23 @@ export const StyledStreamlitMarkdown =
           // Images in markdown should never be wider
           // than the content area.
           maxWidth: "100%",
+          // In labels, widgets should never be taller than the text.
+          maxHeight: isLabel ? "1em" : undefined,
         },
 
         li: {
+          // TODO(lukasmasuch): We might want to refactor
+          // these settings to use our spacing props instead.
+          // But this would require some styling changes.
           margin: "0.2em 0 0.2em 1.2em",
           padding: "0 0 0 0.6em",
           fontSize: theme.fontSizes.md,
+        },
+
+        blockquote: {
+          margin: "1em 0 1em 0",
+          padding: "0 0 0 1.2em",
+          borderLeft: `${theme.sizes.borderWidth} solid ${theme.colors.lightGray}`,
         },
 
         table: {
@@ -86,7 +98,7 @@ export const StyledStreamlitMarkdown =
         },
 
         "th, td": {
-          padding: "6px 13px",
+          padding: `${theme.spacing.xs} ${theme.spacing.md}`,
           border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
         },
 
@@ -207,15 +219,15 @@ export interface StyledDividerProps {
   color: string
 }
 
-export const StyledDivider = styled.hr<StyledDividerProps>(
+export const StyledHeaderDivider = styled.hr<StyledDividerProps>(
   ({ theme, rainbow, color }) => {
     return {
       // Height needs to be !important due to globalStyles.tsx hr height override - line #170
-      height: "2px !important",
+      height: `${theme.spacing.threeXS} !important`,
       marginTop: theme.spacing.sm,
       marginBottom: theme.spacing.none,
       border: "none",
-      borderRadius: "3px",
+      borderRadius: theme.radii.full,
       ...(rainbow ? { background: color } : { backgroundColor: color }),
     }
   }

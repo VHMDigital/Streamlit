@@ -1,12 +1,13 @@
 {
   "name": "streamlit",
-  "version": "1.38.0",
+  "version": "1.39.0",
   "private": true,
   "workspaces": [
     "app",
     "lib"
   ],
   "scripts": {
+    "postinstall": "patch-package",
     "start": "yarn workspace @streamlit/app start",
     "build": "yarn workspace @streamlit/lib build && yarn workspace @streamlit/app build",
     "buildFast": "yarn buildLib && yarn workspace @streamlit/app buildFast",
