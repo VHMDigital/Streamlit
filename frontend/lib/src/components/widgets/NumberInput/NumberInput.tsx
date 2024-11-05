@@ -467,7 +467,8 @@ export const NumberInput: React.FC<Props> = ({
                 step: step,
                 min: min,
                 max: max,
-                inputMode: "decimal",
+                type: "number",
+                inputMode: "",
               },
               style: {
                 lineHeight: theme.lineHeights.inputWidget,
