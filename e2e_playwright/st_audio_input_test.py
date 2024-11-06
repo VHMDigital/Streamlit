@@ -237,10 +237,10 @@ def test_audio_input_works_in_forms(app: Page):
     submit_button.scroll_into_view_if_needed()
     expect(submit_button).to_be_enabled()
 
-    app.wait_for_timeout(1500)
-
     # Verify the form state has not changed yet
     expect(app.get_by_text("Audio Input in Form: None")).to_be_visible()
+
+    app.wait_for_timeout(1500)
 
     # Submit the form and verify the state update
     click_form_button(app, "Submit")
