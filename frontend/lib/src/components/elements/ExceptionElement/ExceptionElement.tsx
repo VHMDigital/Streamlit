@@ -25,12 +25,12 @@ import { Exception as ExceptionProto } from "@streamlit/lib/src/proto"
 import { StyledCode } from "@streamlit/lib/src/components/elements/CodeBlock/styled-components"
 
 import {
+  StyledExceptionMessage,
   StyledMessageType,
   StyledStackTrace,
+  StyledStackTraceContent,
   StyledStackTraceRow,
   StyledStackTraceTitle,
-  StyledExceptionMessage,
-  StyledStackTraceContent,
 } from "./styled-components"
 
 export interface ExceptionElementProps {

@@ -51,6 +51,6 @@ export const StyledStackTraceContent = styled.div({
   minWidth: "100%",
 })
 
-export const StyledExceptionMessage = styled.div(({ theme }) => ({
+export const StyledExceptionMessage = styled.div({
   wordWrap: "break-word",
-}))
+})
