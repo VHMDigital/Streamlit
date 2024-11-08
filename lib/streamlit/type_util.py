@@ -28,6 +28,7 @@ from typing import (
     Final,
     Iterable,
     Literal,
+    Mapping,
     NamedTuple,
     Protocol,
     Sequence,
@@ -59,7 +60,7 @@ class SupportsStr(Protocol):
     def __str__(self) -> str: ...
 
 
-class CustomDict(Protocol):
+class CustomDict(Protocol, Mapping[Any, Any]):
     """Protocol for Streamlit native custom dictionaries (e.g. session state, secrets, query params).
     that can be converted to a dict.
 
@@ -304,24 +305,19 @@ def is_pydantic_model(obj) -> bool:
     return _is_type_instance(obj, "pydantic.main.BaseModel")
 
 
+def _is_from_streamlit(obj: object) -> bool:
+    """True if the object is from the Streamlit."""
+    return obj.__class__.__module__.startswith("streamlit")
+
+
 def is_custom_dict(obj: object) -> TypeGuard[CustomDict]:
     """True if input looks like one of the Streamlit custom dictionaries."""
-    from streamlit.runtime.context import StreamlitCookies, StreamlitHeaders
-    from streamlit.runtime.secrets import Secrets
-    from streamlit.runtime.state import QueryParamsProxy, SessionStateProxy
-    from streamlit.user_info import UserInfoProxy
 
-    return isinstance(
-        obj,
-        (
-            SessionStateProxy,
-            UserInfoProxy,
-            QueryParamsProxy,
-            StreamlitHeaders,
-            StreamlitCookies,
-            Secrets,
-        ),
-    ) and has_callable_attr(obj, "to_dict")
+    return (
+        isinstance(obj, Mapping)
+        and _is_from_streamlit(obj)
+        and has_callable_attr(obj, "to_dict")
+    )
 
 
 def is_iterable(obj: object) -> TypeGuard[Iterable[Any]]:
