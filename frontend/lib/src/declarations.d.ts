@@ -22,8 +22,6 @@ declare module "@loaders.gl/gltf"
 
 declare module "native-file-system-adapter"
 
-declare module "*.png"
-
 declare module "fzy.js" {
   export function score(pattern: string, subject: string): number
   export function positions(pattern: string, subject: string): Array<number>

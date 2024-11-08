@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+const vitest = require("eslint-plugin-vitest")
+
 module.exports = {
   env: {
     // allow using browser-defined globals like `window` and `document`
@@ -60,10 +62,12 @@ module.exports = {
     "**/vendor/*",
     "**/node_modules/*",
   ],
-  plugins: ["no-relative-import-paths", "streamlit-custom"],
+  plugins: ["no-relative-import-paths", "streamlit-custom", "vitest"],
   // Place to specify ESLint rules.
   // Can be used to overwrite rules specified from the extended configs
   rules: {
+    // Recommended vitest configuration to enforce good testing practices
+    ...vitest.configs.recommended.rules,
     // Use `const` or `let` instead of `var`
     "no-var": "error",
     // We don't use PropTypes

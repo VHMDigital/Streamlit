@@ -2201,7 +2201,7 @@ describe("App", () => {
           interval: 1.0,
           fragmentId: "myFragmentId",
         })
-        jest.advanceTimersByTime(1000)
+        vi.advanceTimersByTime(1000)
       })
       expect(connectionManager.sendMessage).toHaveBeenCalledTimes(1)
       expect(

@@ -534,14 +534,14 @@ describe("truncateDecimals", () => {
 describe("formatMoment", () => {
   beforeAll(() => {
     const d = new Date("2022-04-28T00:00:00Z")
-    jest.useFakeTimers()
-    jest.setSystemTime(d)
+    vi.useFakeTimers()
+    vi.setSystemTime(d)
     timezoneMock.register("UTC")
   })
 
   afterAll(() => {
     timezoneMock.unregister()
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it.each([

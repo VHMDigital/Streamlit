@@ -8,7 +8,7 @@
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "buildFast": "env BUILD_AS_FAST_AS_POSSIBLE=1 vite build",
     "preview": "vite preview",
     "test": "vitest run",
@@ -90,6 +90,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-streamlit-custom": "file:../eslint-plugin-streamlit-custom",
     "eslint-plugin-testing-library": "^6.2.2",
+    "eslint-plugin-vitest": "^0.5.4",
     "hard-source-webpack-plugin": "^0.13.1",
     "jsdom": "24.0.0",
     "polyfill-pseudoclass-has": "^1.0.0",

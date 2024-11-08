@@ -18,6 +18,8 @@ import * as polyfill from "polyfill-pseudoclass-has"
 import "vitest-canvas-mock"
 import { vi } from "vitest"
 
+// TODO(vite-update): This is a placeholder to avoid massive set of
+// changes since vi is mostly a drop-in replacement of jest
 global.jest = vi
 
 if (typeof window.URL.createObjectURL === "undefined") {

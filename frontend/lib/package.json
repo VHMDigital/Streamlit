@@ -154,6 +154,7 @@
     "@types/xxhashjs": "^0.2.2",
     "axios-mock-adapter": "^1.21.4",
     "eslint-plugin-streamlit-custom": "file:../eslint-plugin-streamlit-custom",
+    "eslint-plugin-vitest": "^0.5.4",
     "node-fetch": "2.6.7",
     "patch-package": "^8.0.0",
     "postinstall-postinstall": "^2.1.0",
