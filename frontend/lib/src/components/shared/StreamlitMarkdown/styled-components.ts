@@ -88,6 +88,21 @@ export const StyledStreamlitMarkdown =
           borderLeft: `${theme.sizes.borderWidth} solid ${theme.colors.lightGray}`,
         },
 
+        hr: {
+          margin: "2em 0",
+          padding: 0,
+          // Reset Firefox's gray color
+          color: "inherit",
+          backgroundColor: "transparent",
+          border: "none",
+          borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+          "&:not([size])": {
+            // Set correct height and prevent the size attribute
+            // to make the hr look like an input field
+            height: theme.sizes.borderWidth,
+          },
+        },
+
         table: {
           // Add some space below the markdown tables
           marginBottom: theme.spacing.lg,
