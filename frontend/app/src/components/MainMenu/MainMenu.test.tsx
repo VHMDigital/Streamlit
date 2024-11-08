@@ -16,7 +16,6 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { screen, waitFor, within } from "@testing-library/react"
 
 import { Config, IMenuItem, mockSessionInfo, render } from "@streamlit/lib"
@@ -26,16 +25,16 @@ import { getMenuStructure, openMenu } from "./mainMenuTestHelpers"
 import MainMenu, { Props } from "./MainMenu"
 
 const getProps = (extend?: Partial<Props>): Props => ({
-  aboutCallback: jest.fn(),
-  printCallback: jest.fn(),
-  clearCacheCallback: jest.fn(),
+  aboutCallback: vi.fn(),
+  printCallback: vi.fn(),
+  clearCacheCallback: vi.fn(),
   isServerConnected: true,
-  quickRerunCallback: jest.fn(),
+  quickRerunCallback: vi.fn(),
   hostMenuItems: [],
-  screencastCallback: jest.fn(),
+  screencastCallback: vi.fn(),
   screenCastState: "",
-  sendMessageToHost: jest.fn(),
-  settingsCallback: jest.fn(),
+  sendMessageToHost: vi.fn(),
+  settingsCallback: vi.fn(),
   menuItems: {},
   developmentMode: true,
   metricsMgr: new MetricsManager(mockSessionInfo()),

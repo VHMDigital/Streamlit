@@ -16,7 +16,6 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { fireEvent, screen, waitFor } from "@testing-library/react"
 
 import {
@@ -36,7 +35,7 @@ const getProps = (
   connectionState: ConnectionState.CONNECTED,
   sessionEventDispatcher: new SessionEventDispatcher(),
   scriptRunState: ScriptRunState.RUNNING,
-  rerunScript: jest.fn(),
+  rerunScript: vi.fn(),
   stopScript: () => {},
   allowRunOnSave: true,
   theme: mockTheme.emotion,
@@ -77,7 +76,7 @@ describe("StatusWidget element", () => {
   })
 
   it("renders its tooltip when running and minimized", async () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     render(<StatusWidget {...getProps()} />)
     expect(
       screen.queryByTestId("stTooltipHoverTarget")
@@ -98,7 +97,7 @@ describe("StatusWidget element", () => {
 
     // Reset scrollY for following tests not impacted
     global.scrollY = 0
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it("does not render its tooltip when connected", () => {
@@ -115,8 +114,8 @@ describe("StatusWidget element", () => {
 
   it("sets and unsets the sessionEventConnection", () => {
     const sessionEventDispatcher = new SessionEventDispatcher()
-    const connectSpy = jest.fn()
-    const disconnectSpy = jest.fn()
+    const connectSpy = vi.fn()
+    const disconnectSpy = vi.fn()
     sessionEventDispatcher.onSessionEvent.connect =
       connectSpy.mockImplementation(() => ({
         disconnect: disconnectSpy,
@@ -134,8 +133,7 @@ describe("StatusWidget element", () => {
   })
 
   it("calls stopScript when clicked", async () => {
-    jest.useFakeTimers()
-    const stopScript = jest.fn()
+    const stopScript = vi.fn()
     render(<StatusWidget {...getProps({ stopScript })} />)
 
     const baseButtonHeader = await screen.findByTestId("stBaseButton-header")
@@ -143,12 +141,12 @@ describe("StatusWidget element", () => {
     fireEvent.click(baseButtonHeader)
 
     expect(stopScript).toHaveBeenCalled()
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it("shows the rerun button when script changes", () => {
     const sessionEventDispatcher = new SessionEventDispatcher()
-    const rerunScript = jest.fn()
+    const rerunScript = vi.fn()
 
     render(
       <StatusWidget
@@ -182,7 +180,7 @@ describe("StatusWidget element", () => {
 
   it("shows the always rerun button when script changes", () => {
     const sessionEventDispatcher = new SessionEventDispatcher()
-    const rerunScript = jest.fn()
+    const rerunScript = vi.fn()
 
     render(
       <StatusWidget
@@ -216,7 +214,7 @@ describe("StatusWidget element", () => {
 
   it("does not show the always rerun button when script changes", () => {
     const sessionEventDispatcher = new SessionEventDispatcher()
-    const rerunScript = jest.fn()
+    const rerunScript = vi.fn()
 
     render(
       <StatusWidget
@@ -244,7 +242,7 @@ describe("StatusWidget element", () => {
 
   it("calls always run on save", () => {
     const sessionEventDispatcher = new SessionEventDispatcher()
-    const rerunScript = jest.fn()
+    const rerunScript = vi.fn()
 
     render(
       <StatusWidget
@@ -277,15 +275,15 @@ describe("StatusWidget element", () => {
 
 describe("Running Icon", () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it("renders regular running gif before New Years", async () => {
-    jest.setSystemTime(new Date("December 30, 2022 23:59:00"))
+    vi.setSystemTime(new Date("December 30, 2022 23:59:00"))
 
     render(
       <StatusWidget
@@ -298,7 +296,7 @@ describe("Running Icon", () => {
   })
 
   it("renders firework gif on Dec 31st", async () => {
-    jest.setSystemTime(new Date("December 31, 2022 00:00:00"))
+    vi.setSystemTime(new Date("December 31, 2022 00:00:00"))
 
     render(
       <StatusWidget
@@ -311,7 +309,7 @@ describe("Running Icon", () => {
   })
 
   it("renders firework gif on Jan 6th", async () => {
-    jest.setSystemTime(new Date("January 6, 2023 23:59:00"))
+    vi.setSystemTime(new Date("January 6, 2023 23:59:00"))
 
     render(
       <StatusWidget
@@ -324,7 +322,7 @@ describe("Running Icon", () => {
   })
 
   it("renders regular running gif after New Years", async () => {
-    jest.setSystemTime(new Date("January 7, 2023 00:00:00"))
+    vi.setSystemTime(new Date("January 7, 2023 00:00:00"))
 
     render(
       <StatusWidget
@@ -346,7 +344,7 @@ describe("Running Icon", () => {
     let icon = screen.queryByRole("img")
     expect(icon).not.toBeInTheDocument()
 
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     icon = screen.queryByRole("img")
     expect(icon).toHaveAttribute("src", "/src/assets/img/icon_running.gif")

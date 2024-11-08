@@ -21,21 +21,21 @@ import { tick } from "./test_utils";
 
 describe("Streamlit", () => {
   test("setComponentReady register listeners only once", () => {
-    jest.spyOn(window, "addEventListener");
+    vi.spyOn(window, "addEventListener");
 
     Streamlit.setComponentReady();
     Streamlit.setComponentReady();
 
-    expect(jest.mocked(window.addEventListener).mock.calls).toHaveLength(1);
+    expect(vi.mocked(window.addEventListener).mock.calls).toHaveLength(1);
   });
 
   test("setComponentReady sends message to parent window", () => {
-    jest.spyOn(window.parent, "postMessage");
+    vi.spyOn(window.parent, "postMessage");
 
     Streamlit.setComponentReady();
     Streamlit.setComponentReady();
 
-    expect(jest.mocked(window.parent.postMessage).mock.calls).toEqual([
+    expect(vi.mocked(window.parent.postMessage).mock.calls).toEqual([
       [
         {
           apiVersion: 1,
@@ -56,7 +56,7 @@ describe("Streamlit", () => {
   });
 
   test("setFrameHeight sends height to parent window", () => {
-    jest.spyOn(window.parent, "postMessage");
+    vi.spyOn(window.parent, "postMessage");
     Object.defineProperty(document.body, "scrollHeight", {
       value: 42,
       configurable: true,
@@ -64,7 +64,7 @@ describe("Streamlit", () => {
 
     Streamlit.setFrameHeight();
 
-    expect(jest.mocked(window.parent.postMessage).mock.calls[0]).toEqual([
+    expect(vi.mocked(window.parent.postMessage).mock.calls[0]).toEqual([
       {
         height: 42,
         isStreamlitMessage: true,
@@ -77,7 +77,7 @@ describe("Streamlit", () => {
   });
 
   test("setFrameHeight sends height to parent window only if changed", () => {
-    jest.spyOn(window.parent, "postMessage");
+    vi.spyOn(window.parent, "postMessage");
     let scrollHeight = 42;
     Object.defineProperty(document.body, "scrollHeight", {
       get: () => scrollHeight,
@@ -85,23 +85,23 @@ describe("Streamlit", () => {
     });
 
     Streamlit.setFrameHeight();
-    expect(jest.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
+    expect(vi.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
 
     // Assert that the value is not sent again if height does not change
     Streamlit.setFrameHeight();
-    expect(jest.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
+    expect(vi.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
 
     // Ensure that the NEW value is sent again
     scrollHeight = 420;
     Streamlit.setFrameHeight();
-    expect(jest.mocked(window.parent.postMessage).mock.calls).toHaveLength(2);
+    expect(vi.mocked(window.parent.postMessage).mock.calls).toHaveLength(2);
     expect(
-      jest.mocked(window.parent.postMessage).mock.calls[1][0].height
+      vi.mocked(window.parent.postMessage).mock.calls[1][0].height
     ).toEqual(scrollHeight);
   });
 
   test("setComponentValue should support arrowTable", () => {
-    jest.spyOn(window.parent, "postMessage");
+    vi.spyOn(window.parent, "postMessage");
 
     const table = new ArrowTable(
       EXAMPLE_DF.data,
@@ -110,9 +110,9 @@ describe("Streamlit", () => {
     );
     Streamlit.setComponentValue(table);
 
-    expect(jest.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
+    expect(vi.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
 
-    const parentMessage = jest.mocked(window.parent.postMessage).mock
+    const parentMessage = vi.mocked(window.parent.postMessage).mock
       .calls[0][0];
     // Assert content of message except value. The value is too complex for
     // a simple assertion, so we will validate it separately
@@ -132,12 +132,12 @@ describe("Streamlit", () => {
   });
 
   test("setComponentValue should support JSON values", () => {
-    jest.spyOn(window.parent, "postMessage");
+    vi.spyOn(window.parent, "postMessage");
     Streamlit.setComponentValue("123");
 
-    expect(jest.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
+    expect(vi.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
 
-    expect(jest.mocked(window.parent.postMessage).mock.calls[0]).toEqual([
+    expect(vi.mocked(window.parent.postMessage).mock.calls[0]).toEqual([
       {
         dataType: "json",
         isStreamlitMessage: true,
@@ -149,12 +149,12 @@ describe("Streamlit", () => {
   });
 
   test("setComponentValue should support array buffers", () => {
-    jest.spyOn(window.parent, "postMessage");
+    vi.spyOn(window.parent, "postMessage");
     const value = new Uint8Array([1, 2]).buffer;
     Streamlit.setComponentValue(value);
 
-    expect(jest.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
-    expect(jest.mocked(window.parent.postMessage).mock.calls[0]).toEqual([
+    expect(vi.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
+    expect(vi.mocked(window.parent.postMessage).mock.calls[0]).toEqual([
       {
         dataType: "bytes",
         isStreamlitMessage: true,
@@ -166,12 +166,12 @@ describe("Streamlit", () => {
   });
 
   test("setComponentValue should support typed arrays", () => {
-    jest.spyOn(window.parent, "postMessage");
+    vi.spyOn(window.parent, "postMessage");
     const value = new Uint8Array([1, 2]);
     Streamlit.setComponentValue(value);
 
-    expect(jest.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
-    expect(jest.mocked(window.parent.postMessage).mock.calls[0]).toEqual([
+    expect(vi.mocked(window.parent.postMessage).mock.calls).toHaveLength(1);
+    expect(vi.mocked(window.parent.postMessage).mock.calls[0]).toEqual([
       {
         dataType: "bytes",
         isStreamlitMessage: true,
@@ -183,7 +183,7 @@ describe("Streamlit", () => {
   });
 
   test("data from the parent frame is received and propagated as an event", async () => {
-    const streamlitEventsListener = jest.fn();
+    const streamlitEventsListener = vi.fn();
     Streamlit.events.addEventListener(
       "streamlit:render",
       streamlitEventsListener
@@ -203,7 +203,7 @@ describe("Streamlit", () => {
   });
 
   test("The parent frame can set the theme", async () => {
-    const streamlitEventsListener = jest.fn();
+    const streamlitEventsListener = vi.fn();
     Streamlit.events.addEventListener(
       "streamlit:render",
       streamlitEventsListener
@@ -252,7 +252,7 @@ describe("Streamlit", () => {
 
     expect(
       document.getElementById(Streamlit.INJECTED_STYLE_ELEMENT_ID)
-    ).toBeInstanceOf(HTMLStyleElement)
+    ).toBeInstanceOf(HTMLStyleElement);
     expect(
       document.querySelectorAll(`style#${Streamlit.INJECTED_STYLE_ELEMENT_ID}`)
     ).toHaveLength(1);
@@ -269,7 +269,7 @@ describe("Streamlit", () => {
   });
 
   test("The parent frame can sent plain arguments", async () => {
-    const streamlitEventsListener = jest.fn();
+    const streamlitEventsListener = vi.fn();
     Streamlit.events.addEventListener(
       "streamlit:render",
       streamlitEventsListener
@@ -294,7 +294,7 @@ describe("Streamlit", () => {
   });
 
   test("The parent frame can sent dataframe", async () => {
-    const streamlitEventsListener = jest.fn();
+    const streamlitEventsListener = vi.fn();
     Streamlit.events.addEventListener(
       "streamlit:render",
       streamlitEventsListener
@@ -332,7 +332,7 @@ describe("Streamlit", () => {
   });
 
   test("The parent frame can disable component", async () => {
-    const streamlitEventsListener = jest.fn();
+    const streamlitEventsListener = vi.fn();
     Streamlit.events.addEventListener(
       "streamlit:render",
       streamlitEventsListener
