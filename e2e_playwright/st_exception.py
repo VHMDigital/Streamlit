@@ -49,7 +49,3 @@ st.exception(markdown_exception)
 # which would cause tests to fail.
 if st.button("Raise exception"):
     raise basic_exception
-
-
-
-
