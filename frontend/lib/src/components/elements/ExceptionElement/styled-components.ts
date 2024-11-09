@@ -38,6 +38,7 @@ export const StyledStackTrace = styled.pre(({ theme }) => ({
   wordWrap: "break-word",
   color: "inherit",
   fontSize: theme.fontSizes.sm,
+  fontFamily: theme.genericFonts.codeFont,
   backgroundColor: theme.colors.transparent,
   overflowX: "auto",
   margin: `0 0 ${theme.spacing.lg} 0`,

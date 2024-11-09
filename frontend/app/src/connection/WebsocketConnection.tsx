@@ -596,7 +596,9 @@ export class WebsocketConnection {
   }
 }
 
-export const StyledBashCode = styled.code({
+export const StyledBashCode = styled.code(({ theme }) => ({
+  fontFamily: theme.genericFonts.codeFont,
+  fontSize: theme.fontSizes.sm,
   "&::before": {
     content: '"$"',
     // eslint-disable-next-line streamlit-custom/no-hardcoded-theme-values

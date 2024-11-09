@@ -43,6 +43,7 @@ const codeBlockStyle = (theme: Theme): React.CSSProperties => ({
   border: 0,
   color: "inherit",
   display: "inline",
+  fontFamily: theme.genericFonts.codeFont,
   fontSize: theme.fontSizes.sm,
   lineHeight: "inherit",
   margin: 0,
@@ -69,6 +70,7 @@ export const StyledPre = styled.pre(({ theme }) => ({
   borderRadius: theme.radii.default,
   color: theme.colors.bodyText,
   fontSize: theme.fontSizes.twoSm,
+  fontFamily: theme.genericFonts.codeFont,
   display: "block",
   // Remove browser default top margin
   margin: 0,
