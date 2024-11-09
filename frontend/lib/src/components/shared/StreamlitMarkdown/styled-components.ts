@@ -205,6 +205,14 @@ export const StyledStreamlitMarkdown =
           borderLeft: `${theme.sizes.borderWidth} solid ${theme.colors.lightGray}`,
         },
 
+        "b, strong": {
+          fontWeight: theme.fontWeights.bold,
+        },
+
+        small: {
+          fontSize: theme.fontSizes.sm,
+        },
+
         // Handles the horizontal divider:
         hr: {
           margin: "2em 0",
@@ -245,10 +253,6 @@ export const StyledStreamlitMarkdown =
           padding: `${theme.spacing.threeXS} ${theme.spacing.twoXS}`,
           margin: theme.spacing.none,
           borderRadius: theme.radii.md,
-        },
-
-        small: {
-          fontSize: theme.fontSizes.sm,
         },
 
         ...(isToast
