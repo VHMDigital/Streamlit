@@ -16,7 +16,7 @@
 
 import React from "react"
 
-import { fireEvent, screen, waitFor } from "@testing-library/react"
+import { fireEvent, screen } from "@testing-library/react"
 
 import {
   mockTheme,
@@ -75,7 +75,7 @@ describe("StatusWidget element", () => {
     expect(screen.getByTestId("stTooltipHoverTarget")).toBeInTheDocument()
   })
 
-  it("renders its tooltip when running and minimized", async () => {
+  it("renders its tooltip when running and minimized", () => {
     vi.useFakeTimers()
     render(<StatusWidget {...getProps()} />)
     expect(
@@ -86,18 +86,11 @@ describe("StatusWidget element", () => {
     global.scrollY = 50
 
     render(<StatusWidget {...getProps()} />)
-    await waitFor(
-      () => {
-        expect(screen.getByTestId("stTooltipHoverTarget")).toBeInTheDocument()
-      },
-      {
-        timeout: 550,
-      }
-    )
+    vi.runAllTimers()
+    expect(screen.getByTestId("stTooltipHoverTarget")).toBeInTheDocument()
 
     // Reset scrollY for following tests not impacted
     global.scrollY = 0
-    vi.useRealTimers()
   })
 
   it("does not render its tooltip when connected", () => {
@@ -132,16 +125,17 @@ describe("StatusWidget element", () => {
     expect(disconnectSpy).toHaveBeenCalled()
   })
 
-  it("calls stopScript when clicked", async () => {
+  it("calls stopScript when clicked", () => {
+    vi.useFakeTimers()
     const stopScript = vi.fn()
     render(<StatusWidget {...getProps({ stopScript })} />)
 
-    const baseButtonHeader = await screen.findByTestId("stBaseButton-header")
+    vi.runAllTimers()
+    const baseButtonHeader = screen.getByTestId("stBaseButton-header")
 
     fireEvent.click(baseButtonHeader)
 
     expect(stopScript).toHaveBeenCalled()
-    vi.useRealTimers()
   })
 
   it("shows the rerun button when script changes", () => {
@@ -282,7 +276,7 @@ describe("Running Icon", () => {
     vi.useRealTimers()
   })
 
-  it("renders regular running gif before New Years", async () => {
+  it("renders regular running gif before New Years", () => {
     vi.setSystemTime(new Date("December 30, 2022 23:59:00"))
 
     render(
@@ -291,11 +285,13 @@ describe("Running Icon", () => {
       />
     )
 
-    const icon = await screen.findByRole("img")
+    vi.runAllTimers()
+
+    const icon = screen.queryByRole("img")
     expect(icon).toHaveAttribute("src", "/src/assets/img/icon_running.gif")
   })
 
-  it("renders firework gif on Dec 31st", async () => {
+  it("renders firework gif on Dec 31st", () => {
     vi.setSystemTime(new Date("December 31, 2022 00:00:00"))
 
     render(
@@ -304,11 +300,13 @@ describe("Running Icon", () => {
       />
     )
 
-    const icon = await screen.findByRole("img")
+    vi.runAllTimers()
+
+    const icon = screen.queryByRole("img")
     expect(icon).toHaveAttribute("src", "/src/assets/img/fireworks.gif")
   })
 
-  it("renders firework gif on Jan 6th", async () => {
+  it("renders firework gif on Jan 6th", () => {
     vi.setSystemTime(new Date("January 6, 2023 23:59:00"))
 
     render(
@@ -317,7 +315,9 @@ describe("Running Icon", () => {
       />
     )
 
-    const icon = await screen.findByRole("img")
+    vi.runAllTimers()
+
+    const icon = screen.queryByRole("img")
     expect(icon).toHaveAttribute("src", "/src/assets/img/fireworks.gif")
   })
 
@@ -330,7 +330,9 @@ describe("Running Icon", () => {
       />
     )
 
-    const icon = await screen.findByRole("img")
+    vi.runAllTimers()
+
+    const icon = screen.queryByRole("img")
     expect(icon).toHaveAttribute("src", "/src/assets/img/icon_running.gif")
   })
 

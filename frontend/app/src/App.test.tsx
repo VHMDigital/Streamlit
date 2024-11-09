@@ -2900,7 +2900,7 @@ describe("App", () => {
       )
     })
 
-    it("shows hostMenuItems", async () => {
+    it("shows hostMenuItems", () => {
       // We need this to use the Main Menu Button
       // eslint-disable-next-line testing-library/render-result-naming-convention
       const app = renderApp(getProps())
@@ -2915,7 +2915,7 @@ describe("App", () => {
       })
 
       sendForwardMessage("newSession", NEW_SESSION_JSON)
-      await openMenu(screen)
+      openMenu(screen)
       let menuStructure = getMenuStructure(app)
       expect(menuStructure).toEqual([
         [

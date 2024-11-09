@@ -19,6 +19,10 @@ import "vitest-canvas-mock"
 import { vi } from "vitest"
 import "@testing-library/jest-dom/vitest"
 
+// In the event a sub-library uses the jest global, we need to make sure it's
+// aliased to the vi global. An example is timers using react testing library
+global.jest = vi
+
 if (typeof window.URL.createObjectURL === "undefined") {
   window.URL.createObjectURL = vi.fn()
 }

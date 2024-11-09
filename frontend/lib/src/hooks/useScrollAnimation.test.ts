@@ -66,8 +66,6 @@ describe("useScrollAnimation", () => {
 
     // Assert that onEnd callback is called
     expect(onEndMock).toHaveBeenCalled()
-
-    vi.useRealTimers()
   })
 
   it("should register and deregister the correct events", () => {
@@ -101,8 +99,6 @@ describe("useScrollAnimation", () => {
       "wheel",
       expect.any(Function)
     )
-
-    vi.useRealTimers()
   })
 
   it("should not animate scroll if target element is null", () => {
