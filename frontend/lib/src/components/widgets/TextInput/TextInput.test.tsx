@@ -221,7 +221,7 @@ describe("TextInput widget", () => {
   it("does not sync widget value when value did not change", async () => {
     const user = userEvent.setup()
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "setStringValue")
     render(<TextInput {...props} />)
     const textInput = screen.getByRole("textbox")
 
