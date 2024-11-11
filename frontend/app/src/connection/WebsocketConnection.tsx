@@ -604,7 +604,7 @@ export const StyledBashCode = styled.code(({ theme }) => ({
     // eslint-disable-next-line streamlit-custom/no-hardcoded-theme-values
     marginRight: "1ex",
   },
-})
+}))
 
 /**
  * Attempts to connect to the URIs in uriList (in round-robin fashion) and
