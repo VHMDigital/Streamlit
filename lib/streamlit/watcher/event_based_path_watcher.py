@@ -99,8 +99,6 @@ class EventBasedPathWatcher:
             If True, the watcher will not raise an exception if the path does
             not exist. This can be used to watch for the creation of a file or
             directory at a given path.
-        custom_watch_path : str or None
-
         """
         self._path = os.path.abspath(path)
         self._on_changed = on_changed
@@ -149,7 +147,6 @@ class _MultiPathWatcher:
 
     def __init__(self) -> None:
         """Constructor."""
-        _LOGGER.debug("Initializing MultiPathWatcher")
         _MultiPathWatcher._singleton = self
 
         # Map of folder_to_watch -> _FolderEventHandler.
