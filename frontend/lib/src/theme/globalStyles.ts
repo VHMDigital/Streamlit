@@ -240,15 +240,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     border-style: none;
   }
 
-  // Summary
-  //
-  // 1. Add the correct display in all browsers
-
-  summary {
-    display: list-item; // 1
-    cursor: pointer;
-  }
-
   // Hidden attribute
   //
   // Always hide an element with the hidden HTML attribute.
