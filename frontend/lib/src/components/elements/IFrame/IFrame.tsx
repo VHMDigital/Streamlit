@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React, { CSSProperties, ReactElement } from "react"
+import React, { ReactElement } from "react"
 
 import {
   isNullOrUndefined,
