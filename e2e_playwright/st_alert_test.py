@@ -59,10 +59,10 @@ def test_check_top_level_class(app: Page):
 
 
 def test_material_symbol_from_latest_font_version_rendering(
-    themed_app: Page, assert_snapshot: ImageCompareFunction
+    app: Page, assert_snapshot: ImageCompareFunction
 ):
     """Test that icon from latest version material symbols font renders correctly."""
-    alert_elements = themed_app.get_by_test_id("stAlert")
+    alert_elements = app.get_by_test_id("stAlert")
     expect(alert_elements).to_have_count(22)
 
     assert_snapshot(alert_elements.nth(21), name="st_alert-latest_material_symbol")
