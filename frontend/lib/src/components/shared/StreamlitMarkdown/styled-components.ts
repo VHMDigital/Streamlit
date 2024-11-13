@@ -170,6 +170,7 @@ export const StyledStreamlitMarkdown =
         fontFamily: theme.genericFonts.bodyFont,
         fontSize: useSmallerFontSize ? theme.fontSizes.sm : theme.fontSizes.md,
         marginBottom: isLabel ? "" : `-${theme.spacing.lg}`,
+        opacity: isCaption ? 0.6 : undefined,
         color: "inherit",
         ...sharedMarkdownStyle(theme),
         ...getMarkdownHeadingDefinitions(
@@ -264,14 +265,6 @@ export const StyledStreamlitMarkdown =
         "p, ol, ul, dl, li": {
           fontSize: "inherit",
         },
-
-        ...(isCaption
-          ? {
-              color: isInSidebarOrDialog
-                ? theme.colors.gray
-                : theme.colors.fadedText60,
-            }
-          : {}),
       }
     }
   )
