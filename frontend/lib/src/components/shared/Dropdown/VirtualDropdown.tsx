@@ -68,6 +68,8 @@ const VirtualDropdown = React.forwardRef<any, any>((props, ref) => {
           height: theme.sizes.emptyDropdownHeight,
           paddingBottom: theme.spacing.none,
           paddingTop: theme.spacing.none,
+          paddingLeft: theme.spacing.none,
+          paddingRight: theme.spacing.none,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
