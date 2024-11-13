@@ -216,10 +216,6 @@ export const StyledStreamlitMarkdown =
           fontWeight: theme.fontWeights.bold,
         },
 
-        small: {
-          fontSize: "0.875em",
-        },
-
         // Handles the horizontal divider:
         hr: {
           margin: "2em 0",
