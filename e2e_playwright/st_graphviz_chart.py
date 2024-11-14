@@ -98,3 +98,5 @@ digraph Dot {
 }
 """
 st.graphviz_chart(dot_code)
+
+st.graphviz_chart(dot_code, use_container_width=True)
