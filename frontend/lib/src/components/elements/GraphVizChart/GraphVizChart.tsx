@@ -28,10 +28,7 @@ import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/E
 import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
 import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
 
-import {
-  StyledGraphVizChart,
-  StyledGraphVizChartWrapper,
-} from "./styled-components"
+import { StyledGraphVizChart } from "./styled-components"
 
 export interface GraphVizChartProps {
   element: GraphVizChartProto
@@ -84,7 +81,7 @@ function GraphVizChart({
     <StyledToolbarElementContainer
       width={width}
       height={height}
-      useContainerWidth={isFullScreen}
+      useContainerWidth={isFullScreen || element.useContainerWidth}
     >
       <Toolbar
         target={StyledToolbarElementContainer}
@@ -93,14 +90,12 @@ function GraphVizChart({
         onCollapse={collapse}
         disableFullscreenMode={disableFullscreenMode}
       ></Toolbar>
-      <StyledGraphVizChartWrapper width={width} height={height}>
-        <StyledGraphVizChart
-          className="stGraphVizChart"
-          data-testid="stGraphVizChart"
-          id={chartId}
-          isFullScreen={isFullScreen}
-        />
-      </StyledGraphVizChartWrapper>
+      <StyledGraphVizChart
+        className="stGraphVizChart"
+        data-testid="stGraphVizChart"
+        id={chartId}
+        isFullScreen={isFullScreen}
+      />
     </StyledToolbarElementContainer>
   )
 }

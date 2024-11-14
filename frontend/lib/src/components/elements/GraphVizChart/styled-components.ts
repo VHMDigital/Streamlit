@@ -40,11 +40,3 @@ export const StyledGraphVizChart = styled.div<StyledGraphVizChartProps>(
     height: isFullScreen ? "100%" : "auto",
   })
 )
-
-export const StyledGraphVizChartWrapper = styled.div<{
-  width: number
-  height: number | undefined
-}>(({ width, height }) => ({
-  height,
-  width,
-}))

@@ -99,4 +99,11 @@ digraph Dot {
 """
 st.graphviz_chart(dot_code)
 
-st.graphviz_chart(dot_code, use_container_width=True)
+
+horizontal_flow_chart = """
+digraph Dot {
+  rankdir=LR;
+  A -> B -> C -> D -> {F}
+}
+"""
+st.graphviz_chart(horizontal_flow_chart, use_container_width=True)
