@@ -36,6 +36,7 @@ from typing import (
     TypeVar,
     Union,
     overload,
+    runtime_checkable,
 )
 
 from typing_extensions import TypeAlias, TypeGuard
@@ -59,6 +60,11 @@ NumpyShape: TypeAlias = Tuple[int, ...]
 
 class SupportsStr(Protocol):
     def __str__(self) -> str: ...
+
+
+@runtime_checkable
+class SupportsReprHtml(Protocol):
+    def _repr_html_(self) -> str: ...
 
 
 class CustomDict(Protocol):

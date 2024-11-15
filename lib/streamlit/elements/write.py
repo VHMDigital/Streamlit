@@ -499,7 +499,7 @@ class WriteMixin:
                 # https://github.com/python/mypy/issues/12933
                 self.dg.help(cast(type, arg))
             elif (
-                type_util.has_callable_attr(arg, "_repr_html_")
+                isinstance(arg, type_util.SupportsReprHtml)
                 and (repr_html := arg._repr_html_())
                 and (unsafe_allow_html or not probably_contains_html_tags(repr_html))
             ):
