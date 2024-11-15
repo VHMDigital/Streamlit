@@ -16,11 +16,12 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from streamlit.proto.Html_pb2 import Html as HtmlProto
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.string_util import clean_text
+from streamlit.type_util import has_callable_attr
 
 if TYPE_CHECKING:
     from streamlit.delta_generator import DeltaGenerator
@@ -46,13 +47,16 @@ class HtmlMixin:
 
         Parameters
         ----------
-        body : str, Path
+        body : str, Path, any
             The HTML code to insert, or path to an HTML code file which is
             loaded and inserted.
 
             If the provided string is the path of a local file, Streamlit will
             load the file and render its contents as HTML. Otherwise, Streamlit
             will render the string directly as HTML.
+
+            If this argument is an object with a `_repr_html_` method, this
+            will call `_repr_html_` and render the output.
 
         Example
         -------
@@ -69,15 +73,27 @@ class HtmlMixin:
         """
         html_proto = HtmlProto()
 
+        if has_callable_attr(body, "_repr_html_"):
+            html_proto.body = body._repr_html_()
+
         # Check if the body is a file path. If it's a Path object, open it directly.
-        if os.path.isfile(body) or isinstance(body, Path):
+        elif isfile(body) or isinstance(body, Path):
             with open(body, encoding="utf-8") as f:
                 html_proto.body = f.read()
+
         else:
             html_proto.body = clean_text(body)
+
         return self.dg._enqueue("html", html_proto)
 
     @property
     def dg(self) -> DeltaGenerator:
         """Get our DeltaGenerator."""
         return cast("DeltaGenerator", self)
+
+
+def isfile(obj: Any) -> bool:
+    try:
+        return os.path.isfile(obj)
+    except TypeError:
+        return False

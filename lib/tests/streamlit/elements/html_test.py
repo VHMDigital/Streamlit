@@ -41,3 +41,17 @@ class StHtmlAPITest(DeltaGeneratorTestCase):
 
         el = self.get_delta_from_queue().new_element
         self.assertEqual(el.html.body, "<button>Corgi</button>")
+
+    def test_st_html_with_repr_html(self):
+        """Test st.html with _repr_html_."""
+
+        class MyClass:
+            def _repr_html_(self):
+                return "<div>hi</div>"
+
+        obj = MyClass()
+
+        st.html(obj)
+
+        el = self.get_delta_from_queue().new_element
+        self.assertEqual(el.html.body, "<div>hi</div>")
