@@ -495,6 +495,8 @@ class WriteMixin:
             elif (
                 inspect.isgenerator(arg)
                 or inspect.isgeneratorfunction(arg)
+                or inspect.isasyncgenfunction(arg)
+                or inspect.isasyncgen(arg)
                 or type_util.is_type(arg, "openai.Stream")
             ):
                 flush_buffer()

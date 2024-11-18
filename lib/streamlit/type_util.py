@@ -442,15 +442,17 @@ def async_generator_to_sync(
     try:
         loop = asyncio.get_running_loop()
     except RuntimeError:
-        # No event loop is running; safe to create a new one
+        # No event loop is running; it is safe to create a new one
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         close_loop = True
 
     try:
+        # Iterate over the async generator until it raises StopAsyncIteration
         while True:
             yield loop.run_until_complete(async_gen.__anext__())
     except StopAsyncIteration:
+        # The async generator has finished
         pass
     finally:
         if close_loop:
