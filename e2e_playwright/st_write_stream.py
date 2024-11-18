@@ -31,7 +31,7 @@ laboris nisi ut aliquip ex ea commodo consequat.
 
 
 button_group = st.container()
-stream_output = st.container()
+stream_output = st.container(key="stream-output")
 
 # Replay the last output:
 if "written_content" in st.session_state:

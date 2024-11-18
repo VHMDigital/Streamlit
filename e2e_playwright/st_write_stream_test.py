@@ -15,7 +15,11 @@
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction, rerun_app
-from e2e_playwright.shared.app_utils import click_button, expect_markdown
+from e2e_playwright.shared.app_utils import (
+    click_button,
+    expect_markdown,
+    get_element_by_key,
+)
 
 
 def test_stream_generator(app: Page, assert_snapshot: ImageCompareFunction):
@@ -31,8 +35,8 @@ def test_stream_generator(app: Page, assert_snapshot: ImageCompareFunction):
     # Check that the dataframe is visible:
     expect(app.get_by_test_id("stDataFrame")).to_be_visible()
 
-    main_container = app.get_by_test_id("stVerticalBlock").nth(0)
-    assert_snapshot(main_container, name="st_write_stream-generator_output")
+    stream_output = get_element_by_key(app, "stream-output")
+    assert_snapshot(stream_output, name="st_write_stream-generator_output")
 
     # Test that the rerun will output the same elements via st.write:
     rerun_app(app)
@@ -44,9 +48,9 @@ def test_stream_generator(app: Page, assert_snapshot: ImageCompareFunction):
     # Check that the dataframe is visible:
     expect(app.get_by_test_id("stDataFrame")).to_be_visible()
 
-    main_container = app.get_by_test_id("stVerticalBlock").nth(0)
     # Test with the same snapshot name to make sure the output is the same:
-    assert_snapshot(main_container, name="st_write_stream-generator_output")
+    stream_output = get_element_by_key(app, "stream-output")
+    assert_snapshot(stream_output, name="st_write_stream-generator_output")
 
 
 def test_async_generator(app: Page, assert_snapshot: ImageCompareFunction):
@@ -60,8 +64,8 @@ def test_async_generator(app: Page, assert_snapshot: ImageCompareFunction):
     # Check that the dataframe is visible:
     expect(app.get_by_test_id("stDataFrame")).to_be_visible()
 
-    main_container = app.get_by_test_id("stVerticalBlock").nth(0)
-    assert_snapshot(main_container, name="st_write_stream-async_generator_output")
+    stream_output = get_element_by_key(app, "stream-output")
+    assert_snapshot(stream_output, name="st_write_stream-async_generator_output")
 
     # Test that the rerun will output the same elements via st.write:
     rerun_app(app)
@@ -72,6 +76,7 @@ def test_async_generator(app: Page, assert_snapshot: ImageCompareFunction):
 
     # Check that the dataframe is visible:
     expect(app.get_by_test_id("stDataFrame")).to_be_visible()
-    main_container = app.get_by_test_id("stVerticalBlock").nth(0)
+
     # Test with the same snapshot name to make sure the output is the same:
-    assert_snapshot(main_container, name="st_write_stream-async_generator_output")
+    stream_output = get_element_by_key(app, "stream-output")
+    assert_snapshot(stream_output, name="st_write_stream-async_generator_output")
