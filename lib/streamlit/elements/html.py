@@ -18,10 +18,10 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
+from streamlit import type_util
 from streamlit.proto.Html_pb2 import Html as HtmlProto
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.string_util import clean_text
-from streamlit.type_util import SupportsReprHtml
 
 if TYPE_CHECKING:
     from streamlit.delta_generator import DeltaGenerator
@@ -75,8 +75,8 @@ class HtmlMixin:
         html_proto = HtmlProto()
 
         # If body supports _repr_html_, use that.
-        if isinstance(body, SupportsReprHtml):
-            html_proto.body = body._repr_html_()
+        if type_util.has_callable_attr(body, "_repr_html_"):
+            html_proto.body = cast(type_util.SupportsReprHtml, body)._repr_html_()
 
         # If body is a str that doesn't look like a file path, use that.
         # (This avoids a filesystem lookup later on. Premature optimization, I know. But

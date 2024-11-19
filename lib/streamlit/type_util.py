@@ -36,7 +36,6 @@ from typing import (
     TypeVar,
     Union,
     overload,
-    runtime_checkable,
 )
 
 from typing_extensions import TypeAlias, TypeGuard
@@ -62,12 +61,10 @@ class SupportsStr(Protocol):
     def __str__(self) -> str: ...
 
 
-@runtime_checkable
 class SupportsReprHtml(Protocol):
     def _repr_html_(self) -> str: ...
 
 
-@runtime_checkable
 class CustomDict(Protocol):
     """Protocol for Streamlit native custom dictionaries (e.g. session state, secrets, query params).
     that can be converted to a dict.
@@ -338,7 +335,7 @@ def is_custom_dict(obj: object) -> TypeGuard[CustomDict]:
     return (
         isinstance(obj, Mapping)
         and _is_from_streamlit(obj)
-        and isinstance(obj, CustomDict)
+        and has_callable_attr(obj, "to_dict")
     )
 
 
