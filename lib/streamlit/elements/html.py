@@ -18,10 +18,10 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
-from streamlit import type_util
 from streamlit.proto.Html_pb2 import Html as HtmlProto
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.string_util import clean_text
+from streamlit.type_util import SupportsReprHtml, SupportsStr, has_callable_attr
 
 if TYPE_CHECKING:
     from streamlit.delta_generator import DeltaGenerator
@@ -31,7 +31,7 @@ class HtmlMixin:
     @gather_metrics("html")
     def html(
         self,
-        body: str | Path | Any,
+        body: str | Path | SupportsStr | SupportsReprHtml,
     ) -> DeltaGenerator:
         """Insert HTML into your app.
 
@@ -47,7 +47,7 @@ class HtmlMixin:
 
         Parameters
         ----------
-        body : str, Path, Any
+        body : str or Path or object
             The HTML code to insert, or path to an HTML code file which is
             loaded and inserted.
 
@@ -75,18 +75,12 @@ class HtmlMixin:
         html_proto = HtmlProto()
 
         # If body supports _repr_html_, use that.
-        if type_util.has_callable_attr(body, "_repr_html_"):
-            html_proto.body = cast(type_util.SupportsReprHtml, body)._repr_html_()
-
-        # If body is a str that doesn't look like a file path, use that.
-        # (This avoids a filesystem lookup later on. Premature optimization, I know. But
-        # it feels right!)
-        elif _is_str_but_unlikely_a_path(body):
-            html_proto.body = clean_text(body)
+        if has_callable_attr(body, "_repr_html_"):
+            html_proto.body = cast(SupportsReprHtml, body)._repr_html_()
 
         # Check if the body is a file path. May include filesystem lookup.
         elif isinstance(body, Path) or _is_file(body):
-            with open(body, encoding="utf-8") as f:
+            with open(cast(str, body), encoding="utf-8") as f:
                 html_proto.body = f.read()
 
         # OK, let's just try converting to string and hope for the best.
@@ -110,16 +104,3 @@ def _is_file(obj: Any) -> bool:
         return os.path.isfile(obj)
     except TypeError:
         return False
-
-
-def _is_str_but_unlikely_a_path(obj: Any) -> bool:
-    """Cheap test of whether a string that could be HTML looks like a file path.
-
-    File paths are extremely unlikely to have "<" or "\n", so if they're present in
-    the string we assume HTML. This is not guaranteed to be correct, but it's probably
-    correct 100% of times in real-world use cases, so it feels like a good solution.
-    """
-    if not isinstance(obj, str):
-        return False
-
-    return any(c in obj for c in ["<", "\n"])
