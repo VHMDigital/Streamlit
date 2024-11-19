@@ -230,6 +230,11 @@ class StreamlitWriteTest(unittest.TestCase):
 
             p.assert_called_once()
 
+        with patch("streamlit.delta_generator.DeltaGenerator.write_stream") as p:
+            st.write(async_gen_function())
+
+            p.assert_called_once()
+
     @patch("streamlit.type_util.is_type")
     def test_openai_stream(self, is_type):
         """Test st.write with openai.Stream."""
