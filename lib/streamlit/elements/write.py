@@ -164,12 +164,10 @@ class WriteMixin:
                 streamed_response = ""
 
         # Make sure we have a generator and not just a generator function.
-        stream = (
-            stream()
-            if inspect.isgeneratorfunction(stream) or inspect.isasyncgenfunction(stream)
-            else stream
-        )
+        if inspect.isgeneratorfunction(stream) or inspect.isasyncgenfunction(stream):
+            stream = stream()
 
+        # If the stream is an async generator, convert it to a sync generator:
         if inspect.isasyncgen(stream):
             stream = type_util.async_generator_to_sync(stream)
 
