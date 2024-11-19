@@ -85,7 +85,7 @@ class HtmlMixin:
 
         # OK, let's just try converting to string and hope for the best.
         else:
-            html_proto.body = clean_text(body)
+            html_proto.body = clean_text(cast(SupportsStr, body))
 
         return self.dg._enqueue("html", html_proto)
 
