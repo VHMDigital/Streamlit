@@ -32,11 +32,10 @@ import {
  * run
  */
 const run = async appsDirectory => {
-  const now = new Date()
-    .toISOString()
-    .replace(/[-:.TZ]/g, "")
-    .slice(0, 15)
-    .replace("T", "-")
+  // Get the current date and time, convert it to an ISO string, remove
+  // characters '-', ':', '.', 'T', and 'Z'.
+  const now = new Date().toISOString().replace(/[-:.TZ]/g, "")
+  // Create a runId in the format 'YYYYMMDD-HHMMSS' for lexicographical sorting.
   const runId = `${now.slice(0, 8)}-${now.slice(8, 14)}`
 
   /**
@@ -77,6 +76,7 @@ const run = async appsDirectory => {
       await orchestrator.stopStreamlit()
     }
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e)
     orchestrator.destroy()
     // Exit with a non-zero status code to indicate that there was an error.
@@ -86,7 +86,6 @@ const run = async appsDirectory => {
   orchestrator.destroy()
 }
 
-// @ts-expect-error This is a top-level await that works fine in our version of Node
 await run(PERFORMANCE_APPS_DIRECTORY)
 
 process.exit(0)
