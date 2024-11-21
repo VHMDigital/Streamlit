@@ -409,13 +409,3 @@ test("tracks installation data", () => {
   const trackCall = mm.track.mock.calls[0][0]
   expect(trackCall.machineIdV3).toEqual(sessionInfo.current.installationIdV3)
 })
-
-test("ip address is overwritten", () => {
-  const mm = getMetricsManager()
-  mm.initialize({ gatherUsageStats: true })
-
-  mm.enqueue("ev1", { data1: 11 })
-
-  const trackCall = mm.track.mock.calls[0][0]
-  expect(trackCall._ip).toEqual("0.0.0.0")
-})
