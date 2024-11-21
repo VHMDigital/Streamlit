@@ -17,6 +17,7 @@
 import React from "react"
 
 import styled from "@emotion/styled"
+
 import { StyledCheckbox } from "@streamlit/lib/src/components/widgets/Checkbox/styled-components"
 import { Block as BlockProto } from "@streamlit/lib/src/proto"
 import { EmotionTheme } from "@streamlit/lib/src/theme"
