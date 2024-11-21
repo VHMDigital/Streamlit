@@ -67,8 +67,6 @@ function Checkbox({
     fragmentId,
   })
 
-  console.log("value", element.default, value, element.id)
-
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
       setValueWithSource({ value: e.target.checked, fromUi: true })
