@@ -670,7 +670,7 @@ export function getLinkDisplayValueFromRegex(
     if (patternMatch && patternMatch[1] !== undefined) {
       // return the first matching group
       // Since this might be a URI encoded value, we decode it.
-      return decodeURI(patternMatch[1])
+      return decodeURIComponent(patternMatch[1].replace(/\+/g, "%20"))
     }
 
     // if the regex doesn't find a match with the url, just use the url as display value
