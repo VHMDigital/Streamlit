@@ -144,6 +144,8 @@ interface State {
   userSettings: UserSettings
   dialog?: DialogProps | null
   layout: PageConfig.Layout
+  // Preferred layouts for each page: <page script hash, layout>
+  preferredLayouts: Record<string, PageConfig.Layout>
   initialSidebarState: PageConfig.SidebarState
   menuItems?: PageConfig.IMenuItems | null
   allowRunOnSave: boolean
@@ -274,6 +276,7 @@ export class App extends PureComponent<Props, State> {
         runOnSave: false,
       },
       layout: PageConfig.Layout.CENTERED,
+      preferredLayouts: {},
       initialSidebarState: PageConfig.SidebarState.AUTO,
       menuItems: undefined,
       allowRunOnSave: true,
@@ -782,6 +785,15 @@ export class App extends PureComponent<Props, State> {
     }
 
     this.setState({ menuItems })
+
+    // Save current page layout
+    this.setState((prevState: State) => {
+      const newPreferredLayouts = prevState.preferredLayouts
+      newPreferredLayouts[prevState.currentPageScriptHash] = layout
+      return {
+        preferredLayouts: newPreferredLayouts,
+      }
+    })
   }
 
   handlePageInfoChanged = (pageInfo: PageInfo): void => {
@@ -821,6 +833,26 @@ export class App extends PureComponent<Props, State> {
 
   handleNavigation = (navigationMsg: Navigation): void => {
     this.maybeSetState(this.appNavigation.handleNavigation(navigationMsg))
+
+    // If the current page script hash is not already in the preferredLayouts object,
+    // we fallback to the entrypoint files layout when available.
+    const { currentPageScriptHash, mainScriptHash, preferredLayouts } =
+      this.state
+    if (
+      !(currentPageScriptHash in preferredLayouts) &&
+      mainScriptHash in preferredLayouts
+    ) {
+      const newLayout = preferredLayouts[mainScriptHash]
+      preferredLayouts[currentPageScriptHash] = newLayout
+      this.setState(prevState => ({
+        preferredLayouts: preferredLayouts,
+        layout: newLayout,
+        userSettings: {
+          ...prevState.userSettings,
+          wideMode: newLayout === PageConfig.Layout.WIDE,
+        },
+      }))
+    }
   }
 
   handlePageProfileMsg = (pageProfile: PageProfile): void => {
@@ -987,7 +1019,11 @@ export class App extends PureComponent<Props, State> {
       this.handleOneTimeInitialization(newSessionProto)
     }
 
-    const { appHash, currentPageScriptHash: prevPageScriptHash } = this.state
+    const {
+      appHash,
+      preferredLayouts,
+      currentPageScriptHash: prevPageScriptHash,
+    } = this.state
     const {
       scriptRunId,
       name: scriptName,
@@ -1049,6 +1085,21 @@ export class App extends PureComponent<Props, State> {
         scriptName,
         mainScriptHash
       )
+    }
+
+    // Use previously saved layout if exists. If page uses set_page_config,
+    // layout will be overridden later in handlePageConfigChanged.
+    if (newPageScriptHash in preferredLayouts) {
+      this.setState((prevState: State) => {
+        const newLayout = preferredLayouts[newPageScriptHash]
+        return {
+          layout: newLayout,
+          userSettings: {
+            ...prevState.userSettings,
+            wideMode: newLayout === PageConfig.Layout.WIDE,
+          },
+        }
+      })
     }
   }
 
@@ -1285,6 +1336,18 @@ export class App extends PureComponent<Props, State> {
 
     this.setState({ userSettings: newSettings })
 
+    // Save current page layout
+    this.setState((prevState: State) => {
+      const newPreferredLayouts = prevState.preferredLayouts
+      newPreferredLayouts[prevState.currentPageScriptHash] =
+        newSettings.wideMode
+          ? PageConfig.Layout.WIDE
+          : PageConfig.Layout.CENTERED
+      return {
+        preferredLayouts: newPreferredLayouts,
+      }
+    })
+
     if (prevRunOnSave !== runOnSave && this.isServerConnected()) {
       const backMsg = new BackMsg({ setRunOnSave: runOnSave })
       backMsg.type = "setRunOnSave"
@@ -1427,6 +1490,14 @@ export class App extends PureComponent<Props, State> {
   onPageChange = (pageScriptHash: string): void => {
     const { elements, mainScriptHash } = this.state
 
+    this.setState((prevState: State) => {
+      const preferredLayouts = prevState.preferredLayouts
+      preferredLayouts[prevState.currentPageScriptHash] = prevState.layout
+      if (!(prevState.mainScriptHash in preferredLayouts)) {
+        preferredLayouts[prevState.mainScriptHash] = prevState.layout
+      }
+      return { preferredLayouts: preferredLayouts }
+    })
     // We are about to change the page, so clear all auto reruns
     // This also happens in handleNewSession, but it might be too late compared
     // to small interval values, which might trigger a rerun before the new
