@@ -21,7 +21,6 @@ from typing import TYPE_CHECKING, Final, cast
 import streamlit
 from streamlit.errors import (
     MarkdownFormattedException,
-    StreamlitAPIException,
     StreamlitAPIWarning,
     UncaughtAppException,
 )
@@ -84,14 +83,12 @@ def marshall(exception_proto: ExceptionProto, exception: BaseException) -> None:
     exception : BaseException
         The exception whose data we're extracting
     """
-    # If this is a StreamlitAPIException, we prune all Streamlit entries
-    # from the exception's stack trace.
-    is_api_exception = isinstance(exception, StreamlitAPIException)
     is_markdown_exception = isinstance(exception, MarkdownFormattedException)
     is_uncaught_app_exception = isinstance(exception, UncaughtAppException)
+    strip_streamlit_stack_entries = hasattr(exception, "_strip_streamlit_stack_entries")
 
     stack_trace = _get_stack_trace_str_list(
-        exception, strip_streamlit_stack_entries=is_api_exception
+        exception, strip_streamlit_stack_entries=strip_streamlit_stack_entries
     )
 
     # Some exceptions (like UserHashError) have an alternate_name attribute so
