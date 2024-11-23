@@ -18,7 +18,6 @@ import os
 import traceback
 from typing import TYPE_CHECKING, Final, cast
 
-import streamlit
 from streamlit.errors import (
     MarkdownFormattedException,
     StreamlitAPIWarning,
@@ -27,6 +26,7 @@ from streamlit.errors import (
 from streamlit.logger import get_logger
 from streamlit.proto.Exception_pb2 import Exception as ExceptionProto
 from streamlit.runtime.metrics_util import gather_metrics
+from streamlit.runtime.scriptrunner_utils.script_run_context import get_script_run_ctx
 
 if TYPE_CHECKING:
     from streamlit.delta_generator import DeltaGenerator
@@ -36,12 +36,6 @@ _LOGGER: Final = get_logger(__name__)
 # When client.showErrorDetails is False, we show a generic warning in the
 # frontend when we encounter an uncaught app exception.
 _GENERIC_UNCAUGHT_EXCEPTION_TEXT: Final = "This app has encountered an error. The original error message is redacted to prevent data leaks.  Full error details have been recorded in the logs (if you're on Streamlit Cloud, click on 'Manage app' in the lower right of your app)."
-
-# Extract the streamlit package path. Make it absolute, resolve aliases, and
-# ensure there's a trailing path separator
-_STREAMLIT_DIR: Final = os.path.join(
-    os.path.realpath(os.path.dirname(streamlit.__file__)), ""
-)
 
 
 class ExceptionMixin:
@@ -227,15 +221,15 @@ def _get_stack_trace_str_list(exception: BaseException) -> tuple[list[str], list
     return internal_trace_str_list, external_trace_str_list
 
 
-def _is_in_streamlit_package(file: str) -> bool:
-    """True if the given file is part of the streamlit package."""
+def _is_in_package(file: str, package_path: str) -> bool:
+    """True if the given file is part of package_path."""
     try:
-        common_prefix = os.path.commonprefix([os.path.realpath(file), _STREAMLIT_DIR])
+        common_prefix = os.path.commonprefix([os.path.realpath(file), package_path])
     except ValueError:
         # Raised if paths are on different drives.
         return False
 
-    return common_prefix == _STREAMLIT_DIR
+    return common_prefix == package_path
 
 
 def _split_internal_streamlit_frames(
@@ -243,39 +237,45 @@ def _split_internal_streamlit_frames(
 ) -> tuple[list[traceback.FrameSummary], list[traceback.FrameSummary]]:
     """Split the traceback into a Streamlit-internal part and an external part.
 
-    The internal part is everything that appears up to the last Streamlit-related
-    frame. The external part is the rest.
+    The internal part is everything up to (but excluding) the first frame belonging to
+    the user's code. The external part is everything else.
 
-    So if the frame looks like this:
+    So if the stack looks like this:
 
-        1. Pandas line of code
-        2. Streamlit line of code
-        3. Altair line of code
-        4. Streamlit line of code
-        5. line of code from user code
-        6. Matplotlib of code from user code
-        7. line of code from user code
-        8. line of code from user code
+        1. Streamlit frame
+        2. Pandas frame
+        3. Altair frame
+        4. Streamlit frame
+        5. User frame
+        6. User frame
+        7. Streamlit frame
+        8. Matplotlib frame
 
     ...then this should return 1-4 as the internal traceback and 5-8 as the external.
 
     (Note that something like the example above is extremely unlikely to happen since
-    it's not like Matplotlib would be calling user code, or Altair would be calling
-    Streamlit code. But the desired split is still 1-4 and 5-8)
+    it's not like Altair is calling Streamlit code, but you get the idea.)
     """
 
-    internal = []
-    external = []
-    saw_streamlit = False
+    ctx = get_script_run_ctx()
 
-    for frame_summary in reversed(extracted_tb):
-        if not saw_streamlit:
-            if _is_in_streamlit_package(frame_summary.filename):
-                saw_streamlit = True
+    if not ctx:
+        return [], list(extracted_tb)
 
-        if saw_streamlit:
-            internal.append(frame_summary)
-        else:
+    package_path = os.path.join(os.path.realpath(str(ctx.main_script_parent)), "")
+
+    internal: list[traceback.FrameSummary] = []
+    external: list[traceback.FrameSummary] = []
+    saw_user_code = False
+
+    for frame_summary in extracted_tb:
+        if not saw_user_code:
+            if _is_in_package(frame_summary.filename, package_path):
+                saw_user_code = True
+
+        if saw_user_code:
             external.append(frame_summary)
+        else:
+            internal.append(frame_summary)
 
-    return reversed(internal), reversed(external)
+    return internal, external
