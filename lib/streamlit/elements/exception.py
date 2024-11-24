@@ -80,8 +80,6 @@ def marshall(exception_proto: ExceptionProto, exception: BaseException) -> None:
     is_markdown_exception = isinstance(exception, MarkdownFormattedException)
     is_uncaught_app_exception = isinstance(exception, UncaughtAppException)
 
-    internal_stack_trace, external_stack_trace = _get_stack_trace_str_list(exception)
-
     # Some exceptions (like UserHashError) have an alternate_name attribute so
     # we can pretend to the user that the exception is called something else.
     if getattr(exception, "alternate_name", None) is not None:
@@ -89,8 +87,9 @@ def marshall(exception_proto: ExceptionProto, exception: BaseException) -> None:
     else:
         exception_proto.type = type(exception).__name__
 
-    exception_proto.stack_trace.extend(external_stack_trace)
-    exception_proto.internal_stack_trace.extend(internal_stack_trace)
+    stack_trace = _get_stack_trace_str_list(exception)
+
+    exception_proto.stack_trace.extend(stack_trace)
     exception_proto.is_warning = isinstance(exception, Warning)
 
     try:
@@ -174,7 +173,7 @@ def _format_syntax_error_message(exception: SyntaxError) -> str:
     return str(exception)
 
 
-def _get_stack_trace_str_list(exception: BaseException) -> tuple[list[str], list[str]]:
+def _get_stack_trace_str_list(exception: BaseException) -> list[str]:
     """Get the stack trace for the given exception.
 
     Parameters
@@ -202,8 +201,7 @@ def _get_stack_trace_str_list(exception: BaseException) -> tuple[list[str], list
 
     # Format the extracted traceback and add it to the protobuf element.
     if extracted_traceback is None:
-        internal_trace_str_list = []
-        external_trace_str_list = [
+        trace_str_list = [
             "Cannot extract the stack trace for this exception. "
             "Try calling exception() within the `catch` block."
         ]
@@ -212,13 +210,14 @@ def _get_stack_trace_str_list(exception: BaseException) -> tuple[list[str], list
             extracted_traceback
         )
 
-        internal_trace_str_list = traceback.format_list(internal_frames)
-        external_trace_str_list = traceback.format_list(external_frames)
+        if external_frames:
+            trace_str_list = traceback.format_list(external_frames)
+        else:
+            trace_str_list = traceback.format_list(internal_frames)
 
-        internal_trace_str_list = [item.strip() for item in internal_trace_str_list]
-        external_trace_str_list = [item.strip() for item in external_trace_str_list]
+        trace_str_list = [item.strip() for item in trace_str_list]
 
-    return internal_trace_str_list, external_trace_str_list
+    return trace_str_list
 
 
 def _is_in_package(file: str, package_path: str) -> bool:
