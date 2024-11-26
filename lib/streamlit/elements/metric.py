@@ -57,6 +57,7 @@ class MetricMixin:
         delta_color: DeltaColor = "normal",
         help: str | None = None,
         label_visibility: LabelVisibility = "visible",
+        border: bool = False,
     ) -> DeltaGenerator:
         r"""Display a metric in big bold font, with an optional indicator of how the metric changed.
 
@@ -112,6 +113,10 @@ class MetricMixin:
             label, which can help keep the widget alligned with other widgets.
             If this is ``"collapsed"``, Streamlit displays no label or spacer.
 
+        border : bool
+            Whether to show a border around the metric container. If ``True``,
+            a border is shown. If ``False`` (default), no border is shown.
+
         Example
         -------
         >>> import streamlit as st
@@ -156,6 +161,7 @@ class MetricMixin:
         metric_proto.body = _parse_value(value)
         metric_proto.label = _parse_label(label)
         metric_proto.delta = _parse_delta(delta)
+        metric_proto.border = border
         if help is not None:
             metric_proto.help = dedent(help)
 
