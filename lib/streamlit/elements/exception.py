@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import os
 import traceback
-from typing import TYPE_CHECKING, Final, cast
+from typing import TYPE_CHECKING, Callable, Final, TypeVar, cast
 
 from streamlit.errors import (
     MarkdownFormattedException,
@@ -263,18 +263,29 @@ def _split_internal_streamlit_frames(
 
     package_path = os.path.join(os.path.realpath(str(ctx.main_script_parent)), "")
 
-    internal: list[traceback.FrameSummary] = []
-    external: list[traceback.FrameSummary] = []
-    saw_user_code = False
+    return _split_list(
+        extracted_tb,
+        split_point=lambda tb: _is_in_package(tb.filename, package_path),
+    )
 
-    for frame_summary in extracted_tb:
-        if not saw_user_code:
-            if _is_in_package(frame_summary.filename, package_path):
-                saw_user_code = True
 
-        if saw_user_code:
-            external.append(frame_summary)
+T = TypeVar("T")
+
+
+def _split_list(orig_list: list[T], split_point: Callable[[T], bool]):
+    before: list[T] = []
+    after: list[T] = []
+
+    saw_split_point = False
+
+    for item in orig_list:
+        if not saw_split_point:
+            if split_point(item):
+                saw_split_point = True
+
+        if saw_split_point:
+            after.append(item)
         else:
-            internal.append(frame_summary)
+            before.append(item)
 
-    return internal, external
+    return before, after

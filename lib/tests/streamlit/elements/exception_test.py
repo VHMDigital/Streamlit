@@ -29,6 +29,7 @@ from streamlit.elements import exception
 from streamlit.elements.exception import (
     _GENERIC_UNCAUGHT_EXCEPTION_TEXT,
     _format_syntax_error_message,
+    _split_list,
 )
 from streamlit.errors import StreamlitAPIException, UncaughtAppException
 from streamlit.proto.Exception_pb2 import Exception as ExceptionProto
@@ -190,3 +191,21 @@ class StExceptionAPITest(DeltaGeneratorTestCase):
             # We will test stack_trace when testing
             # streamlit.elements.exception_element
             self.assertEqual(el.exception.stack_trace, [])
+
+
+class SplitListTest(unittest.TestCase):
+    @parameterized.expand(
+        [
+            (["a", "b", "c", "-", "d", "e"], 3),
+            (["-", "a", "b", "c", "d", "e"], 0),
+            (["a", "b", "c", "d", "e", "-"], 5),
+            (["a", "b", "c", "d", "e", "f"], 100),
+            (["a", "-", "c", "d", "-", "f"], 1),
+            ([], 100),
+        ]
+    )
+    def test_split_list(self, input_list, split_index):
+        before, after = _split_list(input_list, split_point=lambda x: x == "-")
+
+        self.assertEqual(before, input_list[:split_index])
+        self.assertEqual(after, input_list[split_index:])
