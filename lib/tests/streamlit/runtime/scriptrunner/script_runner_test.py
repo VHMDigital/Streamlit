@@ -66,6 +66,9 @@ text_latin = "complete! ð\x9f\x91¨â\x80\x8dð\x9f\x8e¤"
 
 
 # Workaround for https://github.com/pytest-dev/pytest/issues/12263:
+# Newer pytest version require this method to exist, but its not implemented
+# in older Tornado versions for AsyncTestCase.
+# Adding this to the test harmless and not affecting the ScriptRunnerTest below.
 def runTest(*args, **kwargs):
     pass
 
