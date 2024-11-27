@@ -15,7 +15,6 @@
  */
 
 import React from "react"
-import "@testing-library/jest-dom"
 
 import { fireEvent, screen, within } from "@testing-library/react"
 
@@ -24,9 +23,9 @@ import { render } from "@streamlit/lib/src/test_util"
 import { FacingMode } from "./SwitchFacingModeButton"
 import WebcamComponent, { Props, WebcamPermission } from "./WebcamComponent"
 
-jest.mock("react-webcam")
+vi.mock("react-webcam")
 
-jest.mock("react-device-detect", () => {
+vi.mock("react-device-detect", () => {
   return {
     isMobile: true,
   }
@@ -34,13 +33,13 @@ jest.mock("react-device-detect", () => {
 
 const getProps = (props: Partial<Props> = {}): Props => {
   return {
-    handleCapture: jest.fn(),
+    handleCapture: vi.fn(),
     width: 500,
     disabled: false,
-    setClearPhotoInProgress: jest.fn(),
+    setClearPhotoInProgress: vi.fn(),
     clearPhotoInProgress: false,
     facingMode: FacingMode.USER,
-    setFacingMode: jest.fn(),
+    setFacingMode: vi.fn(),
     testOverride: WebcamPermission.PENDING,
     ...props,
   }
@@ -124,6 +123,8 @@ describe("Test Webcam Component", () => {
       screen.getByTestId("stCameraInputSwitchButton")
     ).getByRole("button")
 
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.click(switchButton)
 
     expect(props.setFacingMode).toHaveBeenCalledTimes(1)
@@ -136,6 +137,8 @@ describe("Test Webcam Component", () => {
       screen.getByTestId("stCameraInputWebcamComponent")
     ).toBeInTheDocument()
 
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.click(screen.getByRole("button", { name: "Take Photo" }))
 
     expect(props.handleCapture).toHaveBeenCalled()

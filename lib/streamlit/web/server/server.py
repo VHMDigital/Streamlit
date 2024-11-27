@@ -48,6 +48,7 @@ from streamlit.web.server.routes import (
     HealthHandler,
     HostConfigHandler,
     MessageCacheHandler,
+    RemoveSlashHandler,
     StaticFileHandler,
 )
 from streamlit.web.server.server_util import DEVELOPMENT_PORT, make_url_path_regex
@@ -368,6 +369,15 @@ class Server:
             routes.extend(
                 [
                     (
+                        # We want to remove paths with a trailing slash, but if the path
+                        # starts with a double slash //, the redirect will point
+                        # the browser to the wrong host.
+                        make_url_path_regex(
+                            base, "(?!/)(.*)", trailing_slash="required"
+                        ),
+                        RemoveSlashHandler,
+                    ),
+                    (
                         make_url_path_regex(base, "(.*)"),
                         StaticFileHandler,
                         {
@@ -381,7 +391,10 @@ class Server:
                             ],
                         },
                     ),
-                    (make_url_path_regex(base, trailing_slash=False), AddSlashHandler),
+                    (
+                        make_url_path_regex(base, trailing_slash="prohibited"),
+                        AddSlashHandler,
+                    ),
                 ]
             )
 

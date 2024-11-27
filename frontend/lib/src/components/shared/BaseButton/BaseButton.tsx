@@ -28,22 +28,21 @@ import {
   StyledIconButton,
   StyledLinkButton,
   StyledMinimalButton,
+  StyledPillsButton,
+  StyledPillsButtonActive,
   StyledPrimaryButton,
   StyledPrimaryFormSubmitButton,
   StyledSecondaryButton,
   StyledSecondaryFormSubmitButton,
+  StyledSegmentedControlButton,
+  StyledSegmentedControlButtonActive,
   StyledTertiaryButton,
 } from "./styled-components"
 
-function BaseButton({
-  kind,
-  size,
-  disabled,
-  onClick,
-  fluidWidth,
-  children,
-  autoFocus,
-}: Readonly<BaseButtonPropsT>): ReactElement {
+function BaseButton(props: Readonly<BaseButtonPropsT>): ReactElement {
+  const { kind, size, disabled, onClick, fluidWidth, children, autoFocus } =
+    props
+
   let ComponentType = StyledPrimaryButton
 
   if (kind === BaseButtonKind.SECONDARY) {
@@ -54,6 +53,14 @@ function BaseButton({
     ComponentType = StyledLinkButton
   } else if (kind === BaseButtonKind.ICON) {
     ComponentType = StyledIconButton
+  } else if (kind === BaseButtonKind.PILLS) {
+    ComponentType = StyledPillsButton
+  } else if (kind === BaseButtonKind.PILLS_ACTIVE) {
+    ComponentType = StyledPillsButtonActive
+  } else if (kind === BaseButtonKind.SEGMENTED_CONTROL) {
+    ComponentType = StyledSegmentedControlButton
+  } else if (kind === BaseButtonKind.SEGMENTED_CONTROL_ACTIVE) {
+    ComponentType = StyledSegmentedControlButtonActive
   } else if (kind === BaseButtonKind.BORDERLESS_ICON) {
     ComponentType = StyledBorderlessIconButton
   } else if (kind === BaseButtonKind.BORDERLESS_ICON_ACTIVE) {
@@ -80,7 +87,8 @@ function BaseButton({
       disabled={disabled || false}
       onClick={onClick || (() => {})}
       autoFocus={autoFocus || false}
-      data-testid={`stBaseButton-${kind}`}
+      data-testid={props["data-testid"] ?? `stBaseButton-${kind}`}
+      aria-label={props["aria-label"] ?? ""}
     >
       {children}
     </ComponentType>

@@ -16,7 +16,6 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { screen } from "@testing-library/react"
 
 import { ScriptRunState } from "@streamlit/lib/src/ScriptRunState"
@@ -33,9 +32,10 @@ describe("Form", () => {
       hasSubmitButton: false,
       scriptRunState: ScriptRunState.RUNNING,
       clearOnSubmit: false,
+      enterToSubmit: true,
       widgetMgr: new WidgetStateManager({
-        sendRerunBackMsg: jest.fn(),
-        formsDataChanged: jest.fn(),
+        sendRerunBackMsg: vi.fn(),
+        formsDataChanged: vi.fn(),
       }),
       border: false,
       ...props,

@@ -16,21 +16,21 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
-import { fireEvent, screen } from "@testing-library/react"
+import { fireEvent, render, screen } from "@testing-library/react"
 
-import { render } from "@streamlit/lib/src/test_util"
+import { mockTheme } from "@streamlit/lib/src/mocks/mockTheme"
+import ThemeProvider from "@streamlit/lib/src/components/core/ThemeProvider"
 
 import OverflowTooltip from "./OverflowTooltip"
 import { Placement } from "./Tooltip"
 
 describe("Tooltip component", () => {
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it("should render when it fits onscreen", () => {
-    const useRefSpy = jest.spyOn(React, "useRef").mockReturnValue({
+    const useRefSpy = vi.spyOn(React, "useRef").mockReturnValue({
       current: {
         // Pretend the body is greater than its onscreen area.
         offsetWidth: 200,
@@ -38,7 +38,7 @@ describe("Tooltip component", () => {
       },
     })
 
-    jest.spyOn(React, "useEffect").mockImplementation(f => f())
+    vi.spyOn(React, "useEffect").mockImplementation(f => f())
 
     render(
       <OverflowTooltip
@@ -47,10 +47,17 @@ describe("Tooltip component", () => {
         style={{}}
       >
         the child
-      </OverflowTooltip>
+      </OverflowTooltip>,
+      {
+        wrapper: ({ children }) => (
+          <ThemeProvider theme={mockTheme.emotion}>{children}</ThemeProvider>
+        ),
+      }
     )
 
     const tooltip = screen.getByTestId("stTooltipHoverTarget")
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.mouseOver(tooltip)
 
     expect(screen.queryByText("the content")).not.toBeInTheDocument()
@@ -59,7 +66,7 @@ describe("Tooltip component", () => {
   })
 
   it("should render when ellipsized", async () => {
-    const useRefSpy = jest.spyOn(React, "useRef").mockReturnValue({
+    const useRefSpy = vi.spyOn(React, "useRef").mockReturnValue({
       current: {
         // Pretend the body is smaller than its onscreen area.
         offsetWidth: 100,
@@ -67,7 +74,7 @@ describe("Tooltip component", () => {
       },
     })
 
-    jest.spyOn(React, "useEffect").mockImplementation(f => f())
+    vi.spyOn(React, "useEffect").mockImplementation(f => f())
 
     render(
       <OverflowTooltip
@@ -76,10 +83,17 @@ describe("Tooltip component", () => {
         style={{}}
       >
         the child
-      </OverflowTooltip>
+      </OverflowTooltip>,
+      {
+        wrapper: ({ children }) => (
+          <ThemeProvider theme={mockTheme.emotion}>{children}</ThemeProvider>
+        ),
+      }
     )
 
     const tooltip = screen.getByTestId("stTooltipHoverTarget")
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.mouseOver(tooltip)
 
     const tooltipContent = await screen.findByText("the content")

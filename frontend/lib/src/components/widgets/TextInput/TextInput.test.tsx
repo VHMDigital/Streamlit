@@ -15,10 +15,9 @@
  */
 
 import React from "react"
-import "@testing-library/jest-dom"
 
-import { fireEvent, screen, within } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
+import { act, fireEvent, screen, within } from "@testing-library/react"
+import { userEvent } from "@testing-library/user-event"
 
 import { render } from "@streamlit/lib/src/test_util"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
@@ -26,7 +25,6 @@ import {
   LabelVisibilityMessage as LabelVisibilityMessageProto,
   TextInput as TextInputProto,
 } from "@streamlit/lib/src/proto"
-import { mockTheme } from "@streamlit/lib/src/mocks/mockTheme"
 
 import TextInput, { Props } from "./TextInput"
 
@@ -43,10 +41,9 @@ const getProps = (
   }),
   width: 300,
   disabled: false,
-  theme: mockTheme.emotion,
   widgetMgr: new WidgetStateManager({
-    sendRerunBackMsg: jest.fn(),
-    formsDataChanged: jest.fn(),
+    sendRerunBackMsg: vi.fn(),
+    formsDataChanged: vi.fn(),
   }),
   ...widgetProps,
 })
@@ -140,7 +137,7 @@ describe("TextInput widget", () => {
 
   it("sets widget value on mount", () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "setStringValue")
     render(<TextInput {...props} />)
 
     expect(props.widgetMgr.setStringValue).toHaveBeenCalledWith(
@@ -153,7 +150,7 @@ describe("TextInput widget", () => {
 
   it("can pass fragmentId to setStringValue", () => {
     const props = getProps(undefined, { fragmentId: "myFragmentId" })
-    jest.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "setStringValue")
     render(<TextInput {...props} />)
 
     expect(props.widgetMgr.setStringValue).toHaveBeenCalledWith(
@@ -182,10 +179,12 @@ describe("TextInput widget", () => {
 
   it("sets widget value on blur", () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "setStringValue")
     render(<TextInput {...props} />)
 
     const textInput = screen.getByRole("textbox")
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(textInput, { target: { value: "testing" } })
     fireEvent.blur(textInput)
 
@@ -202,7 +201,7 @@ describe("TextInput widget", () => {
   it("sets widget value when enter is pressed", async () => {
     const user = userEvent.setup()
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "setStringValue")
     render(<TextInput {...props} />)
     const textInput = screen.getByRole("textbox")
 
@@ -221,12 +220,67 @@ describe("TextInput widget", () => {
     )
   })
 
+  it("does not sync widget value when value did not change", async () => {
+    const user = userEvent.setup()
+    const props = getProps()
+    vi.spyOn(props.widgetMgr, "setStringValue")
+    render(<TextInput {...props} />)
+    const textInput = screen.getByRole("textbox")
+
+    expect(props.widgetMgr.setStringValue).toHaveBeenCalledTimes(1)
+
+    // userEvent necessary to trigger onKeyPress
+    // fireEvent only dispatches DOM events vs. simulating full interactions
+    await user.click(textInput)
+    await user.keyboard("testing{Enter}")
+
+    expect(props.widgetMgr.setStringValue).toHaveBeenLastCalledWith(
+      props.element,
+      "testing",
+      {
+        fromUi: true,
+      },
+      undefined
+    )
+    expect(props.widgetMgr.setStringValue).toHaveBeenCalledTimes(2)
+
+    // losing focus after value changed triggers a server sync
+    await user.click(textInput)
+    await user.keyboard("moreTesting")
+    // click somewhere to lose focus on the input
+    await user.click(document.body)
+
+    expect(props.widgetMgr.setStringValue).toHaveBeenLastCalledWith(
+      props.element,
+      "testingmoreTesting",
+      {
+        fromUi: true,
+      },
+      undefined
+    )
+    expect(props.widgetMgr.setStringValue).toHaveBeenCalledTimes(3)
+
+    // focusing and clicking enter again without changing the value does
+    // not trigger a server-sync and, thus, no re-run
+    await user.click(textInput)
+    await user.keyboard("{enter}")
+    expect(props.widgetMgr.setStringValue).toHaveBeenCalledTimes(3)
+
+    // focusing and losing focus without changing the value does
+    // not trigger a server-sync and, thus, no re-run
+    await user.click(textInput)
+    await user.click(document.body)
+    expect(props.widgetMgr.setStringValue).toHaveBeenCalledTimes(3)
+  })
+
   it("doesn't set widget value when not dirty", () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "setStringValue")
     render(<TextInput {...props} />)
 
     const textInput = screen.getByRole("textbox")
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.keyPress(textInput, { key: "Enter" })
 
     expect(props.widgetMgr.setStringValue).toHaveBeenCalledTimes(1)
@@ -240,23 +294,31 @@ describe("TextInput widget", () => {
     render(<TextInput {...props} />)
 
     const textInput = screen.getByRole("textbox")
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(textInput, { target: { value: "0123456789" } })
     expect(textInput).toHaveValue("0123456789")
 
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(textInput, { target: { value: "0123456789a" } })
     expect(textInput).toHaveValue("0123456789")
   })
 
   it("does update widget value on text changes when inside of a form", async () => {
     const props = getProps({ formId: "formId" })
-    const setStringValueSpy = jest.spyOn(props.widgetMgr, "setStringValue")
+    const setStringValueSpy = vi.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "allowFormEnterToSubmit").mockReturnValue(true)
 
     render(<TextInput {...props} />)
 
     const textInput = screen.getByRole("textbox")
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(textInput, { target: { value: "TEST" } })
     expect(textInput).toHaveValue("TEST")
 
+    fireEvent.focus(textInput)
     expect(
       await screen.findByText("Press Enter to submit form")
     ).toBeInTheDocument()
@@ -273,13 +335,16 @@ describe("TextInput widget", () => {
 
   it("does not update widget value on text changes when outside of a form", async () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "setStringValue")
     render(<TextInput {...props} />)
 
     const textInput = screen.getByRole("textbox")
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(textInput, { target: { value: "TEST" } })
     expect(textInput).toHaveValue("TEST")
 
+    fireEvent.focus(textInput)
     expect(await screen.findByText("Press Enter to apply")).toBeInTheDocument()
 
     // Check that the last call was in componentDidMount.
@@ -296,17 +361,21 @@ describe("TextInput widget", () => {
   it("resets its value when form is cleared", () => {
     // Create a widget in a clearOnSubmit form
     const props = getProps({ formId: "form" })
-    props.widgetMgr.setFormClearOnSubmit("form", true)
+    props.widgetMgr.setFormSubmitBehaviors("form", true)
 
-    jest.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "setStringValue")
 
     render(<TextInput {...props} />)
     const textInput = screen.getByRole("textbox")
     // Change the widget value
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(textInput, { target: { value: "TEST" } })
 
-    // "Submit" the form
-    props.widgetMgr.submitForm("form", undefined)
+    act(() => {
+      // "Submit" the form
+      props.widgetMgr.submitForm("form", undefined)
+    })
 
     // Our widget should be reset, and the widgetMgr should be updated
     expect(textInput).toHaveValue(props.element.default)
@@ -320,15 +389,89 @@ describe("TextInput widget", () => {
     )
   })
 
+  it("shows Input Instructions on dirty state by default", async () => {
+    const user = userEvent.setup()
+    const props = getProps()
+    render(<TextInput {...props} />)
+
+    // Trigger dirty state
+    const textInput = screen.getByRole("textbox")
+    await user.click(textInput)
+    await user.keyboard("TEST")
+
+    expect(screen.getByText("Press Enter to apply")).toBeVisible()
+  })
+
+  it("shows Input Instructions if in form that allows submit on enter", async () => {
+    const user = userEvent.setup()
+    const props = getProps({ formId: "form" })
+    vi.spyOn(props.widgetMgr, "allowFormEnterToSubmit").mockReturnValue(true)
+
+    render(<TextInput {...props} />)
+
+    // Trigger dirty state
+    const textInput = screen.getByRole("textbox")
+    await user.click(textInput)
+    await user.keyboard("TEST")
+
+    expect(screen.getByText("Press Enter to submit form")).toBeVisible()
+  })
+
+  // For this scenario https://github.com/streamlit/streamlit/issues/7079
+  it("shows Input Instructions if focused again in form that allows submit on enter", async () => {
+    const user = userEvent.setup()
+    const props = getProps({ formId: "form" })
+    vi.spyOn(props.widgetMgr, "allowFormEnterToSubmit").mockReturnValue(true)
+
+    render(<TextInput {...props} />)
+
+    const textInput = screen.getByRole("textbox")
+    await user.click(textInput)
+    await user.keyboard("TEST")
+
+    // Remove focus
+    fireEvent.blur(textInput)
+    expect(screen.queryByTestId("InputInstructions")).not.toBeInTheDocument()
+
+    // Then focus again
+    fireEvent.focus(textInput)
+    expect(screen.getByText("Press Enter to submit form")).toBeVisible()
+  })
+
+  it("hides Input Instructions if in form that doesn't allow submit on enter", async () => {
+    const user = userEvent.setup()
+    const props = getProps({ formId: "form" })
+    vi.spyOn(props.widgetMgr, "allowFormEnterToSubmit").mockReturnValue(false)
+
+    render(<TextInput {...props} />)
+
+    // Trigger dirty state
+    const textInput = screen.getByRole("textbox")
+    await user.click(textInput)
+    await user.keyboard("TEST")
+
+    expect(screen.queryByTestId("InputInstructions")).toHaveTextContent("")
+  })
+
   it("hides Please enter to apply text when width is smaller than 180px", () => {
     const props = getProps({}, { width: 100 })
     render(<TextInput {...props} />)
+
+    // Focus on input
+    const textInput = screen.getByRole("textbox")
+    fireEvent.focus(textInput)
+
     expect(screen.queryByTestId("InputInstructions")).not.toBeInTheDocument()
   })
 
   it("shows Please enter to apply text when width is bigger than 180px", () => {
     const props = getProps({}, { width: 190 })
     render(<TextInput {...props} />)
+
+    // Focus on input
+    const textInput = screen.getByRole("textbox")
+    fireEvent.focus(textInput)
+
     expect(screen.getByTestId("InputInstructions")).toBeInTheDocument()
   })
 
@@ -352,6 +495,8 @@ describe("TextInput widget", () => {
 
     // Make some change to cause a rerender
     const textInput = screen.getByRole("textbox")
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(textInput, { target: { value: "0123456789" } })
     expect(textInput).toHaveValue("0123456789")
 

@@ -91,6 +91,8 @@ export interface AppViewProps {
   currentPageScriptHash: string
 
   hideSidebarNav: boolean
+
+  expandSidebarNav: boolean
 }
 
 /**
@@ -112,6 +114,7 @@ function AppView(props: AppViewProps): ReactElement {
     navSections,
     onPageChange,
     currentPageScriptHash,
+    expandSidebarNav,
     hideSidebarNav,
     sendMessageToHost,
     endpoints,
@@ -139,7 +142,7 @@ function AppView(props: AppViewProps): ReactElement {
     sidebarChevronDownshift,
   } = React.useContext(AppContext)
 
-  const { addScriptFinishedHandler, removeScriptFinishedHandler, libConfig } =
+  const { addScriptFinishedHandler, removeScriptFinishedHandler } =
     React.useContext(LibContext)
 
   const layout = wideMode ? "wide" : "narrow"
@@ -246,6 +249,7 @@ function AppView(props: AppViewProps): ReactElement {
           onPageChange={onPageChange}
           currentPageScriptHash={currentPageScriptHash}
           hideSidebarNav={hideSidebarNav}
+          expandSidebarNav={expandSidebarNav}
         >
           <StyledSidebarBlockContainer>
             {renderBlock(elements.sidebar)}
@@ -276,7 +280,6 @@ function AppView(props: AppViewProps): ReactElement {
           hasBottom={hasBottomElements}
           isEmbedded={embedded}
           hasSidebar={showSidebar}
-          disableFullscreenMode={Boolean(libConfig.disableFullscreenMode)}
         >
           {renderBlock(elements.main)}
         </StyledAppViewBlockContainer>

@@ -12,18 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pathlib
+import time
+from pathlib import Path
 
 from PIL import Image
 
 import streamlit as st
 
-parent_directory = pathlib.Path(__file__).parent.parent / "multipage_apps"
-small_logo = Image.open(str(parent_directory / "small-streamlit.png"))
+PARENT_DIR = Path(__file__).parent.parent / "multipage_apps"
+SMALL_LOGO = Image.open(str(PARENT_DIR / "small-streamlit.png"))
 
-logo = Image.open(str(parent_directory / "full-streamlit.png"))
+LOGO = Image.open(str(PARENT_DIR / "full-streamlit.png"))
 
-st.logo(logo, link="https://www.example.com", icon_image=small_logo)
+st.logo(LOGO, link="https://www.example.com", icon_image=SMALL_LOGO)
 
 st.header("Main Page")
 x = st.slider("x")
@@ -35,7 +36,7 @@ set_default = bool(st.query_params.get("default", False))
 page2 = st.Page("page_2.py")
 page3 = st.Page("page_3.py", title="Different Title")
 page4 = st.Page("🦒_page_4.py")
-page5 = st.Page("page_5.py", icon=":material/settings:")
+page5 = st.Page(Path("page_5.py"), icon=":material/settings:")
 page6 = st.Page("page_6_slow_page.py", title="slow page")
 
 
@@ -65,6 +66,17 @@ def page_10():
     get_input()
 
 
+def page_14():
+    time.sleep(0.5)
+    st.number_input("mynum", value=1, key="mynum")
+
+    @st.fragment
+    def fragment_number_input():
+        st.number_input("mynum 2", value=1, key="mynum2")
+
+    fragment_number_input()
+
+
 page7 = st.Page(page_7, default=set_default)
 page8 = st.Page(page_8, url_path="my_url_path")
 page9 = st.Page(page_9)
@@ -72,10 +84,11 @@ page10 = st.Page(page_10)
 page11 = st.Page(page_8, title="page 11", url_path="page_11")
 page12 = st.Page(page_9, title="page 12", url_path="page_12")
 page13 = st.Page(page_8, title="page 13", url_path="page_13")
-page14 = st.Page(page_9, title="page 14", url_path="page_14")
+page14 = st.Page(page_14, title="page 14")
 
 hide_sidebar = st.checkbox("Hide sidebar")
 dynamic_nav = st.checkbox("Change navigation dynamically")
+expanded = st.checkbox("Expand navigation")
 pg = st.navigation(
     (
         [page2, page3, page5, page9]
@@ -90,6 +103,7 @@ pg = st.navigation(
         }
     ),
     position="hidden" if hide_sidebar else "sidebar",
+    expanded=expanded,
 )
 
 if st.button("page 5"):

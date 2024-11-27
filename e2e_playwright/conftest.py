@@ -242,11 +242,11 @@ def app_server(
     streamlit_proc.start()
     if not wait_for_app_server_to_start(app_port):
         streamlit_stdout = streamlit_proc.terminate()
-        print(streamlit_stdout)
+        print(streamlit_stdout, flush=True)
         raise RuntimeError("Unable to start Streamlit app")
     yield streamlit_proc
     streamlit_stdout = streamlit_proc.terminate()
-    print(streamlit_stdout)
+    print(streamlit_stdout, flush=True)
 
 
 @pytest.fixture(scope="function")
@@ -281,6 +281,9 @@ class IframedPageAttrs:
     src_query_params: dict[str, str] | None = None
     # additional HTML body
     additional_html_head: str | None = None
+    # html content to load. Following placeholders are replaced during the test:
+    # - $APP_URL: the URL of the Streamlit app
+    html_content: str | None = None
 
 
 @dataclass
@@ -311,6 +314,8 @@ def iframed_app(page: Page, app_port: int) -> IframedPage:
         f"default-src 'none'; worker-src blob:; form-action 'none'; "
         f"connect-src ws://localhost:{app_port}/_stcore/stream "
         f"http://localhost:{app_port}/_stcore/allowed-message-origins "
+        f"http://localhost:{app_port}/_stcore/upload_file/ "
+        f"https://some-prefix.com/somethingelse/_stcore/upload_file/ "
         f"http://localhost:{app_port}/_stcore/host-config "
         f"http://localhost:{app_port}/_stcore/health; script-src 'unsafe-inline' "
         f"'unsafe-eval' {app_url}/static/js/; style-src 'unsafe-inline' "
@@ -334,7 +339,8 @@ def iframed_app(page: Page, app_port: int) -> IframedPage:
             if _iframe_element_attrs.additional_html_head
             else ""
         )
-        _iframed_body = f"""
+        _iframed_body = (
+            f"""
             <!DOCTYPE html>
             <html style="height: 100%;">
                 <head>
@@ -349,7 +355,7 @@ def iframed_app(page: Page, app_port: int) -> IframedPage:
                             if _iframe_element_attrs.element_id
                             else ""}
                         title="Iframed Streamlit App"
-                        allow="clipboard-write;"
+                        allow="clipboard-write; microphone;"
                         sandbox="allow-popups allow-same-origin allow-scripts allow-downloads"
                         width="100%"
                     >
@@ -357,6 +363,9 @@ def iframed_app(page: Page, app_port: int) -> IframedPage:
                 </body>
             </html>
             """
+            if _iframe_element_attrs.html_content is None
+            else _iframe_element_attrs.html_content.replace("$APP_URL", app_url)
+        )
 
         def fulfill_iframe_request(route: Route) -> None:
             """Return as response an iframe that loads the actual Streamlit app."""
@@ -497,6 +506,42 @@ class ImageCompareFunction(Protocol):
         """
 
 
+@pytest.fixture(scope="session", autouse=True)
+def delete_output_dir(pytestconfig: Any) -> None:
+    # Overwriting the default delete_output_dir fixture from pytest-playwright:
+    # There seems to be a bug with the combination of pytest-playwright, xdist,
+    # and pytest-rerunfailures where the output dir is deleted when it shouldn't be.
+    # To prevent this issue, we are not deleting the output dir when running with
+    # reruns and xdist.
+
+    uses_xdist = (
+        pytestconfig.getoption("workerinput", None) or os.getenv("PYTEST_XDIST_WORKER"),
+    )
+    uses_reruns = pytestconfig.getoption("reruns", None)
+
+    if not (uses_xdist and uses_reruns):
+        # Delete the output folder. Uses the same logic as the default
+        # delete_output_dir fixture from pytest-playwright:
+        # https://github.com/microsoft/playwright-pytest/blob/fb51327390ccbd3561c1777499934eb88296f1bf/pytest-playwright/pytest_playwright/pytest_playwright.py#L68
+        output_dir = pytestconfig.getoption("--output")
+        if os.path.exists(output_dir):
+            try:
+                shutil.rmtree(output_dir)
+            except FileNotFoundError:
+                # When running in parallel, another thread may have already deleted the files
+                pass
+            except OSError as error:
+                if error.errno != 16:
+                    raise
+                # We failed to remove folder, might be due to the whole folder being mounted inside a container:
+                #   https://github.com/microsoft/playwright/issues/12106
+                #   https://github.com/microsoft/playwright-python/issues/1781
+                # Do a best-effort to remove all files inside of it instead.
+                entries = os.listdir(output_dir)
+                for entry in entries:
+                    shutil.rmtree(entry)
+
+
 @pytest.fixture(scope="session")
 def output_folder(pytestconfig: Any) -> Path:
     """Fixture returning the directory that is used for all test failures information.
@@ -633,7 +678,13 @@ def assert_snapshot(
             # Update this in updates folder:
             snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
             snapshot_updates_file_path.write_bytes(img_bytes)
-            pytest.fail(f"Snapshot matching for {snapshot_file_name} failed: {ex}")
+
+            test_failure_messages.append(
+                f"Snapshot matching for {snapshot_file_name} failed. "
+                f"Expected size: {img_b.size}, actual size: {img_a.size}. "
+                f"Error: {ex}"
+            )
+            return
         total_pixels = img_a.size[0] * img_a.size[1]
         max_diff_pixels = int(image_threshold * total_pixels)
 
@@ -650,7 +701,7 @@ def assert_snapshot(
         img_a.save(f"{test_failures_dir}/actual_{snapshot_file_name}{file_extension}")
         img_b.save(f"{test_failures_dir}/expected_{snapshot_file_name}{file_extension}")
 
-        pytest.fail(
+        test_failure_messages.append(
             f"Snapshot mismatch for {snapshot_file_name} ({mismatch} pixels difference;"
             f" {mismatch/total_pixels * 100:.2f}%)"
         )
@@ -658,7 +709,9 @@ def assert_snapshot(
     yield compare
 
     if test_failure_messages:
-        pytest.fail("Missing snapshots: \n" + "\n".join(test_failure_messages))
+        pytest.fail(
+            "Missing or mismatched snapshots: \n" + "\n".join(test_failure_messages)
+        )
 
 
 # Public utility methods:
@@ -684,7 +737,7 @@ def wait_for_app_run(
     page_or_locator.locator(
         "[data-testid='stApp'][data-test-connection-state='CONNECTED']"
     ).wait_for(
-        timeout=20000,
+        timeout=25000,
         state="attached",
     )
     # Wait until we know the script has started. We determine this by checking
@@ -693,7 +746,7 @@ def wait_for_app_run(
     page_or_locator.locator(
         "[data-testid='stApp'][data-test-script-state='notRunning']"
     ).wait_for(
-        timeout=20000,
+        timeout=25000,
         state="attached",
     )
 

@@ -64,6 +64,7 @@ export interface SidebarProps {
   onPageChange: (pageName: string) => void
   currentPageScriptHash: string
   hideSidebarNav: boolean
+  expandSidebarNav: boolean
 }
 
 interface State {
@@ -94,7 +95,7 @@ class Sidebar extends PureComponent<SidebarProps, State> {
     )
 
     const cachedSidebarWidth = localStorageAvailable()
-      ? localStorage.getItem("sidebarWidth")
+      ? window.localStorage.getItem("sidebarWidth")
       : undefined
 
     this.state = {
@@ -279,6 +280,7 @@ class Sidebar extends PureComponent<SidebarProps, State> {
       onPageChange,
       currentPageScriptHash,
       hideSidebarNav,
+      expandSidebarNav,
       navSections,
     } = this.props
 
@@ -368,6 +370,7 @@ class Sidebar extends PureComponent<SidebarProps, State> {
                 currentPageScriptHash={currentPageScriptHash}
                 navSections={navSections}
                 hasSidebarElements={hasElements}
+                expandSidebarNav={expandSidebarNav}
                 onPageChange={onPageChange}
               />
             )}

@@ -32,9 +32,11 @@ from streamlit.web.server.server import (
     HOST_CONFIG_ENDPOINT,
     MESSAGE_ENDPOINT,
     NEW_HEALTH_ENDPOINT,
+    AddSlashHandler,
     HealthHandler,
     HostConfigHandler,
     MessageCacheHandler,
+    RemoveSlashHandler,
     StaticFileHandler,
 )
 from tests.streamlit.message_mocks import create_dataframe_msg
@@ -189,6 +191,53 @@ class StaticFileHandlerTest(tornado.testing.AsyncHTTPTestCase):
             assert r.code == 404
 
 
+class RemoveSlashHandlerTest(tornado.testing.AsyncHTTPTestCase):
+    def get_app(self):
+        return tornado.web.Application(
+            [
+                (
+                    r"^/(?!/)(.*)",
+                    RemoveSlashHandler,
+                )
+            ]
+        )
+
+    def test_parse_url_path_301(self):
+        paths = ["/page1/", "/page2/page3/"]
+        responses = [self.fetch(path, follow_redirects=False) for path in paths]
+
+        for idx, r in enumerate(responses):
+            assert r.code == 301
+            assert r.headers["Location"] == paths[idx].rstrip("/")
+
+    def test_parse_url_path_404(self):
+        paths = ["//page1/", "//page2/page3/"]
+        responses = [self.fetch(path, follow_redirects=False) for path in paths]
+
+        for r in responses:
+            assert r.code == 404
+
+
+class AddSlashHandlerTest(tornado.testing.AsyncHTTPTestCase):
+    def get_app(self):
+        return tornado.web.Application(
+            [
+                (
+                    r"/(.*)",
+                    AddSlashHandler,
+                )
+            ]
+        )
+
+    def test_parse_url_path_301(self):
+        paths = ["/page1"]
+        responses = [self.fetch(path, follow_redirects=False) for path in paths]
+
+        for idx, r in enumerate(responses):
+            assert r.code == 301
+            assert r.headers["Location"] == paths[idx] + "/"
+
+
 class HostConfigHandlerTest(tornado.testing.AsyncHTTPTestCase):
     def setUp(self):
         super().setUp()
@@ -215,6 +264,7 @@ class HostConfigHandlerTest(tornado.testing.AsyncHTTPTestCase):
                 # Default host configuration settings:
                 "enableCustomParentMessages": False,
                 "enforceDownloadInNewTab": False,
+                "metricsUrl": "",
             },
             response_body,
         )

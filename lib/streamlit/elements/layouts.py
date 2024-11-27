@@ -162,8 +162,13 @@ class LayoutsMixin:
                 block_proto.vertical.border = True
 
         if key:
+            # At the moment, the ID is only used for extracting the
+            # key on the frontend and setting it as CSS class.
+            # There are plans to use the ID for other container features
+            # in the future. This might require including more container
+            # parameters in the ID calculation.
             block_proto.id = compute_and_register_element_id(
-                "container", user_key=key, height=height, border=border
+                "container", user_key=key, form_id=None
             )
 
         return self.dg._block(block_proto)
@@ -364,7 +369,9 @@ class LayoutsMixin:
             Creates a tab for each string in the list. The first tab is selected
             by default. The string is used as the name of the tab and can
             optionally contain GitHub-flavored Markdown of the following types:
-            Bold, Italics, Strikethroughs, Inline Code, and Links.
+            Bold, Italics, Strikethroughs, Inline Code, Links, and Images.
+            Images display like icons, with a max height equal to the font
+            height.
 
             Unsupported Markdown elements are unwrapped so only their children
             (text contents) render. Display unsupported elements as literal
@@ -471,7 +478,8 @@ class LayoutsMixin:
         label : str
             A string to use as the header for the expander. The label can optionally
             contain GitHub-flavored Markdown of the following types: Bold, Italics,
-            Strikethroughs, Inline Code, and Links.
+            Strikethroughs, Inline Code, Links, and Images. Images display like
+            icons, with a max height equal to the font height.
 
             Unsupported Markdown elements are unwrapped so only their children
             (text contents) render. Display unsupported elements as literal
@@ -590,8 +598,9 @@ class LayoutsMixin:
         label : str
             The label of the button that opens the popover container.
             The label can optionally contain GitHub-flavored Markdown of the
-            following types: Bold, Italics, Strikethroughs, Inline Code, and
-            Links.
+            following types: Bold, Italics, Strikethroughs, Inline Code, Links,
+            and Images. Images display like icons, with a max height equal to
+            the font height.
 
             Unsupported Markdown elements are unwrapped so only their children
             (text contents) render. Display unsupported elements as literal
@@ -626,8 +635,8 @@ class LayoutsMixin:
               font library.
 
         disabled : bool
-            An optional boolean, which disables the popover button if set to
-            True. The default is False.
+            An optional boolean that disables the popover button if set to
+            ``True``. The default is ``False``.
 
         use_container_width : bool
             Whether to expand the button's width to fill its parent container.
@@ -724,7 +733,8 @@ class LayoutsMixin:
         label : str
             The initial label of the status container. The label can optionally
             contain GitHub-flavored Markdown of the following types: Bold, Italics,
-            Strikethroughs, Inline Code, and Links.
+            Strikethroughs, Inline Code, Links, and Images. Images display like
+            icons, with a max height equal to the font height.
 
             Unsupported Markdown elements are unwrapped so only their children
             (text contents) render. Display unsupported elements as literal

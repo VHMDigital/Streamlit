@@ -25,11 +25,15 @@ import {
 import { DatePickerType } from "@glideapps/glide-data-grid-cells"
 import moment from "moment"
 
+import { DataFrameCell, Quiver } from "@streamlit/lib/src/dataframes/Quiver"
+import {
+  convertToSeconds,
+  format as formatArrowCell,
+} from "@streamlit/lib/src/dataframes/arrowFormatUtils"
 import {
   Type as ArrowType,
-  DataFrameCell,
-  Quiver,
-} from "@streamlit/lib/src/dataframes/Quiver"
+  getTypeName,
+} from "@streamlit/lib/src/dataframes/arrowTypeUtils"
 import {
   isNullOrUndefined,
   notNullOrUndefined,
@@ -42,9 +46,12 @@ import {
   ColumnCreator,
   DateColumn,
   DateTimeColumn,
+  DateTimeColumnParams,
   isErrorCell,
+  LinkColumnParams,
   ListColumn,
   NumberColumn,
+  NumberColumnParams,
   ObjectColumn,
   removeLineBreaks,
   SelectboxColumn,
@@ -136,7 +143,7 @@ export function applyPandasStylerCss(
  * Maps the data type from Arrow to a column type.
  */
 export function getColumnTypeFromArrow(arrowType: ArrowType): ColumnCreator {
-  let typeName = arrowType ? Quiver.getTypeName(arrowType) : null
+  let typeName = arrowType ? getTypeName(arrowType) : null
 
   if (!typeName) {
     // Use object column as fallback
@@ -211,7 +218,7 @@ export function getIndexFromArrow(
   const title = data.indexNames[indexPosition]
   let isEditable = true
 
-  if (Quiver.getTypeName(arrowType) === "range") {
+  if (getTypeName(arrowType) === "range") {
     // Range indices are not editable
     isEditable = false
   }
@@ -240,7 +247,29 @@ export function getColumnFromArrow(
   data: Quiver,
   columnPosition: number
 ): BaseColumnProps {
-  const title = data.columns[0][columnPosition]
+  // data.columns refers to the header rows (not sure about why it is named this way)
+  // It is a matrix of column names.
+  const columnHeaderNames = data.columns.map(column => column[columnPosition])
+  const title =
+    columnHeaderNames.length > 0
+      ? columnHeaderNames[columnHeaderNames.length - 1]
+      : ""
+
+  // If there are > 1 header columns, join all these headers with a "/"
+  // and use it as the group name, but ignore empty strings headers.
+  // This does not include the last column, which we use as the actual
+  // column name. E.g.
+  // columnHeaders = ["a", "b", "c"] -> group = "a / b" name: "c"
+  // columnHeaders = ["", "b", "c"] -> group = "b" name: "c"
+
+  const group =
+    columnHeaderNames.length > 1
+      ? columnHeaderNames
+          .filter(column => column !== "")
+          .slice(0, -1)
+          .join(" / ")
+      : undefined
+
   let arrowType = data.types.data[columnPosition]
 
   if (isNullOrUndefined(arrowType)) {
@@ -253,7 +282,7 @@ export function getColumnFromArrow(
   }
 
   let columnTypeOptions
-  if (Quiver.getTypeName(arrowType) === "categorical") {
+  if (getTypeName(arrowType) === "categorical") {
     // Get the available categories and use it in column type metadata
     const options = data.getCategoricalOptions(columnPosition)
     if (notNullOrUndefined(options)) {
@@ -272,6 +301,7 @@ export function getColumnFromArrow(
     columnTypeOptions,
     isIndex: false,
     isHidden: false,
+    group,
   } as BaseColumnProps
 }
 
@@ -346,9 +376,7 @@ export function getCellFromArrow(
   arrowCell: DataFrameCell,
   cssStyles: string | undefined = undefined
 ): GridCell {
-  const typeName = column.arrowType
-    ? Quiver.getTypeName(column.arrowType)
-    : null
+  const typeName = column.arrowType ? getTypeName(column.arrowType) : null
 
   let cellTemplate
   if (column.kind === "object") {
@@ -357,7 +385,7 @@ export function getCellFromArrow(
     cellTemplate = column.getCell(
       notNullOrUndefined(arrowCell.content)
         ? removeLineBreaks(
-            Quiver.format(
+            formatArrowCell(
               arrowCell.content,
               arrowCell.contentType,
               arrowCell.field
@@ -383,10 +411,7 @@ export function getCellFromArrow(
       // Time values needs to be adjusted to seconds based on the unit
       parsedDate = moment
         .unix(
-          Quiver.convertToSeconds(
-            arrowCell.content,
-            arrowCell.field?.type?.unit ?? 0
-          )
+          convertToSeconds(arrowCell.content, arrowCell.field?.type?.unit ?? 0)
         )
         .utc()
         .toDate()
@@ -402,7 +427,7 @@ export function getCellFromArrow(
     // because we don't have access to the required scale in the number column.
     const decimalStr = isNullOrUndefined(arrowCell.content)
       ? null
-      : Quiver.format(
+      : formatArrowCell(
           arrowCell.content,
           arrowCell.contentType,
           arrowCell.field
@@ -430,19 +455,35 @@ export function getCellFromArrow(
           ...cellTemplate,
           displayData,
         } as TextCell
-      } else if (cellTemplate.kind === GridCellKind.Number) {
+      } else if (
+        cellTemplate.kind === GridCellKind.Number &&
+        // Only apply styler value if format was not explicitly set by the user.
+        isNullOrUndefined(
+          (column.columnTypeOptions as NumberColumnParams)?.format
+        )
+      ) {
         cellTemplate = {
           ...cellTemplate,
           displayData,
         } as NumberCell
-      } else if (cellTemplate.kind === GridCellKind.Uri) {
+      } else if (
+        cellTemplate.kind === GridCellKind.Uri &&
+        // Only apply styler value if display text was not explicitly set by the user.
+        isNullOrUndefined(
+          (column.columnTypeOptions as LinkColumnParams)?.display_text
+        )
+      ) {
         cellTemplate = {
           ...cellTemplate,
           displayData,
         } as UriCell
       } else if (
         cellTemplate.kind === GridCellKind.Custom &&
-        (cellTemplate as DatePickerType).data?.kind === "date-picker-cell"
+        (cellTemplate as DatePickerType).data?.kind === "date-picker-cell" &&
+        // Only apply styler value if format was not explicitly set by the user.
+        isNullOrUndefined(
+          (column.columnTypeOptions as DateTimeColumnParams)?.format
+        )
       ) {
         cellTemplate = {
           ...cellTemplate,

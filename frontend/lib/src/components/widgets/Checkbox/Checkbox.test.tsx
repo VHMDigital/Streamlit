@@ -16,8 +16,7 @@
 
 import React from "react"
 
-import { fireEvent, screen } from "@testing-library/react"
-import "@testing-library/jest-dom"
+import { act, fireEvent, screen } from "@testing-library/react"
 
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import { render } from "@streamlit/lib/src/test_util"
@@ -26,12 +25,12 @@ import {
   LabelVisibilityMessage as LabelVisibilityMessageProto,
 } from "@streamlit/lib/src/proto"
 
-import Checkbox, { OwnProps } from "./Checkbox"
+import Checkbox, { Props } from "./Checkbox"
 
 const getProps = (
   elementProps: Partial<CheckboxProto> = {},
-  widgetProps: Partial<OwnProps> = {}
-): OwnProps => ({
+  widgetProps: Partial<Props> = {}
+): Props => ({
   element: CheckboxProto.create({
     id: "1",
     label: "Label",
@@ -42,8 +41,8 @@ const getProps = (
   width: 0,
   disabled: false,
   widgetMgr: new WidgetStateManager({
-    sendRerunBackMsg: jest.fn(),
-    formsDataChanged: jest.fn(),
+    sendRerunBackMsg: vi.fn(),
+    formsDataChanged: vi.fn(),
   }),
   ...widgetProps,
 })
@@ -58,7 +57,7 @@ describe("Checkbox widget", () => {
 
   it("sets widget value on mount", () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setBoolValue")
+    vi.spyOn(props.widgetMgr, "setBoolValue")
 
     render(<Checkbox {...props} />)
 
@@ -126,10 +125,12 @@ describe("Checkbox widget", () => {
 
   it("handles the onChange event", () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setBoolValue")
+    vi.spyOn(props.widgetMgr, "setBoolValue")
 
     render(<Checkbox {...props} />)
 
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.click(screen.getByRole("checkbox"))
 
     expect(props.widgetMgr.setBoolValue).toHaveBeenCalledWith(
@@ -143,10 +144,12 @@ describe("Checkbox widget", () => {
 
   it("can pass fragmentId to setBoolValue", () => {
     const props = getProps(undefined, { fragmentId: "myFragmentId" })
-    jest.spyOn(props.widgetMgr, "setBoolValue")
+    vi.spyOn(props.widgetMgr, "setBoolValue")
 
     render(<Checkbox {...props} />)
 
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.click(screen.getByRole("checkbox"))
 
     expect(props.widgetMgr.setBoolValue).toHaveBeenCalledWith(
@@ -160,13 +163,15 @@ describe("Checkbox widget", () => {
   it("resets its value when form is cleared", () => {
     // Create a widget in a clearOnSubmit form
     const props = getProps({ formId: "form" })
-    props.widgetMgr.setFormClearOnSubmit("form", true)
+    props.widgetMgr.setFormSubmitBehaviors("form", true)
 
-    jest.spyOn(props.widgetMgr, "setBoolValue")
+    vi.spyOn(props.widgetMgr, "setBoolValue")
 
     render(<Checkbox {...props} />)
 
     // Change the widget value
+    // TODO: Utilize user-event instead of fireEvent
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.click(screen.getByRole("checkbox"))
 
     expect(screen.getByRole("checkbox")).toBeChecked()
@@ -178,7 +183,9 @@ describe("Checkbox widget", () => {
     )
 
     // "Submit" the form
-    props.widgetMgr.submitForm("form", undefined)
+    act(() => {
+      props.widgetMgr.submitForm("form", undefined)
+    })
 
     // Our widget should be reset, and the widgetMgr should be updated
     expect(screen.getByRole("checkbox")).not.toBeChecked()

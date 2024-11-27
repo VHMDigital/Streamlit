@@ -138,7 +138,6 @@ pytest:
 	cd lib; \
 		PYTHONPATH=. \
 		pytest -v \
-			--junitxml=test-reports/pytest/junit.xml \
 			-l tests/ \
 			$(PYTHON_MODULES)
 
@@ -148,7 +147,6 @@ pytest-integration:
 	cd lib; \
 		PYTHONPATH=. \
 		pytest -v \
-			--junitxml=test-reports/pytest/junit.xml \
 			--require-integration \
 			-l tests/ \
 			$(PYTHON_MODULES)
@@ -219,6 +217,7 @@ clean:
 	rm -f lib/Pipfile.lock
 	rm -rf frontend/app/build
 	rm -rf frontend/node_modules
+	rm -rf frontend/app/performance/lighthouse/reports
 	rm -rf frontend/app/node_modules
 	rm -rf frontend/lib/node_modules
 	rm -rf frontend/test_results
@@ -264,7 +263,7 @@ protobuf: check-protoc
 		echo ; \
 		yarn --silent pbjs \
 			../proto/streamlit/proto/*.proto \
-			--path=proto -t static-module --wrap es6 \
+			--path ../proto -t static-module --wrap es6 \
 	) > ./lib/src/proto.js
 
 	@# Typescript type declarations for our generated protobufs
@@ -304,35 +303,30 @@ frontend-app:
 	cd frontend/ ; yarn run buildApp
 
 .PHONY: jslint
-# Lint the JS code.
+# Verify that our JS/TS code is formatted and that there are no lint errors.
 jslint:
-	cd frontend; \
-		yarn lint;
+	cd frontend/ ; yarn run formatCheck
+	cd frontend/ ; yarn run lint
 
 .PHONY: tstypecheck
 # Typecheck the JS/TS code.
 tstypecheck:
-	pre-commit run typecheck-lib --all-files --hook-stage manual && pre-commit run typecheck-app --all-files --hook-stage manual
+	cd frontend/ ; yarn run typecheck
 
 .PHONY: jsformat
 # Fix formatting issues in our JavaScript & TypeScript files.
 jsformat:
-	pre-commit run prettier --all-files --hook-stage manual
+	cd frontend/ ; yarn run format
 
 .PHONY: jstest
 # Run JS unit tests.
 jstest:
 	cd frontend; TESTPATH=$(TESTPATH) yarn run test
 
-.PHONY: jscoverage
+.PHONY: jstestcoverage
 # Run JS unit tests and generate a coverage report.
-jscoverage:
-	cd frontend; yarn run test --coverage --watchAll=false
-
-.PHONY: e2etest
-# Run E2E tests.
-e2etest:
-	./scripts/run_e2e_tests.py
+jstestcoverage:
+	cd frontend; TESTPATH=$(TESTPATH) yarn run testcoverage
 
 .PHONY: playwright
 # Run playwright E2E tests (without custom component tests).
@@ -355,6 +349,11 @@ playwright-custom-components:
 		pip install $${pip_args}; \
 	fi; \
 	pytest ${custom_components_test_folder} --browser webkit --browser chromium --browser firefox --video retain-on-failure --screenshot only-on-failure --output ./test-results/ -n auto --reruns 1 --reruns-delay 1 --rerun-except "Missing snapshot" --durations=5 -r aR -v
+
+.PHONY: update-snapshots
+# Update e2e playwright snapshots based on the latest completed CI run.
+update-snapshots:
+	python ./scripts/update_e2e_snapshots.py
 
 .PHONY: loc
 # Count the number of lines of code in the project.
@@ -390,7 +389,6 @@ notices:
 	./scripts/append_license.sh frontend/app/src/assets/img/Open-Iconic.LICENSE
 	./scripts/append_license.sh frontend/lib/src/vendor/bokeh/bokeh-LICENSE.txt
 	./scripts/append_license.sh frontend/lib/src/vendor/twemoji-LICENSE.txt
-	./scripts/append_license.sh frontend/app/src/vendor/Segment-LICENSE.txt
 	./scripts/append_license.sh frontend/lib/src/vendor/react-bootstrap-LICENSE.txt
 	./scripts/append_license.sh lib/streamlit/vendor/ipython/IPython-LICENSE.txt
 
@@ -415,6 +413,12 @@ pre-commit-install:
 # Ensure relative imports exist within the lib/dist folder when doing yarn buildLibProd.
 ensure-relative-imports:
 	./scripts/ensure_relative_imports.sh
+
+.PHONY: performance-lighthouse
+# Run Lighthouse performance tests
+performance-lighthouse:
+	cd frontend/app; \
+	yarn run lighthouse:run
 
 .PHONY frontend-lib-prod:
 # Build the production version for @streamlit/lib.

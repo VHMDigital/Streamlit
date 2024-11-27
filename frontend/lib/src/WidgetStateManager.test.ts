@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Mock } from "vitest"
 import { enableAllPlugins } from "immer"
 
 import {
@@ -71,15 +72,15 @@ const MOCK_FILE_UPLOADER_STATE = new FileUploaderStateProto({
 enableAllPlugins()
 
 describe("Widget State Manager", () => {
-  let sendBackMsg: jest.Mock
+  let sendBackMsg: Mock
   let widgetMgr: WidgetStateManager
   let formsData: FormsData
-  let onFormsDataChanged: jest.Mock
+  let onFormsDataChanged: Mock
 
   beforeEach(() => {
     formsData = createFormsData()
-    sendBackMsg = jest.fn()
-    onFormsDataChanged = jest.fn(newData => {
+    sendBackMsg = vi.fn()
+    onFormsDataChanged = vi.fn(newData => {
       formsData = newData
     })
     widgetMgr = new WidgetStateManager({
@@ -500,7 +501,7 @@ describe("Widget State Manager", () => {
     })
 
     it("updates formsWithUploads", () => {
-      widgetMgr.setFormsWithUploads(new Set(["three", "four"]))
+      widgetMgr.setFormsWithUploadsInProgress(new Set(["three", "four"]))
       expect(onFormsDataChanged).toHaveBeenCalledTimes(1)
       expect(formsData.formsWithUploads.has("one")).toBe(false)
       expect(formsData.formsWithUploads.has("two")).toBe(false)
@@ -516,7 +517,7 @@ describe("Widget State Manager", () => {
       // It's sufficient to check just a single FormsData member for this test;
       // Immer imposes this immutability guarantee on all of an object's
       // sets, maps, and arrays.
-      widgetMgr.setFormsWithUploads(new Set(["one", "two"]))
+      widgetMgr.setFormsWithUploadsInProgress(new Set(["one", "two"]))
       expect(Object.isFrozen(formsData.formsWithUploads)).toBe(true)
     })
   })
@@ -614,7 +615,7 @@ describe("Widget State Manager", () => {
       ).toThrow(`invalid formID ${MOCK_WIDGET.formId}`)
     })
 
-    it("submits the form for the first submitButton if an actualSubmitButton proto is passed", () => {
+    it("submits the form for the first submitButton if an actualSubmitButton proto is not passed", () => {
       const formId = "mockFormId"
       widgetMgr.addSubmitButton(
         formId,
@@ -636,34 +637,168 @@ describe("Widget State Manager", () => {
       )
     })
 
-    it("does not submit the form if the first submitButton is disabled", () => {
-      const formId = "mockFormId"
-      widgetMgr.addSubmitButton(
-        formId,
-        new ButtonProto({ id: "firstSubmitButton", disabled: true })
-      )
-      widgetMgr.addSubmitButton(
-        formId,
-        new ButtonProto({ id: "secondSubmitButton" })
-      )
-      widgetMgr.submitForm(formId, undefined)
-
-      expect(sendBackMsg).not.toHaveBeenCalled()
-    })
-
-    it("does not submit the form if the second submitButton is disabled", () => {
+    it("submits the form for the actualSubmitButton when passed", () => {
       const formId = "mockFormId"
       widgetMgr.addSubmitButton(
         formId,
         new ButtonProto({ id: "firstSubmitButton" })
       )
+      const actualSubmitButton = new ButtonProto({
+        id: "secondSubmitButton",
+        isFormSubmitter: true,
+      })
+      widgetMgr.addSubmitButton(formId, actualSubmitButton)
+      widgetMgr.submitForm(formId, undefined, actualSubmitButton)
+
+      expect(sendBackMsg).toHaveBeenCalledWith(
+        {
+          widgets: [{ id: "secondSubmitButton", triggerValue: true }],
+        },
+        undefined,
+        undefined,
+        undefined
+      )
+    })
+  })
+
+  describe("allowFormEnterToSubmit", () => {
+    it("returns true for a valid formId with 1st submit button enabled", () => {
+      // Create form with a submit button
+      const formId = "mockFormId"
+
       widgetMgr.addSubmitButton(
         formId,
-        new ButtonProto({ id: "secondSubmitButton", disabled: true })
+        new ButtonProto({ id: "submitButton" })
       )
-      widgetMgr.submitForm(formId, undefined)
+      widgetMgr.setStringValue(
+        { id: "widget1", formId },
+        "foo",
+        {
+          fromUi: true,
+        },
+        undefined
+      )
 
-      expect(sendBackMsg).not.toHaveBeenCalled()
+      // Form should exist & allow submission on Enter
+      // @ts-expect-error - checking that form exists via internal state
+      expect(widgetMgr.forms.get(formId)).toBeTruthy()
+      expect(widgetMgr.allowFormEnterToSubmit(formId)).toBe(true)
+    })
+
+    it("returns false for an invalid formId", () => {
+      // Create form with a submit button
+      const formId = "mockFormId"
+
+      widgetMgr.addSubmitButton(
+        formId,
+        new ButtonProto({ id: "submitButton" })
+      )
+      widgetMgr.setStringValue(
+        { id: "widget1", formId },
+        "foo",
+        {
+          fromUi: true,
+        },
+        undefined
+      )
+
+      // @ts-expect-error - Created form should exist
+      expect(widgetMgr.forms.get(formId)).toBeTruthy()
+
+      // @ts-expect-error - Other form should NOT exist & should not allow submit on Enter
+      expect(widgetMgr.forms.get("INVALID_FORM_ID")).toBeFalsy()
+      expect(widgetMgr.allowFormEnterToSubmit("INVALID_FORM_ID")).toBe(false)
+    })
+
+    it("returns false for a valid formId with no submit buttons", () => {
+      // Create form with a submit button
+      const formId = "mockFormId"
+
+      widgetMgr.setStringValue(
+        { id: "widget1", formId },
+        "foo",
+        {
+          fromUi: true,
+        },
+        undefined
+      )
+
+      // @ts-expect-error - Created form should exist, but no allow submit on Enter
+      expect(widgetMgr.forms.get(formId)).toBeTruthy()
+      expect(widgetMgr.allowFormEnterToSubmit(formId)).toBe(false)
+    })
+
+    it("returns false if the 1st submit button disabled", () => {
+      // Create form with a submit button
+      const formId = "mockFormId"
+
+      widgetMgr.addSubmitButton(
+        formId,
+        new ButtonProto({ id: "submitButton", disabled: true })
+      )
+      widgetMgr.setStringValue(
+        { id: "widget1", formId },
+        "foo",
+        {
+          fromUi: true,
+        },
+        undefined
+      )
+
+      // @ts-expect-error - Created form should exist, but no allow submit on Enter
+      expect(widgetMgr.forms.get(formId)).toBeTruthy()
+      expect(widgetMgr.allowFormEnterToSubmit(formId)).toBe(false)
+    })
+
+    it("returns true if the 1st submit button enabled, others disabled", () => {
+      // Create form with a submit button
+      const formId = "mockFormId"
+
+      widgetMgr.addSubmitButton(
+        formId,
+        new ButtonProto({ id: "submitButton" })
+      )
+      widgetMgr.addSubmitButton(
+        formId,
+        new ButtonProto({ id: "submitButton2", disabled: true })
+      )
+      widgetMgr.setStringValue(
+        { id: "widget1", formId },
+        "foo",
+        {
+          fromUi: true,
+        },
+        undefined
+      )
+
+      // @ts-expect-error - Created form should exist and allow submit on Enter
+      expect(widgetMgr.forms.get(formId)).toBeTruthy()
+      expect(widgetMgr.allowFormEnterToSubmit(formId)).toBe(true)
+    })
+
+    it("returns false if form created with enter_to_submit=False", () => {
+      // Create form with a submit button
+      const formId = "mockFormId"
+
+      // Create form with enter_to_submit=False
+      widgetMgr.setFormSubmitBehaviors(formId, false, false)
+
+      widgetMgr.addSubmitButton(
+        formId,
+        new ButtonProto({ id: "submitButton" })
+      )
+      widgetMgr.setStringValue(
+        { id: "widget1", formId },
+        "foo",
+        {
+          fromUi: true,
+        },
+        undefined
+      )
+
+      // @ts-expect-error - Created form should exist, but no allow submit on Enter
+      expect(widgetMgr.forms.get(formId)).toBeTruthy()
+      expect(widgetMgr.allowFormEnterToSubmit(formId)).toBe(false)
     })
   })
 
@@ -977,8 +1112,8 @@ describe("WidgetStateDict", () => {
 
   it("supplies WidgetStates with for active widgets based on input", () => {
     const widgetStateManager = new WidgetStateManager({
-      sendRerunBackMsg: jest.fn(),
-      formsDataChanged: jest.fn(),
+      sendRerunBackMsg: vi.fn(),
+      formsDataChanged: vi.fn(),
     })
 
     widgetStateManager.setStringValue(
