@@ -49,7 +49,7 @@ export type CustomGridTheme = {
  *
  * @return a glide-data-grid compatible theme.
  */
-function useCustomTheme(): CustomGridTheme {
+function useCustomTheme(): Readonly<CustomGridTheme> {
   const theme: EmotionTheme = useTheme()
 
   const gridTheme: CustomGridTheme = React.useMemo<CustomGridTheme>(() => {
