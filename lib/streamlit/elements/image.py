@@ -63,7 +63,7 @@ class ImageMixin:
 
         Parameters
         ----------
-        image : numpy.ndarray, [numpy.ndarray], BytesIO, str, [str], Path, or [Path]
+        image : numpy.ndarray, BytesIO, str, Path, or list of these
             The image to display. This can be one of the following:
 
             - A URL (string) for a hosted image.

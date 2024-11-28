@@ -42,11 +42,11 @@ class MarkdownMixin:
 
         Parameters
         ----------
-        body : str or object
+        body : any
             The text to display as GitHub-flavored Markdown. Syntax
             information can be found at: https://github.github.com/gfm.
             If anything other than a string is passed, it will be converted
-            into a string behind the scenes using `str()`.
+            into a string behind the scenes using ``str(body)``.
 
             This also supports:
 

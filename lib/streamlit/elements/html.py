@@ -47,7 +47,7 @@ class HtmlMixin:
 
         Parameters
         ----------
-        body : str or Path or object
+        body : any
             The HTML code to insert. This can be one of the following:
 
             * A string of HTML code.
