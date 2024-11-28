@@ -146,7 +146,7 @@ class ChatMixin:
             accessibility label. For accessibility reasons, you should not use
             an empty string.
 
-        avatar : Anything supported by st.image, str, or None
+        avatar : Anything supported by st.image (except list), str, or None
             The avatar shown next to the message.
 
             If ``avatar`` is ``None`` (default), the icon will be determined
