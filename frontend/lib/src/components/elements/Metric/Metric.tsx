@@ -16,6 +16,7 @@
 
 import React, { ReactElement } from "react"
 
+import { EmotionIcon } from "@emotion-icons/emotion-icon"
 import { ArrowDownward, ArrowUpward } from "@emotion-icons/material-outlined"
 
 import { Metric as MetricProto } from "@streamlit/lib/src/proto"
@@ -50,10 +51,10 @@ export default function Metric({
     color,
     labelVisibility,
     help,
-    border,
+    showBorder,
   } = element
 
-  let metricDirection: any = null
+  let metricDirection: EmotionIcon | null = null
 
   switch (direction) {
     case MetricDirection.DOWN:
@@ -61,10 +62,6 @@ export default function Metric({
       break
     case MetricDirection.UP:
       metricDirection = ArrowUpward
-      break
-    // this must be none
-    default:
-      metricDirection = null
       break
   }
 
@@ -75,7 +72,7 @@ export default function Metric({
     <StyledMetricContainer
       className="stMetric"
       data-testid="stMetric"
-      border={border}
+      showBorder={showBorder}
     >
       <StyledMetricLabelText
         data-testid="stMetricLabel"
@@ -95,17 +92,18 @@ export default function Metric({
       </StyledMetricValueText>
       {deltaExists && (
         <StyledMetricDeltaText data-testid="stMetricDelta" metricColor={color}>
-          <Icon
-            testid={
-              // if direction is null, icon will be null
-              metricDirection === ArrowUpward
-                ? "stMetricDeltaIcon-Up"
-                : "stMetricDeltaIcon-Down"
-            }
-            content={metricDirection}
-            size="lg"
-            margin={arrowMargin}
-          />
+          {metricDirection && (
+            <Icon
+              testid={
+                metricDirection === ArrowUpward
+                  ? "stMetricDeltaIcon-Up"
+                  : "stMetricDeltaIcon-Down"
+              }
+              content={metricDirection}
+              size="lg"
+              margin={arrowMargin}
+            />
+          )}
           <StyledTruncateText> {delta} </StyledTruncateText>
         </StyledMetricDeltaText>
       )}

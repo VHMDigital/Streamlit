@@ -161,7 +161,7 @@ class MetricMixin:
         metric_proto.body = _parse_value(value)
         metric_proto.label = _parse_label(label)
         metric_proto.delta = _parse_delta(delta)
-        metric_proto.border = border
+        metric_proto.show_border = border
         if help is not None:
             metric_proto.help = dedent(help)
 

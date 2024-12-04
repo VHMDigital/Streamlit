@@ -150,7 +150,7 @@ describe("Metric element", () => {
   })
 
   it("renders with border if passed", () => {
-    const props = getProps({ border: true })
+    const props = getProps({ showBorder: true })
     render(<Metric {...props} />)
 
     const expectedBorder = `${mockTheme.emotion.sizes.borderWidth} solid ${mockTheme.emotion.colors.borderColor}`

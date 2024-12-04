@@ -21,12 +21,12 @@ import { Metric as MetricProto } from "@streamlit/lib/src/proto"
 import { LabelVisibilityOptions } from "@streamlit/lib/src/util/utils"
 
 export interface StyledMetricContainerProps {
-  border: boolean
+  showBorder: boolean
 }
 
 export const StyledMetricContainer = styled.div<StyledMetricContainerProps>(
-  ({ theme, border }) => ({
-    ...(border && {
+  ({ theme, showBorder }) => ({
+    ...(showBorder && {
       border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
       borderRadius: theme.radii.default,
       padding: `calc(${theme.spacing.lg} - ${theme.sizes.borderWidth})`,
