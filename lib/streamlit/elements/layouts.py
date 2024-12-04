@@ -343,7 +343,7 @@ class LayoutsMixin:
             col_proto.column.vertical_alignment = vertical_alignment_mapping[
                 vertical_alignment
             ]
-            col_proto.column.border = border
+            col_proto.column.show_border = border
             col_proto.allow_empty = True
             return col_proto
 

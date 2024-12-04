@@ -176,7 +176,7 @@ const BlockNodeRenderer = (props: BlockPropsWithWidth): ReactElement => {
         verticalAlignment={
           node.deltaBlock.column.verticalAlignment ?? undefined
         }
-        border={node.deltaBlock.column.border ?? false}
+        showBorder={node.deltaBlock.column.showBorder ?? false}
         className="stColumn"
         data-testid="stColumn"
       >

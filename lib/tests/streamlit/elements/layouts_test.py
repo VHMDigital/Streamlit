@@ -46,7 +46,7 @@ class ColumnsTest(DeltaGeneratorTestCase):
             BlockProto.Column.VerticalAlignment.TOP,
         )
         self.assertEqual(columns_blocks[0].add_block.column.gap, "small")
-        self.assertEqual(columns_blocks[0].add_block.column.border, False)
+        self.assertEqual(columns_blocks[0].add_block.column.show_border, False)
 
         # Check the weights are correct
         self.assertEqual(columns_blocks[0].add_block.column.weight, 1.0 / 3)
@@ -195,9 +195,9 @@ class ColumnsTest(DeltaGeneratorTestCase):
         # 4 elements will be created: 1 horizontal block, 3 columns, each receives
         # border=True
         self.assertEqual(len(all_deltas), 4)
-        self.assertTrue(columns_blocks[0].add_block.column.border)
-        self.assertTrue(columns_blocks[1].add_block.column.border)
-        self.assertTrue(columns_blocks[2].add_block.column.border)
+        self.assertTrue(columns_blocks[0].add_block.column.show_border)
+        self.assertTrue(columns_blocks[1].add_block.column.show_border)
+        self.assertTrue(columns_blocks[2].add_block.column.show_border)
 
 
 class ExpanderTest(DeltaGeneratorTestCase):
