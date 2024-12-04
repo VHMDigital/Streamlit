@@ -126,14 +126,7 @@ function ImageList({
         onCollapse={collapse}
         disableFullscreenMode={disableFullscreenMode}
       ></Toolbar>
-      <StyledImageList
-        className="stImage"
-        data-testid="stImage"
-        style={{
-          maxWidth: elementWidth,
-          width: "fit-content",
-        }}
-      >
+      <StyledImageList className="stImage" data-testid="stImage">
         {element.imgs.map((iimage, idx): ReactElement => {
           const image = iimage as ImageProto
           return (
