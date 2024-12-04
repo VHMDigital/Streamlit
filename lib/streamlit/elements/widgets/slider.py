@@ -44,7 +44,11 @@ from streamlit.elements.lib.utils import (
     get_label_visibility_proto_value,
     to_key,
 )
-from streamlit.errors import StreamlitAPIException
+from streamlit.errors import (
+    StreamlitAPIException,
+    StreamlitValueAboveMaxError,
+    StreamlitValueBelowMinError,
+)
 from streamlit.proto.Slider_pb2 import Slider as SliderProto
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.runtime.scriptrunner import ScriptRunContext, get_script_run_ctx
@@ -845,6 +849,32 @@ class SliderMixin:
         )
 
         if widget_state.value_changed:
+            try:
+                # Min/Max bounds checks when the value is updated.
+                for value in widget_state.value:
+                    if value < slider_proto.min:
+                        raise StreamlitValueBelowMinError(
+                            value=value, min_value=slider_proto.min
+                        )
+
+                    if value > slider_proto.max:
+                        raise StreamlitValueAboveMaxError(
+                            value=value, max_value=slider_proto.max
+                        )
+            except TypeError:
+                # Value is not iterable.
+                if widget_state.value < slider_proto.min:
+                    raise StreamlitValueBelowMinError(
+                        value=serde.serialize(widget_state.value),
+                        min_value=slider_proto.min,
+                    )
+
+                if widget_state.value > slider_proto.max:
+                    raise StreamlitValueAboveMaxError(
+                        value=serde.serialize(widget_state.value),
+                        max_value=slider_proto.max,
+                    )
+
             slider_proto.value[:] = serde.serialize(widget_state.value)
             slider_proto.set_value = True
 
