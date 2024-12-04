@@ -183,7 +183,7 @@ export const StyledTertiaryButton = styled(
     },
     "&:focus-visible": {
       color: theme.colors.primary,
-      boxShadow: `0 0 0 0.2rem ${transparentize(theme.colors.gray90, 0.8)}`,
+      boxShadow: `0 0 0 0.2rem ${transparentize(theme.colors.primary, 0.5)}`,
     },
     "&:hover": {
       color: theme.colors.primary,
