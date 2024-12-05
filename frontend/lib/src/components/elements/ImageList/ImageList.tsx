@@ -118,6 +118,7 @@ function ImageList({
       width={elementWidth}
       height={height}
       useContainerWidth={isFullScreen}
+      topCentered
     >
       <Toolbar
         target={StyledToolbarElementContainer}
