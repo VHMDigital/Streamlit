@@ -26,6 +26,21 @@ const HASH = process.env.OMIT_HASH_FROM_MAIN_FILES ? "" : ".[hash]"
 // We do not explicitly set the DEV_BUILD in any of our processes
 // This is a convenience for developers for debugging purposes
 const DEV_BUILD = process.env.DEV_BUILD || false
+
+// const profilerAliases = process.env.IS_PROFILER_BUILD
+const profilerAliases = true
+  ? [
+      {
+        find: /^react-dom$/,
+        replacement: "react-dom/profiling",
+      },
+      {
+        find: "scheduler/tracing",
+        replacement: "scheduler/tracing-profiling",
+      },
+    ]
+  : []
+
 // https://vitejs.dev/config/
 export default defineConfig({
   base: BASE,
@@ -41,10 +56,17 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: {
-      "@streamlit/lib/src": path.resolve(__dirname, "../lib/src"),
-      "@streamlit/lib": path.resolve(__dirname, "../lib/src"),
-    },
+    alias: [
+      {
+        find: "@streamlit/lib/src",
+        replacement: path.resolve(__dirname, "../lib/src"),
+      },
+      {
+        find: "@streamlit/lib",
+        replacement: path.resolve(__dirname, "../lib/src"),
+      },
+      ...profilerAliases,
+    ],
   },
   server: {
     open: true,
