@@ -25,7 +25,11 @@ import React, {
 import { CircularBuffer } from "./CircularBuffer"
 
 export type ProfilerProps = PropsWithChildren<{
-  id: string
+  /**
+   * The unique ID of a Profiler.
+   * Statically typed so we can enforce which profiles are being collected.
+   */
+  id: "Main" | "Sidebar" | "Bottom" | "Event"
 }>
 
 /**
