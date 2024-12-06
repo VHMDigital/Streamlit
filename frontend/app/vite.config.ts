@@ -26,9 +26,15 @@ const HASH = process.env.OMIT_HASH_FROM_MAIN_FILES ? "" : ".[hash]"
 // We do not explicitly set the DEV_BUILD in any of our processes
 // This is a convenience for developers for debugging purposes
 const DEV_BUILD = process.env.DEV_BUILD || false
+const IS_PROFILER_BUILD = process.env.IS_PROFILER_BUILD || false
 
-// const profilerAliases = process.env.IS_PROFILER_BUILD
-const profilerAliases = true
+/**
+ * If this is a profiler build, we need to alias react-dom and scheduler to
+ * their profiling versions so that we can use the React DevTools profiler
+ * programmatically in tests.
+ * @see https://fb.me/react-profiling
+ */
+const profilerAliases = IS_PROFILER_BUILD
   ? [
       {
         find: /^react-dom$/,
