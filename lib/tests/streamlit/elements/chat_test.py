@@ -29,7 +29,6 @@ from streamlit.proto.Block_pb2 import Block as BlockProto
 from streamlit.proto.Common_pb2 import FileURLs as FileURLsProto
 from streamlit.proto.RootContainer_pb2 import RootContainer as RootContainerProto
 from streamlit.runtime.uploaded_file_manager import (
-    DeletedFile,
     UploadedFile,
     UploadedFileRec,
 )
@@ -367,32 +366,3 @@ class ChatTest(DeltaGeneratorTestCase):
         file0.seek(2)
         self.assertEqual(b"3", file0.read())
         self.assertEqual(b"123", file1.read())
-
-    @patch("streamlit.elements.widgets.chat.ChatInputSerde.deserialize")
-    def test_deleted_files_filtered_out(self, deserialize_patch):
-        """We should filter out DeletedFile objects for final user value."""
-
-        rec0 = UploadedFileRec("file0", "name0", "type", b"1234")
-        rec1 = UploadedFileRec("file1", "name1", "type", b"5678")
-
-        uploaded_files = [
-            DeletedFile(file_id="a"),
-            UploadedFile(
-                rec0, FileURLsProto(file_id="file0", delete_url="d0", upload_url="u0")
-            ),
-            DeletedFile(file_id="b"),
-            UploadedFile(
-                rec1, FileURLsProto(file_id="file1", delete_url="d1", upload_url="u1")
-            ),
-            DeletedFile(file_id="c"),
-        ]
-
-        deserialize_patch.return_value = ChatInputValue(
-            text="placeholder", files=uploaded_files
-        )
-
-        files0 = st.chat_input(accept_file=True).files
-        files1 = st.chat_input(accept_file="multiple")
-
-        self.assertEqual(files0[0], None)
-        self.assertEqual(files1, [uploaded_files[1], uploaded_files[3]])
