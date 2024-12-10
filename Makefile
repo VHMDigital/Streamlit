@@ -294,6 +294,12 @@ react-build:
 	rsync -av --delete --delete-excluded --exclude=reports \
 		frontend/app/build/ lib/streamlit/static/
 
+.PHONY: frontend-build-with-profiler
+frontend-build-with-profiler:
+	cd frontend/ ; yarn run buildWithProfiler
+	rsync -av --delete --delete-excluded --exclude=reports \
+		frontend/app/build/ lib/streamlit/static/
+
 .PHONY: frontend-lib
 # Build the frontend library.
 frontend-lib:
