@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { ScriptRunState } from "@streamlit/lib/src/ScriptRunState"
+
 /**
  * Streamlit Performance Metric names. Allows this to be type-safe for our
  * purposes.
@@ -24,9 +26,4 @@ export type StPerformanceMetric = "script-run-cycle"
  * Streamlit Performance Mark names. Allows this to be type-safe for our
  * purposes.
  */
-export type StPerformanceMark =
-  | "running"
-  | "notRunning"
-  | "rerunRequested"
-  | "stopRequested"
-  | "compilationError"
+export type StPerformanceMark = `${ScriptRunState}`

@@ -50,6 +50,8 @@ const handleRender: ProfilerOnRenderCallback = (
     window.__streamlit_profiles__[id] ||
     // Use a CircularBuffer to limit the number of profiles stored in memory to
     // prevent any potential memory leaks.
+    // 1000 is an arbitrary number that should be enough to store more than
+    // enough entries for debugging purposes without consuming too much memory.
     new CircularBuffer<(typeof window.__streamlit_profiles__)[string]>(1000)
 
   window.__streamlit_profiles__[id].push({

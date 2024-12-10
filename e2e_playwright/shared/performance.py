@@ -26,16 +26,17 @@ if TYPE_CHECKING:
 
 # Observe long tasks, measure, marks, and paints with PerformanceObserver
 # @see https://developer.mozilla.org/en-US/docs/Web/API/PerformanceObserver
+# @see https://developer.mozilla.org/en-US/docs/Web/API/PerformanceObserverEntryList#using_performanceobserverentrylist
 CAPTURE_TRACES_SCRIPT = """
-window.__capturedTraces = {};
+window.__stCapturedTraces = {};
 
 function handleEntries(list) {
     const entries = list.getEntries();
     for (const entry of entries) {
-        if (!window.__capturedTraces[entry.entryType]) {
-            window.__capturedTraces[entry.entryType] = [];
+        if (!window.__stCapturedTraces[entry.entryType]) {
+            window.__stCapturedTraces[entry.entryType] = [];
         }
-        window.__capturedTraces[entry.entryType].push(entry);
+        window.__stCapturedTraces[entry.entryType].push(entry);
     }
 }
 
@@ -45,16 +46,16 @@ new PerformanceObserver(handleEntries).observe({
 """
 
 GET_CAPTURED_TRACES_SCRIPT = """
-window.__capturedTraces.profiles = {};
+window.__stCapturedTraces.profiles = {};
 
 for (const [key, value] of Object.entries(window.__streamlit_profiles__ || {})) {
-    window.__capturedTraces.profiles[key] = {
+    window.__stCapturedTraces.profiles[key] = {
         entries: value.buffer.filter(Boolean),
         totalWrittenEntries: value.totalWrittenEntries,
     };
 }
 
-JSON.stringify(window.__capturedTraces)
+JSON.stringify(window.__stCapturedTraces)
 """
 
 
