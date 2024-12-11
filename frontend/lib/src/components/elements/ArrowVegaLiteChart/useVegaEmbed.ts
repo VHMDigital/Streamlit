@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RefObject, useCallback, useRef, useState } from "react"
+import { RefObject, useCallback, useEffect, useRef, useState } from "react"
 
 import { truthy, View as VegaView } from "vega"
 import embed from "vega-embed"
@@ -64,14 +64,24 @@ export function useVegaEmbed(
   const datasetsRef = useRef<WrappedNamedDataset[]>([])
   const [error, setError] = useState<Error | null>(null)
 
-  // This hook is responsible for providing the setup function for selections in the chart
+  // Setup interactivity for the chart if it supports selections
   const maybeConfigureSelections = useVegaLiteSelections(
     inputElement,
     widgetMgr,
     fragmentId
   )
 
-  const { id: chartId } = inputElement
+  const { id: chartId, data, datasets } = inputElement
+
+  // Initialize the data and datasets refs with the current data and datasets
+  // This is predominantly used to handle the case where we want to reference
+  // these in createView before the first render.
+  useEffect(() => {
+    if (vegaView.current === null) {
+      dataRef.current = data
+      datasetsRef.current = datasets
+    }
+  }, [data, datasets])
 
   const finalizeView = useCallback(() => {
     if (vegaFinalizer.current) {
@@ -85,7 +95,7 @@ export function useVegaEmbed(
   const createView = useCallback(
     async (
       containerRef: RefObject<HTMLDivElement>,
-      element: VegaLiteChartElement
+      spec: any
     ): Promise<VegaView | null> => {
       try {
         logMessage("Creating a new Vega view.")
@@ -112,7 +122,7 @@ export function useVegaEmbed(
 
         const { vgSpec, view, finalize } = await embed(
           containerRef.current,
-          element.spec,
+          spec,
           options
         )
 
@@ -134,9 +144,8 @@ export function useVegaEmbed(
           }
         }
 
-        const dataArrays = getDataArrays(
-          element.datasets as WrappedNamedDataset[]
-        )
+        // Load the initial set of data into the chart.
+        const dataArrays = getDataArrays(datasetsRef.current)
 
         // Heuristic to determine the default dataset name.
         const datasetNames = dataArrays ? Object.keys(dataArrays) : []
@@ -147,7 +156,7 @@ export function useVegaEmbed(
           defaultDataName.current = DEFAULT_DATA_NAME
         }
 
-        const dataObj = getInlineData(element.data as Quiver | null)
+        const dataObj = getInlineData(dataRef.current as Quiver | null)
         if (dataObj) {
           vegaView.current.insert(defaultDataName.current, dataObj)
         }
@@ -156,9 +165,6 @@ export function useVegaEmbed(
             vegaView.current.insert(name, data)
           }
         }
-
-        datasetsRef.current = element.datasets
-        dataRef.current = element.data
 
         await vegaView.current.runAsync()
 
@@ -176,16 +182,17 @@ export function useVegaEmbed(
   )
 
   const updateData = useCallback(
-    (name: string, prevData: Quiver | null, data: Quiver | null): void => {
-      if (!vegaView.current) {
-        return
-      }
-
+    (
+      view: VegaView,
+      name: string,
+      prevData: Quiver | null,
+      data: Quiver | null
+    ): void => {
       if (!data || data.data.numRows === 0) {
         // The new data is empty, so we remove the dataset from the
         // chart view if the named dataset exists.
         try {
-          vegaView.current.remove(name, truthy)
+          view.remove(name, truthy)
         } finally {
           return
         }
@@ -193,7 +200,7 @@ export function useVegaEmbed(
 
       if (!prevData || prevData.data.numRows === 0) {
         // The previous data was empty, so we just insert the new data.
-        vegaView.current.insert(name, getDataArray(data))
+        view.insert(name, getDataArray(data))
         return
       }
 
@@ -214,11 +221,11 @@ export function useVegaEmbed(
       ) {
         if (prevNumRows < numRows) {
           // Insert the new rows.
-          vegaView.current.insert(name, getDataArray(data, prevNumRows))
+          view.insert(name, getDataArray(data, prevNumRows))
         }
       } else {
         // Clean the dataset and insert from scratch.
-        vegaView.current.data(name, getDataArray(data))
+        view.data(name, getDataArray(data))
         logMessage(
           `Had to clear the ${name} dataset before inserting data through Vega view.`
         )
@@ -232,12 +239,21 @@ export function useVegaEmbed(
       inputData: Quiver | null,
       inputDatasets: WrappedNamedDataset[]
     ): Promise<VegaView | null> => {
+      if (vegaView.current === null) {
+        return null
+      }
+
       // At this point the previous data should be updated
       const prevData = dataRef.current
       const prevDatasets = datasetsRef.current
 
       if (dataRef.current || inputData) {
-        updateData(defaultDataName.current, prevData, inputData)
+        updateData(
+          vegaView.current,
+          defaultDataName.current,
+          prevData,
+          inputData
+        )
       }
 
       const prevDataSets = getDataSets(prevDatasets) ?? {}
@@ -247,7 +263,7 @@ export function useVegaEmbed(
         const datasetName = name || defaultDataName.current
         const prevDataset = prevDataSets[datasetName]
 
-        updateData(datasetName, prevDataset, dataset)
+        updateData(vegaView.current, datasetName, prevDataset, dataset)
       }
 
       // Remove all datasets that are in the previous but not the current datasets.
@@ -256,14 +272,13 @@ export function useVegaEmbed(
           !dataSets.hasOwnProperty(name) &&
           name !== defaultDataName.current
         ) {
-          updateData(name, null, null)
+          updateData(vegaView.current, name, null, null)
         }
       }
 
       await vegaView.current?.resize().runAsync()
 
       dataRef.current = inputData
-
       datasetsRef.current = inputDatasets
 
       return vegaView.current

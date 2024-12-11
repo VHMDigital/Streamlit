@@ -73,20 +73,21 @@ const ArrowVegaLiteChart: FC<Props> = ({
     fragmentId
   )
 
+  const { data, datasets, spec } = element
+
+  // Create the view once the container is ready and re-create
+  // if the spec changes or the dimensions change.
   useEffect(() => {
     if (containerRef.current !== null) {
-      createView(containerRef, element)
+      createView(containerRef, spec)
     }
 
     return finalizeView
-    // We only want to create a view when the spec changes as we handle the data
-    // in the updateView call
-    // eslint-disable-next-line react-compiler/react-compiler
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createView, finalizeView, element.spec, width, height])
+  }, [createView, finalizeView, spec, width, height])
 
-  const { data, datasets } = element
-
+  // The references to data and datasets will always change each rerun
+  // because the forward message always produces new references, so
+  // this function will run regularly to update the view.
   useEffect(() => {
     updateView(data, datasets)
   }, [data, datasets, updateView])
