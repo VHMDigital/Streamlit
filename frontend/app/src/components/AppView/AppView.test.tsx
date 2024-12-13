@@ -89,7 +89,7 @@ function getProps(props: Partial<AppViewProps> = {}): AppViewProps {
       formsDataChanged: vi.fn(),
     }),
     uploadClient: new FileUploadClient({
-      sessionInfo: sessionInfo,
+      sessionInfo,
       endpoints: mockEndpointProp,
       formsWithPendingRequestsChanged: () => {},
       requestFileURLs: vi.fn(),
