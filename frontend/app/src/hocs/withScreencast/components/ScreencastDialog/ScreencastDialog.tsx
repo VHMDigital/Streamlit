@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ChangeEvent, ReactElement, useCallback, useState } from "react"
+import React, { ChangeEvent, useCallback, useState } from "react"
 
 import {
   BaseButtonKind,
