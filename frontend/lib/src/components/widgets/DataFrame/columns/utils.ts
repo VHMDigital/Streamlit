@@ -128,9 +128,9 @@ export interface ErrorCell extends TextCell {
 /**
  * Returns a cell with an error message.
  *
- * @param errorMsg: A short error message to use as display value.
+ * @param errorMsg: A short error message or the wrong value to use as display value.
  * @param errorDetails: The full error message to show when the user
- *                     clicks on a cell.
+ *                     hovers on a cell.
  *
  * @return a read-only GridCell object that can be used by glide-data-grid.
  */
@@ -144,7 +144,7 @@ export function getErrorCell(errorMsg: string, errorDetails = ""): ErrorCell {
     errorDetails: errorDetails,
     isError: true,
     style: "faded",
-  } as ErrorCell
+  }
 }
 
 /**
