@@ -41,7 +41,7 @@ const ScreencastDialog: React.FC<Props> = ({
   toggleRecordAudio,
   recordAudio: initialRecordAudio,
   startRecording,
-}: Props): ReactElement => {
+}) => {
   const [recordAudio, setRecordAudio] = useState(initialRecordAudio)
 
   const handleRecordAudioCheckbox = useCallback(
