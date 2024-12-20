@@ -57,7 +57,7 @@ interface UseDebouncedCallbackReturn<A extends unknown[]> {
  * // Cancel any pending invocation:
  * cancel();
  */
-export function useDebouncedCallback<A extends any[]>(
+export function useDebouncedCallback<A extends unknown[]>(
   callback: (...args: A) => void,
   delay: number
 ): UseDebouncedCallbackReturn<A> {
