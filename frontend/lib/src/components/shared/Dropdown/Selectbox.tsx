@@ -93,6 +93,7 @@ const Selectbox: React.FC<Props> = ({
   const [value, setValue] = useState<number | null>(propValue)
 
   // Update the value whenever the value provided by the props changes
+  // TODO: Find a better way to handle this to prevent unneeded re-renders
   useEffect(() => {
     setValue(propValue)
   }, [propValue])
