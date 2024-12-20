@@ -19,7 +19,7 @@ import { useCallback, useEffect, useRef } from "react"
 /**
  * Interface for the return value of the useDebouncedCallback hook.
  */
-interface UseDebouncedCallbackReturn<A extends any[]> {
+interface UseDebouncedCallbackReturn<A extends unknown[]> {
   /**
    * The debounced callback function.
    */
