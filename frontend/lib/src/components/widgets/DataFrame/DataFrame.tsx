@@ -42,13 +42,14 @@ import {
   WidgetInfo,
   WidgetStateManager,
 } from "@streamlit/lib/src/WidgetStateManager"
-import { debounce, isNullOrUndefined } from "@streamlit/lib/src/util/utils"
+import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
 import Toolbar, {
   ToolbarAction,
 } from "@streamlit/lib/src/components/shared/Toolbar"
 import { LibContext } from "@streamlit/lib/src/components/core/LibContext"
 import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
 import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
+import { useDebouncedCallback } from "@streamlit/lib/src/hooks/useDebouncedCallback"
 
 import EditingState, { getColumnName } from "./EditingState"
 import {
@@ -324,26 +325,10 @@ function DataFrame({
     ]
   )
 
-  // Next, useMemo to create the debounced version of the callback.
-  // Now the linter can inspect `innerSyncSelectionState` for dependencies properly.
-  const debouncedSyncSelectionState = React.useMemo(() => {
-    // `debounce` returns a new function. We rely on `innerSyncSelectionState` being stable (due to useCallback).
-    return debounce(DEBOUNCE_TIME_MS, innerSyncSelectionState)
-  }, [innerSyncSelectionState])
-
-  /**
-   * This callback is used to synchronize the selection state with the state
-   * of the widget state of the component.
-   *
-   * Uses debounce to prevent rapid updates to the widget state.
-   *
-   * @param newSelection - The new selection state
-   */
-  const syncSelectionState = React.useCallback(
-    (newSelection: GridSelection) => {
-      debouncedSyncSelectionState(newSelection)
-    },
-    [debouncedSyncSelectionState]
+  // Use a debounce to prevent rapid updates to the widget state.
+  const { debouncedCallback: syncSelectionState } = useDebouncedCallback(
+    innerSyncSelectionState,
+    DEBOUNCE_TIME_MS
   )
 
   const {
@@ -459,6 +444,14 @@ function DataFrame({
     }
   }, [numRows])
 
+  /**
+   * This callback is used to synchronize the editing state with
+   * the widget state of the component. This might also send a rerun message
+   * to the backend if the editing state has changed.
+   *
+   * This is the inner version to be used by the debounce callback below.
+   * Its split out to allow better dependency inspection.
+   */
   const innerSyncEditState = React.useCallback(() => {
     const currentEditingState = editingState.current.toJson(columns)
     let currentWidgetState = widgetMgr.getStringValue({
@@ -487,18 +480,11 @@ function DataFrame({
     }
   }, [columns, element.id, element.formId, widgetMgr, fragmentId])
 
-  const debouncedSyncEditState = React.useMemo(() => {
-    return debounce(DEBOUNCE_TIME_MS, innerSyncEditState)
-  }, [innerSyncEditState])
-
-  /**
-   * This callback is used to synchronize the editing state with
-   * the widget state of the component. This might also send a rerun message
-   * to the backend if the editing state has changed.
-   */
-  const syncEditState = React.useCallback(() => {
-    debouncedSyncEditState()
-  }, [debouncedSyncEditState])
+  // Use a debounce to prevent rapid updates to the widget state.
+  const { debouncedCallback: syncEditState } = useDebouncedCallback(
+    innerSyncEditState,
+    DEBOUNCE_TIME_MS
+  )
 
   const { exportToCsv } = useDataExporter(
     getCellContent,
