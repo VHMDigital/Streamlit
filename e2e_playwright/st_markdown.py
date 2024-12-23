@@ -166,7 +166,7 @@ with st.container(key="latex_elements"):
         \sum_{k=0}^{n-1} ar^k =
         a \left(\frac{1-r^{n}}{1-r}\right)
         """,
-        help="This is example tooltip displayed on latex.",
+        help="foo",
     )
 
     st.latex(
@@ -199,7 +199,12 @@ with st.container(key="badge_elements"):
         ":blue-badge[Blue markdown badge] :green-badge[🌱 Green markdown badge]"
     )
 
-"---"
+    st.latex(
+        "this is a very long formula this is a very long formula this is a very long "
+        "formula this is a very long formula this is a very long formula",
+        help="foo",
+    )
+
 
 st.markdown(
     "Images in markdown should stay inside the container width:\n\n![image](./app/static/streamlit-logo.png)"
