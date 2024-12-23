@@ -47,9 +47,7 @@ if st.button("Create some elements to unmount component"):
         st.write("Another element")
 
 
-st.data_editor(
-    random_df, num_rows="dynamic", key="data_editor", use_container_width=False
-)
+st.data_editor(random_df, num_rows="dynamic", key="data_editor")
 
 
 cell_overlay_test_df = pd.DataFrame(
@@ -73,19 +71,13 @@ cell_overlay_test_column_config = {
 
 st.header("Test read-only cell overlay")
 st.dataframe(
-    cell_overlay_test_df,
-    hide_index=True,
-    column_config=cell_overlay_test_column_config,
-    use_container_width=False,
+    cell_overlay_test_df, hide_index=True, column_config=cell_overlay_test_column_config
 )
 
 st.header("Test cell editor")
 
 result = st.data_editor(
-    cell_overlay_test_df,
-    hide_index=True,
-    column_config=cell_overlay_test_column_config,
-    use_container_width=False,
+    cell_overlay_test_df, hide_index=True, column_config=cell_overlay_test_column_config
 )
 
 st.write("Edited DF:", str(result))

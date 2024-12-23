@@ -48,7 +48,6 @@ selection = st.dataframe(
     on_select="rerun",
     selection_mode="single-row",
     column_config=column_config,
-    use_container_width=False,
 )
 st.write("Dataframe single-row selection:", str(selection))
 
@@ -59,7 +58,6 @@ selection = st.dataframe(
     on_select="rerun",
     selection_mode="single-column",
     column_config=column_config,
-    use_container_width=False,
 )
 st.write("Dataframe single-column selection:", str(selection))
 
@@ -70,7 +68,6 @@ selection = st.dataframe(
     on_select="rerun",
     selection_mode="multi-row",
     column_config=column_config,
-    use_container_width=False,
 )
 st.write("Dataframe multi-row selection:", str(selection))
 
@@ -81,7 +78,6 @@ selection = st.dataframe(
     on_select="rerun",
     selection_mode="multi-column",
     column_config=column_config,
-    use_container_width=False,
 )
 st.write("Dataframe multi-column selection:", str(selection))
 
@@ -99,7 +95,6 @@ selection = st.dataframe(
     on_select="rerun",
     selection_mode=["multi-row", "multi-column"],
     column_config=column_config,
-    use_container_width=False,
 )
 st.write("Dataframe multi-row-multi-column selection:", str(selection))
 
@@ -113,7 +108,6 @@ with st.form(key="my_form", clear_on_submit=True):
         selection_mode=["multi-row", "multi-column"],
         key="df_selection_in_form",
         column_config=column_config,
-        use_container_width=False,
     )
     st.form_submit_button("Submit")
 
@@ -138,7 +132,6 @@ st.dataframe(
     selection_mode=["multi-row", "multi-column"],
     key="df_selection",
     column_config=column_config,
-    use_container_width=False,
 )
 
 st.header("Selections in fragment:")
@@ -153,7 +146,6 @@ def test_fragment():
         selection_mode=["multi-row", "multi-column"],
         key="inside_fragment",
         column_config=column_config,
-        use_container_width=False,
     )
     st.write("Dataframe-in-fragment selection:", str(selection))
 
@@ -176,6 +168,5 @@ selection = st.dataframe(
     key="with_index",
     column_config=column_config,
     column_order=["col_1", "col_3"],
-    use_container_width=False,
 )
 st.write("No selection on index column:", str(selection))
