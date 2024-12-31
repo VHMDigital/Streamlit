@@ -20,7 +20,6 @@ import json
 import os
 import sys
 import textwrap
-from datetime import datetime, timezone
 from typing import Final, NamedTuple, NoReturn
 from uuid import uuid4
 
@@ -67,30 +66,33 @@ Collecting usage statistics. To deactivate, set browser.gatherUsageStats to fals
 
 
 def _send_email(email: str) -> None:
-    """Send the user's email to segment.io, if submitted"""
+    """Send the user's email for metrics, if submitted"""
     import requests
 
     if email is None or "@" not in email:
         return
 
+    metrics_url = ""
+    try:
+        response_json = requests.get(
+            "https://data.streamlit.io/metrics.json", timeout=2
+        ).json()
+        metrics_url = response_json.get("url", "")
+    except Exception:
+        _LOGGER.error("Failed to fetch metrics URL")
+        return
+
     headers = {
-        "authority": "api.segment.io",
         "accept": "*/*",
         "accept-language": "en-US,en;q=0.9",
-        "content-type": "text/plain",
+        "content-type": "application/json",
         "origin": "localhost:8501",
         "referer": "localhost:8501/",
     }
 
-    dt = f"{datetime.now(timezone.utc).isoformat()}+00:00"
-
     data = {
         "anonymous_id": None,
-        "context": {
-            "library": {"name": "analytics-python", "version": "2.2.2"},
-        },
         "messageId": str(uuid4()),
-        "timestamp": dt,
         "event": "submittedEmail",
         "traits": {
             "authoremail": email,
@@ -98,11 +100,15 @@ def _send_email(email: str) -> None:
         },
         "type": "track",
         "userId": email,
-        "writeKey": "iCkMy7ymtJ9qYzQRXkQpnAJEq7D4NyMU",
     }
 
+    # TODO: metrics_url override for testing
+    metrics_url = (
+        "https://webhooks.fivetran.com/webhooks/69b8ff71-3e5c-4073-a9ef-c4b49e411b25"
+    )
+
     response = requests.post(
-        "https://api.segment.io/v1/t",
+        metrics_url,
         headers=headers,
         data=json.dumps(data).encode(),
     )
