@@ -67,7 +67,7 @@ const ArrowVegaLiteChart: FC<Props> = ({
 
   // This hook is provides lifecycle functions for creating and removing the view.
   // It also will update the view if the data changes (and not the spec)
-  const { error, createView, updateView, finalizeView } = useVegaEmbed(
+  const { createView, updateView, finalizeView } = useVegaEmbed(
     element,
     widgetMgr,
     fragmentId
@@ -91,10 +91,6 @@ const ArrowVegaLiteChart: FC<Props> = ({
   useEffect(() => {
     updateView(data, datasets)
   }, [data, datasets, updateView])
-
-  if (error !== null) {
-    throw error
-  }
 
   // Create the container inside which Vega draws its content.
   // To style the Vega tooltip, we need to apply global styles since

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RefObject, useCallback, useEffect, useRef, useState } from "react"
+import { RefObject, useCallback, useEffect, useRef } from "react"
 
 import { truthy, View as VegaView } from "vega"
 import embed from "vega-embed"
@@ -22,7 +22,6 @@ import { expressionInterpreter } from "vega-interpreter"
 
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
-import { ensureError } from "@streamlit/lib/src/util/ErrorHandling"
 import { logMessage, logWarning } from "@streamlit/lib/src/util/log"
 import { notNullOrUndefined } from "@streamlit/lib/src/util/utils"
 
@@ -40,7 +39,6 @@ import { useVegaLiteSelections } from "./useVegaLiteSelection"
 const DEFAULT_DATA_NAME = "source"
 
 interface UseVegaEmbedOutput {
-  error: Error | null
   createView: (
     containerRef: RefObject<HTMLDivElement>,
     spec: any
@@ -62,7 +60,6 @@ export function useVegaEmbed(
   const defaultDataName = useRef<string>(DEFAULT_DATA_NAME)
   const dataRef = useRef<Quiver | null>(null)
   const datasetsRef = useRef<WrappedNamedDataset[]>([])
-  const [error, setError] = useState<Error | null>(null)
 
   // Setup interactivity for the chart if it supports selections
   const maybeConfigureSelections = useVegaLiteSelections(
@@ -97,86 +94,81 @@ export function useVegaEmbed(
       containerRef: RefObject<HTMLDivElement>,
       spec: any
     ): Promise<VegaView | null> => {
-      try {
-        logMessage("Creating a new Vega view.")
+      logMessage("Creating a new Vega view.")
 
-        if (containerRef.current === null) {
-          throw new Error("Element missing.")
-        }
-
-        // Finalize the previous view so it can be garbage collected.
-        finalizeView()
-
-        const options = {
-          // Adds interpreter support for Vega expressions that is compliant with CSP
-          ast: true,
-          expr: expressionInterpreter,
-
-          // Disable default styles so that vega doesn't inject <style> tags in the
-          // DOM. We set these styles manually for finer control over them and to
-          // avoid inlining styles.
-          tooltip: { disableDefaultStyle: true },
-          defaultStyle: false,
-          forceActionsMenu: true,
-        }
-
-        const { vgSpec, view, finalize } = await embed(
-          containerRef.current,
-          spec,
-          options
-        )
-
-        vegaView.current = view
-
-        maybeConfigureSelections(view)
-
-        vegaFinalizer.current = finalize
-
-        // Try to load the previous state of the chart from the element state.
-        // This is useful to restore the selection state when the component is re-mounted
-        // or when its put into fullscreen mode.
-        const viewState = widgetMgr.getElementState(chartId, "viewState")
-        if (notNullOrUndefined(viewState)) {
-          try {
-            vegaView.current = view.setState(viewState)
-          } catch (e) {
-            logWarning("Failed to restore view state", e)
-          }
-        }
-
-        // Load the initial set of data into the chart.
-        const dataArrays = getDataArrays(datasetsRef.current)
-
-        // Heuristic to determine the default dataset name.
-        const datasetNames = dataArrays ? Object.keys(dataArrays) : []
-        if (datasetNames.length === 1) {
-          const [datasetName] = datasetNames
-          defaultDataName.current = datasetName
-        } else if (datasetNames.length === 0 && vgSpec.data) {
-          defaultDataName.current = DEFAULT_DATA_NAME
-        }
-
-        const dataObj = getInlineData(dataRef.current as Quiver | null)
-        if (dataObj) {
-          vegaView.current.insert(defaultDataName.current, dataObj)
-        }
-        if (dataArrays) {
-          for (const [name, data] of Object.entries(dataArrays)) {
-            vegaView.current.insert(name, data)
-          }
-        }
-
-        await vegaView.current.runAsync()
-
-        // Fix bug where the "..." menu button overlaps with charts where width is
-        // set to -1 on first load.
-        await vegaView.current.resize().runAsync()
-
-        return vegaView.current
-      } catch (e) {
-        setError(ensureError(e))
-        return null
+      if (containerRef.current === null) {
+        throw new Error("Element missing.")
       }
+
+      // Finalize the previous view so it can be garbage collected.
+      finalizeView()
+
+      const options = {
+        // Adds interpreter support for Vega expressions that is compliant with CSP
+        ast: true,
+        expr: expressionInterpreter,
+
+        // Disable default styles so that vega doesn't inject <style> tags in the
+        // DOM. We set these styles manually for finer control over them and to
+        // avoid inlining styles.
+        tooltip: { disableDefaultStyle: true },
+        defaultStyle: false,
+        forceActionsMenu: true,
+      }
+
+      const { vgSpec, view, finalize } = await embed(
+        containerRef.current,
+        spec,
+        options
+      )
+
+      vegaView.current = view
+
+      maybeConfigureSelections(view)
+
+      vegaFinalizer.current = finalize
+
+      // Try to load the previous state of the chart from the element state.
+      // This is useful to restore the selection state when the component is re-mounted
+      // or when its put into fullscreen mode.
+      const viewState = widgetMgr.getElementState(chartId, "viewState")
+      if (notNullOrUndefined(viewState)) {
+        try {
+          vegaView.current = view.setState(viewState)
+        } catch (e) {
+          logWarning("Failed to restore view state", e)
+        }
+      }
+
+      // Load the initial set of data into the chart.
+      const dataArrays = getDataArrays(datasetsRef.current)
+
+      // Heuristic to determine the default dataset name.
+      const datasetNames = dataArrays ? Object.keys(dataArrays) : []
+      if (datasetNames.length === 1) {
+        const [datasetName] = datasetNames
+        defaultDataName.current = datasetName
+      } else if (datasetNames.length === 0 && vgSpec.data) {
+        defaultDataName.current = DEFAULT_DATA_NAME
+      }
+
+      const dataObj = getInlineData(dataRef.current as Quiver | null)
+      if (dataObj) {
+        vegaView.current.insert(defaultDataName.current, dataObj)
+      }
+      if (dataArrays) {
+        for (const [name, data] of Object.entries(dataArrays)) {
+          vegaView.current.insert(name, data)
+        }
+      }
+
+      await vegaView.current.runAsync()
+
+      // Fix bug where the "..." menu button overlaps with charts where width is
+      // set to -1 on first load.
+      await vegaView.current.resize().runAsync()
+
+      return vegaView.current
     },
     [chartId, finalizeView, maybeConfigureSelections, widgetMgr]
   )
@@ -247,7 +239,7 @@ export function useVegaEmbed(
       const prevData = dataRef.current
       const prevDatasets = datasetsRef.current
 
-      if (dataRef.current || inputData) {
+      if (prevData || inputData) {
         updateData(
           vegaView.current,
           defaultDataName.current,
@@ -286,5 +278,5 @@ export function useVegaEmbed(
     [updateData]
   )
 
-  return { error, createView, updateView, finalizeView }
+  return { createView, updateView, finalizeView }
 }
