@@ -575,7 +575,25 @@ class TimeWidgetsMixin:
     def date_input(
         self,
         label: str,
-        value: NullableScalarDateValue = "today",
+        value: date | datetime | str | Literal["today"] = "today",
+        min_value: NullableScalarDateValue = None,
+        max_value: NullableScalarDateValue = None,
+        key: Key | None = None,
+        help: str | None = None,
+        on_change: WidgetCallback | None = None,
+        args: WidgetArgs | None = None,
+        kwargs: WidgetKwargs | None = None,
+        *,  # keyword-only arguments:
+        format: str = "YYYY/MM/DD",
+        disabled: bool = False,
+        label_visibility: LabelVisibility = "visible",
+    ) -> date: ...
+
+    @overload
+    def date_input(
+        self,
+        label: str,
+        value: None,
         min_value: NullableScalarDateValue = None,
         max_value: NullableScalarDateValue = None,
         key: Key | None = None,
