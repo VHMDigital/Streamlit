@@ -126,13 +126,16 @@ class UserInfoProxy(Mapping[str, Union[str, bool, None]]):
         return bool(ctx.user_info.get("_streamlit_logged_in", False))
 
     def __getitem__(self, key: str) -> str | bool | None:
-        return _get_user_info()[key]
+        try:
+            return _get_user_info()[key]
+        except KeyError:
+            raise KeyError(f'st.experimental_user has no key "{key}".')
 
     def __getattr__(self, key: str) -> str | bool | None:
         try:
             return _get_user_info()[key]
         except KeyError:
-            raise AttributeError
+            raise AttributeError(f'st.experimental_user has no attribute "{key}".')
 
     def __setattr__(self, name: str, value: str | None) -> NoReturn:
         raise StreamlitAPIException("st.experimental_user cannot be modified")
