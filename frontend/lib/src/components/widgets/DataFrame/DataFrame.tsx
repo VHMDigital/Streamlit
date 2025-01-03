@@ -63,6 +63,7 @@ import {
   useDataEditor,
   useDataExporter,
   useDataLoader,
+  useRowHover,
   useSelectionHandler,
   useTableSizer,
   useTooltips,
@@ -136,6 +137,9 @@ function DataFrame({
   const resizableContainerRef = React.useRef<HTMLDivElement>(null)
 
   const gridTheme = useCustomTheme()
+
+  const { getRowThemeOverride, onItemHovered: handleRowHover } =
+    useRowHover(gridTheme)
 
   const {
     libConfig: { enforceDownloadInNewTab = false }, // Default to false, if no libConfig, e.g. for tests
@@ -510,10 +514,11 @@ function DataFrame({
       clearSelection
     )
 
-  const { tooltip, clearTooltip, onItemHovered } = useTooltips(
-    columns,
-    getCellContent
-  )
+  const {
+    tooltip,
+    clearTooltip,
+    onItemHovered: handleTooltips,
+  } = useTooltips(columns, getCellContent)
 
   const { drawCell, customRenderers } = useCustomRenderer(columns)
 
@@ -824,8 +829,11 @@ function DataFrame({
             // Column selection is not compatible with column reordering.
             isColumnSelectionActivated ? undefined : onColumnMoved
           }
-          // Enable tooltips on hover of a cell or column header:
-          onItemHovered={onItemHovered}
+          // Enable tooltips and row hovering theme on hover of a cell or column header:
+          onItemHovered={(args: GridMouseEventArgs) => {
+            handleRowHover?.(args)
+            handleTooltips?.(args)
+          }}
           // Activate keybindings:
           keybindings={{ downFill: true }}
           // Search needs to be activated manually, to support search
@@ -880,6 +888,7 @@ function DataFrame({
             }
           }}
           theme={gridTheme.glideTheme}
+          getRowThemeOverride={getRowThemeOverride}
           onMouseMove={(args: GridMouseEventArgs) => {
             // Determine if the dataframe is focused or not
             if (args.kind === "out-of-bounds" && isFocused) {

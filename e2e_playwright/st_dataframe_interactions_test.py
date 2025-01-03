@@ -513,6 +513,18 @@ def test_column_reorder_via_ui(app: Page, assert_snapshot: ImageCompareFunction)
     )
 
 
+def test_row_hover_highlight(themed_app: Page, assert_snapshot: ImageCompareFunction):
+    """Test that a row gets highlighted when hovering over a cell in the row."""
+    df = themed_app.get_by_test_id("stDataFrame").nth(0)
+    expect_canvas_to_be_visible(df)
+    column_middle_width_px, row_middle_height_px = calc_middle_cell_position(
+        2, 2, "small"
+    )
+    df.hover(position={"x": column_middle_width_px, "y": row_middle_height_px})
+
+    assert_snapshot(df, name="st_dataframe-row_hover_highlight")
+
+
 # TODO(lukasmasuch): Add additional interactive tests:
 # - Copy data to clipboard
 # - Paste in data
