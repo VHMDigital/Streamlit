@@ -1,0 +1,21 @@
+{
+  "name": "Streamlit DevContainer",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-python.mypy-type-checker",
+        "ms-python.python",
+        "ms-python.debugpy",
+        "charliermarsh.ruff",
+        "EditorConfig.EditorConfig",
+        "vitest.explorer"
+      ]
+    }
+  },
+  "postCreateCommand": "make mini-devel"
+}

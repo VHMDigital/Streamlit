@@ -282,6 +282,11 @@ protobuf: check-protoc
 		yarn --silent pbts ./lib/src/proto.js \
 	) > ./lib/src/proto.d.ts
 
+.PHONY: yarn-init
+# Yarn init.
+yarn-init:
+	cd frontend/ ; corepack enable ; corepack install
+
 .PHONY: react-init
 # React init.
 react-init:
