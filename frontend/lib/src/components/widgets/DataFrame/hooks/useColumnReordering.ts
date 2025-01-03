@@ -26,13 +26,13 @@ type ColumnReorderingReturn = Pick<DataEditorProps, "onColumnMoved">
  * A React hook that provides features to interact with columns from UI.
  *
  * @param columns - The columns of the table.
- * @param freezeColumns - The number of columns to freeze.
- * @param clearSelection - A callback to clear current selections in the table.
- * @param setColumnConfigMapping - A callback to set the column config mapping.
- * @param setColumnOrder - A callback to set the column order.
+ * @param freezeColumns - The number of columns to freeze
+ * @param pinColumn - A callback to pin a column
+ * @param unpinColumn - A callback to unpin a column
+ * @param setColumnOrder - A callback to set the column order state
  *
  * @returns An object containing the following properties:
- * - `onColumnMoved`: A callback to handle column movement.
+ * - `onColumnMoved`: A glide-data-grid compatible callback to handle column movement.
  */
 function useColumnReordering(
   columns: BaseColumn[],
