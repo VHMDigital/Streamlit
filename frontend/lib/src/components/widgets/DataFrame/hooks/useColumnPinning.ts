@@ -27,7 +27,7 @@ type ColumnPinningReturn = {
   unpinColumn: (columnName: string) => void
 }
 
-function useColumnFreeze(
+function useColumnPinning(
   columns: BaseColumn[],
   isEmptyTable: boolean,
   containerWidth: number,
@@ -98,4 +98,4 @@ function useColumnFreeze(
   }
 }
 
-export default useColumnFreeze
+export default useColumnPinning

@@ -20,7 +20,7 @@ import { DataEditorProps } from "@glideapps/glide-data-grid"
 
 import { BaseColumn } from "@streamlit/lib/src/components/widgets/DataFrame/columns"
 
-type ColumnInteractivityReturn = Pick<DataEditorProps, "onColumnMoved">
+type ColumnReorderingReturn = Pick<DataEditorProps, "onColumnMoved">
 
 /**
  * A React hook that provides features to interact with columns from UI.
@@ -34,13 +34,13 @@ type ColumnInteractivityReturn = Pick<DataEditorProps, "onColumnMoved">
  * @returns An object containing the following properties:
  * - `onColumnMoved`: A callback to handle column movement.
  */
-function useColumnMove(
+function useColumnReordering(
   columns: BaseColumn[],
   freezeColumns: number,
   pinColumn: (columnName: string) => void,
   unpinColumn: (columnName: string) => void,
   setColumnOrder: React.Dispatch<React.SetStateAction<string[]>>
-): ColumnInteractivityReturn {
+): ColumnReorderingReturn {
   const onColumnMoved = React.useCallback(
     (startIndex: number, endIndex: number): void => {
       // Create a shallow copy of the original columns
@@ -70,4 +70,4 @@ function useColumnMove(
   }
 }
 
-export default useColumnMove
+export default useColumnReordering
