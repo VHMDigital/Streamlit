@@ -179,6 +179,9 @@ export function getColumnConfig(configJson: string): Map<string, any> {
 
 type ColumnLoaderReturn = {
   columns: BaseColumn[]
+  setColumnConfigMapping: React.Dispatch<
+    React.SetStateAction<Map<string, any>>
+  >
 }
 
 /**
@@ -222,10 +225,16 @@ function useColumnLoader(
   element: ArrowProto,
   data: Quiver,
   disabled: boolean,
-  columnConfigMapping: Map<string, any>,
   columnOrder: string[]
 ): ColumnLoaderReturn {
   const theme: EmotionTheme = useTheme()
+
+  const [columnConfigMapping, setColumnConfigMapping] = React.useState<
+    Map<string, any>
+  >(getColumnConfig(element.columns))
+  React.useEffect(() => {
+    setColumnConfigMapping(getColumnConfig(element.columns))
+  }, [element.columns])
 
   const stretchColumns: boolean =
     element.useContainerWidth ||
@@ -346,6 +355,7 @@ function useColumnLoader(
 
   return {
     columns,
+    setColumnConfigMapping,
   }
 }
 

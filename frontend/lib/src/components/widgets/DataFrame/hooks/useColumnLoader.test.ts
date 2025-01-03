@@ -264,7 +264,7 @@ describe("useColumnLoader hook", () => {
     const data = new Quiver(element)
 
     const { result } = renderHook(() => {
-      return useColumnLoader(element, data, false)
+      return useColumnLoader(element, data, false, element.columnOrder)
     })
 
     const { columns } = result.current
@@ -289,7 +289,7 @@ describe("useColumnLoader hook", () => {
     const data = new Quiver(element)
 
     const { result } = renderHook(() => {
-      return useColumnLoader(element, data, false)
+      return useColumnLoader(element, data, false, element.columnOrder)
     })
 
     const { columns } = result.current
@@ -314,7 +314,7 @@ describe("useColumnLoader hook", () => {
     const data = new Quiver(element)
 
     const { result } = renderHook(() => {
-      return useColumnLoader(element, data, false)
+      return useColumnLoader(element, data, false, element.columnOrder)
     })
 
     const { columns } = result.current
@@ -337,7 +337,7 @@ describe("useColumnLoader hook", () => {
     const data = new Quiver(element)
 
     const { result } = renderHook(() => {
-      return useColumnLoader(element, data, false)
+      return useColumnLoader(element, data, false, element.columnOrder)
     })
 
     for (const column of result.current.columns) {
@@ -355,7 +355,7 @@ describe("useColumnLoader hook", () => {
     const data = new Quiver(element)
 
     const { result } = renderHook(() => {
-      return useColumnLoader(element, data, false)
+      return useColumnLoader(element, data, false, element.columnOrder)
     })
 
     for (const column of result.current.columns) {
@@ -378,7 +378,7 @@ describe("useColumnLoader hook", () => {
     const data = new Quiver(element)
 
     const { result } = renderHook(() => {
-      return useColumnLoader(element, data, false)
+      return useColumnLoader(element, data, false, element.columnOrder)
     })
 
     expect(result.current.columns[1].isRequired).toBe(true)
@@ -400,7 +400,7 @@ describe("useColumnLoader hook", () => {
     const data = new Quiver(element)
 
     const { result } = renderHook(() => {
-      return useColumnLoader(element, data, false)
+      return useColumnLoader(element, data, false, element.columnOrder)
     })
 
     // Test that the column is hidden (not part of columns).
@@ -418,7 +418,7 @@ describe("useColumnLoader hook", () => {
     const data = new Quiver(element)
 
     const { result } = renderHook(() => {
-      return useColumnLoader(element, data, false)
+      return useColumnLoader(element, data, false, element.columnOrder)
     })
 
     for (const column of result.current.columns) {
@@ -443,7 +443,7 @@ describe("useColumnLoader hook", () => {
     const data = new Quiver(element)
 
     const { result } = renderHook(() => {
-      return useColumnLoader(element, data, false)
+      return useColumnLoader(element, data, false, element.columnOrder)
     })
 
     // Range index:

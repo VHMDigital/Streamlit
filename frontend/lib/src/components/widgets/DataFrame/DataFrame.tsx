@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useMemo } from "react"
+import React, { ReactElement } from "react"
 
 import {
   CompactSelection,
@@ -53,9 +53,9 @@ import { useDebouncedCallback } from "@streamlit/lib/src/hooks/useDebouncedCallb
 
 import EditingState, { getColumnName } from "./EditingState"
 import {
-  useColumnFreeze,
   useColumnLoader,
-  useColumnMove,
+  useColumnPinning,
+  useColumnReordering,
   useColumnSizer,
   useColumnSort,
   useCustomRenderer,
@@ -67,7 +67,6 @@ import {
   useTableSizer,
   useTooltips,
 } from "./hooks"
-import { getColumnConfig } from "./hooks/useColumnLoader"
 import { getTextCell, ImageCellEditor, toGlideColumn } from "./columns"
 import Tooltip from "./Tooltip"
 import { StyledResizableContainer } from "./styled-components"
@@ -208,21 +207,12 @@ function DataFrame({
     setNumRows(editingState.current.getNumRows())
   }, [originalNumRows])
 
-  const [columnConfigMapping, setColumnConfigMapping] = React.useState<
-    Map<string, any>
-  >(getColumnConfig(element.columns))
-
-  React.useEffect(() => {
-    setColumnConfigMapping(getColumnConfig(element.columns))
-  }, [element.columns])
-
   const [columnOrder, setColumnOrder] = React.useState(element.columnOrder)
 
-  const { columns: originalColumns } = useColumnLoader(
+  const { columns: originalColumns, setColumnConfigMapping } = useColumnLoader(
     element,
     data,
     disabled,
-    columnConfigMapping,
     columnOrder
   )
 
@@ -585,7 +575,7 @@ function DataFrame({
   const isDynamicAndEditable =
     !isEmptyTable && element.editingMode === DYNAMIC && !disabled
 
-  const { pinColumn, unpinColumn, freezeColumns } = useColumnFreeze(
+  const { pinColumn, unpinColumn, freezeColumns } = useColumnPinning(
     columns,
     isEmptyTable,
     containerWidth,
@@ -594,7 +584,7 @@ function DataFrame({
     setColumnConfigMapping
   )
 
-  const { onColumnMoved } = useColumnMove(
+  const { onColumnMoved } = useColumnReordering(
     columns,
     freezeColumns,
     pinColumn,
