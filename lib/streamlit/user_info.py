@@ -86,22 +86,6 @@ class UserInfoProxy(Mapping[str, Union[str, bool, None]]):
     Properties can be accessed via key or attribute notation. For example,
     ``st.experimental_user["email"]`` or ``st.experimental_user.email``.
 
-    Attributes
-    ----------
-    email : str
-        If running locally, this property returns the string literal
-        ``"test@example.com"``.
-
-        If running on Streamlit Community Cloud, this
-        property returns one of two values:
-
-        - ``None`` if the user is not logged in or not a member of the app's\
-        workspace. Such users appear under anonymous pseudonyms in the app's\
-        analytics.
-        - The user's email if the user is logged in and a member of the\
-        app's workspace. Such users are identified by their email in the app's\
-        analytics.
-
     """
 
     @gather_metrics("login")

@@ -96,7 +96,7 @@ class DuplicateWidgetID(StreamlitAPIException):
     pass
 
 
-class AuthError(StreamlitAPIException):
+class StreamlitAuthError(StreamlitAPIException):
     pass
 
 

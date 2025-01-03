@@ -18,7 +18,7 @@ from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Mapping, TypedDict, cast
 
 from streamlit import config
-from streamlit.errors import AuthError
+from streamlit.errors import StreamlitAuthError
 from streamlit.runtime.secrets import AttrDict, secrets_singleton
 
 if TYPE_CHECKING:
@@ -73,7 +73,7 @@ def encode_provider_token(provider: str) -> str:
     try:
         from authlib.jose import jwt  # type: ignore[import-untyped]
     except ImportError:
-        raise AuthError(
+        raise StreamlitAuthError(
             "To use Auth you need to install the 'Authlib' package."
         ) from None
 
@@ -92,7 +92,7 @@ def decode_provider_token(provider_token: str) -> ProviderTokenPayload:
     try:
         from authlib.jose import JoseError, JWTClaims, jwt
     except ImportError:
-        raise AuthError(
+        raise StreamlitAuthError(
             "To use Auth you need to install the 'Authlib' package."
         ) from None
 
@@ -105,7 +105,7 @@ def decode_provider_token(provider_token: str) -> ProviderTokenPayload:
         )
         payload.validate()
     except JoseError as e:
-        raise AuthError(f"Error decoding provider token: {e}") from None
+        raise StreamlitAuthError(f"Error decoding provider token: {e}") from None
 
     return cast("ProviderTokenPayload", payload)
 
@@ -131,17 +131,17 @@ def generate_default_provider_section(auth_section) -> dict[str, Any]:
 def validate_auth_credentials(provider: str) -> None:
     """Validate the general auth credentials and auth credentials for the given provider."""
     if not secrets_singleton.load_if_toml_exists():
-        raise AuthError(
+        raise StreamlitAuthError(
             "To use Auth you need to configure auth credentials in secrets.toml."
         )
 
     auth_section = secrets_singleton.get("auth")
     if auth_section is None:
-        raise AuthError(
+        raise StreamlitAuthError(
             "Auth credentials are missing. Please check your configuration."
         )
     if "redirect_uri" not in auth_section:
-        raise AuthError(
+        raise StreamlitAuthError(
             "Auth credentials are missing 'redirect_uri'. Please check your configuration."
         )
 
@@ -151,12 +151,12 @@ def validate_auth_credentials(provider: str) -> None:
         provider_section = generate_default_provider_section(auth_section)
 
     if provider_section is None:
-        raise AuthError(
+        raise StreamlitAuthError(
             f"Auth credentials are missing for *'{provider}'* provider. Please check your configuration."
         )
 
     if not isinstance(provider_section, Mapping):
-        raise AuthError(
+        raise StreamlitAuthError(
             f"Auth credentials for '{provider}' provider must be a toml section."
             f" Please check your configuration."
         )
@@ -164,7 +164,7 @@ def validate_auth_credentials(provider: str) -> None:
     required_keys = ["client_id", "client_secret", "server_metadata_url"]
     missing_keys = [key for key in required_keys if key not in provider_section]
     if missing_keys:
-        raise AuthError(
+        raise StreamlitAuthError(
             f"Auth credentials for '{provider}' provider are missing the following keys: "
             f"{missing_keys}. Please check your configuration."
         )

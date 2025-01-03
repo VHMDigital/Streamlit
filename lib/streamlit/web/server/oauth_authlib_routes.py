@@ -25,7 +25,7 @@ from streamlit.auth_util import (
     generate_default_provider_section,
     get_secrets_auth_section,
 )
-from streamlit.errors import AuthError
+from streamlit.errors import StreamlitAuthError
 from streamlit.url_util import make_url_path
 from streamlit.web.server.oidc_mixin import TornadoOAuth, TornadoOAuth2App
 from streamlit.web.server.server_util import AUTH_COOKIE_NAME
@@ -109,9 +109,9 @@ class AuthLoginHandler(AuthHandlerMixin, tornado.web.RequestHandler):
         provider_token = self.get_argument("provider", None)
         try:
             if provider_token is None:
-                raise AuthError("Missing provider token")
+                raise StreamlitAuthError("Missing provider token")
             payload = decode_provider_token(provider_token)
-        except AuthError:
+        except StreamlitAuthError:
             return None
 
         return payload["provider"]
