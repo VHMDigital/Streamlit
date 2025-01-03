@@ -657,7 +657,8 @@ class ScriptRunnerTest(AsyncTestCase):
             patched_create_page_profile_message.assert_called_once()
             call_kwargs = patched_create_page_profile_message.call_args_list[0].kwargs
 
-            assert len(call_kwargs["commands"]) == 1  # text command
+            # Check the
+            assert len(call_kwargs["commands"]) == 2  # text & exception command
             assert call_kwargs["exec_time"] > 0
             assert call_kwargs["prep_time"] > 0
             assert call_kwargs["uncaught_exception"] == "AttributeError"
