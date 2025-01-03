@@ -71,12 +71,11 @@ NullableScalarDateValue: TypeAlias = Union[date, datetime, str, Literal["today"]
 DateValue: TypeAlias = Union[NullableScalarDateValue, Sequence[NullableScalarDateValue]]
 
 # The return value of st.date_input.
-DateWidgetReturn: TypeAlias = Union[
-    date, Tuple[()], Tuple[date], Tuple[date, date], None
-]
 DateWidgetRangeReturn: TypeAlias = Union[
     Tuple[()], Tuple[date], Tuple[date, date], None
 ]
+DateWidgetReturn: TypeAlias = Union[date, DateWidgetRangeReturn]
+
 
 DEFAULT_STEP_MINUTES: Final = 15
 ALLOWED_DATE_FORMATS: Final = re.compile(
@@ -574,11 +573,9 @@ class TimeWidgetsMixin:
     def date_input(
         self,
         label: str,
-        value: SingleDateValue
-        | Literal["today", "default_value_today"]
-        | None = "default_value_today",
-        min_value: SingleDateValue = None,
-        max_value: SingleDateValue = None,
+        value: NullableScalarDateValue = "today",
+        min_value: NullableScalarDateValue = None,
+        max_value: NullableScalarDateValue = None,
         key: Key | None = None,
         help: str | None = None,
         on_change: WidgetCallback | None = None,
@@ -594,12 +591,9 @@ class TimeWidgetsMixin:
     def date_input(
         self,
         label: str,
-        value: tuple[SingleDateValue, SingleDateValue]
-        | tuple[()]
-        | Literal["today", "default_value_today"]
-        | None = "default_value_today",
-        min_value: SingleDateValue = None,
-        max_value: SingleDateValue = None,
+        value: Sequence[NullableScalarDateValue] = "today",
+        min_value: NullableScalarDateValue = None,
+        max_value: NullableScalarDateValue = None,
         key: Key | None = None,
         help: str | None = None,
         on_change: WidgetCallback | None = None,
