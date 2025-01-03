@@ -42,7 +42,7 @@ AUTH_LOGOUT_ENDPOINT: Final = "/auth/logout"
 
 
 @gather_metrics("login")
-def login(provider: str) -> None:
+def login(provider: str = "default") -> None:
     """Initiate the login for the given provider.
 
     Parameters
