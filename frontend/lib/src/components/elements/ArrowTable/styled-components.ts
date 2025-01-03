@@ -50,21 +50,6 @@ export const StyledTable = styled.table(({ theme }) => ({
   color: theme.colors.bodyText,
 
   borderSpacing: 0,
-
-  // Add border radius to corner cells to prevent colored background from showing
-  // through the border.
-  "& thead tr:first-child th:first-child": {
-    borderTopLeftRadius: theme.radii.default,
-  },
-  "& thead tr:first-child th:last-child": {
-    borderTopRightRadius: theme.radii.default,
-  },
-  "& tbody tr:last-child td:first-child": {
-    borderBottomLeftRadius: theme.radii.default,
-  },
-  "& tbody tr:last-child td:last-child": {
-    borderBottomRightRadius: theme.radii.default,
-  },
 }))
 
 const styleCellFunction = (theme: EmotionTheme): CSSObject => ({
