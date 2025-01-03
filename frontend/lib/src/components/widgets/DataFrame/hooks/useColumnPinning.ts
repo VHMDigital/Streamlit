@@ -27,6 +27,21 @@ type ColumnPinningReturn = {
   unpinColumn: (columnId: string) => void
 }
 
+/**
+ * A React hook that adds the ability to pin/freeze columns to the left side of the table.
+ *
+ * @param columns - The columns of the table
+ * @param isEmptyTable - Whether the table is empty (no rows)
+ * @param containerWidth - The width of the parent container
+ * @param minColumnWidth - The minimum width allowed for a column
+ * @param clearSelection - A callback to clear current selections in the table
+ * @param setColumnConfigMapping - A callback to set the column config mapping state
+ *
+ * @returns An object containing the following properties:
+ * - `pinColumn`: A callback to pin a column
+ * - `unpinColumn`: A callback to unpin a column
+ * - `freezeColumns`: The number of columns to freeze
+ */
 function useColumnPinning(
   columns: BaseColumn[],
   isEmptyTable: boolean,
