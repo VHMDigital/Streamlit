@@ -22,9 +22,10 @@ import tornado.web
 from streamlit.auth_util import (
     AuthCache,
     decode_provider_token,
+    generate_default_provider_section,
     get_secrets_auth_section,
 )
-from streamlit.errors import AuthError
+from streamlit.errors import StreamlitAuthError
 from streamlit.url_util import make_url_path
 from streamlit.web.server.oidc_mixin import TornadoOAuth, TornadoOAuth2App
 from streamlit.web.server.server_util import AUTH_COOKIE_NAME
@@ -43,6 +44,11 @@ def create_oauth_client(provider: str) -> tuple[TornadoOAuth2App, str]:
         redirect_uri = "/"
 
     provider_section = config.setdefault(provider, {})
+
+    if not provider_section and provider == "default":
+        provider_section = generate_default_provider_section(auth_section)
+        config["default"] = provider_section
+
     provider_client_kwargs = provider_section.setdefault("client_kwargs", {})
     if "scope" not in provider_client_kwargs:
         provider_client_kwargs["scope"] = "openid email profile"
@@ -103,9 +109,9 @@ class AuthLoginHandler(AuthHandlerMixin, tornado.web.RequestHandler):
         provider_token = self.get_argument("provider", None)
         try:
             if provider_token is None:
-                raise AuthError("Missing provider token")
+                raise StreamlitAuthError("Missing provider token")
             payload = decode_provider_token(provider_token)
-        except AuthError:
+        except StreamlitAuthError:
             return None
 
         return payload["provider"]
@@ -127,14 +133,10 @@ class AuthCallbackHandler(AuthHandlerMixin, tornado.web.RequestHandler):
 
         error = self.get_argument("error", None)
         if error:
-            cookie_value = self._prepare_error_cookie_value(error, origin, provider)
-            self.set_auth_cookie(cookie_value)
             self.redirect_to_base()
             return
 
         if provider is None:
-            cookie_value = self._prepare_missing_provider_cookie_value(origin)
-            self.set_auth_cookie(cookie_value)
             self.redirect_to_base()
             return
 
@@ -172,21 +174,3 @@ class AuthCallbackHandler(AuthHandlerMixin, tornado.web.RequestHandler):
             redirect_uri_parsed.scheme + "://" + redirect_uri_parsed.netloc
         )
         return origin_from_redirect_uri
-
-    def _prepare_error_cookie_value(
-        self, error: str, origin: str, provider: str | None
-    ) -> dict[str, Any]:
-        return {
-            "provider": provider,
-            "error": error,
-            "_streamlit_logged_in": False,
-            "origin": origin,
-        }
-
-    def _prepare_missing_provider_cookie_value(self, origin: str) -> dict[str, Any]:
-        return {
-            "provider": None,
-            "error": "Missing provider",
-            "_streamlit_logged_in": False,
-            "origin": origin,
-        }

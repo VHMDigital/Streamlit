@@ -22,7 +22,7 @@ from unittest.mock import MagicMock, patch
 from parameterized import parameterized
 
 import streamlit as st
-from streamlit.errors import AuthError, StreamlitAPIException
+from streamlit.errors import StreamlitAPIException, StreamlitAuthError
 from streamlit.runtime.forward_msg_queue import ForwardMsgQueue
 from streamlit.runtime.fragment import MemoryFragmentStorage
 from streamlit.runtime.pages_manager import PagesManager
@@ -171,10 +171,12 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
 
     def test_user_login_with_invalid_provider(self):
         """Test that st.login raise exception for invalid provider."""
-        with self.assertRaises(AuthError) as ex:
+        with self.assertRaises(StreamlitAuthError) as ex:
             st.login("invalid_provider")
 
-        assert "Auth credentials are missing *'invalid_provider'*" in str(ex.exception)
+        assert "Auth credentials are missing for *'invalid_provider'*" in str(
+            ex.exception
+        )
 
     def test_user_login_redirect_uri_missing(self):
         """Tests that an error is raised if the redirect uri is missing"""
@@ -185,7 +187,7 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
                 get=MagicMock(return_value={"google": {}}),
             ),
         ):
-            with self.assertRaises(AuthError) as ex:
+            with self.assertRaises(StreamlitAuthError) as ex:
                 st.login("google")
 
             assert (
@@ -207,11 +209,11 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
                 ),
             ),
         ):
-            with self.assertRaises(AuthError) as ex:
+            with self.assertRaises(StreamlitAuthError) as ex:
                 st.login("google")
 
             assert (
-                "Auth credentials for 'google' are missing the following keys: ['client_id', 'client_secret', 'server_metadata_url']. Please check your configuration."
+                "Auth credentials for 'google' provider are missing the following keys: ['client_id', 'client_secret', 'server_metadata_url']. Please check your configuration."
                 in str(ex.exception)
             )
 

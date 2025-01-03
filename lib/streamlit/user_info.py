@@ -92,9 +92,24 @@ def _get_user_info() -> UserInfo:
         # TODO: Add appropriate warnings when ctx is missing
         return {}
     context_user_info = ctx.user_info.copy()
-    if "_streamlit_logged_in" in context_user_info:
-        del context_user_info["_streamlit_logged_in"]
     return context_user_info
+
+
+def _clear_user_info() -> None:
+    context = _get_script_run_ctx()
+    if context is not None:
+        context.user_info.clear()
+        session_id = context.session_id
+
+        if runtime.exists():
+            instance = runtime.get_instance()
+            instance.clear_user_info_for_session(session_id)
+
+        base_path = config.get_option("server.baseUrlPath")
+
+        fwd_msg = ForwardMsg()
+        fwd_msg.auth_redirect.url = make_url_path(base_path, AUTH_LOGOUT_ENDPOINT)
+        context.enqueue(fwd_msg)
 
 
 class UserInfoProxy(Mapping[str, Union[str, bool, None]]):
@@ -108,40 +123,19 @@ class UserInfoProxy(Mapping[str, Union[str, bool, None]]):
     Properties can be accessed via key or attribute notation. For example,
     ``st.experimental_user["email"]`` or ``st.experimental_user.email``.
 
-    Attributes
-    ----------
-    email : str
-        If running locally, this property returns the string literal
-        ``"test@example.com"``.
-
-        If running on Streamlit Community Cloud, this
-        property returns one of two values:
-
-        - ``None`` if the user is not logged in or not a member of the app's\
-        workspace. Such users appear under anonymous pseudonyms in the app's\
-        analytics.
-        - The user's email if the user is logged in and a member of the\
-        app's workspace. Such users are identified by their email in the app's\
-        analytics.
-
     """
 
-    def __bool__(self):
-        ctx = _get_script_run_ctx()
-        if ctx is None:
-            return False
-        # TODO[kajarenc] replace user_info object type from a Dict, to more
-        #  structured object (e.g. user AuthenticatedUser vs. AnonymousUser).
-        return bool(ctx.user_info.get("_streamlit_logged_in", False))
-
     def __getitem__(self, key: str) -> str | bool | None:
-        return _get_user_info()[key]
+        try:
+            return _get_user_info()[key]
+        except KeyError:
+            raise KeyError(f'st.experimental_user has no key "{key}".')
 
     def __getattr__(self, key: str) -> str | bool | None:
         try:
             return _get_user_info()[key]
         except KeyError:
-            raise AttributeError
+            raise AttributeError(f'st.experimental_user has no attribute "{key}".')
 
     def __setattr__(self, name: str, value: str | None) -> NoReturn:
         raise StreamlitAPIException("st.experimental_user cannot be modified")
