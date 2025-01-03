@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from datetime import date, datetime
 
     from streamlit.elements.widgets.time_widgets import (
-        DateTupleReturn,
+        DateWidgetRangeReturn,
         TimeWidgetsMixin,
     )
 
@@ -38,11 +38,11 @@ if TYPE_CHECKING:
 
     # Date range input
     assert_type(
-        date_input("foo", (date(2024, 1, 1), date(2024, 1, 31))), DateTupleReturn
+        date_input("foo", (date(2024, 1, 1), date(2024, 1, 31))), DateWidgetRangeReturn
     )
     assert_type(
         date_input("foo", (datetime(2024, 1, 1), datetime(2024, 1, 31))),
-        DateTupleReturn,
+        DateWidgetRangeReturn,
     )
 
     # Test with min_value and max_value
@@ -62,7 +62,7 @@ if TYPE_CHECKING:
             min_value=date(2022, 1, 1),
             max_value=date(2024, 12, 31),
         ),
-        DateTupleReturn,
+        DateWidgetRangeReturn,
     )
 
     # Test with different formats
@@ -71,7 +71,7 @@ if TYPE_CHECKING:
     )
     assert_type(
         date_input("foo", (date(2024, 1, 1), date(2024, 12, 31)), format="DD.MM.YYYY"),
-        DateTupleReturn,
+        DateWidgetRangeReturn,
     )
 
     # Test with disabled and label_visibility
@@ -112,14 +112,14 @@ if TYPE_CHECKING:
     )
 
     # Edge cases
-    assert_type(date_input("foo", (None, date(2024, 12, 31))), DateTupleReturn)
-    assert_type(date_input("foo", (date(2024, 1, 1), None)), DateTupleReturn)
-    assert_type(date_input("foo", ()), DateTupleReturn)
+    assert_type(date_input("foo", (None, date(2024, 12, 31))), DateWidgetRangeReturn)
+    assert_type(date_input("foo", (date(2024, 1, 1), None)), DateWidgetRangeReturn)
+    assert_type(date_input("foo", ()), DateWidgetRangeReturn)
 
     # Mixed input types
     assert_type(
-        date_input("foo", (date(2024, 1, 1), datetime(2024, 12, 31))), DateTupleReturn
+        date_input("foo", (date(2024, 1, 1), datetime(2024, 12, 31))), DateWidgetRangeReturn
     )
     assert_type(
-        date_input("foo", (datetime(2024, 1, 1), date(2024, 12, 31))), DateTupleReturn
+        date_input("foo", (datetime(2024, 1, 1), date(2024, 12, 31))), DateWidgetRangeReturn
     )
