@@ -163,8 +163,6 @@ class BrowserWebSocketHandler(WebSocketHandler, SessionClient):
             email = "test@example.com"
         user_info: dict[str, str | bool | None] = {
             "email": None if is_public_cloud_app else email,
-            "_streamlit_logged_in": not is_public_cloud_app
-            and email != "test@example.com",
         }
 
         if is_public_cloud_app or email == "test@example.com":
