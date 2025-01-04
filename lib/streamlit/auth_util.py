@@ -52,7 +52,12 @@ class AuthCache:
 def is_authlib_installed() -> bool:
     """Check if Authlib is installed."""
     try:
-        import authlib  # noqa: F401
+        import authlib  # type: ignore[import-untyped]
+
+        if authlib.__version__ < "1.3.2" or authlib.__version__ >= "2.0":
+            raise StreamlitAuthError(
+                "Authlib version must be at >= 1.3.2 and < 2.0 Please upgrade Authlib."
+            )
     except (ImportError, ModuleNotFoundError):
         return False
     return True
