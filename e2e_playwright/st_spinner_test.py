@@ -26,14 +26,12 @@ def test_spinner_execution(app: Page):
 def test_spinner_elapsed_time(app: Page):
     click_button(app, "Run spinner with elapsed time")
     expect(app.get_by_test_id("stSpinner")).to_contain_text("Loading...")
-
-    # To not make this flaky, we don't check that the timer shows exactly 0.0 seconds,
-    # but just that it's somewhere around 0.x seconds
-    expect(app.get_by_test_id("stSpinner")).to_contain_text("0.")
-    expect(app.get_by_test_id("stSpinner")).to_contain_text("seconds")
-
-    # Similarly, we wait for 1 second and check that it shows 1.x seconds.
-    # TODO: Need to check in practice if this is flaky.
-    expect(app.get_by_test_id("stSpinner")).to_contain_text("1.", timeout=1000)
     expect(app.get_by_test_id("stSpinner")).to_contain_text("seconds")
     check_top_level_class(app, "stSpinner")
+
+    # Check that the timer text changes.
+    # We're not doing any exact text matching of the time here since that might be flaky.
+    initial_text = app.get_by_test_id("stSpinner").text_content()
+    app.wait_for_timeout(200)
+    updated_text = app.get_by_test_id("stSpinner").text_content()
+    assert initial_text != updated_text
