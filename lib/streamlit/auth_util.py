@@ -49,6 +49,20 @@ class AuthCache:
         self.cache.pop(key, None)
 
 
+def is_authlib_installed() -> bool:
+    """Check if Authlib is installed."""
+    try:
+        import authlib  # type: ignore[import-untyped]
+
+        if authlib.__version__ < "1.3.2" or authlib.__version__ >= "2.0":
+            raise StreamlitAuthError(
+                "Authlib version must be at >= 1.3.2 and < 2.0 Please upgrade Authlib."
+            )
+    except (ImportError, ModuleNotFoundError):
+        return False
+    return True
+
+
 def get_signing_secret() -> str:
     """Get the cookie signing secret from the configuration or secrets.toml."""
     signing_secret: str = config.get_option("server.cookieSecret")
