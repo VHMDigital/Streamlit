@@ -164,6 +164,11 @@ def validate_auth_credentials(provider: str) -> None:
             """Authentication credentials in `.streamlit/secrets.toml` are missing the
             "redirect_uri" key. Please check your configuration."""
         )
+    if "cookie_secret" not in auth_section:
+        raise StreamlitAuthError(
+            """Authentication credentials in `.streamlit/secrets.toml` are missing the
+            "cookie_secret" key. Please check your configuration."""
+        )
 
     provider_section = auth_section.get(provider)
 

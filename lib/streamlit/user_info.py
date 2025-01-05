@@ -95,23 +95,6 @@ def _get_user_info() -> UserInfo:
     return context_user_info
 
 
-def _clear_user_info() -> None:
-    context = _get_script_run_ctx()
-    if context is not None:
-        context.user_info.clear()
-        session_id = context.session_id
-
-        if runtime.exists():
-            instance = runtime.get_instance()
-            instance.clear_user_info_for_session(session_id)
-
-        base_path = config.get_option("server.baseUrlPath")
-
-        fwd_msg = ForwardMsg()
-        fwd_msg.auth_redirect.url = make_url_path(base_path, AUTH_LOGOUT_ENDPOINT)
-        context.enqueue(fwd_msg)
-
-
 class UserInfoProxy(Mapping[str, Union[str, bool, None]]):
     """
     A read-only, dict-like object for accessing information about current user.
