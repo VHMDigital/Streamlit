@@ -76,7 +76,7 @@ export default function StreamlitSyntaxHighlighter({
 
   return (
     <StyledCodeBlock className="stCode" data-testid="stCode">
-      <StyledPre style={height ? { height: `${height}px` } : undefined}>
+      <StyledPre $height={height}>
         <SyntaxHighlighter
           language={language}
           PreTag="div"
