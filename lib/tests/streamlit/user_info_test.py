@@ -174,9 +174,10 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
         with self.assertRaises(StreamlitAuthError) as ex:
             st.login("invalid_provider")
 
-        assert "Auth credentials are missing for 'invalid_provider'" in str(
-            ex.exception
-        )
+        assert (
+            "Authentication credentials in `.streamlit/secrets.toml` are missing for the "
+            'authentication provider "invalid_provider". Please check your configuration.'
+        ) == str(ex.exception)
 
     def test_user_login_redirect_uri_missing(self):
         """Tests that an error is raised if the redirect uri is missing"""
@@ -190,10 +191,8 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
             with self.assertRaises(StreamlitAuthError) as ex:
                 st.login("google")
 
-            assert (
-                "Auth credentials are missing 'redirect_uri'. Please check your configuration."
-                in str(ex.exception)
-            )
+            assert """Authentication credentials in `.streamlit/secrets.toml` are missing the
+            "redirect_uri" key. Please check your configuration.""" in str(ex.exception)
 
     def test_user_login_required_fields_missing(self):
         """Tests that an error is raised if the required fields are missing"""
@@ -213,9 +212,11 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
                 st.login("google")
 
             assert (
-                "Auth credentials for 'google' provider are missing the following keys: ['client_id', 'client_secret', 'server_metadata_url']. Please check your configuration."
-                in str(ex.exception)
-            )
+                "Authentication credentials in `.streamlit/secrets.toml` for the "
+                'authentication provider "google" are missing the following keys: '
+                "['client_id', 'client_secret', 'server_metadata_url']. Please check your "
+                "configuration."
+            ) == str(ex.exception)
 
     def test_user_logout(self):
         """Test that st.logout sends correct proto message."""
