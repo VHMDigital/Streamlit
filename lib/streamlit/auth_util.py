@@ -158,22 +158,23 @@ def validate_auth_credentials(provider: str) -> None:
 
     if provider_section is None:
         raise StreamlitAuthError(
-            f"""Authentication credentials in `.streamlit/secrets.toml` are missing for
-            the authentication provider "{provider}". Please check your configuration."""
+            f"Authentication credentials in `.streamlit/secrets.toml` are missing for "
+            f'the authentication provider "{provider}". Please check your '
+            f"configuration."
         )
 
     if not isinstance(provider_section, Mapping):
         raise StreamlitAuthError(
-            f"""Authentication credentials in `.streamlit/secrets.toml` for the
-            authentication provider "{provider}" must be valid TOML. Please check your
-            configuration."""
+            f"Authentication credentials in `.streamlit/secrets.toml` for the "
+            f'authentication provider "{provider}" must be valid TOML. Please check '
+            f"your configuration."
         )
 
     required_keys = ["client_id", "client_secret", "server_metadata_url"]
     missing_keys = [key for key in required_keys if key not in provider_section]
     if missing_keys:
         raise StreamlitAuthError(
-            f"""Authentication credentials in `.streamlit/secrets.toml` for the
-            authentication provider "{provider}" are missing the following keys:
-            {missing_keys}. Please check your configuration."""
+            "Authentication credentials in `.streamlit/secrets.toml` for the "
+            f'authentication provider "{provider}" are missing the following keys: '
+            f"{missing_keys}. Please check your configuration."
         )
