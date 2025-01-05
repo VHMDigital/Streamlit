@@ -18,7 +18,7 @@ from e2e_playwright.shared.app_utils import check_top_level_class, click_button
 
 
 def test_spinner_execution(app: Page):
-    click_button(app, "Run spinner")
+    click_button(app, "Run spinner basic")
     expect(app.get_by_test_id("stSpinner")).to_have_text("Loading...")
     check_top_level_class(app, "stSpinner")
 
