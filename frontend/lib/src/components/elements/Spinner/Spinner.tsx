@@ -39,6 +39,9 @@ export interface SpinnerProps {
 // For example, 1.1 -> (1.1 seconds)
 // 65.3 -> (1 minute, 5.3 seconds)
 // 3661.1 -> (1 hour, 1 minute, 1.1 seconds)
+// TODO: In the future, we might want to replace this with `Intl.DurationFormat` (see
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DurationFormat).
+// But that API is not available on Firefox yet.
 export const formatTime = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600)
   const mins = Math.floor((seconds % 3600) / 60)
