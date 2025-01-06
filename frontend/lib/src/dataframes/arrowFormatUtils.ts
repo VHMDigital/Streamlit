@@ -421,13 +421,11 @@ function formatObject(object: any, field?: Field): string {
   if (field?.type instanceof Struct) {
     // This type is used by python dictionary values
 
-    // Workaround: Arrow JS adds all properties from all cells
-    // as fields. When you convert to string, it will contain lots of fields with
-    // null values. To mitigate this, we filter out null values.
-
     return JSON.stringify(object, (_key, value) => {
       if (!notNullOrUndefined(value)) {
-        // Ignore null and undefined values ->
+        // Workaround: Arrow JS adds all properties from all cells
+        // as fields. When you convert to string, it will contain lots of fields with
+        // null values. To mitigate this, we filter out null values.
         return undefined
       }
       if (typeof value === "bigint") {
@@ -441,6 +439,7 @@ function formatObject(object: any, field?: Field): string {
     })
   }
 
+  // TODO(lukasmasuch): Investigate if we can unify this with the logic above.
   return JSON.stringify(object, (_key, value) =>
     typeof value === "bigint" ? Number(value) : value
   )
