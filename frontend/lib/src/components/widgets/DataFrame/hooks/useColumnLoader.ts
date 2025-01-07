@@ -276,19 +276,22 @@ function useColumnLoader(
 ): ColumnLoaderReturn {
   const theme: EmotionTheme = useTheme()
 
-  // const parsedColumnConfig = useMemo(
-  //   () => getColumnConfig(element.columns),
-  //   [element.columns]
-  // )
-  // We just initialize with an empty map here since it will be set in the
-  // useEffect below.
-  const [columnConfigMapping, setColumnConfigMapping] = React.useState<
-    Map<string, any>
-  >(getColumnConfig(element.columns))
+  // Memoize the column config parsing to avoid unnecessary re-renders & re-parsing:
+  const parsedColumnConfig = React.useMemo(
+    () => getColumnConfig(element.columns),
+    [element.columns]
+  )
 
+  // Initialize state with the parsed column config:
+  // We need that to allow changing the column config state
+  // (e.g. via changes by the user in the UI)
+  const [columnConfigMapping, setColumnConfigMapping] =
+    React.useState<Map<string, any>>(parsedColumnConfig)
+
+  // Resync state whenever the parsed column config from the proto changes:
   React.useEffect(() => {
-    setColumnConfigMapping(getColumnConfig(element.columns))
-  }, [element.columns])
+    setColumnConfigMapping(parsedColumnConfig)
+  }, [parsedColumnConfig])
 
   const stretchColumns: boolean =
     element.useContainerWidth ||
