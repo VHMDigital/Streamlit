@@ -119,10 +119,8 @@ function generateTableCell(
   const formattedContent =
     displayContent || formatArrowCell(content, contentType, field)
 
-  const isNumeric = contentType ? isNumericType(contentType) : false
-
   const style: React.CSSProperties = {
-    textAlign: isNumeric ? "right" : "left",
+    textAlign: isNumericType(contentType) ? "right" : "left",
   }
 
   switch (type) {

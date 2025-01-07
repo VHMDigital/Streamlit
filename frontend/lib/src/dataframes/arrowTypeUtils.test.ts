@@ -174,6 +174,7 @@ describe("getTypeName", () => {
 
 describe("isIntegerType", () => {
   it.each([
+    [undefined, false],
     [
       {
         pandas_type: "float64",
@@ -239,7 +240,7 @@ describe("isIntegerType", () => {
     ],
   ])(
     "interprets %s as integer type: %s",
-    (arrowType: Type, expected: boolean) => {
+    (arrowType: Type | undefined, expected: boolean) => {
       expect(isIntegerType(arrowType)).toEqual(expected)
     }
   )
@@ -247,6 +248,7 @@ describe("isIntegerType", () => {
 
 describe("isUnsignedIntegerType", () => {
   it.each([
+    [undefined, false],
     [
       {
         pandas_type: "float64",
@@ -298,7 +300,7 @@ describe("isUnsignedIntegerType", () => {
     ],
   ])(
     "interprets %s as unsigned integer type: %s",
-    (arrowType: Type, expected: boolean) => {
+    (arrowType: Type | undefined, expected: boolean) => {
       expect(isUnsignedIntegerType(arrowType)).toEqual(expected)
     }
   )
@@ -306,6 +308,7 @@ describe("isUnsignedIntegerType", () => {
 
 describe("isBooleanType", () => {
   it.each([
+    [undefined, false],
     [
       {
         pandas_type: "bool",
@@ -343,7 +346,7 @@ describe("isBooleanType", () => {
     ],
   ])(
     "interprets %s as boolean type: %s",
-    (arrowType: Type, expected: boolean) => {
+    (arrowType: Type | undefined, expected: boolean) => {
       expect(isBooleanType(arrowType)).toEqual(expected)
     }
   )
@@ -392,6 +395,7 @@ describe("getTimezone", () => {
 
 describe("isFloatType", () => {
   it.each([
+    [undefined, false],
     [
       {
         pandas_type: "float64",
@@ -429,7 +433,7 @@ describe("isFloatType", () => {
     ],
   ])(
     "interprets %s as float type: %s",
-    (arrowType: Type, expected: boolean) => {
+    (arrowType: Type | undefined, expected: boolean) => {
       expect(isFloatType(arrowType)).toEqual(expected)
     }
   )
@@ -437,6 +441,7 @@ describe("isFloatType", () => {
 
 describe("isDecimalType", () => {
   it.each([
+    [undefined, false],
     [
       {
         pandas_type: "object",
@@ -467,7 +472,7 @@ describe("isDecimalType", () => {
     ],
   ])(
     "interprets %s as decimal type: %s",
-    (arrowType: Type, expected: boolean) => {
+    (arrowType: Type | undefined, expected: boolean) => {
       expect(isDecimalType(arrowType)).toEqual(expected)
     }
   )
@@ -475,6 +480,7 @@ describe("isDecimalType", () => {
 
 describe("isNumericType", () => {
   it.each([
+    [undefined, false],
     [
       {
         pandas_type: "float64",
@@ -526,7 +532,7 @@ describe("isNumericType", () => {
     ],
   ])(
     "interprets %s as numeric type: %s",
-    (arrowType: Type, expected: boolean) => {
+    (arrowType: Type | undefined, expected: boolean) => {
       expect(isNumericType(arrowType)).toEqual(expected)
     }
   )

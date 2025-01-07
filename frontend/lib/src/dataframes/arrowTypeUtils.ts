@@ -16,6 +16,8 @@
 
 import { Dictionary, Struct, StructRow, Vector } from "apache-arrow"
 
+import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
+
 /** Data types used by ArrowJS. */
 export type DataType =
   | null
@@ -115,7 +117,10 @@ export function getTimezone(arrowType: Type): string | undefined {
 /** True if the arrow type is an integer type.
  * For example: int8, int16, int32, int64, uint8, uint16, uint32, uint64, range
  */
-export function isIntegerType(arrowType: Type): boolean {
+export function isIntegerType(arrowType?: Type): boolean {
+  if (isNullOrUndefined(arrowType)) {
+    return false
+  }
   const typeName = getTypeName(arrowType) ?? ""
   return (
     (typeName.startsWith("int") && !typeName.startsWith("interval")) ||
@@ -125,7 +130,10 @@ export function isIntegerType(arrowType: Type): boolean {
 }
 
 /** True if the arrow type is an unsigned integer type. */
-export function isUnsignedIntegerType(arrowType: Type): boolean {
+export function isUnsignedIntegerType(arrowType?: Type): boolean {
+  if (isNullOrUndefined(arrowType)) {
+    return false
+  }
   const typeName = getTypeName(arrowType) ?? ""
   return typeName.startsWith("uint")
 }
@@ -133,18 +141,27 @@ export function isUnsignedIntegerType(arrowType: Type): boolean {
 /** True if the arrow type is a float type.
  * For example: float16, float32, float64, float96, float128
  */
-export function isFloatType(arrowType: Type): boolean {
+export function isFloatType(arrowType?: Type): boolean {
+  if (isNullOrUndefined(arrowType)) {
+    return false
+  }
   const typeName = getTypeName(arrowType) ?? ""
   return typeName.startsWith("float")
 }
 
 /** True if the arrow type is a decimal type. */
-export function isDecimalType(arrowType: Type): boolean {
+export function isDecimalType(arrowType?: Type): boolean {
+  if (isNullOrUndefined(arrowType)) {
+    return false
+  }
   return getTypeName(arrowType) === "decimal"
 }
 
 /** True if the arrow type is a numeric type. */
-export function isNumericType(arrowType: Type): boolean {
+export function isNumericType(arrowType?: Type): boolean {
+  if (isNullOrUndefined(arrowType)) {
+    return false
+  }
   return (
     isIntegerType(arrowType) ||
     isFloatType(arrowType) ||
@@ -153,6 +170,9 @@ export function isNumericType(arrowType: Type): boolean {
 }
 
 /** True if the arrow type is a boolean type. */
-export function isBooleanType(arrowType: Type): boolean {
+export function isBooleanType(arrowType?: Type): boolean {
+  if (isNullOrUndefined(arrowType)) {
+    return false
+  }
   return getTypeName(arrowType) === "bool"
 }
