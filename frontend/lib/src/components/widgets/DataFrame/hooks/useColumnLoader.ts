@@ -262,6 +262,8 @@ export function getColumnType(column: BaseColumnProps): ColumnCreator {
  * @param element - The proto message of the dataframe element
  * @param data - The Arrow data extracted from the proto message
  * @param disabled - Whether the widget is disabled
+ * @param columnOrder - The custom column order state. This is a list of column names or column ids.
+ *        If this is empty, the columns will be ordered by their position in the Arrow table.
  *
  * @returns the columns and the cell content getter compatible with glide-data-grid
  * and the parsed column config mapping.
@@ -274,9 +276,16 @@ function useColumnLoader(
 ): ColumnLoaderReturn {
   const theme: EmotionTheme = useTheme()
 
+  // const parsedColumnConfig = useMemo(
+  //   () => getColumnConfig(element.columns),
+  //   [element.columns]
+  // )
+  // We just initialize with an empty map here since it will be set in the
+  // useEffect below.
   const [columnConfigMapping, setColumnConfigMapping] = React.useState<
     Map<string, any>
   >(getColumnConfig(element.columns))
+
   React.useEffect(() => {
     setColumnConfigMapping(getColumnConfig(element.columns))
   }, [element.columns])
