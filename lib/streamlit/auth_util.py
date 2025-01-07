@@ -90,7 +90,7 @@ def encode_provider_token(provider: str) -> str:
     except ImportError:
         raise StreamlitAuthError(
             """To use authentication features you need to install
-            the "Authlib>=1.3.2, <2" package, e.g. via `pip install Authlib`."""
+            the "Authlib>=1.3.2" package, e.g. via `pip install Authlib`."""
         ) from None
 
     header = {"alg": "HS256"}
@@ -110,7 +110,7 @@ def decode_provider_token(provider_token: str) -> ProviderTokenPayload:
     except ImportError:
         raise StreamlitAuthError(
             """To use authentication features you need to install
-            the "Authlib>=1.3.2, <2" package, e.g. via `pip install Authlib`."""
+            the "Authlib>=1.3.2" package, e.g. via `pip install Authlib`."""
         ) from None
 
     # Our JWT token is short-lived (2 minutes), so we check here that it contains
