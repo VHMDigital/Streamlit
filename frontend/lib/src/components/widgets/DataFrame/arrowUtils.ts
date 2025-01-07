@@ -208,7 +208,7 @@ export function getIndexFromArrow(
   }
 
   return {
-    id: `index-${indexPosition}`,
+    id: `_index-${indexPosition}`,
     name: title,
     title,
     isEditable,
@@ -279,7 +279,7 @@ export function getColumnFromArrow(
   }
 
   return {
-    id: `column-${title}-${columnPosition}`,
+    id: `_column-${title}-${columnPosition}`,
     name: title,
     title,
     isEditable: true,
@@ -299,7 +299,7 @@ export function getColumnFromArrow(
  */
 export function getEmptyIndexColumn(): BaseColumnProps {
   return {
-    id: `empty-index`,
+    id: `_empty-index`,
     title: "",
     indexNumber: 0,
     isEditable: false,
