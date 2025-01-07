@@ -106,7 +106,9 @@ describe("useVegaEmbed hook", () => {
 
     // Mock useVegaLiteSelections returns two callbacks:
     ;(useVegaLiteSelections as Mock).mockReturnValue({
-      maybeConfigureSelections: vi.fn(),
+      maybeConfigureSelections: vi
+        .fn()
+        .mockImplementation((view: any) => view),
       onFormCleared: vi.fn(),
     })
 
@@ -170,17 +172,11 @@ describe("useVegaEmbed hook", () => {
       useVegaLiteSelectionsMock.results[0].value
     expect(maybeConfigureSelections).toHaveBeenCalledWith(mockVegaView)
 
-    // 5) attempts to restore viewState from widgetMgr
-    expect(mockWidgetMgr.getElementState).toHaveBeenCalledWith(
-      "chartId",
-      "viewState"
-    )
-
-    // 6) Insert data (getInlineData => null, so none inserted)
+    // 5) Insert data (getInlineData => null, so none inserted)
     expect(mockVegaView.insert).not.toHaveBeenCalled() // if getInlineData was null
     expect(mockVegaView.runAsync).toHaveBeenCalled() // runAsync
 
-    // 7) Resizes the new vega view
+    // 6) Resizes the new vega view
     expect(mockVegaView.resize).toHaveBeenCalled()
     expect(mockVegaView.runAsync).toHaveBeenCalled()
   })

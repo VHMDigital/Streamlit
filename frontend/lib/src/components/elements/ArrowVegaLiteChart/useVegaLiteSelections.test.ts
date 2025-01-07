@@ -40,6 +40,7 @@ describe("useVegaLiteSelections", () => {
     vi.useFakeTimers()
 
     mockWidgetMgr = {
+      getElementState: vi.fn(),
       setElementState: vi.fn(),
       setStringValue: vi.fn(),
       getStringValue: vi.fn(),

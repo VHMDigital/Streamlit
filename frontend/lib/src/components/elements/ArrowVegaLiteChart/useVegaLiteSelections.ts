@@ -23,6 +23,7 @@ import {
   WidgetInfo,
   WidgetStateManager,
 } from "@streamlit/lib/src/WidgetStateManager"
+import { logWarning } from "@streamlit/lib/src/util/log"
 import { debounce, notNullOrUndefined } from "@streamlit/lib/src/util/utils"
 
 import { VegaLiteChartElement } from "./arrowUtils"
@@ -42,7 +43,7 @@ export interface VegaLiteState {
 }
 
 export interface UseVegaLiteSelectionsOutput {
-  maybeConfigureSelections: (view: VegaView | null) => void
+  maybeConfigureSelections: (view: VegaView) => VegaView
   onFormCleared: () => void
 }
 
@@ -54,11 +55,11 @@ export const useVegaLiteSelections = (
   const { id: chartId, formId, selectionMode } = element
 
   const maybeConfigureSelections = useCallback(
-    (vegaView: VegaView | null): void => {
+    (vegaView: VegaView): VegaView => {
       // Add listeners for all selection events. Find out more here:
       // https://vega.github.io/vega/docs/api/view/#view_addSignalListener
       selectionMode.forEach(param => {
-        vegaView?.addSignalListener(
+        vegaView.addSignalListener(
           param,
           debounce(DEBOUNCE_TIME_MS, (name: string, value: SignalValue) => {
             // Store the current chart selection state with the widget manager so that it
@@ -66,7 +67,7 @@ export const useVegaLiteSelections = (
             // created again. This can happen when elements are added before it within
             // the delta path. The viewState is only stored in the frontend, and not
             // synced to the backend.
-            const viewState = vegaView?.getState({
+            const viewState = vegaView.getState({
               // There are also `signals` data, but I believe its
               // not relevant for restoring the selection state.
               data: (name?: string, _operator?: any) => {
@@ -125,6 +126,20 @@ export const useVegaLiteSelections = (
           })
         )
       })
+
+      // Try to load the previous state of the chart from the element state.
+      // This is useful to restore the selection state when the component is re-mounted
+      // or when its put into fullscreen mode.
+      const viewState = widgetMgr.getElementState(chartId, "viewState")
+      if (notNullOrUndefined(viewState)) {
+        try {
+          return vegaView.setState(viewState)
+        } catch (e) {
+          logWarning("Failed to restore view state", e)
+        }
+      }
+
+      return vegaView
     },
     [chartId, selectionMode, widgetMgr, formId, fragmentId]
   )

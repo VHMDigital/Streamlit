@@ -23,8 +23,7 @@ import { expressionInterpreter } from "vega-interpreter"
 import { useFormClearHelper } from "@streamlit/lib/src/components/widgets/Form"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
-import { logMessage, logWarning } from "@streamlit/lib/src/util/log"
-import { notNullOrUndefined } from "@streamlit/lib/src/util/utils"
+import { logMessage } from "@streamlit/lib/src/util/log"
 
 import {
   dataIsAnAppendOfPrev,
@@ -71,7 +70,7 @@ export function useVegaEmbed(
 
   useFormClearHelper({ widgetMgr, element: inputElement, onFormCleared })
 
-  const { id: chartId, data, datasets } = inputElement
+  const { data, datasets } = inputElement
 
   // Initialize the data and datasets refs with the current data and datasets
   // This is predominantly used to handle the case where we want to reference
@@ -97,8 +96,6 @@ export function useVegaEmbed(
       containerRef: RefObject<HTMLDivElement>,
       spec: any
     ): Promise<VegaView | null> => {
-      logMessage("Creating a new Vega view.")
-
       if (containerRef.current === null) {
         throw new Error("Element missing.")
       }
@@ -125,23 +122,9 @@ export function useVegaEmbed(
         options
       )
 
-      vegaView.current = view
-
-      maybeConfigureSelections(view)
+      vegaView.current = maybeConfigureSelections(view)
 
       vegaFinalizer.current = finalize
-
-      // Try to load the previous state of the chart from the element state.
-      // This is useful to restore the selection state when the component is re-mounted
-      // or when its put into fullscreen mode.
-      const viewState = widgetMgr.getElementState(chartId, "viewState")
-      if (notNullOrUndefined(viewState)) {
-        try {
-          vegaView.current = view.setState(viewState)
-        } catch (e) {
-          logWarning("Failed to restore view state", e)
-        }
-      }
 
       // Load the initial set of data into the chart.
       const dataArrays = getDataArrays(datasetsRef.current)
@@ -173,7 +156,7 @@ export function useVegaEmbed(
 
       return vegaView.current
     },
-    [chartId, finalizeView, maybeConfigureSelections, widgetMgr]
+    [finalizeView, maybeConfigureSelections]
   )
 
   const updateData = useCallback(

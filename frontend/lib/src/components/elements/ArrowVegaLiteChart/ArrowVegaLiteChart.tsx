@@ -65,7 +65,7 @@ const ArrowVegaLiteChart: FC<Props> = ({
   //    Note: We do not stabilize data/datasets as that is managed by the embed.
   const element = useVegaElementPreprocessor(inputElement)
 
-  // This hook is provides lifecycle functions for creating and removing the view.
+  // This hook provides lifecycle functions for creating and removing the view.
   // It also will update the view if the data changes (and not the spec)
   const { createView, updateView, finalizeView } = useVegaEmbed(
     element,
