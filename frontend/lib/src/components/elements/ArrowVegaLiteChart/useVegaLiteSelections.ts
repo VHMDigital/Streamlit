@@ -47,6 +47,14 @@ export interface UseVegaLiteSelectionsOutput {
   onFormCleared: () => void
 }
 
+/**
+ * Hook that returns a function that can be used to configure the selection
+ * events for a vega-lite chart.
+ *
+ * @param element The vega-lite chart element
+ * @param widgetMgr The widget manager
+ * @param fragmentId The fragment id of the element
+ */
 export const useVegaLiteSelections = (
   element: VegaLiteChartElement,
   widgetMgr: WidgetStateManager,

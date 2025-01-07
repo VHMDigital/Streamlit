@@ -140,6 +140,11 @@ const generateSpec = (
   return spec
 }
 
+/**
+ * Preprocesses the element to generate the VegaLite spec.
+ * It stabilizes some of the references (e.g. selectionMode and spec)
+ * and avoids further processing if unnecessary.
+ */
 export const useVegaElementPreprocessor = (
   element: VegaLiteChartElement
 ): VegaLiteChartElement => {

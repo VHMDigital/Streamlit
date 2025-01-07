@@ -50,6 +50,14 @@ interface UseVegaEmbedOutput {
   finalizeView: () => void
 }
 
+/**
+ * Hook that returns a set of lifecycle functions that can be used to create,
+ * update, and remove a vega-lite chart into the DOM.
+ *
+ * @param inputElement The vega-lite chart element
+ * @param widgetMgr The widget manager
+ * @param fragmentId The fragment id of the element
+ */
 export function useVegaEmbed(
   inputElement: VegaLiteChartElement,
   widgetMgr: WidgetStateManager,
