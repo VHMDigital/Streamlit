@@ -57,7 +57,7 @@ def is_authlib_installed() -> bool:
         authlib_version = authlib.__version__
         authlib_version_tuple = tuple(map(int, authlib_version.split(".")))
 
-        if authlib_version_tuple < (1, 3, 2) or authlib_version_tuple >= (2, 0):
+        if authlib_version_tuple < (1, 3, 2):
             return False
     except (ImportError, ModuleNotFoundError):
         return False
