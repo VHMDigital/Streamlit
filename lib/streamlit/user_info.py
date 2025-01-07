@@ -60,8 +60,7 @@ def login(provider: str = "default") -> None:
     if context is not None:
         if not is_authlib_installed():
             raise StreamlitAuthError(
-                """To use authentication features you need to install
-                the "Authlib>=1.3.2" package, e.g. via `pip install Authlib`."""
+                """To use authentication features, you need to install Authlib>=1.3.2, e.g. via `pip install Authlib`."""
             )
         validate_auth_credentials(provider)
         fwd_msg = ForwardMsg()
