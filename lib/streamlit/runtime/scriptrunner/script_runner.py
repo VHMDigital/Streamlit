@@ -553,11 +553,14 @@ class ScriptRunner:
                                 wrapped_fragment()
 
                             except FragmentStorageKeyError:
-                                # Only raise an error if the fragment is not an
-                                # auto_rerun. If it is an auto_rerun, we might have a
-                                # race condition where the fragment_id is removed
-                                # but the webapp sends a rerun request before the
-                                # removal information has reached the web app
+                                # This can happen if the fragment_id is removed from the
+                                # storage before the script runner gets to it. In this
+                                # case, the fragment is simply skipped.
+                                # Also, only log an error if the fragment is not an
+                                # auto_rerun to avoid noise. If it is an auto_rerun, we
+                                # might have a race condition where the fragment_id is
+                                # removed but the webapp sends a rerun request before
+                                # the removal information has reached the web app
                                 # (see https://github.com/streamlit/streamlit/issues/9080).
                                 if not rerun_data.is_auto_rerun:
                                     _LOGGER.error(
