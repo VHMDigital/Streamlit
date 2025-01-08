@@ -560,7 +560,7 @@ class ScriptRunner:
                                 # removal information has reached the web app
                                 # (see https://github.com/streamlit/streamlit/issues/9080).
                                 if not rerun_data.is_auto_rerun:
-                                    raise RuntimeError(
+                                    _LOGGER.error(
                                         f"Could not find fragment with id {fragment_id}"
                                     )
                             except (RerunException, StopException) as e:
