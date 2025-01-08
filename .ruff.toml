@@ -47,6 +47,7 @@ select = [
   "TID",    # Helps you write tidier imports.
   "UP",     # pyupgrade
   "W",      # pycodestyle warnings
+  "G",      # Better usage of built-in logging
 ]
 ignore = [
   "B008",    # Checks for function calls in default function arguments.
@@ -59,6 +60,7 @@ ignore = [
   "PYI051",  # Checks for redundant unions between a Literal and a builtin supertype of that Literal.
   "UP031",   # Checks for printf-style string formatting, and offers to replace it with str.format calls.
   "PLC0208", # Checks for iterations over set literals.
+  "G004",    # Checks for usage of f-strings in logging messages
 ]
 # Do not lint files in tests, scripts, and vendor directory:
 exclude = [
