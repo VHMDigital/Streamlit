@@ -35,6 +35,9 @@ import {
   WidgetLabel,
 } from "@streamlit/lib/src/components/widgets/BaseWidget"
 import { EmotionTheme } from "@streamlit/lib/src/theme"
+import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown/StreamlitMarkdown"
+
+import { StyledValueText } from "./styled-components"
 
 const NO_OPTIONS_MSG = "No options to select."
 
@@ -257,6 +260,19 @@ const Selectbox: React.FC<Props> = ({
                 },
               },
             },
+          },
+          SingleValue: {
+            component: ({ children }: { children: string }) => (
+              <StyledValueText>
+                <StreamlitMarkdown
+                  source={children}
+                  allowHTML={false}
+                  isLabel
+                  largerLabel
+                  disableLinks
+                />
+              </StyledValueText>
+            ),
           },
         }}
       />

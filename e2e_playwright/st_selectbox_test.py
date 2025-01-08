@@ -23,7 +23,7 @@ def test_selectbox_widget_rendering(
 ):
     """Test that the selectbox widgets are correctly rendered via screenshot matching."""
     selectbox_widgets = themed_app.get_by_test_id("stSelectbox")
-    expect(selectbox_widgets).to_have_count(12)
+    expect(selectbox_widgets).to_have_count(14)
 
     assert_snapshot(selectbox_widgets.nth(0), name="st_selectbox-default")
     assert_snapshot(selectbox_widgets.nth(1), name="st_selectbox-formatted_options")
@@ -39,12 +39,14 @@ def test_selectbox_widget_rendering(
     )
     assert_snapshot(selectbox_widgets.nth(10), name="st_selectbox-dataframe_options")
     assert_snapshot(selectbox_widgets.nth(11), name="st_selectbox-value_from_state")
+    assert_snapshot(selectbox_widgets.nth(12), name="st_selectbox-columns")
+    assert_snapshot(selectbox_widgets.nth(13), name="st_selectbox-markdown_support")
 
 
 def test_selectbox_has_correct_initial_values(app: Page):
     """Test that st.selectbox returns the correct initial values."""
     markdown_elements = app.get_by_test_id("stMarkdown")
-    expect(markdown_elements).to_have_count(13)
+    expect(markdown_elements).to_have_count(14)
 
     expected = [
         "value 1: male",
@@ -60,6 +62,8 @@ def test_selectbox_has_correct_initial_values(app: Page):
         "value 10: None",
         "value 11: male",
         "value 12: female",
+        "value 13: A long option",
+        "value 14: **Bold** text",
     ]
 
     for markdown_element, expected_text in zip(markdown_elements.all(), expected):
@@ -202,3 +206,13 @@ def test_check_top_level_class(app: Page):
 def test_custom_css_class_via_key(app: Page):
     """Test that the element can have a custom css class via the key argument."""
     expect(get_element_by_key(app, "selectbox8")).to_be_visible()
+
+
+def test_markdown_support_dropdown(app: Page, assert_snapshot: ImageCompareFunction):
+    """Test that markdown is supported in the dropdown of st.selectbox."""
+    # Click to open dropdown
+    app.get_by_test_id("stSelectbox").nth(13).locator("input").click()
+
+    # Take snapshot of dropdown
+    selection_dropdown = app.locator('[data-baseweb="popover"]').first
+    assert_snapshot(selection_dropdown, name="st_selectbox-markdown_support_dropdown")

@@ -100,3 +100,22 @@ v12 = st.selectbox(
     "selectbox 12 (empty, value from state)", options, index=None, key="selectbox_12"
 )
 st.write("value 12:", v12)
+
+multiple_cols = st.columns(5)
+v13 = multiple_cols[0].selectbox("selectbox 13", ["A long option"], index=0)
+st.text(f"value 13: {v13}")
+
+v14 = st.selectbox(
+    "selectbox 14 (markdown support)",
+    options=[
+        "**Bold** text",
+        "_Italic_, ~~struck through~~, and `code`",
+        ":red[Red text], arrows -> <-, and icons :sunglasses: :streamlit: :material/check_circle:",
+        "# Heading",
+        "> Blockquote",
+        "[Link](https://streamlit.io)",
+        "| Column 1 | Column 2 |\n|----------|----------|\n| Table | Content |",
+    ],
+    index=0,
+)
+st.text(f"value 14: {v14}")

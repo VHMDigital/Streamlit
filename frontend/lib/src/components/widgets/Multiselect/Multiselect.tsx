@@ -35,7 +35,10 @@ import {
   StyledWidgetLabelHelp,
   WidgetLabel,
 } from "@streamlit/lib/src/components/widgets/BaseWidget"
-import { StyledUISelect } from "@streamlit/lib/src/components/widgets/Multiselect/styled-components"
+import {
+  StyledUISelect,
+  StyledValueText,
+} from "@streamlit/lib/src/components/widgets/Multiselect/styled-components"
 import { MultiSelect as MultiSelectProto } from "@streamlit/lib/src/proto"
 import { EmotionTheme } from "@streamlit/lib/src/theme"
 import { labelVisibilityProtoValueToEnum } from "@streamlit/lib/src/util/utils"
@@ -44,6 +47,7 @@ import {
   useBasicWidgetState,
   ValueWithSource,
 } from "@streamlit/lib/src/hooks/useBasicWidgetState"
+import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown/StreamlitMarkdown"
 
 export interface Props {
   disabled: boolean
@@ -334,6 +338,19 @@ const Multiselect: FC<Props> = props => {
                       // the order of the precendence.
                       cursor: "default !important",
                     },
+                  },
+                  Text: {
+                    component: ({ children }: { children: string }) => (
+                      <StyledValueText>
+                        <StreamlitMarkdown
+                          source={children}
+                          allowHTML={false}
+                          isLabel
+                          largerLabel
+                          disableLinks
+                        />
+                      </StyledValueText>
+                    ),
                   },
                   Action: {
                     style: {
