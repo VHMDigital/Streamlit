@@ -55,7 +55,7 @@ def login(provider: str | None = None) -> None:
     provider : str or None
         The provider to use for login. This value must match the name of a
         provider configured in the app's auth section of ``secrets.toml`` file.
-        If None, the provider configured as the default in the auth section.
+        If None, the default provider in the auth section will be used.
     """
     if provider is None:
         provider = "default"
@@ -64,7 +64,8 @@ def login(provider: str | None = None) -> None:
     if context is not None:
         if not is_authlib_installed():
             raise StreamlitAuthError(
-                """To use authentication features, you need to install Authlib>=1.3.2, e.g. via `pip install Authlib`."""
+                """To use authentication features, you need to install """
+                """Authlib>=1.3.2, e.g. via `pip install Authlib`."""
             )
         validate_auth_credentials(provider)
         fwd_msg = ForwardMsg()
