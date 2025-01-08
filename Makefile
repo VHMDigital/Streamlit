@@ -285,7 +285,7 @@ protobuf: check-protoc
 .PHONY: react-init
 # React init.
 react-init:
-	cd frontend/ ; yarn install --frozen-lockfile
+	cd frontend/ ; yarn install --immutable
 
 .PHONY: react-build
 # React build.
