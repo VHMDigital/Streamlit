@@ -144,6 +144,24 @@ def _do_with_retries(
     orig_fn: Callable,
     exception: type[Exception],
 ) -> Any:
+    """Helper for retrying a function.
+
+    If the `exception` is raised, the function retries. If some other exception, this
+    re-raises it. Otherwise, the function is assumed to have worked so no further retries
+    take place.
+
+    To use it, just replace things like this:
+
+        result = thing_to_do(a, b, c)
+
+
+    With this:
+
+        result = _do_with_retries(
+            lambda: thing_to_do(a, b, c),
+            exception: ExceptionThatWillCauseARetry,
+        )
+    """
     for i in _retry_dance():
         try:
             return orig_fn()
@@ -153,6 +171,23 @@ def _do_with_retries(
 
 
 def _retry_dance():
+    """Helper for writing a retry loop.
+
+    This is useful to make sure all our retry loops work the same way. For example,
+    prior to this helper, some loops had time.sleep() *before the first try*, which just
+    slowed things down for no reason.
+
+    Usage:
+
+    for i in _retry_dance():
+        # Do the thing you want to retry automatically.
+        the_thing_worked = do_thing()
+
+        # Don't forget to include a break/return when the thing you're trying to do
+        # worked.
+        if the_thing_worked:
+            break
+    """
     for i in range(_MAX_RETRIES):
         yield i
         time.sleep(_RETRY_WAIT_SECS)
