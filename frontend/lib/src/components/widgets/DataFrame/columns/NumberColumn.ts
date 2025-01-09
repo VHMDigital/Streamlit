@@ -73,8 +73,8 @@ function NumberColumn(props: BaseColumnProps): BaseColumn {
   ) as NumberColumnParams
 
   // If not custom format is provided & the column type is duration or period,
-  // instruct the column to use the arrow formatting function.
-  const formatWithArrow =
+  // instruct the column to use the arrow formatting for the display value.
+  const useArrowFormatting =
     !parameters.format &&
     (isDurationType(props.arrowType) || isPeriodType(props.arrowType))
 
@@ -192,7 +192,7 @@ function NumberColumn(props: BaseColumnProps): BaseColumn {
         }
 
         try {
-          if (formatWithArrow) {
+          if (useArrowFormatting) {
             // Use arrow formatting for some selected types (see above)
             displayData = formatArrowCell(cellData)
           } else {
