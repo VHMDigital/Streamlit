@@ -35,8 +35,9 @@ def test_color_picker_widget_display(
     assert_snapshot(color_pickers.nth(2), name="st_color_picker-disabled")
     assert_snapshot(color_pickers.nth(3), name="st_color_picker-hidden_label")
     assert_snapshot(color_pickers.nth(4), name="st_color_picker-collapsed_label")
-    # The other color pickers do not need to be snapshot tested.
-    assert_snapshot(color_pickers.nth(7), name="st_color_picker-in_fragment")
+    # The other color pickers do not need to be snapshot tested since they
+    # don't have any visually interesting differences.
+    assert_snapshot(color_pickers.nth(7), name="st_color_picker-markdown_label")
 
 
 def test_help_tooltip_works(app: Page):
