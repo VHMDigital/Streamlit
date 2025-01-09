@@ -166,7 +166,7 @@ def _do_with_retries(
         try:
             return orig_fn()
         except exception:
-            if i == _MAX_RETRIES - 1:
+            if i >= _MAX_RETRIES - 1:
                 raise
 
 
