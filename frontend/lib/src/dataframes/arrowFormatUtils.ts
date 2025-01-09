@@ -40,12 +40,12 @@ import {
 
 import {
   DataType,
-  getTypeName,
   isDatetimeType,
   isDateType,
   isDecimalType,
   isDurationType,
   isFloatType,
+  isIntervalType,
   isListType,
   isObjectType,
   isPeriodType,
@@ -541,7 +541,6 @@ export function format(
   pandasType?: PandasColumnType,
   field?: Field
 ): string {
-  const typeName = pandasType && getTypeName(pandasType)
   const extensionName = field && field.metadata.get("ARROW:extension:name")
   const fieldType = field?.type
 
@@ -572,10 +571,7 @@ export function format(
     return formatPeriod(x as bigint, field)
   }
 
-  if (
-    typeName?.startsWith("interval") ||
-    extensionName === "pandas.interval"
-  ) {
+  if (isIntervalType(pandasType) || extensionName === "pandas.interval") {
     return formatInterval(x as StructRow, field)
   }
 

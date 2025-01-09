@@ -228,3 +228,35 @@ export function isObjectType(type?: PandasColumnType): boolean {
   }
   return getTypeName(type) === "object"
 }
+
+/** True if the arrow type is a bytes type. */
+export function isBytesType(type?: PandasColumnType): boolean {
+  if (isNullOrUndefined(type)) {
+    return false
+  }
+  return getTypeName(type) === "bytes"
+}
+
+/** True if the arrow type is a string type. */
+export function isStringType(type?: PandasColumnType): boolean {
+  if (isNullOrUndefined(type)) {
+    return false
+  }
+  return ["unicode", "large_string[pyarrow]"].includes(getTypeName(type))
+}
+
+/** True if the arrow type is an empty type. */
+export function isEmptyType(type?: PandasColumnType): boolean {
+  if (isNullOrUndefined(type)) {
+    return false
+  }
+  return getTypeName(type) === "empty"
+}
+
+/** True if the arrow type is a interval type. */
+export function isIntervalType(type?: PandasColumnType): boolean {
+  if (isNullOrUndefined(type)) {
+    return false
+  }
+  return getTypeName(type)?.startsWith("interval")
+}

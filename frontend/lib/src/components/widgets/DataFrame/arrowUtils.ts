@@ -34,13 +34,16 @@ import {
   PandasColumnType as ArrowType,
   getTypeName,
   isBooleanType,
+  isBytesType,
   isCategoricalType,
   isDatetimeType,
   isDateType,
   isDecimalType,
+  isEmptyType,
   isListType,
   isNumericType,
   isObjectType,
+  isStringType,
   isTimeType,
 } from "@streamlit/lib/src/dataframes/arrowTypeUtils"
 import {
@@ -152,19 +155,9 @@ export function applyPandasStylerCss(
  * Maps the data type from Arrow to a column type.
  */
 export function getColumnTypeFromArrow(arrowType: ArrowType): ColumnCreator {
-  let typeName = arrowType ? getTypeName(arrowType) : null
-
-  if (!typeName) {
-    // Use object column as fallback
-    return ObjectColumn
-  }
-
-  typeName = typeName.toLowerCase().trim()
-  // Match based on arrow types
-  if (["unicode", "empty", "large_string[pyarrow]"].includes(typeName)) {
+  if (isStringType(arrowType) || isEmptyType(arrowType)) {
     return TextColumn
   }
-
   if (isDatetimeType(arrowType)) {
     return DateTimeColumn
   }
@@ -174,7 +167,7 @@ export function getColumnTypeFromArrow(arrowType: ArrowType): ColumnCreator {
   if (isDateType(arrowType)) {
     return DateColumn
   }
-  if (isObjectType(arrowType) || typeName === "bytes") {
+  if (isObjectType(arrowType) || isBytesType(arrowType)) {
     return ObjectColumn
   }
   if (isBooleanType(arrowType)) {
