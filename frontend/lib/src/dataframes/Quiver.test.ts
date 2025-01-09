@@ -17,7 +17,6 @@
 import { Field, Utf8 } from "apache-arrow"
 import cloneDeep from "lodash/cloneDeep"
 
-import { PandasIndexTypeName } from "@streamlit/lib/src/dataframes/arrowTypeUtils"
 import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
 import {
   CATEGORICAL,
@@ -149,7 +148,7 @@ describe("Quiver", () => {
           content: "i1",
           field: new Field("__index_level_0__", new Utf8(), true, new Map([])),
           contentType: {
-            pandas_type: PandasIndexTypeName.UnicodeIndex,
+            pandas_type: "unicode",
             numpy_type: "object",
             meta: null,
           },
@@ -211,7 +210,7 @@ describe("Quiver", () => {
         expect(q.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.CategoricalIndex,
+              pandas_type: "categorical",
               numpy_type: "int8",
               meta: {
                 num_categories: 3,
@@ -258,7 +257,7 @@ describe("Quiver", () => {
         expect(q.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.DatetimeIndex,
+              pandas_type: "datetime",
               numpy_type: "datetime64[ns]",
               meta: null,
             },
@@ -291,8 +290,8 @@ describe("Quiver", () => {
         expect(q.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.Float64Index,
-              numpy_type: PandasIndexTypeName.Float64Index,
+              pandas_type: "float64",
+              numpy_type: "float64",
               meta: null,
             },
           ],
@@ -324,8 +323,8 @@ describe("Quiver", () => {
         expect(q.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.Int64Index,
-              numpy_type: PandasIndexTypeName.Int64Index,
+              pandas_type: "int64",
+              numpy_type: "int64",
               meta: null,
             },
           ],
@@ -499,8 +498,8 @@ describe("Quiver", () => {
         expect(q.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.RangeIndex,
-              numpy_type: PandasIndexTypeName.RangeIndex,
+              pandas_type: "range",
+              numpy_type: "range",
               meta: {
                 start: 0,
                 step: 1,
@@ -538,8 +537,8 @@ describe("Quiver", () => {
         expect(q.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.UInt64Index,
-              numpy_type: PandasIndexTypeName.UInt64Index,
+              pandas_type: "uint64",
+              numpy_type: "uint64",
               meta: null,
             },
           ],
@@ -571,7 +570,7 @@ describe("Quiver", () => {
         expect(q.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.UnicodeIndex,
+              pandas_type: "unicode",
               numpy_type: "object",
               meta: null,
             },
@@ -634,12 +633,12 @@ describe("Quiver", () => {
         expect(q.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.Int64Index,
+              pandas_type: "int64",
               numpy_type: "int64",
               meta: null,
             },
             {
-              pandas_type: PandasIndexTypeName.UnicodeIndex,
+              pandas_type: "unicode",
               numpy_type: "object",
               meta: null,
             },
@@ -680,8 +679,8 @@ describe("Quiver", () => {
         expect(q.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.RangeIndex,
-              numpy_type: PandasIndexTypeName.RangeIndex,
+              pandas_type: "range",
+              numpy_type: "range",
               meta: {
                 start: 0,
                 step: 1,
@@ -734,7 +733,7 @@ describe("Quiver", () => {
         expect(qq.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.CategoricalIndex,
+              pandas_type: "categorical",
               numpy_type: "int8",
               meta: {
                 num_categories: 3,
@@ -790,7 +789,7 @@ describe("Quiver", () => {
         expect(qq.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.DatetimeIndex,
+              pandas_type: "datetime",
               numpy_type: "datetime64[ns]",
               meta: null,
             },
@@ -829,8 +828,8 @@ describe("Quiver", () => {
         expect(qq.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.Float64Index,
-              numpy_type: PandasIndexTypeName.Float64Index,
+              pandas_type: "float64",
+              numpy_type: "float64",
               meta: null,
             },
           ],
@@ -868,8 +867,8 @@ describe("Quiver", () => {
         expect(qq.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.Int64Index,
-              numpy_type: PandasIndexTypeName.Int64Index,
+              pandas_type: "int64",
+              numpy_type: "int64",
               meta: null,
             },
           ],
@@ -1063,8 +1062,8 @@ describe("Quiver", () => {
         expect(qq.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.RangeIndex,
-              numpy_type: PandasIndexTypeName.RangeIndex,
+              pandas_type: "range",
+              numpy_type: "range",
               meta: {
                 start: 0,
                 step: 1,
@@ -1108,8 +1107,8 @@ describe("Quiver", () => {
         expect(qq.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.UInt64Index,
-              numpy_type: PandasIndexTypeName.UInt64Index,
+              pandas_type: "uint64",
+              numpy_type: "uint64",
               meta: null,
             },
           ],
@@ -1147,7 +1146,7 @@ describe("Quiver", () => {
         expect(qq.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.UnicodeIndex,
+              pandas_type: "unicode",
               numpy_type: "object",
               meta: null,
             },
@@ -1201,12 +1200,12 @@ describe("Quiver", () => {
         expect(qq.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.Int64Index,
-              numpy_type: PandasIndexTypeName.Int64Index,
+              pandas_type: "int64",
+              numpy_type: "int64",
               meta: null,
             },
             {
-              pandas_type: PandasIndexTypeName.UnicodeIndex,
+              pandas_type: "unicode",
               numpy_type: "object",
               meta: null,
             },
@@ -1247,7 +1246,7 @@ describe("Quiver", () => {
         expect(q1q2.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.UnicodeIndex,
+              pandas_type: "unicode",
               numpy_type: "object",
               meta: null,
             },
@@ -1317,7 +1316,7 @@ describe("Quiver", () => {
         expect(q1q2.columnTypes).toEqual({
           index: [
             {
-              pandas_type: PandasIndexTypeName.UnicodeIndex,
+              pandas_type: "unicode",
               numpy_type: "object",
               meta: null,
             },

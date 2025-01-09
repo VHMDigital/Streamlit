@@ -35,7 +35,6 @@ import {
   convertVectorToList,
   DataType,
   PandasColumnType,
-  PandasIndexTypeName,
 } from "./arrowTypeUtils"
 
 /**
@@ -353,7 +352,7 @@ export class Quiver {
         // ArrowJS automatically converts "columns" cells to strings.
         // Keep ArrowJS structure for consistency.
         contentType: {
-          pandas_type: PandasIndexTypeName.UnicodeIndex,
+          pandas_type: "unicode",
           numpy_type: "object",
         },
       }

@@ -59,7 +59,6 @@ import {
   isTimeType,
   isUnsignedIntegerType,
   PandasColumnType,
-  PandasIndexTypeName,
 } from "./arrowTypeUtils"
 
 describe("getTypeName", () => {
@@ -135,9 +134,7 @@ describe("getTypeName", () => {
       const q = new Quiver(mockElement)
       const indexType = q.columnTypes.index[0]
 
-      expect(getTypeName(indexType)).toEqual(
-        PandasIndexTypeName.CategoricalIndex
-      )
+      expect(getTypeName(indexType)).toEqual("categorical")
     })
 
     test("date", () => {
@@ -145,7 +142,7 @@ describe("getTypeName", () => {
       const q = new Quiver(mockElement)
       const indexType = q.columnTypes.index[0]
 
-      expect(getTypeName(indexType)).toEqual(PandasIndexTypeName.DatetimeIndex)
+      expect(getTypeName(indexType)).toEqual("datetime")
     })
 
     test("float64", () => {
@@ -153,7 +150,7 @@ describe("getTypeName", () => {
       const q = new Quiver(mockElement)
       const indexType = q.columnTypes.index[0]
 
-      expect(getTypeName(indexType)).toEqual(PandasIndexTypeName.Float64Index)
+      expect(getTypeName(indexType)).toEqual("float64")
     })
 
     test("int64", () => {
@@ -161,7 +158,7 @@ describe("getTypeName", () => {
       const q = new Quiver(mockElement)
       const indexType = q.columnTypes.index[0]
 
-      expect(getTypeName(indexType)).toEqual(PandasIndexTypeName.Int64Index)
+      expect(getTypeName(indexType)).toEqual("int64")
     })
 
     test("range", () => {
@@ -169,7 +166,7 @@ describe("getTypeName", () => {
       const q = new Quiver(mockElement)
       const indexType = q.columnTypes.index[0]
 
-      expect(getTypeName(indexType)).toEqual(PandasIndexTypeName.RangeIndex)
+      expect(getTypeName(indexType)).toEqual("range")
     })
 
     test("uint64", () => {
@@ -177,7 +174,7 @@ describe("getTypeName", () => {
       const q = new Quiver(mockElement)
       const indexType = q.columnTypes.index[0]
 
-      expect(getTypeName(indexType)).toEqual(PandasIndexTypeName.UInt64Index)
+      expect(getTypeName(indexType)).toEqual("uint64")
     })
 
     test("unicode", () => {
@@ -185,7 +182,7 @@ describe("getTypeName", () => {
       const q = new Quiver(mockElement)
       const indexType = q.columnTypes.index[0]
 
-      expect(getTypeName(indexType)).toEqual(PandasIndexTypeName.UnicodeIndex)
+      expect(getTypeName(indexType)).toEqual("unicode")
     })
   })
 })

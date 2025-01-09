@@ -35,22 +35,13 @@ export type DataType =
   | bigint // period
 
 export enum PandasIndexTypeName {
-  CategoricalIndex = "categorical",
-  DatetimeIndex = "datetime",
-  Float64Index = "float64",
-  Int64Index = "int64",
   RangeIndex = "range",
-  UInt64Index = "uint64",
-  UnicodeIndex = "unicode",
-
-  // Throws an error.
-  TimedeltaIndex = "time",
 }
 
 /** Pandas type information for single-index columns, and data columns. */
 export interface PandasColumnType {
   /** The type label returned by pandas.api.types.infer_dtype */
-  pandas_type: PandasIndexTypeName | string
+  pandas_type: string
 
   /** The numpy dtype that corresponds to the types returned in df.dtypes */
   numpy_type: string
@@ -84,9 +75,7 @@ export function convertVectorToList(vector: Vector<any>): string[] {
 }
 
 /** Returns type for a single-index column or data column. */
-export function getTypeName(
-  type: PandasColumnType
-): PandasIndexTypeName | string {
+export function getTypeName(type: PandasColumnType): string {
   // For `PeriodType` and `IntervalType` types are kept in `numpy_type`,
   // for the rest of the indexes in `pandas_type`.
   return type.pandas_type === "object" ? type.numpy_type : type.pandas_type
