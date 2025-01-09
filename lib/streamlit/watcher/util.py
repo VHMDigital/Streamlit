@@ -69,11 +69,6 @@ def calc_md5_with_blocking_retries(
     return md5.hexdigest()
 
 
-def _get_file_content(file_path: str) -> bytes:
-    with open(file_path, "rb") as f:
-        return f.read()
-
-
 def path_modification_time(path: str, allow_nonexistent: bool = False) -> float:
     """Return the modification time of a path (file or directory).
 
@@ -95,6 +90,11 @@ def path_modification_time(path: str, allow_nonexistent: bool = False) -> float:
         lambda: os.stat(path).st_mtime,
         FileNotFoundError,
     )
+
+
+def _get_file_content(file_path: str) -> bytes:
+    with open(file_path, "rb") as f:
+        return f.read()
 
 
 def _dirfiles(dir_path: str, glob_pattern: str) -> str:
