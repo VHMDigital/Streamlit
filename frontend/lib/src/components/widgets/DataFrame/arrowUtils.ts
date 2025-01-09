@@ -40,6 +40,7 @@ import {
   isDecimalType,
   isListType,
   isNumericType,
+  isObjectType,
   isTimeType,
 } from "@streamlit/lib/src/dataframes/arrowTypeUtils"
 import {
@@ -173,7 +174,7 @@ export function getColumnTypeFromArrow(arrowType: ArrowType): ColumnCreator {
   if (isDateType(arrowType)) {
     return DateColumn
   }
-  if (["object", "bytes"].includes(typeName)) {
+  if (isObjectType(arrowType) || typeName === "bytes") {
     return ObjectColumn
   }
   if (isBooleanType(arrowType)) {

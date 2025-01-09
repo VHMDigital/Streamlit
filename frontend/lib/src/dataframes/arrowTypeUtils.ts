@@ -220,3 +220,11 @@ export function isListType(type?: PandasColumnType): boolean {
   }
   return getTypeName(type)?.startsWith("list")
 }
+
+/** True if the arrow type is an object type. */
+export function isObjectType(type?: PandasColumnType): boolean {
+  if (isNullOrUndefined(type)) {
+    return false
+  }
+  return getTypeName(type) === "object"
+}

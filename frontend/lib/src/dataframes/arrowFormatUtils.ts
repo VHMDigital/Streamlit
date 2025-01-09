@@ -47,6 +47,7 @@ import {
   isDurationType,
   isFloatType,
   isListType,
+  isObjectType,
   isPeriodType,
   isTimeType,
   PandasColumnType,
@@ -593,7 +594,7 @@ export function format(
     return formatFloat(x as number)
   }
 
-  if (typeName === "object" || isListType(pandasType)) {
+  if (isObjectType(pandasType) || isListType(pandasType)) {
     return formatObject(x, field)
   }
 
