@@ -16,7 +16,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Iterator, Literal, Mapping, Sequence, cast, overload
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Iterator,
+    Literal,
+    Mapping,
+    Sequence,
+    cast,
+    overload,
+)
 
 from streamlit import runtime
 from streamlit.delta_generator_singletons import get_dg_singleton_instance
@@ -53,7 +62,7 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class ChatInputValue(Mapping[str, str | list[UploadedFile]]):
+class ChatInputValue(Mapping[str, Any]):
     text: str
     files: list[UploadedFile]
 
