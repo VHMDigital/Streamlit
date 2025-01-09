@@ -83,13 +83,6 @@ export function convertVectorToList(vector: Vector<any>): string[] {
   return values
 }
 
-/** True if the index name represents a "range" index. */
-export function isRangeIndex(
-  indexName: string | PandasRangeIndex
-): indexName is PandasRangeIndex {
-  return typeof indexName === "object" && indexName.kind === "range"
-}
-
 /** Returns type for a single-index column or data column. */
 export function getTypeName(
   type: PandasColumnType
