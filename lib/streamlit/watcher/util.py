@@ -24,6 +24,7 @@ import hashlib
 import os
 import time
 from pathlib import Path
+from typing import Any, Callable
 
 from streamlit.util import HASHLIB_KWARGS
 
@@ -56,13 +57,21 @@ def calc_md5_with_blocking_retries(
         glob_pattern = glob_pattern or "*"
         content = _stable_dir_identifier(path, glob_pattern).encode("UTF-8")
     else:
-        content = _get_file_content_with_blocking_retries(path)
+        content = _do_with_retries(
+            lambda: _get_file_content(path),
+            FileNotFoundError,
+        )
 
     md5 = hashlib.md5(**HASHLIB_KWARGS)
     md5.update(content)
 
     # Use hexdigest() instead of digest(), so it's easier to debug.
     return md5.hexdigest()
+
+
+def _get_file_content(file_path: str) -> bytes:
+    with open(file_path, "rb") as f:
+        return f.read()
 
 
 def path_modification_time(path: str, allow_nonexistent: bool = False) -> float:
@@ -81,24 +90,11 @@ def path_modification_time(path: str, allow_nonexistent: bool = False) -> float:
     """
     if allow_nonexistent and not os.path.exists(path):
         return 0.0
-    return os.stat(path).st_mtime
 
-
-def _get_file_content_with_blocking_retries(file_path: str) -> bytes:
-    content = b""
-    # There's a race condition where sometimes file_path no longer exists when
-    # we try to read it (since the file is in the process of being written).
-    # So here we retry a few times using this loop. See issue #186.
-    for i in range(_MAX_RETRIES):
-        try:
-            with open(file_path, "rb") as f:
-                content = f.read()
-                break
-        except FileNotFoundError as e:
-            if i >= _MAX_RETRIES - 1:
-                raise e
-            time.sleep(_RETRY_WAIT_SECS)
-    return content
+    return _do_with_retries(
+        lambda: os.stat(path).st_mtime,
+        FileNotFoundError,
+    )
 
 
 def _dirfiles(dir_path: str, glob_pattern: str) -> str:
@@ -134,9 +130,7 @@ def _stable_dir_identifier(dir_path: str, glob_pattern: str) -> str:
     """
     dirfiles = _dirfiles(dir_path, glob_pattern)
 
-    for _ in range(_MAX_RETRIES):
-        time.sleep(_RETRY_WAIT_SECS)
-
+    for _ in _retry_dance():
         new_dirfiles = _dirfiles(dir_path, glob_pattern)
         if dirfiles == new_dirfiles:
             break
@@ -144,3 +138,21 @@ def _stable_dir_identifier(dir_path: str, glob_pattern: str) -> str:
         dirfiles = new_dirfiles
 
     return f"{dir_path}+{dirfiles}"
+
+
+def _do_with_retries(
+    orig_fn: Callable,
+    exception: type[Exception],
+) -> Any:
+    for i in _retry_dance():
+        try:
+            return orig_fn()
+        except exception:
+            if i == _MAX_RETRIES - 1:
+                raise
+
+
+def _retry_dance():
+    for i in range(_MAX_RETRIES):
+        yield i
+        time.sleep(_RETRY_WAIT_SECS)
