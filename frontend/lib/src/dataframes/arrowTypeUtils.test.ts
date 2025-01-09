@@ -40,6 +40,7 @@ import {
   getTimezone,
   getTypeName,
   isBooleanType,
+  isCategoricalType,
   isDatetimeType,
   isDateType,
   isDecimalType,
@@ -747,6 +748,45 @@ describe("isTimeType", () => {
     "interprets %s as time type: %s",
     (arrowType: PandasColumnType | undefined, expected: boolean) => {
       expect(isTimeType(arrowType)).toEqual(expected)
+    }
+  )
+})
+
+describe("isCategoricalType", () => {
+  it.each([
+    [undefined, false],
+    [
+      {
+        pandas_type: "categorical",
+        numpy_type: "category",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "object",
+        numpy_type: "categorical",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "datetime",
+        numpy_type: "datetime64[ns]",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "int64",
+        numpy_type: "int64",
+      },
+      false,
+    ],
+  ])(
+    "interprets %s as categorical type: %s",
+    (arrowType: PandasColumnType | undefined, expected: boolean) => {
+      expect(isCategoricalType(arrowType)).toEqual(expected)
     }
   )
 })
