@@ -393,7 +393,7 @@ export function getCellFromArrow(
     // do some custom conversion here.
     let parsedDate
     if (
-      isTimeType(arrowCell.contentType) &&
+      isTimeType(column.arrowType) &&
       notNullOrUndefined(arrowCell.field?.type?.unit)
     ) {
       // Time values needs to be adjusted to seconds based on the unit
@@ -404,7 +404,7 @@ export function getCellFromArrow(
     }
 
     cellTemplate = column.getCell(parsedDate)
-  } else if (isDecimalType(arrowCell.contentType)) {
+  } else if (isDecimalType(column.arrowType)) {
     // This is a special case where we want to already prepare a decimal value
     // to a number string based on the arrow field metadata. This is required
     // because we don't have access to the required scale in the number column.

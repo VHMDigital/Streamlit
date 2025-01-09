@@ -849,7 +849,7 @@ describe("isObjectType", () => {
         pandas_type: "object",
         numpy_type: "dict",
       },
-      true,
+      false,
     ],
     [
       {
