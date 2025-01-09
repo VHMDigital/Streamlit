@@ -16,10 +16,9 @@
 
 import {
   getTimezone,
-  getTypeName,
   isDatetimeType,
   isDateType,
-  PandasIndexTypeName,
+  isNumericType,
 } from "@streamlit/lib/src/dataframes/arrowTypeUtils"
 import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
 import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
@@ -27,18 +26,6 @@ import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
 const MagicFields = {
   DATAFRAME_INDEX: "(index)",
 }
-
-/** Types of dataframe-indices that are supported as x axis.
- * TODO(lukasmasuch): These are old pandas indices, can we
- * remove the support check?
- */
-const SUPPORTED_INDEX_TYPES = new Set([
-  PandasIndexTypeName.DatetimeIndex,
-  PandasIndexTypeName.Float64Index,
-  PandasIndexTypeName.Int64Index,
-  PandasIndexTypeName.RangeIndex,
-  PandasIndexTypeName.UInt64Index,
-])
 
 /** All of the data that makes up a VegaLite chart. */
 export interface VegaLiteChartElement {
@@ -153,21 +140,17 @@ export function getDataArray(
   }
 
   const dataArr = []
-  const {
-    dataRows: numRows,
-    dataColumns: numColumns,
-    indexColumns: numIndexColumns,
-  } = quiverData.dimensions
+  const { dataRows: numRows, dataColumns: numColumns } = quiverData.dimensions
 
-  // This currently only works with a single index column
+  // This currently only works with a single index column.
   // To support multiple index columns would require some
   // changes to this logic:
+  const firstIndexColumnType = quiverData.columnTypes.index[0] ?? undefined
   const hasSupportedIndex =
-    numIndexColumns > 0
-      ? SUPPORTED_INDEX_TYPES.has(
-          getTypeName(quiverData.columnTypes.index[0]) as PandasIndexTypeName
-        )
-      : false
+    firstIndexColumnType &&
+    (isNumericType(firstIndexColumnType) ||
+      isDatetimeType(firstIndexColumnType) ||
+      isDateType(firstIndexColumnType))
 
   for (let rowIndex = startIndex; rowIndex < numRows; rowIndex++) {
     const row: { [field: string]: any } = {}
