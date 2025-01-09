@@ -58,6 +58,9 @@ def calc_md5_with_blocking_retries(
         glob_pattern = glob_pattern or "*"
         content = _stable_dir_identifier(path, glob_pattern).encode("UTF-8")
     else:
+        # There's a race condition where sometimes file_path no longer exists when
+        # we try to read it (since the file is in the process of being written).
+        # So here we retry a few times using this loop. See issue #186.
         content = _do_with_retries(
             lambda: _get_file_content(path),
             FileNotFoundError,
@@ -87,6 +90,8 @@ def path_modification_time(path: str, allow_nonexistent: bool = False) -> float:
     if allow_nonexistent and not os.path.exists(path):
         return 0.0
 
+    # Use retries to avoid race condition where file may be in the process of being
+    # modified.
     return _do_with_retries(
         lambda: os.stat(path).st_mtime,
         FileNotFoundError,
@@ -190,7 +195,7 @@ def _retry_dance():
         the_thing_worked = do_thing()
 
         # Don't forget to include a break/return when the thing you're trying to do
-        # worked.
+        # works.
         if the_thing_worked:
             break
     """
