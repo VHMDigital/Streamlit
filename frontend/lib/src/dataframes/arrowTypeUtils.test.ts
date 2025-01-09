@@ -54,6 +54,7 @@ import {
   isNumericType,
   isObjectType,
   isPeriodType,
+  isRangeIndexType,
   isStringType,
   isTimeType,
   isUnsignedIntegerType,
@@ -1034,6 +1035,45 @@ describe("isIntervalType", () => {
     "interprets %s as interval type: %s",
     (arrowType: PandasColumnType | undefined, expected: boolean) => {
       expect(isIntervalType(arrowType)).toEqual(expected)
+    }
+  )
+})
+
+describe("isRangeIndexType", () => {
+  it.each([
+    [undefined, false],
+    [
+      {
+        pandas_type: "range",
+        numpy_type: "range",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "object",
+        numpy_type: "range",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "int64",
+        numpy_type: "int64",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "categorical",
+        numpy_type: "range",
+      },
+      false,
+    ],
+  ])(
+    "interprets %s as range index type: %s",
+    (arrowType: PandasColumnType | undefined, expected: boolean) => {
+      expect(isRangeIndexType(arrowType)).toEqual(expected)
     }
   )
 })

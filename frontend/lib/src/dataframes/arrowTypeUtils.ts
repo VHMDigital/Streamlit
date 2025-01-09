@@ -108,9 +108,9 @@ export function isIntegerType(type?: PandasColumnType): boolean {
   }
   const typeName = getTypeName(type) ?? ""
   return (
-    (typeName.startsWith("int") && !typeName.startsWith("interval")) ||
-    typeName === "range" ||
-    typeName.startsWith("uint")
+    (typeName.startsWith("int") && !isIntervalType(type)) ||
+    isRangeIndexType(type) ||
+    isUnsignedIntegerType(type)
   )
 }
 
@@ -119,8 +119,7 @@ export function isUnsignedIntegerType(type?: PandasColumnType): boolean {
   if (isNullOrUndefined(type)) {
     return false
   }
-  const typeName = getTypeName(type) ?? ""
-  return typeName.startsWith("uint")
+  return getTypeName(type)?.startsWith("uint")
 }
 
 /** True if the arrow type is a float type.
@@ -130,8 +129,7 @@ export function isFloatType(type?: PandasColumnType): boolean {
   if (isNullOrUndefined(type)) {
     return false
   }
-  const typeName = getTypeName(type) ?? ""
-  return typeName.startsWith("float")
+  return getTypeName(type)?.startsWith("float")
 }
 
 /** True if the arrow type is a decimal type. */
@@ -252,4 +250,12 @@ export function isIntervalType(type?: PandasColumnType): boolean {
     return false
   }
   return getTypeName(type)?.startsWith("interval")
+}
+
+/** True if the arrow type is a range index type. */
+export function isRangeIndexType(type?: PandasColumnType): boolean {
+  if (isNullOrUndefined(type)) {
+    return false
+  }
+  return getTypeName(type) === "range"
 }

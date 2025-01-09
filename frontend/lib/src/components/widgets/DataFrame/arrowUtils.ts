@@ -32,7 +32,6 @@ import {
 } from "@streamlit/lib/src/dataframes/arrowFormatUtils"
 import {
   PandasColumnType as ArrowType,
-  getTypeName,
   isBooleanType,
   isBytesType,
   isCategoricalType,
@@ -43,6 +42,7 @@ import {
   isListType,
   isNumericType,
   isObjectType,
+  isRangeIndexType,
   isStringType,
   isTimeType,
 } from "@streamlit/lib/src/dataframes/arrowTypeUtils"
@@ -202,7 +202,7 @@ export function getIndexFromArrow(
   const title = data.indexNames[indexPosition]
   let isEditable = true
 
-  if (getTypeName(arrowType) === "range") {
+  if (isRangeIndexType(arrowType)) {
     // Range indices are not editable
     isEditable = false
   }
