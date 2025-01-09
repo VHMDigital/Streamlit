@@ -79,10 +79,8 @@ def test_multiselect_on_load(themed_app: Page, assert_snapshot: ImageCompareFunc
     assert_snapshot(multiselect_elements.nth(5), name="st_multiselect-disabled")
     assert_snapshot(multiselect_elements.nth(6), name="st_multiselect-hidden_label")
     assert_snapshot(multiselect_elements.nth(7), name="st_multiselect-collapsed_label")
-    assert_snapshot(multiselect_elements.nth(8), name="st_multiselect-max_selections_1")
-    assert_snapshot(
-        multiselect_elements.nth(9), name="st_multiselect-max_selections_in_form"
-    )
+    # The other multiselect widgets do not need to be screenshot tested since they
+    # don't have any visually interesting differences.
     assert_snapshot(multiselect_elements.nth(11), name="st_multiselect-narrow_column")
     assert_snapshot(multiselect_elements.nth(12), name="st_multiselect-markdown_label")
 
