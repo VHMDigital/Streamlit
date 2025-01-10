@@ -15,6 +15,7 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version-file: ".nvmrc"
+        cache: "yarn"
         cache-dependency-path: "**/yarn.lock"
     - name: Enable and Prepare Latest Yarn
       run: |
