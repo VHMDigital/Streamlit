@@ -943,6 +943,13 @@ describe("isStringType", () => {
       },
       false,
     ],
+    [
+      {
+        pandas_type: "object",
+        numpy_type: "object",
+      },
+      false,
+    ],
   ])(
     "interprets %s as string type: %s",
     (arrowType: PandasColumnType | undefined, expected: boolean) => {
