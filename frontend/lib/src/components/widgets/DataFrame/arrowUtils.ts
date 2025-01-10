@@ -370,6 +370,9 @@ export function getCellFromArrow(
   if (column.kind === "object") {
     // Always use display value from Quiver for object types
     // these are special types that the dataframe only support in read-only mode.
+
+    // TODO(lukasmasuch): Move this to object column once the
+    // field information is available in the arrowType.
     cellTemplate = column.getCell(
       notNullOrUndefined(arrowCell.content)
         ? removeLineBreaks(
@@ -411,6 +414,9 @@ export function getCellFromArrow(
     // This is a special case where we want to already prepare a decimal value
     // to a number string based on the arrow field metadata. This is required
     // because we don't have access to the required scale in the number column.
+
+    // TODO(lukasmasuch): Move this to number column once the
+    // field information is available in the arrowType.
     const decimalStr = isNullOrUndefined(arrowCell.content)
       ? null
       : formatArrowCell(
