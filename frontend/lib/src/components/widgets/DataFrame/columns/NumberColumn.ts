@@ -194,7 +194,7 @@ function NumberColumn(props: BaseColumnProps): BaseColumn {
         try {
           if (useArrowFormatting) {
             // Use arrow formatting for some selected types (see above)
-            displayData = formatArrowCell(cellData)
+            displayData = formatArrowCell(cellData, props.arrowType)
           } else {
             displayData = formatNumber(
               cellData,
