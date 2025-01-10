@@ -33,8 +33,8 @@ import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
 
 import {
   PandasColumnType,
-  PandasIndexTypeName,
   PandasRangeIndex,
+  PandasRangeIndexType,
 } from "./arrowTypeUtils"
 
 /**
@@ -284,8 +284,8 @@ function parseIndexType(pandasSchema: PandasSchema): PandasColumnType[] {
   return pandasSchema.index_columns.map(indexName => {
     if (isPandasRangeIndex(indexName)) {
       return {
-        pandas_type: PandasIndexTypeName.RangeIndex,
-        numpy_type: PandasIndexTypeName.RangeIndex,
+        pandas_type: PandasRangeIndexType,
+        numpy_type: PandasRangeIndexType,
         meta: indexName as PandasRangeIndex,
       }
     }

@@ -34,9 +34,10 @@ export type DataType =
   | Struct // dict
   | bigint // period
 
-export enum PandasIndexTypeName {
-  RangeIndex = "range",
-}
+/** The name we use for range index columns.  We have to set the name ourselves since range
+ * indices are not included in the data or the arrow schema.
+ */
+export const PandasRangeIndexType = "range"
 
 /** Pandas type information for single-index columns, and data columns. */
 export interface PandasColumnType {
@@ -246,5 +247,5 @@ export function isRangeIndexType(type?: PandasColumnType): boolean {
   if (isNullOrUndefined(type)) {
     return false
   }
-  return getTypeName(type) === "range"
+  return getTypeName(type) === PandasRangeIndexType
 }

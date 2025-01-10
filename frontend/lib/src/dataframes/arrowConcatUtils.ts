@@ -26,8 +26,8 @@ import { Data, IndexData, PandasColumnTypes } from "./arrowParseUtils"
 import {
   getTypeName,
   PandasColumnType,
-  PandasIndexTypeName,
   PandasRangeIndex,
+  PandasRangeIndexType,
 } from "./arrowTypeUtils"
 
 /** True if both arrays contain the same data types in the same order.
@@ -103,7 +103,7 @@ but was expecting \`${JSON.stringify(expectedIndexTypes)}\`.
 
   // NOTE: "range" index cannot be a part of a multi-index, i.e.
   // if the index type is "range", there will only be one element in the index array.
-  if (baseIndexTypes[0].pandas_type === PandasIndexTypeName.RangeIndex) {
+  if (baseIndexTypes[0].pandas_type === PandasRangeIndexType) {
     // Continue the sequence for a "range" index.
     // NOTE: The metadata of the original index will be used, i.e.
     // if both indexes are of type "range" and they have different
@@ -206,7 +206,7 @@ but was expecting \`${JSON.stringify(expectedIndexTypes)}\`.
   return baseIndexTypes.map(indexType => {
     // NOTE: "range" index cannot be a part of a multi-index, i.e.
     // if the index type is "range", there will only be one element in the index array.
-    if (indexType.pandas_type === PandasIndexTypeName.RangeIndex) {
+    if (indexType.pandas_type === PandasRangeIndexType) {
       const { stop, step } = indexType.meta as PandasRangeIndex
       const {
         start: appendStart,
