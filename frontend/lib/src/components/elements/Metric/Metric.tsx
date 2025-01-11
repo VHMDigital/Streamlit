@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { ReactElement, useEffect, useRef } from "react"
 
+import { useTheme } from "@emotion/react"
 import { EmotionIcon } from "@emotion-icons/emotion-icon"
 import { ArrowDownward, ArrowUpward } from "@emotion-icons/material-outlined"
 
@@ -27,6 +28,7 @@ import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
 import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
 import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
 
+import { applyStreamlitTheme } from "@streamlit/lib/src/components/elements/ArrowVegaLiteChart"
 import {
   StyledMetricContainer,
   StyledMetricDeltaText,
@@ -35,13 +37,20 @@ import {
   StyledTruncateText,
 } from "./styled-components"
 
+import { expressionInterpreter } from "vega-interpreter"
+import { EmotionTheme } from "@streamlit/lib"
+import embed from "vega-embed"
+
 export interface MetricProps {
   element: MetricProto
+  width: number
 }
 
 export default function Metric({
   element,
+  width,
 }: Readonly<MetricProps>): ReactElement {
+  const theme: EmotionTheme = useTheme()
   const { MetricDirection } = MetricProto
   const {
     body,
@@ -52,6 +61,7 @@ export default function Metric({
     labelVisibility,
     help,
     showBorder,
+    sparkline,
   } = element
 
   let metricDirection: EmotionIcon | null = null
@@ -67,6 +77,54 @@ export default function Metric({
 
   const arrowMargin = "0 threeXS 0 0"
   const deltaExists = delta !== ""
+
+  const sparklineRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (sparkline && sparklineRef.current) {
+      const spec = {
+        $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+        width,
+        height: 60,
+        data: {
+          values: sparkline.map((value, index) => ({ x: index, y: value })),
+        },
+        mark: "line",
+        encoding: {
+          x: {
+            field: "x",
+            type: "quantitative",
+            axis: null,
+            scale: { zero: false, nice: false },
+          },
+          y: {
+            field: "y",
+            type: "quantitative",
+            axis: null,
+            scale: { zero: false, nice: false },
+          },
+        },
+        config: {
+          view: { stroke: null },
+          padding: { left: 0, right: 0, top: 0, bottom: 0 },
+        },
+      }
+      spec.config = applyStreamlitTheme(spec.config as any, theme)
+
+      embed(sparklineRef.current, spec as any, {
+        actions: false,
+        renderer: "svg",
+        ast: true,
+        expr: expressionInterpreter,
+        tooltip: {
+          theme: "custom",
+          formatTooltip: (value: any) => {
+            return `${value.y}`
+          },
+        },
+      })
+    }
+  }, [sparkline, color, theme, width])
 
   return (
     <StyledMetricContainer
@@ -106,6 +164,13 @@ export default function Metric({
           )}
           <StyledTruncateText> {delta} </StyledTruncateText>
         </StyledMetricDeltaText>
+      )}
+      {sparkline && sparkline.length > 0 && (
+        <div
+          ref={sparklineRef}
+          data-testid="stMetricSparkline"
+          style={{ marginTop: "0.5rem" }}
+        />
       )}
     </StyledMetricContainer>
   )
