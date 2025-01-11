@@ -51,6 +51,11 @@ jobs:
           streamlit_wheel=$(readlink -e "${streamlit_wheel}")
           echo "output_file=${streamlit_wheel}" >> $GITHUB_OUTPUT
 
+      - name: Enable and Prepare Latest Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@4.5.3 --activate
+
       - name: Install node dependencies for streamlit-component-lib
         working-directory: component-lib
         shell: bash
