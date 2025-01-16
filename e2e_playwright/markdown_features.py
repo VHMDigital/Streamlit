@@ -169,4 +169,3 @@ st.container(key="st_table").table(
         "Header": [selected_feature_markdown],
     }
 )
-
