@@ -102,7 +102,10 @@ function generateTableHeader(table: Quiver): ReactElement {
               className={header.cssClass}
               scope="col"
             >
-              {header.name || "\u00A0"}
+              <StreamlitMarkdown
+                source={header.name || "\u00A0"}
+                allowHTML={false}
+              />
             </StyledTableCellHeader>
           ))}
         </tr>
