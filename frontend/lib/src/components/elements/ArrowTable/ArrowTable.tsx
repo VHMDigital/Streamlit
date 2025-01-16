@@ -18,17 +18,17 @@ import React, { memo, ReactElement } from "react"
 
 import range from "lodash/range"
 
+import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
 import {
   DataFrameCellType,
-  Quiver,
-} from "@streamlit/lib/src/dataframes/Quiver"
+  isNumericType,
+} from "@streamlit/lib/src/dataframes/arrowTypeUtils"
 import {
   getStyledCell,
   getStyledHeaders,
 } from "@streamlit/lib/src/dataframes/pandasStylerUtils"
 import { format as formatArrowCell } from "@streamlit/lib/src/dataframes/arrowFormatUtils"
 import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown/StreamlitMarkdown"
-import { isNumericType } from "@streamlit/lib/src/dataframes/arrowTypeUtils"
 
 import {
   StyledEmptyTableCell,
@@ -139,14 +139,11 @@ function generateTableCell(
   rowIndex: number,
   columnIndex: number
 ): ReactElement {
-  const { type, content, contentType, field } = table.getCell(
-    rowIndex,
-    columnIndex
-  )
+  const { type, content, contentType } = table.getCell(rowIndex, columnIndex)
   const styledCell = getStyledCell(table, rowIndex, columnIndex)
 
   const formattedContent =
-    styledCell?.displayContent || formatArrowCell(content, contentType, field)
+    styledCell?.displayContent || formatArrowCell(content, contentType)
 
   const style: React.CSSProperties = {
     textAlign: isNumericType(contentType) ? "right" : "left",
