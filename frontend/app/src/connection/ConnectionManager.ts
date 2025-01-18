@@ -28,6 +28,7 @@ import {
 } from "@streamlit/lib"
 
 import { ConnectionState } from "./ConnectionState"
+import { StaticConnection } from "./StaticConnection"
 import { WebsocketConnection } from "./WebsocketConnection"
 
 /**
@@ -136,16 +137,41 @@ export class ConnectionManager {
     }
   }
 
+  /**
+   * Checks query params to determine if static notebook Id has been passed.
+   * If so, returns the Id.
+   */
+  private checkStaticConnection(): string | null {
+    const queryParams = new URLSearchParams(document.location.search)
+    return queryParams.get("staticNotebookId")
+  }
+
+  /**
+   * Establish either a WebsocketConnection or StaticConnection
+   * based on query params.
+   */
   private async connect(): Promise<void> {
-    try {
-      this.connection = await this.connectToRunningServer()
-    } catch (e) {
-      const err = ensureError(e)
-      logError(err.message)
-      this.setConnectionState(
-        ConnectionState.DISCONNECTED_FOREVER,
-        err.message
-      )
+    const staticNotebookId = this.checkStaticConnection()
+
+    if (staticNotebookId) {
+      // Establish a static connection
+      StaticConnection({
+        staticNotebookId,
+        onConnectionStateChange: this.setConnectionState,
+        onMessage: this.props.onMessage,
+      })
+    } else {
+      // Establish a websocket connection
+      try {
+        this.connection = await this.connectToRunningServer()
+      } catch (e) {
+        const err = ensureError(e)
+        logError(err.message)
+        this.setConnectionState(
+          ConnectionState.DISCONNECTED_FOREVER,
+          err.message
+        )
+      }
     }
   }
 

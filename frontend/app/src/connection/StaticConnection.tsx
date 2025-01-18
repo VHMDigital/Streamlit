@@ -23,7 +23,7 @@ import {
 import { ConnectionState } from "./ConnectionState"
 
 // Holds url for static asset location
-export const STATIC_CONFIG = "https://data.streamlit.io/static.json"
+export const STATIC_ASSET_CONFIG = "https://data.streamlit.io/static.json"
 
 type OnMessage = (ForwardMsg: any) => void
 type OnConnectionStateChange = (
@@ -33,7 +33,7 @@ type OnConnectionStateChange = (
 
 interface Props {
   /** The static notebook's ID from query param */
-  notebookId: string
+  staticNotebookId: string
 
   /**
    * Function called when our ConnectionState changes.
@@ -48,22 +48,22 @@ interface Props {
 }
 
 // Fetches the static asset url from the config file
-async function getStaticConfig(): Promise<string> {
+export async function getStaticConfig(): Promise<string> {
   const isLocalStoreAvailable = localStorageAvailable()
-  let staticURL = ""
+  let staticAssetUrl = ""
 
   // Pull static asset url from localStorage if available
   if (isLocalStoreAvailable) {
-    const cachedConfig = window.localStorage.getItem("stStaticUrl")
+    const cachedConfig = window.localStorage.getItem("stStaticAssetUrl")
     if (cachedConfig) {
-      staticURL = cachedConfig
+      staticAssetUrl = cachedConfig
     }
   }
 
   // Otherwise, fetch url from config file
-  if (!staticURL) {
+  if (!staticAssetUrl) {
     try {
-      const response = await fetch(STATIC_CONFIG, {
+      const response = await fetch(STATIC_ASSET_CONFIG, {
         signal: AbortSignal.timeout(5000),
       })
 
@@ -71,11 +71,11 @@ async function getStaticConfig(): Promise<string> {
         logError("Failed to fetch static config url: ", response.status)
       } else {
         const config = await response.json()
-        staticURL = config.static_url ?? undefined
+        staticAssetUrl = config.static_url ?? undefined
 
         // Set in localStorage
-        if (isLocalStoreAvailable && staticURL) {
-          window.localStorage.setItem("stStaticUrl", staticURL)
+        if (isLocalStoreAvailable && staticAssetUrl) {
+          window.localStorage.setItem("stStaticAssetUrl", staticAssetUrl)
         }
       }
     } catch (err) {
@@ -83,20 +83,20 @@ async function getStaticConfig(): Promise<string> {
     }
   }
 
-  return staticURL
+  return staticAssetUrl
 }
 
 // Fetches FowardMsg protos from S3 for static streamlit apps
 // First, gets the location of the static assets from url in the config
 // Then fetches the protos from that location
-async function getProtoResponse(
-  notebookId: string
+export async function getProtoResponse(
+  staticNotebookId: string
 ): Promise<void | ArrayBuffer> {
-  const staticURL = await getStaticConfig()
+  const staticAssetURL = await getStaticConfig()
 
   // Next, fetch the static app's protos (if we have a url)
-  if (staticURL) {
-    const path = `${staticURL}/${notebookId}/protos.pb`
+  if (staticAssetURL) {
+    const path = `${staticAssetURL}/${staticNotebookId}/protos.pb`
     const response = await fetch(path, {
       signal: AbortSignal.timeout(5000),
     })
@@ -114,11 +114,11 @@ async function getProtoResponse(
 
 // Triggers fetch of static app assets and dispatches ForwardMsgs to be handled
 // by App.tsx's handleMessage, replicating the app
-async function dispatchAppForwardMessages(
-  notebookId: string,
+export async function dispatchAppForwardMessages(
+  staticNotebookId: string,
   onMessage: OnMessage
 ): Promise<void> {
-  const arrayBuffer = await getProtoResponse(notebookId)
+  const arrayBuffer = await getProtoResponse(staticNotebookId)
 
   if (!arrayBuffer) {
     logError("Failed to retrieve static app protos")
@@ -137,7 +137,7 @@ async function dispatchAppForwardMessages(
 }
 
 export function StaticConnection({
-  notebookId,
+  staticNotebookId,
   onConnectionStateChange,
   onMessage,
 }: Props): void {
@@ -145,7 +145,7 @@ export function StaticConnection({
   // state until assets fetched/loaded from S3
   onConnectionStateChange(ConnectionState.STATIC_CONNECTING)
 
-  dispatchAppForwardMessages(notebookId, onMessage)
+  dispatchAppForwardMessages(staticNotebookId, onMessage)
 
   // Once protos are fetched & dispatched, we are connected
   onConnectionStateChange(ConnectionState.STATIC_CONNECTED)
