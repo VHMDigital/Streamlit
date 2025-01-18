@@ -98,11 +98,12 @@ _CHANNELS: Final = {
 VegaLiteSpec: TypeAlias = "dict[str, Any]"
 AltairChart: TypeAlias = """Union[
     alt.Chart,
-    alt.LayerChart,
     alt.ConcatChart,
-    alt.HConcatChart,
-    alt.VConcatChart,
     alt.FacetChart,
+    alt.HConcatChart,
+    alt.LayerChart,
+    alt.RepeatChart,
+    alt.VConcatChart,
 ]"""
 
 
