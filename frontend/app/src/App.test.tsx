@@ -109,8 +109,8 @@ vi.mock("@streamlit/app/src/connection/ConnectionManager", async () => {
     ConnectionManager: MockedClass,
   }
 })
-vi.mock("~/lib/SessionInfo", async () => {
-  const actualModule = await vi.importActual<any>("~/lib/SessionInfo")
+vi.mock("~lib/SessionInfo", async () => {
+  const actualModule = await vi.importActual<any>("~lib/SessionInfo")
 
   const MockedClass = vi.fn().mockImplementation(() => {
     return new actualModule.SessionInfo()
@@ -127,9 +127,9 @@ vi.mock("~/lib/SessionInfo", async () => {
   }
 })
 
-vi.mock("~/lib/hostComm/HostCommunicationManager", async () => {
+vi.mock("~lib/hostComm/HostCommunicationManager", async () => {
   const actualModule = await vi.importActual<any>(
-    "~/lib/hostComm/HostCommunicationManager"
+    "~lib/hostComm/HostCommunicationManager"
   )
 
   const MockedClass = vi.fn().mockImplementation((...props) => {
@@ -164,8 +164,8 @@ vi.mock(
   }
 )
 
-vi.mock("~/lib/WidgetStateManager", async () => {
-  const actualModule = await vi.importActual<any>("~/lib/WidgetStateManager")
+vi.mock("~lib/WidgetStateManager", async () => {
+  const actualModule = await vi.importActual<any>("~lib/WidgetStateManager")
 
   const MockedClass = vi.fn().mockImplementation((...props) => {
     const widgetStateManager = new actualModule.WidgetStateManager(...props)
@@ -198,8 +198,8 @@ vi.mock("@streamlit/app/src/MetricsManager", async () => {
   }
 })
 
-vi.mock("~/lib/FileUploadClient", async () => {
-  const actualModule = await vi.importActual<any>("~/lib/FileUploadClient")
+vi.mock("~lib/FileUploadClient", async () => {
+  const actualModule = await vi.importActual<any>("~lib/FileUploadClient")
 
   const MockedClass = vi.fn().mockImplementation((...props) => {
     return new actualModule.FileUploadClient(...props)

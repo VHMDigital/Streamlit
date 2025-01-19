@@ -22,11 +22,6 @@ module.exports = {
       {
         patterns: [
           {
-            group: ["~/lib/*"],
-            message:
-              "Direct imports from '~/lib/*' are not allowed. Please import from '@streamlit/lib' instead.",
-          },
-          {
             group: ["~lib/*"],
             message:
               "Direct imports from '~lib/*' are not allowed. Please import from '@streamlit/lib' instead.",

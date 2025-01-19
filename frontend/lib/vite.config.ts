@@ -62,7 +62,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "~/lib": path.resolve(__dirname, "../lib/src"),
+      "~lib": path.resolve(__dirname, "../lib/src"),
     },
   },
   test: {
