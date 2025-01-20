@@ -33,10 +33,10 @@ export interface ColumnMenuProps {
   // The left position of the menu
   left: number
   // Callback to close the menu
-  menuClosed: () => void
+  onMenuClosed: () => void
   // Callback to sort column
   // If undefined, the sort menu item will not be shown
-  sortColumn: ((direction: "asc" | "desc") => void) | undefined
+  onSortColumn: ((direction: "asc" | "desc") => void) | undefined
 }
 
 /**
@@ -45,8 +45,8 @@ export interface ColumnMenuProps {
 function ColumnMenu({
   top,
   left,
-  menuClosed,
-  sortColumn,
+  onMenuClosed,
+  onSortColumn,
 }: ColumnMenuProps): ReactElement {
   const [open, setOpen] = React.useState(true)
   const theme: EmotionTheme = useTheme()
@@ -79,8 +79,8 @@ function ColumnMenu({
 
   const closeMenu = React.useCallback((): void => {
     setOpen(false)
-    menuClosed()
-  }, [setOpen, menuClosed])
+    onMenuClosed()
+  }, [setOpen, onMenuClosed])
 
   return (
     <Popover
@@ -88,11 +88,11 @@ function ColumnMenu({
       aria-label="Dataframe column menu"
       content={
         <StyledMenuList>
-          {sortColumn && (
+          {onSortColumn && (
             <>
               <StyledMenuListItem
                 onClick={() => {
-                  sortColumn("asc")
+                  onSortColumn("asc")
                   closeMenu()
                 }}
                 role="menuitem"
@@ -107,7 +107,7 @@ function ColumnMenu({
               </StyledMenuListItem>
               <StyledMenuListItem
                 onClick={() => {
-                  sortColumn("desc")
+                  onSortColumn("desc")
                   closeMenu()
                 }}
                 role="menuitem"

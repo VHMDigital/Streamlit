@@ -27,8 +27,8 @@ describe("DataFrame ColumnMenu", () => {
   const defaultProps: ColumnMenuProps = {
     top: 100,
     left: 100,
-    menuClosed: vi.fn(),
-    sortColumn: vi.fn(),
+    onMenuClosed: vi.fn(),
+    onSortColumn: vi.fn(),
   }
 
   beforeEach(() => {
@@ -59,16 +59,16 @@ describe("DataFrame ColumnMenu", () => {
     render(<ColumnMenu {...defaultProps} />)
 
     await userEvent.click(screen.getByText("Sort ascending"))
-    expect(defaultProps.sortColumn).toHaveBeenCalledWith("asc")
-    expect(defaultProps.menuClosed).toHaveBeenCalled()
+    expect(defaultProps.onSortColumn).toHaveBeenCalledWith("asc")
+    expect(defaultProps.onMenuClosed).toHaveBeenCalled()
   })
 
   test("calls sortColumn with 'desc' when clicking sort descending", async () => {
     render(<ColumnMenu {...defaultProps} />)
 
     await userEvent.click(screen.getByText("Sort descending"))
-    expect(defaultProps.sortColumn).toHaveBeenCalledWith("desc")
-    expect(defaultProps.menuClosed).toHaveBeenCalled()
+    expect(defaultProps.onSortColumn).toHaveBeenCalledWith("desc")
+    expect(defaultProps.onMenuClosed).toHaveBeenCalled()
   })
 
   it("should not render sort options when sortColumn is undefined", () => {
@@ -76,8 +76,8 @@ describe("DataFrame ColumnMenu", () => {
       <ColumnMenu
         top={0}
         left={0}
-        menuClosed={() => {}}
-        sortColumn={undefined}
+        onMenuClosed={() => {}}
+        onSortColumn={undefined}
       />
     )
 
@@ -91,8 +91,8 @@ describe("DataFrame ColumnMenu", () => {
       <ColumnMenu
         top={0}
         left={0}
-        menuClosed={() => {}}
-        sortColumn={() => {}}
+        onMenuClosed={() => {}}
+        onSortColumn={() => {}}
       />
     )
 
