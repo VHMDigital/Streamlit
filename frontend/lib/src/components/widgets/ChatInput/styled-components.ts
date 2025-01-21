@@ -17,7 +17,6 @@ import styled from "@emotion/styled"
 import { Theme } from "@emotion/react"
 
 import { hasLightBackgroundColor } from "@streamlit/lib/src/theme"
-import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
 
 const chatBorderRadius = (theme: Theme): string => theme.radii.xxxl
 
@@ -124,12 +123,12 @@ export const StyledInputInstructionsContainer = styled.div(({ theme }) => ({
 }))
 
 export interface StyledFileUploadDropzoneProps {
-  showOnlyDropzone: boolean
+  showDropzone: boolean
 }
 
 export const StyledFileUploadDropzone =
-  styled.div<StyledFileUploadDropzoneProps>(({ theme, showOnlyDropzone }) => {
-    return showOnlyDropzone
+  styled.div<StyledFileUploadDropzoneProps>(({ theme, showDropzone }) => {
+    return showDropzone
       ? {
           height: "100%",
           width: "100%",
