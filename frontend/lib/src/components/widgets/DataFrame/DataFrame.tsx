@@ -1063,12 +1063,12 @@ function DataFrame({
                 }
               : undefined
           }
-          isPinned={originalColumns[showMenu.col].isPinned}
+          isPinned={originalColumns[showMenu.columnIdx].isPinned}
           unpinColumn={() => {
-            unpinColumn(originalColumns[showMenu.col].id)
+            unpinColumn(originalColumns[showMenu.columnIdx].id)
           }}
           pinColumn={() => {
-            pinColumn(originalColumns[showMenu.col].id)
+            pinColumn(originalColumns[showMenu.columnIdx].id)
           }}
         ></ColumnMenu>
       )}
