@@ -235,21 +235,21 @@ const MAX_VISIBLE_NUM_LINES = 6.5
 const ROUNDING_OFFSET = 1
 
 interface FileUploadAreaProps {
-  fileDragged: boolean
   getRootProps: any
   getInputProps: any
+  showDropzone: boolean
   disabled: boolean
 }
 
 const FileUploadArea = ({
-  fileDragged,
   getRootProps,
   getInputProps,
+  showDropzone,
   disabled,
 }: FileUploadAreaProps) => (
-  <StyledFileUploadDropzone showDropzone={fileDragged} {...getRootProps()}>
+  <StyledFileUploadDropzone showDropzone={showDropzone} {...getRootProps()}>
     <input {...getInputProps()} />
-    {fileDragged ? (
+    {showDropzone ? (
       "Drag and drop files here"
     ) : (
       <BaseButton kind={BaseButtonKind.BORDERLESS_ICON} disabled={disabled}>
@@ -592,9 +592,9 @@ function ChatInput({
         <StyledChatInput>
           {acceptFile === AcceptFileValue.None ? null : (
             <FileUploadArea
-              fileDragged={fileDragged}
               getRootProps={getRootProps}
               getInputProps={getInputProps}
+              showDropzone={showDropzone}
               disabled={disabled}
             />
           )}
