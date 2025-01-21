@@ -810,7 +810,9 @@ def wait_for_app_run(
         page.wait_for_timeout(wait_delay)
 
 
-def wait_for_app_loaded(page: Page, embedded: bool = False):
+def wait_for_app_loaded(
+    page: Page, embedded: bool = False, static_override: bool = False
+):
     """Wait for the app to fully load."""
     # Wait for the app view container to appear:
     page.wait_for_selector(
@@ -823,7 +825,7 @@ def wait_for_app_loaded(page: Page, embedded: bool = False):
             "[data-testid='stMainMenu']", timeout=20000, state="attached"
         )
 
-    wait_for_app_run(page)
+    wait_for_app_run(page, static_override=static_override)
 
 
 def rerun_app(page: Page):
