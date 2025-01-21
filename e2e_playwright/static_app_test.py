@@ -20,7 +20,7 @@ from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_loaded
 def test_static_app(page: Page, app_port: int, assert_snapshot: ImageCompareFunction):
     """Test that a static app can be loaded"""
     page.goto(f"http://localhost:{app_port}/?staticNotebookId=Load_CSV_from_S3")
-    wait_for_app_loaded(page)
+    wait_for_app_loaded(page, True)
 
     app_cells = page.get_by_test_id("stExpander")
     expect(app_cells).to_have_length(20)

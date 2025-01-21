@@ -762,7 +762,9 @@ def playwright_profiling(request, page: Page):
 
 
 def wait_for_app_run(
-    page_or_locator: Page | Locator | FrameLocator, wait_delay: int = 100
+    page_or_locator: Page | Locator | FrameLocator,
+    wait_delay: int = 100,
+    state_override: bool = False,
 ):
     """Wait for the given page to finish running."""
     # Add a little timeout to wait for eventual debounce timeouts used in some widgets.
@@ -778,12 +780,21 @@ def wait_for_app_run(
     # if isinstance(page, Page):
     page.wait_for_timeout(155)
     # Make sure that the websocket connection is established.
-    page_or_locator.locator(
-        "[data-testid='stApp'][data-test-connection-state='CONNECTED']"
-    ).wait_for(
-        timeout=25000,
-        state="attached",
-    )
+    if state_override is None:
+        page_or_locator.locator(
+            "[data-testid='stApp'][data-test-connection-state='CONNECTED']"
+        ).wait_for(
+            timeout=25000,
+            state="attached",
+        )
+    else:
+        page_or_locator.locator(
+            "[data-testid='stApp'][data-test-connection-state='STATIC_CONNECTED']"
+        ).wait_for(
+            timeout=25000,
+            state="attached",
+        )
+
     # Wait until we know the script has started. We determine this by checking
     # whether the app is in notRunning state. (The data-test-connection-state attribute
     # goes through the sequence "initial" -> "running" -> "notRunning").
