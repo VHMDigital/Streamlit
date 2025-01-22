@@ -36,7 +36,7 @@ export interface ColumnMenuProps {
   top: number
   // The left position of the menu
   left: number
-  // Callback to instruct the parent to close the menu
+  // Callback used to instruct the parent to close the menu
   onCloseMenu: () => void
   // Callback to sort column
   // If undefined, the sort menu item will not be shown
