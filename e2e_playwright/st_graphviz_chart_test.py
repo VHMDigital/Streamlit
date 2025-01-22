@@ -148,6 +148,6 @@ def test_use_container_width_true(app: Page, assert_snapshot: ImageCompareFuncti
 def test_with_themed_app(themed_app: Page, assert_snapshot: ImageCompareFunction):
     """Test that it renders correctly in light and dark mode."""
     assert_snapshot(
-        get_first_graph_svg(themed_app),
+        themed_app.get_by_test_id("stGraphVizChart").nth(1).locator("svg"),
         name="st_graphviz_chart-theming",
     )
