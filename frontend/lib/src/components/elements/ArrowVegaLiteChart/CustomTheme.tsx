@@ -89,13 +89,13 @@ export function applyStreamlitTheme(config: any, theme: EmotionTheme): any {
       titleFontWeight: theme.fontWeights.normal,
       titleFontStyle: "normal",
       titleColor: getGray70(theme),
-      titlePadding: 5,
+      titlePadding: convertRemToPx("0.313rem"),
       labelPadding: convertRemToPx(theme.spacing.lg),
       columnPadding: convertRemToPx(theme.spacing.sm),
       rowPadding: convertRemToPx(theme.spacing.twoXS),
       // eslint-disable-next-line streamlit-custom/no-hardcoded-theme-values
-      padding: 7,
-      symbolStrokeWidth: 4,
+      padding: convertRemToPx("0.438rem"),
+      symbolStrokeWidth: convertRemToPx("0.25rem"),
     },
     range: {
       category: getCategoricalColorsArray(theme),
@@ -107,8 +107,8 @@ export function applyStreamlitTheme(config: any, theme: EmotionTheme): any {
       columns: 1,
       strokeWidth: 0,
       stroke: "transparent",
-      continuousHeight: 350,
-      continuousWidth: 400,
+      continuousHeight: convertRemToPx(theme.sizes.defaultChartHeight),
+      continuousWidth: convertRemToPx(theme.sizes.defaultChartWidth),
     },
     concat: {
       columns: 1,
@@ -181,8 +181,8 @@ export function applyThemeDefaults(config: any, theme: EmotionTheme): any {
     },
     view: {
       stroke: getGray30(theme),
-      continuousHeight: 350,
-      continuousWidth: 400,
+      continuousHeight: convertRemToPx(theme.sizes.defaultChartHeight),
+      continuousWidth: convertRemToPx(theme.sizes.defaultChartWidth),
     },
     mark: {
       tooltip: true,
