@@ -52,8 +52,8 @@ def login(provider: str | None = None) -> None:
 
     This command redirects the user to an OpenID Connect (OIDC) provider. After
     the user authenticates their identity, they are redirected back to the
-    home page of your app. Streamlit stores a cookie in the user's browser with
-    the user's identity information. The identity information can be accessed
+    home page of your app. Streamlit stores a cookie with the user's identity
+    information in the user's browser . You can access the identity information
     through |st.experimental_user|_. Call ``st.logout()`` to remove the cookie
     and start a new session.
 
@@ -61,11 +61,11 @@ def login(provider: str | None = None) -> None:
     You must configure the provider through secrets management. Although OIDC
     is an extension of OAuth 2.0, you can't use generic OAuth providers.
     Streamlit parses the user's identity token and surfaces its attributes in
-    ``st.experimental_user``. If an access token is returned by the provider,
-    it is ignored. Therefore, this command will not allow your app to act on
+    ``st.experimental_user``. If the provider returns an access token, that
+    token is ignored. Therefore, this command will not allow your app to act on
     behalf of a user in a secure system.
 
-    For all providers, there are two common settings, ``redirect_uri`` and
+    For all providers, there are two shared settings, ``redirect_uri`` and
     ``cookie_secret``, which you must specify in an ``[auth]`` dictionary
     in ``secrets.toml``. Other settings must be defined as described in the
     ``provider`` parameter.
@@ -75,7 +75,7 @@ def login(provider: str | None = None) -> None:
       ``http://localhost:8501/oauth2callback``.
     - ``cookie_secret`` should be a strong, randomly generated secret.
 
-    In addition to the common settings, the following settings are required:
+    In addition to the shared settings, the following settings are required:
 
     - ``client_id``
     - ``client_secret``
@@ -87,17 +87,17 @@ def login(provider: str | None = None) -> None:
     ``scope="openid profile email"`` and ``prompt="select_account"``. You can
     change these and other OIDC parameters by passing a dictionary of settings
     to ``client_kwargs``. ``state`` and ``nonce``, which are used for
-    security, are handled automatically and don't need to specified. For more
-    information, see Example 4.
+    security, are handled automatically and don't need to be specified. For
+    more information, see Example 4.
 
     .. Important::
         - You must install ``Authlib>=1.3.2`` to use this command.
         - Your authentication configuration is dependent on your host location.
           When you deploy your app, remember to update your ``redirect_uri``
-          both within your app and within your provider.
-        - All URLs declared in the settings must be absolute (i.e. begin with
+          within your app and your provider.
+        - All URLs declared in the settings must be absolute (i.e., begin with
           ``http://`` or ``https://``).
-        - Streamlit will automatically enable CORS and XSRF protection when you
+        - Streamlit automatically enables CORS and XSRF protection when you
           configure authentication in ``secrets.toml``. This takes precedence
           over configuration options in ``config.toml``.
         - If a user is logged into your app and opens a new tab in the same
@@ -127,7 +127,7 @@ def login(provider: str | None = None) -> None:
     Examples
     --------
 
-    **Example 1: Use a single, default identity provider**
+    **Example 1: Use an unnamed default identity provider**
 
     If you do not specify a name for your provider, specify all settings within
     the ``[auth]`` dictionary of your ``secrets.toml`` file. The following
@@ -160,12 +160,12 @@ def login(provider: str | None = None) -> None:
 
     **Example 2: Use a named identity provider**
 
-    If you specify a name for your provider, save the common settings in the
+    If you specify a name for your provider, save the shared settings in the
     ``[auth]`` dictionary of your ``secrets.toml`` file, and save the other
     settings in an ``[auth.{provider}]`` dictionary, where ``{provider}`` is
     the name of your provider. The following example configures Microsoft as
     the provider. The example uses ``provider="microsoft"``, but you can use
-    any name. This name is internal to Streamlit and used to match the login
+    any name. This name is internal to Streamlit and is used to match the login
     command to its configuration. For information about using OIDC with
     Microsoft, see `Microsoft Entra ID
     <https://learn.microsoft.com/en-us/power-pages/security/authentication/openid-settings>`_.
@@ -199,9 +199,9 @@ def login(provider: str | None = None) -> None:
     configure multiple providers and give them each a unique name. The
     following example lets users choose between Okta and Microsoft to log in.
     Always check with your identity provider to understand the structure of
-    their identity tokens because the returned fields may be different.
-    Remember to set ``{tenant}`` and ``{subdomain}`` in ``server_metadata_url``
-    for Microsoft and Okta, respectively.
+    their identity tokens because the returned fields may differ. Remember to
+    set ``{tenant}`` and ``{subdomain}`` in ``server_metadata_url`` for
+    Microsoft and Okta, respectively.
 
     >>> [auth]
     >>> redirect_uri = "http://localhost:8501/oauth2callback"
@@ -293,8 +293,8 @@ def logout() -> None:
     """Logout the current user.
 
     This command removes the user's information from ``st.experimental_user``,
-    deletes their identity cookie, and redirects them back to the home page of
-    your app. This creates a new session.
+    deletes their identity cookie, and redirects them back to your app's home
+    page. This creates a new session.
 
     If the user has multiple sessions open in the same browser,
     ``st.experimental_user`` will not be cleared in any other session.
@@ -375,7 +375,7 @@ class UserInfoProxy(Mapping[str, Union[str, bool, None]]):
 
     ``st.experimental_user`` is dependent on the host platform running your
     Streamlit app. If the host platform has not configured the function, it
-    will behave as it does in a locally running app.
+    will behave as in a locally running app.
 
     When authentication is configured in ``secrets.toml``, Streamlit will parse
     the OpenID Connect (OIDC) identity token and copy the attributes to
@@ -385,7 +385,7 @@ class UserInfoProxy(Mapping[str, Union[str, bool, None]]):
     When authentication is not configured, ``st.experimental_user`` has no
     attributes.
 
-    Values can be accessed via key or attribute notation. For example, use
+    You can access values via key or attribute notation. For example, use
     ``st.experimental_user["email"]`` or ``st.experimental_user.email`` to
     access the ``email`` attribute.
 
