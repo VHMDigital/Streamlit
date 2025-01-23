@@ -25,7 +25,6 @@ import React, {
 import axios from "axios"
 import { useTheme } from "@emotion/react"
 import { Send } from "@emotion-icons/material-rounded"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
 import { Textarea as UITextArea } from "baseui/textarea"
 import { AttachFile } from "@emotion-icons/material-outlined"
 import {
@@ -35,6 +34,7 @@ import {
 } from "react-dropzone"
 import zip from "lodash/zip"
 
+import { EmotionTheme } from "@streamlit/lib/src/theme"
 import {
   AcceptFileValue,
   chatInputAcceptFileProtoValueToEnum,
