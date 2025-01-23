@@ -63,7 +63,6 @@ import {
   UploadFileInfo,
 } from "@streamlit/lib/src/components/widgets/FileUploader/UploadFileInfo"
 import { FileUploadClient } from "@streamlit/lib/src/FileUploadClient"
-import UploadedFiles from "@streamlit/lib/src/components/widgets/FileUploader/UploadedFiles"
 
 import {
   StyledChatInput,

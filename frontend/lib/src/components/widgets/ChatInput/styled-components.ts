@@ -16,7 +16,7 @@
 import styled from "@emotion/styled"
 
 import { hasLightBackgroundColor } from "@streamlit/lib/src/theme"
-import { FileStatus } from "../FileUploader/UploadFileInfo"
+import { FileStatus } from "@streamlit/lib/src/components/widgets/FileUploader/UploadFileInfo"
 
 export interface StyledChatInputContainerProps {
   width: number
@@ -155,11 +155,11 @@ export const StyledChatUploadedFiles = styled.div(({ theme }) => ({
   overflowX: "auto",
 }))
 
-export const StyledUploadedChatFileList = styled.div(({ theme }) => ({
+export const StyledUploadedChatFileList = styled.div(({}) => ({
   display: "flex",
 }))
 
-export const StyledUploadedChatFileListItem = styled.div(({ theme }) => ({
+export const StyledUploadedChatFileListItem = styled.div(({}) => ({
   flex: "0 0 auto",
 }))
 

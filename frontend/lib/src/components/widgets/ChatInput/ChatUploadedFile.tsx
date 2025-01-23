@@ -32,8 +32,7 @@ import { FileSize, getSizeDisplay } from "@streamlit/lib/src/util/FileHelper"
 import Tooltip, {
   Placement,
 } from "@streamlit/lib/src/components/shared/Tooltip"
-
-import { UploadFileInfo } from "../FileUploader/UploadFileInfo"
+import { UploadFileInfo } from "@streamlit/lib/src/components/widgets/FileUploader/UploadFileInfo"
 
 import {
   StyledChatUploadedFile,
