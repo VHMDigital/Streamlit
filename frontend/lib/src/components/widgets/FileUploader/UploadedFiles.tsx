@@ -23,8 +23,11 @@ import {
   StyledUploadedFiles,
   StyledUploadedFilesList,
   StyledUploadedFilesListItem,
+  StyledUploadedChatFileList,
+  StyledUploadedChatFileListItem,
 } from "./styled-components"
 import { UploadFileInfo } from "./UploadFileInfo"
+import styled from "@emotion/styled"
 
 export interface Props {
   items: UploadFileInfo[]
@@ -53,16 +56,37 @@ const UploadedFileList = ({
   )
 }
 
+const UploadedChatFileList = ({
+  items,
+  onDelete,
+  surface,
+}: Props): ReactElement => {
+  return (
+    <StyledUploadedChatFileList>
+      {items.map(file => (
+        <StyledUploadedChatFileListItem key={file.id}>
+          <UploadedFile
+            fileInfo={file}
+            onDelete={onDelete}
+            surface={surface}
+          />
+        </StyledUploadedChatFileListItem>
+      ))}
+    </StyledUploadedChatFileList>
+  )
+}
+
 export const PaginatedFiles = withPagination(UploadedFileList)
 
 const UploadedFiles = (props: Props & PaginationProps): ReactElement =>
   props.surface === "chat" ? (
     <StyledChatUploadedFiles>
-      <PaginatedFiles {...props} />
+      <UploadedChatFileList {...props} />
     </StyledChatUploadedFiles>
   ) : (
     <StyledUploadedFiles>
       <PaginatedFiles {...props} />
     </StyledUploadedFiles>
   )
+
 export default UploadedFiles

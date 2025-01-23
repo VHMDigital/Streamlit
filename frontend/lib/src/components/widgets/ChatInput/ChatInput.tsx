@@ -74,6 +74,7 @@ import {
   StyledSendIconButtonContainer,
   StyledVerticalDivider,
 } from "./styled-components"
+import ChatUploadedFiles from "./ChatUploadedFiles"
 
 export interface Props {
   disabled: boolean
@@ -584,11 +585,11 @@ function ChatInput({
   return (
     <>
       {files.length > 0 && (
-        <UploadedFiles
+        <ChatUploadedFiles
           items={[...files]}
           pageSize={1}
           onDelete={deleteFile}
-          surface="chat"
+          // surface="chat"
           resetOnAdd
           style={{
             paddingLeft: 0,

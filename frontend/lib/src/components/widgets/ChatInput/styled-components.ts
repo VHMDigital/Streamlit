@@ -16,6 +16,7 @@
 import styled from "@emotion/styled"
 
 import { hasLightBackgroundColor } from "@streamlit/lib/src/theme"
+import { FileStatus, UploadedStatus } from "../FileUploader/UploadFileInfo"
 
 export interface StyledChatInputContainerProps {
   width: number
@@ -143,4 +144,73 @@ export const StyledVerticalDivider = styled.div<StyledVerticalDividerProps>(
       backgroundColor: color ?? theme.colors.fadedText20,
     }
   }
+)
+
+export const StyledChatUploadedFiles = styled.div(({ theme }) => ({
+  left: 0,
+  right: 0,
+  lineHeight: theme.lineHeights.tight,
+  paddingLeft: theme.spacing.sm,
+  paddingRight: theme.spacing.sm,
+  // display: "flex",
+  // paddingLeft: theme.spacing.sm,
+  overflowX: "auto",
+}))
+
+export const StyledUploadedChatFileList = styled.div(({ theme }) => ({
+  display: "flex",
+  // overflowX: "auto",
+  // paddingBottom: theme.spacing.sm,
+}))
+
+export const StyledUploadedChatFileListItem = styled.div(({ theme }) => ({
+  flex: "0 0 auto",
+}))
+
+export const StyledChatUploadedFile = styled.div(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  padding: theme.spacing.sm,
+  gap: theme.spacing.twoXS,
+}))
+
+export const StyledChatUploadedFileData = styled.div(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  // paddingLeft: theme.spacing.twoXS,
+  // flex: 1,
+  overflow: "hidden",
+}))
+
+export const StyledChatUploadedFileIcon = styled.div(({ theme }) => ({
+  display: "flex",
+  color: theme.colors.fadedText60,
+}))
+
+export interface StyledChatUploadedFileStatusProps {
+  fileStatus: FileStatus
+}
+
+export const StyledChatUploadedFileName =
+  styled.div<StyledChatUploadedFileStatusProps>(({ theme, fileStatus }) => ({
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    color:
+      fileStatus.type === "uploaded"
+        ? theme.colors.default
+        : theme.colors.fadedText60,
+  }))
+
+export const StyledChatUploadedFileSize = styled.small(({ theme }) => ({
+  marginRight: theme.spacing.md,
+  color: theme.colors.fadedText60,
+}))
+
+export const StyledChatUploadedFileDeleteButton = styled.small(
+  ({ theme }) => ({
+    display: "flex",
+    alignItems: "center",
+    maxHeight: theme.sizes.smallElementHeight,
+  })
 )
