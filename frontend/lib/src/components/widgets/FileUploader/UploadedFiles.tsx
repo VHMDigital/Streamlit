@@ -19,74 +19,36 @@ import React, { ReactElement } from "react"
 import withPagination, { PaginationProps } from "./withPagination"
 import UploadedFile from "./UploadedFile"
 import {
-  StyledChatUploadedFiles,
   StyledUploadedFiles,
   StyledUploadedFilesList,
   StyledUploadedFilesListItem,
-  StyledUploadedChatFileList,
-  StyledUploadedChatFileListItem,
 } from "./styled-components"
 import { UploadFileInfo } from "./UploadFileInfo"
-import styled from "@emotion/styled"
 
 export interface Props {
   items: UploadFileInfo[]
   onDelete: (id: number) => void
   style?: React.CSSProperties
-  surface?: "chat" | null
 }
 
-const UploadedFileList = ({
-  items,
-  onDelete,
-  surface,
-}: Props): ReactElement => {
+const UploadedFileList = ({ items, onDelete }: Props): ReactElement => {
   return (
     <StyledUploadedFilesList>
       {items.map(file => (
         <StyledUploadedFilesListItem key={file.id}>
-          <UploadedFile
-            fileInfo={file}
-            onDelete={onDelete}
-            surface={surface}
-          />
+          <UploadedFile fileInfo={file} onDelete={onDelete} />
         </StyledUploadedFilesListItem>
       ))}
     </StyledUploadedFilesList>
   )
 }
 
-const UploadedChatFileList = ({
-  items,
-  onDelete,
-  surface,
-}: Props): ReactElement => {
-  return (
-    <StyledUploadedChatFileList>
-      {items.map(file => (
-        <StyledUploadedChatFileListItem key={file.id}>
-          <UploadedFile
-            fileInfo={file}
-            onDelete={onDelete}
-            surface={surface}
-          />
-        </StyledUploadedChatFileListItem>
-      ))}
-    </StyledUploadedChatFileList>
-  )
-}
-
 export const PaginatedFiles = withPagination(UploadedFileList)
 
-const UploadedFiles = (props: Props & PaginationProps): ReactElement =>
-  props.surface === "chat" ? (
-    <StyledChatUploadedFiles>
-      <UploadedChatFileList {...props} />
-    </StyledChatUploadedFiles>
-  ) : (
-    <StyledUploadedFiles>
-      <PaginatedFiles {...props} />
-    </StyledUploadedFiles>
-  )
+const UploadedFiles = (props: Props & PaginationProps): ReactElement => (
+  <StyledUploadedFiles>
+    <PaginatedFiles {...props} />
+  </StyledUploadedFiles>
+)
 
 export default UploadedFiles

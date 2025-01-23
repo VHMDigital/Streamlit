@@ -93,17 +93,6 @@ export const StyledUploadedFilesListItem = styled.li(({ theme }) => ({
   padding: theme.spacing.none,
 }))
 
-export const StyledUploadedChatFileList = styled.div(({ theme }) => ({
-  display: "flex",
-  // display: "flex",
-  // overflowX: "auto",
-  // paddingBottom: theme.spacing.sm,
-}))
-
-export const StyledUploadedChatFileListItem = styled.div(({ theme }) => ({
-  flex: "0 0 auto",
-}))
-
 export const StyledUploadedFileData = styled.div(({ theme }) => ({
   display: "flex",
   alignItems: "baseline",
