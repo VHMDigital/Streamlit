@@ -200,6 +200,7 @@ function DateInput({
         disabled={disabled}
         onChange={handleChange}
         onClose={handleClose}
+        quickSelect={element.isRange}
         overrides={{
           Popover: {
             props: {
@@ -335,6 +336,22 @@ function DateInput({
                   },
                   props: {
                     "data-testid": "stDateInputField",
+                  },
+                },
+              },
+            },
+          },
+          QuickSelect: {
+            props: {
+              overrides: {
+                ControlContainer: {
+                  style: {
+                    height: theme.sizes.minElementHeight,
+                    // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
+                    borderLeftWidth: theme.sizes.borderWidth,
+                    borderRightWidth: theme.sizes.borderWidth,
+                    borderTopWidth: theme.sizes.borderWidth,
+                    borderBottomWidth: theme.sizes.borderWidth,
                   },
                 },
               },
