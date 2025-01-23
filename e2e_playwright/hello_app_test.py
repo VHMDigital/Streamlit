@@ -220,3 +220,8 @@ def test_app_print_mode_landscape_with_sidebar_closed(
     _evaluate_match_media_print(app)
 
     assert_snapshot(app, name="hello_app-print_media-landscape-sidebar_closed")
+
+
+def test_max_content_width_uses_px(app: Page):
+    """Test that the max content width uses px and not rem."""
+    expect(app.get_by_test_id("stMainBlockContainer")).to_have_css("max-width", "736px")
