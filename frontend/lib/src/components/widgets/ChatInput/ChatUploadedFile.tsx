@@ -27,7 +27,9 @@ import BaseButton, {
   BaseButtonKind,
   BaseButtonSize,
 } from "@streamlit/lib/src/components/shared/BaseButton"
-import Icon from "@streamlit/lib/src/components/shared/Icon"
+import Icon, {
+  StyledSpinnerIcon,
+} from "@streamlit/lib/src/components/shared/Icon"
 import ProgressBar, {
   Size,
 } from "@streamlit/lib/src/components/shared/ProgressBar"
@@ -69,35 +71,37 @@ export const UploadedFileStatus = ({
   fileInfo,
 }: UploadedFileStatusProps): React.ReactElement | null => {
   if (fileInfo.status.type === "uploading") {
-    return <ProgressBar value={fileInfo.status.progress} size={Size.SMALL} />
+    return (
+      <StyledSpinnerIcon
+        usingCustomTheme={false}
+        data-testid="stChatInputFileIconSpinner"
+        size="base"
+        margin="0"
+        padding="0"
+      />
+    )
   }
 
   if (fileInfo.status.type === "error") {
-    return <Icon content={ErrorOutline} size={"lg"} />
+    return <Icon content={ErrorOutline} size="lg" />
     // return (
     //   <StyledFileError>
     //     <StyledErrorMessage data-testid="stFileUploaderFileErrorMessage">
     //       {fileInfo.status.errorMessage}
     //     </StyledErrorMessage>
     //     <StyledFileErrorIcon>
-    //       <Icon content={Error} size="lg" />
+    //       <Icon content={Error} size"lg" /
     //     </StyledFileErrorIcon>
     //   </StyledFileError>
     // )
   }
 
   if (fileInfo.status.type === "uploaded") {
-    return <Icon content={InsertDriveFile} size={"lg"} />
+    return <Icon content={InsertDriveFile} size="lg" />
   }
 
   return null
 }
-
-// export const UploadedFileSize = ({
-//   fileInfo,
-// }: UploadedFileSizeProps): React.ReactElement | null => (
-//   <Small>{getSizeDisplay(fileInfo.size, FileSize.Byte)}</Small>
-// )
 
 const ChatUploadedFile = ({
   fileInfo,
@@ -105,17 +109,16 @@ const ChatUploadedFile = ({
 }: Props): React.ReactElement => {
   return (
     <StyledChatUploadedFile
-      className="stFileUploaderFile"
-      data-testid="stFileUploaderFile"
+      className="stChatInputFile"
+      data-testid="stChatInputFile"
     >
       <StyledChatUploadedFileIcon>
         <UploadedFileStatus fileInfo={fileInfo} />
       </StyledChatUploadedFileIcon>
       {/* <UploadedFileStatus fileInfo={fileInfo} /> */}
-      {/* <StyledChatUploadedFileData className="stFileUploaderFileData"> */}
       <StyledChatUploadedFileName
-        className="stFileUploaderFileName"
-        data-testid="stFileUploaderFileName"
+        className="stChatInputFileName"
+        data-testid="stChatInputFileName"
         title={fileInfo.name}
         fileStatus={fileInfo.status}
       >
@@ -124,8 +127,7 @@ const ChatUploadedFile = ({
       <StyledChatUploadedFileSize>
         {getSizeDisplay(fileInfo.size, FileSize.Byte)}
       </StyledChatUploadedFileSize>
-      {/* </StyledChatUploadedFileData> */}
-      <StyledChatUploadedFileDeleteButton data-testid="stFileUploaderDeleteBtn">
+      <StyledChatUploadedFileDeleteButton data-testid="stChatInputDeleteBtn">
         <BaseButton
           onClick={() => onDelete(fileInfo.id)}
           kind={BaseButtonKind.MINIMAL}

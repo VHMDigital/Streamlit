@@ -16,17 +16,13 @@
 
 import React, { ReactElement } from "react"
 
-import withPagination, {
-  PaginationProps,
-} from "../FileUploader/withPagination"
-import UploadedFile from "../FileUploader/UploadedFile"
+import { UploadFileInfo } from "../FileUploader/UploadFileInfo"
+
 import {
   StyledChatUploadedFiles,
   StyledUploadedChatFileList,
   StyledUploadedChatFileListItem,
 } from "./styled-components"
-import { UploadFileInfo } from "../FileUploader/UploadFileInfo"
-import styled from "@emotion/styled"
 import ChatUploadedFile from "./ChatUploadedFile"
 
 export interface Props {
@@ -47,7 +43,7 @@ const UploadedChatFileList = ({ items, onDelete }: Props): ReactElement => {
   )
 }
 
-const ChatUploadedFiles = (props: Props & PaginationProps): ReactElement => (
+const ChatUploadedFiles = (props: Props): ReactElement => (
   <StyledChatUploadedFiles>
     <UploadedChatFileList {...props} />
   </StyledChatUploadedFiles>
