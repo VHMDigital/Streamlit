@@ -583,14 +583,14 @@ function ChatInput({
 
   return (
     <>
-      {files.length > 0 && (
+      {acceptFile === AcceptFileValue.None ? null : (
         <ChatUploadedFiles
           items={[...files]}
           onDelete={deleteFile}
-          style={{
-            paddingLeft: 0,
-            paddingRight: 0,
-          }}
+          // style={{
+          //   paddingLeft: 0,
+          //   paddingRight: 0,
+          // }}
         />
       )}
       <StyledChatInputContainer

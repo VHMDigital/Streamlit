@@ -149,6 +149,7 @@ export const StyledVerticalDivider = styled.div<StyledVerticalDividerProps>(
 export const StyledChatUploadedFiles = styled.div(({ theme }) => ({
   left: 0,
   right: 0,
+  minHeight: theme.sizes.minElementHeight,
   lineHeight: theme.lineHeights.tight,
   paddingLeft: theme.spacing.sm,
   paddingRight: theme.spacing.sm,
@@ -199,5 +200,6 @@ export const StyledChatUploadedFileDeleteButton = styled.small(
     display: "flex",
     alignItems: "center",
     maxHeight: theme.sizes.smallElementHeight,
+    color: theme.colors.fadedText60,
   })
 )
