@@ -60,6 +60,11 @@ if TYPE_CHECKING:
     from types import ModuleType
 
 
+# Used for static app testing
+class StaticPage(Page):
+    pass
+
+
 def pytest_configure(config: pytest.Config):
     config.addinivalue_line(
         "markers", "no_perf: mark test to not use performance profiling"
@@ -278,6 +283,21 @@ def app_server(
 def app(page: Page, app_port: int) -> Page:
     """Fixture that opens the app."""
     page.goto(f"http://localhost:{app_port}/")
+    start_capture_traces(page)
+    wait_for_app_loaded(page)
+    return page
+
+
+@pytest.fixture(scope="function")
+def static_app(page: Page, app_port: int, request) -> Page:
+    """Fixture that opens the app."""
+    query_param = request.node.get_closest_marker("query_param")
+    query_string = query_param.args[0] if query_param else ""
+
+    # Indicate this is a StaticPage
+    page.__class__ = StaticPage
+
+    page.goto(f"http://localhost:{app_port}/{query_string}")
     start_capture_traces(page)
     wait_for_app_loaded(page)
     return page
@@ -764,7 +784,6 @@ def playwright_profiling(request, page: Page):
 def wait_for_app_run(
     page_or_locator: Page | Locator | FrameLocator,
     wait_delay: int = 100,
-    static_override: bool = False,
 ):
     """Wait for the given page to finish running."""
     # Add a little timeout to wait for eventual debounce timeouts used in some widgets.
@@ -779,17 +798,19 @@ def wait_for_app_run(
 
     # if isinstance(page, Page):
     page.wait_for_timeout(155)
-    # Make sure that the websocket connection is established.
-    if static_override is False:
+
+    if isinstance(page_or_locator, StaticPage):
+        # Check that static connection established.
         page_or_locator.locator(
-            "[data-testid='stApp'][data-test-connection-state='CONNECTED']"
+            "[data-testid='stApp'][data-test-connection-state='STATIC_CONNECTED']"
         ).wait_for(
             timeout=25000,
             state="attached",
         )
     else:
+        # Make sure that the websocket connection is established.
         page_or_locator.locator(
-            "[data-testid='stApp'][data-test-connection-state='STATIC_CONNECTED']"
+            "[data-testid='stApp'][data-test-connection-state='CONNECTED']"
         ).wait_for(
             timeout=25000,
             state="attached",
@@ -811,7 +832,8 @@ def wait_for_app_run(
 
 
 def wait_for_app_loaded(
-    page: Page, embedded: bool = False, static_override: bool = False
+    page: Page,
+    embedded: bool = False,
 ):
     """Wait for the app to fully load."""
     # Wait for the app view container to appear:
@@ -825,7 +847,7 @@ def wait_for_app_loaded(
             "[data-testid='stMainMenu']", timeout=20000, state="attached"
         )
 
-    wait_for_app_run(page, static_override=static_override)
+    wait_for_app_run(page)
 
 
 def rerun_app(page: Page):

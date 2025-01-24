@@ -12,20 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 from playwright.sync_api import Page, expect
 
-from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_loaded
+from e2e_playwright.conftest import ImageCompareFunction
 
 
-def test_static_app(page: Page, app_port: int, assert_snapshot: ImageCompareFunction):
+@pytest.mark.query_param("?staticAppId=Hyperparameter_Tuning_with_sklearn")
+def test_static_app(
+    static_app: Page, app_port: int, assert_snapshot: ImageCompareFunction
+):
     """Test that a static app can be loaded"""
-    page.goto(
-        f"http://localhost:{app_port}/?staticNotebookId=Hyperparameter_Tuning_with_sklearn"
-    )
-    wait_for_app_loaded(page, static_override=True)
+    main_app_body = static_app.locator(".stMainBlockContainer .stVerticalBlock").first
+    app_cells = main_app_body.locator("> div")
 
-    app_cells = page.get_by_test_id("stExpander")
-    expect(app_cells).to_have_count(24)
+    # App always has an empty cell at the beginning (24 displayed cells + 1 empty cell)
+    expect(app_cells).to_have_count(25)
 
-    first_cell = app_cells.nth(0)
+    first_cell = app_cells.nth(1)
     assert_snapshot(first_cell, name="example_static_app")
