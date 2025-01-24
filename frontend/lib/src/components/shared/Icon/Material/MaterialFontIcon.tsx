@@ -60,7 +60,7 @@ const MaterialFontIcon = ({
       // https://github.com/streamlit/streamlit/issues/10168
       translate="no"
     >
-      {snakeCase(iconName)}
+      {iconName}
     </StyledMaterialIcon>
   )
 }
