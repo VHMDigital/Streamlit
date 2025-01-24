@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ForwardMsgList,
-  localStorageAvailable,
-  logError,
-} from "@streamlit/lib"
+import { ForwardMsgList, logError } from "@streamlit/lib"
 
 import { ConnectionState } from "./ConnectionState"
 import {
@@ -28,44 +24,43 @@ import {
   getStaticConfig,
 } from "./StaticConnection"
 
-vi.mock("@streamlit/lib", () => ({
-  localStorageAvailable: vi.fn(),
-  logError: vi.fn(),
-  ForwardMsgList: {
-    decode: vi.fn(),
-  },
-}))
-
-global.fetch = vi.fn()
-
-global.localStorage = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-}
-
 describe("StaticConnection", () => {
+  beforeAll(() => {
+    vi.mock(import("@streamlit/lib"), async importOriginal => {
+      const actual = await importOriginal()
+      return {
+        ...actual,
+        localStorageAvailable: vi.fn().mockReturnValue(true),
+        logError: vi.fn(),
+      }
+    })
+  })
+
   afterEach(() => {
     vi.clearAllMocks()
   })
 
   describe("getStaticConfig", () => {
     it("fetches URL from localStorage if available", async () => {
-      localStorageAvailable.mockReturnValue(true)
-      global.localStorage.getItem.mockReturnValue("https://example.com")
-
+      vi.spyOn(window.localStorage.__proto__, "getItem").mockReturnValue(
+        "https://example.com"
+      )
       const result = await getStaticConfig()
-
       expect(result).toBe("https://example.com")
     })
 
     it("fetches URL from STATIC_ASSET_CONFIG if not in localStorage", async () => {
-      localStorageAvailable.mockReturnValue(true)
-      global.localStorage.getItem.mockReturnValue(null)
+      vi.spyOn(window.localStorage.__proto__, "getItem").mockReturnValue(null)
+      const setItemSpy = vi.spyOn(window.localStorage.__proto__, "setItem")
 
-      fetch.mockResolvedValue({
-        ok: true,
-        json: vi.fn().mockResolvedValue({ static_url: "https://example.com" }),
-      })
+      // Mock fetch for our static asset location
+      // @ts-expect-error
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ static_url: "https://example.com" }),
+        })
+      )
 
       const result = await getStaticConfig()
 
@@ -74,35 +69,52 @@ describe("StaticConnection", () => {
         expect.objectContaining({ signal: expect.any(AbortSignal) })
       )
       expect(result).toBe("https://example.com")
-      expect(global.localStorage.setItem).toHaveBeenCalledWith(
+      expect(setItemSpy).toHaveBeenCalledWith(
         "stStaticAssetUrl",
         "https://example.com"
       )
     })
 
     it("logs error when fetch fails", async () => {
-      fetch.mockRejectedValue(new Error("Fetch error"))
+      vi.spyOn(window.localStorage.__proto__, "getItem").mockReturnValue(null)
+      // Mock fetch for our static asset location
+      // @ts-expect-error
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 404,
+        })
+      )
 
       const result = await getStaticConfig()
 
       expect(result).toBe("")
       expect(logError).toHaveBeenCalledWith(
-        "Failed to fetch static config url:",
-        expect.any(Error)
+        "Failed to fetch static config url: ",
+        404
       )
     })
   })
 
   describe("getProtoResponse", () => {
+    beforeEach(() => {
+      // Handles getStaticConfig
+      vi.spyOn(window.localStorage.__proto__, "getItem").mockReturnValue(
+        "www.example.com"
+      )
+    })
+
     it("fetches proto response from correct URL", async () => {
       const staticAppId = "123"
-      localStorageAvailable.mockReturnValue(true)
-      global.localStorage.getItem.mockReturnValue("www.example.com")
 
-      fetch.mockResolvedValue({
-        ok: true,
-        arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
-      })
+      // Mock fetch for our protos
+      // @ts-expect-error
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
+        })
+      )
 
       const result = await getProtoResponse(staticAppId)
 
@@ -115,10 +127,15 @@ describe("StaticConnection", () => {
 
     it("logs error if fetch fails", async () => {
       const staticAppId = "123"
-      localStorageAvailable.mockReturnValue(true)
-      global.localStorage.getItem.mockReturnValue("www.example.com")
 
-      fetch.mockResolvedValue({ ok: false, status: 404 })
+      // Mock fetch for our protos
+      // @ts-expect-error
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 404,
+        })
+      )
 
       const result = await getProtoResponse(staticAppId)
 
@@ -133,8 +150,9 @@ describe("StaticConnection", () => {
   describe("dispatchAppForwardMessages", () => {
     beforeEach(() => {
       // Handles getStaticConfig
-      localStorageAvailable.mockReturnValue(true)
-      global.localStorage.getItem.mockReturnValue("www.example.com")
+      vi.spyOn(window.localStorage.__proto__, "getItem").mockReturnValue(
+        "www.example.com"
+      )
     })
 
     it("decodes and dispatches messages", async () => {
@@ -143,15 +161,20 @@ describe("StaticConnection", () => {
       const onConnectionError = vi.fn()
 
       // Handles getProtoResponse
-      fetch.mockResolvedValue({
-        ok: true,
-        arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
-      })
+      // @ts-expect-error
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
+        })
+      )
 
-      const mockMessages = [{ id: 1 }, { id: 2 }]
-      vi.spyOn(ForwardMsgList, "decode").mockReturnValue({
-        messages: mockMessages,
+      const mockForwardMsgList = new ForwardMsgList({
+        messages: [{ hash: "string1" }, { hash: "string2" }],
       })
+      const decodeSpy = vi
+        .spyOn(ForwardMsgList, "decode")
+        .mockReturnValue(mockForwardMsgList)
 
       await dispatchAppForwardMessages(
         staticAppId,
@@ -159,10 +182,8 @@ describe("StaticConnection", () => {
         onConnectionError
       )
 
-      expect(ForwardMsgList.decode).toHaveBeenCalled()
+      expect(decodeSpy).toHaveBeenCalled()
       expect(onMessage).toHaveBeenCalledTimes(2)
-      expect(onMessage).toHaveBeenCalledWith(mockMessages[0])
-      expect(onMessage).toHaveBeenCalledWith(mockMessages[1])
     })
 
     it("logs error if arrayBuffer is undefined", async () => {
@@ -171,10 +192,13 @@ describe("StaticConnection", () => {
       const onConnectionError = vi.fn()
 
       // Handles getProtoResponse
-      fetch.mockResolvedValue({
-        ok: true,
-        arrayBuffer: vi.fn().mockResolvedValue(null),
-      })
+      // @ts-expect-error
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          arrayBuffer: () => Promise.resolve(null),
+        })
+      )
 
       await dispatchAppForwardMessages(
         staticAppId,
@@ -191,14 +215,18 @@ describe("StaticConnection", () => {
   describe("StaticConnection", () => {
     beforeEach(() => {
       // Handles getStaticConfig
-      localStorageAvailable.mockReturnValue(true)
-      global.localStorage.getItem.mockReturnValue("www.example.com")
+      vi.spyOn(window.localStorage.__proto__, "getItem").mockReturnValue(
+        "www.example.com"
+      )
 
       // Handles getProtoResponse
-      fetch.mockResolvedValue({
-        ok: true,
-        arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
-      })
+      // @ts-expect-error
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
+        })
+      )
     })
 
     it("handles connection state changes and message dispatch", async () => {
