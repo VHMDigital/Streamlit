@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import pandas as pd
 
 import streamlit as st
@@ -21,17 +22,40 @@ st.set_page_config(initial_sidebar_state="expanded", layout="wide")
 
 st.header("Custom Theme :primary[App]")
 
+
+def page1():
+    pass
+
+
+def page2():
+    pass
+
+
+st.navigation(
+    [
+        st.Page(page1, title="Page 1", icon=":material/home:"),
+        st.Page(page2, title="Page 2", icon=":material/settings:"),
+    ]
+)
+
+
 col1, col2, col3 = st.columns(3)
 
 with col1:
     st.button("Button")
     st.button("Primary Button", type="primary")
+    st.code("# st.code\na = 1234")
 with col2:
-    st.text_input("Text Input")
+    st.text_input("Text Input", placeholder="Placeholder")
     st.checkbox("Checkbox", value=True)
+    st.slider("Slider", min_value=0, max_value=100, value=50)
 with col3:
     st.dataframe(pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]}))
 
 with st.sidebar:
-    st.write("Hello World")
-    st.text_input("Text Input in Sidebar")
+    st.markdown(
+        ":rainbow-background[:rainbow[Hello World]] :material/waving_hand:",
+        help="Tooltip",
+    )
+    st.success("Wohooo!")
+    st.text_input("Text Input in Sidebar", placeholder="Placeholder")
