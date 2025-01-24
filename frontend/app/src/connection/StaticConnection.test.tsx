@@ -23,9 +23,9 @@ import {
 import { ConnectionState } from "./ConnectionState"
 import {
   dispatchAppForwardMessages,
+  establishStaticConnection,
   getProtoResponse,
   getStaticConfig,
-  establishStaticConnection,
 } from "./StaticConnection"
 
 vi.mock("@streamlit/lib", () => ({

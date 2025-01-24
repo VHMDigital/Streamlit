@@ -159,6 +159,7 @@ export class ConnectionManager {
         staticAppId,
         onConnectionStateChange: this.setConnectionState,
         onMessage: this.props.onMessage,
+        onConnectionError: this.props.onConnectionError,
       })
     } else {
       // Establish a websocket connection

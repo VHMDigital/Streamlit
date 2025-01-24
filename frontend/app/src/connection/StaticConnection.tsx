@@ -45,6 +45,11 @@ interface Props {
    * Function called when we receive a new ForwardMsg
    */
   onMessage: OnMessage
+
+  /**
+   * Function to be called when the connection errors out.
+   */
+  onConnectionError: (message: string) => void
 }
 
 // Fetches the static asset url from the config file
@@ -118,12 +123,16 @@ export async function getProtoResponse(
 // by App.tsx's handleMessage, replicating the app
 export async function dispatchAppForwardMessages(
   staticAppId: string,
-  onMessage: OnMessage
+  onMessage: OnMessage,
+  onConnectionError: (message: string) => void
 ): Promise<void> {
   const arrayBuffer = await getProtoResponse(staticAppId)
 
   if (!arrayBuffer) {
     logError("Failed to retrieve static app protos")
+    onConnectionError(
+      `Failed to retrieve static app protos. Please confirm the id is correct and try again. Given static app id: ${staticAppId}`
+    )
     return
   }
 
@@ -142,12 +151,13 @@ export function establishStaticConnection({
   staticAppId,
   onConnectionStateChange,
   onMessage,
+  onConnectionError,
 }: Props): void {
   // Static notebooks are not connected to a server - put into connecting
   // state until assets fetched/loaded from S3
   onConnectionStateChange(ConnectionState.STATIC_CONNECTING)
 
-  dispatchAppForwardMessages(staticAppId, onMessage)
+  dispatchAppForwardMessages(staticAppId, onMessage, onConnectionError)
 
   // Once protos are fetched & dispatched, we are connected
   onConnectionStateChange(ConnectionState.STATIC_CONNECTED)
