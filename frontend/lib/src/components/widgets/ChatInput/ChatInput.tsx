@@ -63,6 +63,8 @@ import {
   UploadFileInfo,
 } from "@streamlit/lib/src/components/widgets/FileUploader/UploadFileInfo"
 import { FileUploadClient } from "@streamlit/lib/src/FileUploadClient"
+import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
+import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
 
 import {
   StyledChatInput,
@@ -74,8 +76,6 @@ import {
   StyledVerticalDivider,
 } from "./styled-components"
 import ChatUploadedFiles from "./UploadedFile/ChatUploadedFiles"
-import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
-import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
 
 export interface Props {
   disabled: boolean
