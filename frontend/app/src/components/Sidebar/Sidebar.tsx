@@ -138,6 +138,24 @@ const Sidebar: React.FC<SidebarProps> = ({
     setShowSidebarCollapse(false)
   }, [])
 
+  const initializeSidebarWidth = useCallback((width: number): void => {
+    const newWidth = width.toString()
+
+    setSidebarWidth(newWidth)
+
+    if (localStorageAvailable()) {
+      window.localStorage.setItem("sidebarWidth", newWidth)
+    }
+  }, [])
+
+  const onResizeStop = useCallback(
+    (_e: any, _direction: any, _ref: any, d: any) => {
+      const newWidth = parseInt(sidebarWidth, 10) + d.width
+      initializeSidebarWidth(newWidth)
+    },
+    [initializeSidebarWidth, sidebarWidth]
+  )
+
   useEffect(() => {
     const checkMobileOnResize = (): boolean => {
       if (!window) return false
@@ -182,16 +200,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       shouldCollapse(initialSidebarState, mediumBreakpointPx)
     )
   }, [initialSidebarState, mediumBreakpointPx])
-
-  function initializeSidebarWidth(width: number): void {
-    const newWidth = width.toString()
-
-    setSidebarWidth(newWidth)
-
-    if (localStorageAvailable()) {
-      window.localStorage.setItem("sidebarWidth", newWidth)
-    }
-  }
 
   function resetSidebarWidth(event: any): void {
     // Double clicking on the resize handle resets sidebar to default width
@@ -290,10 +298,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           height: "auto",
         }}
         as={StyledSidebar}
-        onResizeStop={(e, direction, ref, d) => {
-          const newWidth = parseInt(sidebarWidth, 10) + d.width
-          initializeSidebarWidth(newWidth)
-        }}
+        onResizeStop={onResizeStop}
         // Props part of StyledSidebar, but not Resizable component
         // @ts-expect-error
         isCollapsed={collapsedSidebar}
