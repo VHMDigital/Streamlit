@@ -15,6 +15,7 @@
  */
 
 import { PageConfig } from "@streamlit/lib"
+
 import { shouldCollapse } from "./utils"
 
 describe("shouldCollapse", () => {
