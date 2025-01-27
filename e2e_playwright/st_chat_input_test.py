@@ -14,7 +14,12 @@
 
 from playwright.sync_api import Page, expect
 
-from e2e_playwright.conftest import ImageCompareFunction, rerun_app, wait_for_app_loaded
+from e2e_playwright.conftest import (
+    ImageCompareFunction,
+    rerun_app,
+    wait_for_app_loaded,
+    wait_for_app_run,
+)
 from e2e_playwright.shared.app_utils import check_top_level_class, get_element_by_key
 
 
@@ -207,6 +212,55 @@ def test_calls_callback_on_submit(app: Page):
     expect(markdown_output).to_have_text(
         "Chat input 3 (callback) - value: None",
         use_inner_text=True,
+    )
+
+
+def test_uploads_and_delete_single_file(
+    app: Page, assert_snapshot: ImageCompareFunction
+):
+    """Test that it correctly uploads and deletes a single file."""
+    file_name1 = "file1.txt"
+    file_content1 = b"file1content"
+    file_name2 = "file2.txt"
+    file_content2 = b"file2content"
+
+    chat_input = app.get_by_test_id("stChatInput").nth(3)
+    with app.expect_file_chooser() as fc_info:
+        chat_input.get_by_test_id("stChatInputFileUploadButton").click()
+
+    file_chooser = fc_info.value
+    file_chooser.set_files(
+        files=[{"name": file_name1, "mimeType": "text/plain", "buffer": file_content1}]
+    )
+    wait_for_app_run(app)
+
+    uploaded_files = app.get_by_test_id("stChatUploadedFiles").nth(0)
+    expect(uploaded_files).to_have_text(file_name1, use_inner_text=True)
+
+    assert_snapshot(uploaded_files, name="st_chat_input-single_file_uploaded")
+
+    # Upload a second file. This one will replace the first.
+    with app.expect_file_chooser() as fc_info:
+        chat_input.get_by_test_id("stChatInputFileUploadButton").click()
+
+    file_chooser = fc_info.value
+    file_chooser.set_files(
+        files=[{"name": file_name2, "mimeType": "text/plain", "buffer": file_content2}]
+    )
+
+    wait_for_app_run(app)
+
+    uploaded_files = app.get_by_test_id("stChatUploadedFiles").nth(0)
+    expect(uploaded_files).not_to_have_text(file_name1, use_inner_text=True)
+    expect(uploaded_files).to_have_text(file_name2, use_inner_text=True)
+
+    # Delete the uploaded file
+    chat_input.get_by_test_id("stChatInputDeleteBtn").nth(0).click()
+
+    wait_for_app_run(app)
+
+    expect(app.get_by_test_id("stChatUploadedFiles").nth(0)).not_to_have_text(
+        file_name2, use_inner_text=True
     )
 
 
