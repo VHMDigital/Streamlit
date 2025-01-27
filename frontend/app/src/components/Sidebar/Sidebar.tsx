@@ -109,6 +109,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   navSections,
 }) => {
   const mediumBreakpointPx = calculateMaxBreakpoint(theme.breakpoints.md)
+  const sideBarInitiallyCollapsed = shouldCollapse(
+    initialSidebarState,
+    mediumBreakpointPx
+  )
 
   const sidebarRef = useRef<HTMLDivElement>(null)
 
@@ -117,7 +121,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     : undefined
 
   const [collapsedSidebar, setCollapsedSidebar] = useState<boolean>(
-    shouldCollapse(initialSidebarState, mediumBreakpointPx)
+    sideBarInitiallyCollapsed
   )
   const [sidebarWidth, setSidebarWidth] = useState<string>(
     cachedSidebarWidth || MIN_WIDTH
@@ -195,12 +199,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [lastInnerWidth, mediumBreakpointPx])
-
-  useEffect(() => {
-    setCollapsedSidebar(
-      shouldCollapse(initialSidebarState, mediumBreakpointPx)
-    )
-  }, [initialSidebarState, mediumBreakpointPx])
 
   function resetSidebarWidth(event: MouseEvent): void {
     // Double clicking on the resize handle resets sidebar to default width
