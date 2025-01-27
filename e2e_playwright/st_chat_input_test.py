@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from playwright.sync_api import Page, expect
+from playwright.sync_api import FilePayload, Page, expect
 
 from e2e_playwright.conftest import (
     ImageCompareFunction,
@@ -215,24 +215,22 @@ def test_calls_callback_on_submit(app: Page):
     )
 
 
-def test_uploads_and_delete_single_file(
+def test_uploads_and_deletes_single_file(
     app: Page, assert_snapshot: ImageCompareFunction
 ):
     """Test that it correctly uploads and deletes a single file."""
     file_name1 = "file1.txt"
-    file_content1 = b"file1content"
+    file1 = FilePayload(name=file_name1, mimeType="text/plain", buffer=b"file1content")
 
     file_name2 = "file2.txt"
-    file_content2 = b"file2content"
+    file2 = FilePayload(name=file_name2, mimeType="text/plain", buffer=b"file2content")
 
     chat_input = app.get_by_test_id("stChatInput").nth(3)
     with app.expect_file_chooser() as fc_info:
         chat_input.get_by_test_id("stChatInputFileUploadButton").click()
 
     file_chooser = fc_info.value
-    file_chooser.set_files(
-        files=[{"name": file_name1, "mimeType": "text/plain", "buffer": file_content1}]
-    )
+    file_chooser.set_files(files=[file1])
     wait_for_app_run(app)
 
     uploaded_files = app.get_by_test_id("stChatUploadedFiles").nth(0)
@@ -245,9 +243,7 @@ def test_uploads_and_delete_single_file(
         chat_input.get_by_test_id("stChatInputFileUploadButton").click()
 
     file_chooser = fc_info.value
-    file_chooser.set_files(
-        files=[{"name": file_name2, "mimeType": "text/plain", "buffer": file_content2}]
-    )
+    file_chooser.set_files(files=[file2])
 
     wait_for_app_run(app)
 
@@ -276,8 +272,8 @@ def test_uploads_and_deletes_multiple_files(
     file_content2 = b"file2content"
 
     files = [
-        {"name": file_name1, "mimeType": "text/plain", "buffer": file_content1},
-        {"name": file_name2, "mimeType": "text/plain", "buffer": file_content2},
+        FilePayload(name=file_name1, mimeType="text/plain", buffer=file_content1),
+        FilePayload(name=file_name2, mimeType="text/plain", buffer=file_content2),
     ]
 
     chat_input = app.get_by_test_id("stChatInput").nth(4)
