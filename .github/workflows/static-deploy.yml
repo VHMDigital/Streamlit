@@ -1,4 +1,4 @@
-name: Static Streamlilt Deploy
+name: Static FE Streamlit Deploy
 
 on:
   workflow_dispatch:
