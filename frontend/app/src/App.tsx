@@ -133,8 +133,10 @@ import "@streamlit/app/src/assets/css/theme.scss"
 import { ThemeManager } from "./util/useThemeManager"
 import { AppNavigation, MaybeStateUpdate } from "./util/AppNavigation"
 
-// vite config builds global variable STREAMLIT_APP_VERSION from frontend/app/package.json's version
-declare const STREAMLIT_APP_VERSION: string
+// vite config builds global variable PACKAGE_METADATA
+declare const PACKAGE_METADATA: {
+  version: string
+}
 
 export interface Props {
   screenCast: ScreenCastHOC
@@ -581,9 +583,9 @@ export class App extends PureComponent<Props, State> {
     if (
       window.__streamlit
         ?.ENABLE_RELOAD_BASED_ON_HARDCODED_STREAMLIT_VERSION === true &&
-      STREAMLIT_APP_VERSION
+      PACKAGE_METADATA?.version
     ) {
-      currentStreamlitVersion = STREAMLIT_APP_VERSION
+      currentStreamlitVersion = PACKAGE_METADATA.version
     } else if (this.sessionInfo.isSet) {
       currentStreamlitVersion = this.sessionInfo.current.streamlitVersion
     }
