@@ -119,6 +119,10 @@ test_file_fragment()
 
 st.file_uploader(":material/check: :rainbow[Fancy] _**markdown** `label` _support_")
 
+col1, col2 = st.columns(2)
+with col1:
+    st.file_uploader("Uses compact file uploader")
+
 if "runs" not in st.session_state:
     st.session_state.runs = 0
 st.session_state.runs += 1
