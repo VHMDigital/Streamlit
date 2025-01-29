@@ -27,7 +27,6 @@ import axios from "axios"
 import { useTheme } from "@emotion/react"
 import { Send } from "@emotion-icons/material-rounded"
 import { Textarea as UITextArea } from "baseui/textarea"
-import { AttachFile } from "@emotion-icons/material-outlined"
 import {
   ErrorCode as FileErrorCode,
   FileRejection,
@@ -44,7 +43,6 @@ import {
   UploadedFileInfo as UploadedFileInfoProto,
 } from "@streamlit/protobuf"
 
-import { EmotionTheme } from "~lib/theme"
 import {
   AcceptFileValue,
   chatInputAcceptFileProtoValueToEnum,
@@ -54,7 +52,6 @@ import { WidgetInfo, WidgetStateManager } from "~lib/WidgetStateManager"
 import Icon from "~lib/components/shared/Icon"
 import InputInstructions from "~lib/components/shared/InputInstructions/InputInstructions"
 import { isEnterKeyPressed } from "~lib/util/inputUtils"
-import BaseButton, { BaseButtonKind } from "~lib/components/shared/BaseButton"
 import {
   UploadedStatus,
   UploadFileInfo,
@@ -64,13 +61,12 @@ import { FileUploadClient } from "~lib/FileUploadClient"
 import {
   StyledChatInput,
   StyledChatInputContainer,
-  StyledFileUploadDropzone,
   StyledInputInstructionsContainer,
   StyledSendIconButton,
   StyledSendIconButtonContainer,
-  StyledVerticalDivider,
 } from "./styled-components"
 import ChatUploadedFiles from "./UploadedFile/ChatUploadedFiles"
+import FileUploadArea from "./FileUploadArea/FileUploadArea"
 
 export interface Props {
   disabled: boolean
@@ -236,42 +232,6 @@ const MAX_VISIBLE_NUM_LINES = 6.5
 // Rounding errors can arbitrarily create scrollbars. We add a rounding offset
 // to manage it better.
 const ROUNDING_OFFSET = 1
-
-interface FileUploadAreaProps {
-  getRootProps: any
-  getInputProps: any
-  showDropzone: boolean
-  disabled: boolean
-  theme: EmotionTheme
-}
-
-const FileUploadArea = ({
-  getRootProps,
-  getInputProps,
-  showDropzone,
-  disabled,
-  theme,
-}: FileUploadAreaProps): React.ReactElement =>
-  showDropzone ? (
-    <StyledFileUploadDropzone {...getRootProps()}>
-      <input {...getInputProps()} />
-      Drag and drop files here
-    </StyledFileUploadDropzone>
-  ) : (
-    <>
-      <div data-testid="stChatInputFileUploadButton" {...getRootProps()}>
-        <input {...getInputProps()} />
-        <BaseButton kind={BaseButtonKind.MINIMAL} disabled={disabled}>
-          <Icon
-            content={AttachFile}
-            size="lg"
-            color={theme.colors.fadedText60}
-          />
-        </BaseButton>
-      </div>
-      <StyledVerticalDivider />
-    </>
-  )
 
 function ChatInput({
   width,
