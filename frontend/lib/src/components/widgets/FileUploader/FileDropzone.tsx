@@ -43,6 +43,8 @@ const FileDropzone = ({
   disabled,
   label,
 }: Props): React.ReactElement => {
+  // Before we support official MIME types, using the custom "application/streamlit" as a wild card
+  // to allow file types defined in acceptedExtensions.
   const accept: Accept | undefined = acceptedExtensions.length
     ? { "application/streamlit": acceptedExtensions }
     : undefined
