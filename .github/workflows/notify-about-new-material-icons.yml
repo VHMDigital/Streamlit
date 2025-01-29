@@ -6,7 +6,7 @@ on:
     - cron: "30 6 * * *"
 
 jobs:
-  create-update-material-icons-pr:
+  notify-about-new-material-icons:
     runs-on: ubuntu-latest
 
     if: github.repository == 'streamlit/streamlit'
@@ -32,7 +32,12 @@ jobs:
 
       - name: Run make develop
         run: make develop
-      - name: Install playwright
-        run: python -m playwright install --with-deps
-      - name: Run make frontend-build-with-profiler
-        run: make frontend-build-with-profiler
+
+      - name: Check new Material Icons
+        run: python scripts/check_new_material_icons.py
+
+      - name: New Material Icons Release Slack Message
+        if: ${{ failure() }}
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: python scripts/slack_notifications.py material new_icons

@@ -65,6 +65,11 @@ def send_notification():
                 "text": f":blobonfire: Release failed - <https://github.com/streamlit/streamlit/actions/runs/{run_id}|Link to run>"
             }
 
+    if workflow == "material" and message_key == "new_icons":
+        payload = {
+            "text": f":symbols: New Material Symbols available. Please run `make update-material-icons` to update the material icons."
+        }
+
     if payload:
         response = requests.post(webhook, json=payload)
 
