@@ -44,11 +44,8 @@ const FileDropzone = ({
   label,
 }: Props): React.ReactElement => {
   const accept: Accept | undefined = acceptedExtensions.length
-    ? { "text/plain": [".txt"] }
+    ? { "application/streamlit": acceptedExtensions }
     : undefined
-
-  console.log(acceptedExtensions)
-  console.log(accept)
 
   return (
     <Dropzone
