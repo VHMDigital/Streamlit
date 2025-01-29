@@ -21,6 +21,7 @@ from e2e_playwright.conftest import ImageCompareFunction
 @pytest.mark.query_param("?staticAppId=Ingest_Public_JSON")
 def test_static_app(static_app: Page, assert_snapshot: ImageCompareFunction):
     """Test that a static app can be loaded"""
+    static_app.set_viewport_size({"width": 1280, "height": 720})
     main_app_body = static_app.locator(".stMainBlockContainer .stVerticalBlock").first
     app_cells = main_app_body.locator("> div")
 
