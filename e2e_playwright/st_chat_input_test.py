@@ -215,6 +215,9 @@ def test_calls_callback_on_submit(app: Page):
     )
 
 
+# File Upload
+
+
 def test_uploads_and_deletes_single_file(
     app: Page, assert_snapshot: ImageCompareFunction
 ):
@@ -227,7 +230,7 @@ def test_uploads_and_deletes_single_file(
 
     chat_input = app.get_by_test_id("stChatInput").nth(3)
     with app.expect_file_chooser() as fc_info:
-        chat_input.get_by_test_id("stChatInputFileUploadButton").click()
+        chat_input.get_by_role("button").nth(0).click()
 
     file_chooser = fc_info.value
     file_chooser.set_files(files=[file1])
@@ -279,7 +282,7 @@ def test_uploads_and_deletes_multiple_files(
 
     chat_input = app.get_by_test_id("stChatInput").nth(4)
     with app.expect_file_chooser() as fc_info:
-        chat_input.get_by_test_id("stChatInputFileUploadButton").click()
+        chat_input.get_by_role("button").nth(0).click()
 
     file_chooser = fc_info.value
     file_chooser.set_files(files=files)
