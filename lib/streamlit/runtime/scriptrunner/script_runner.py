@@ -534,25 +534,36 @@ class ScriptRunner:
             # assume is the main script directory.
             module.__dict__["__file__"] = script_path
 
-            def code_to_exec(code=code, module=module, ctx=ctx, rerun_data=rerun_data):
+            def code_to_exec(
+                code=code, module=module, ctx=ctx, rerun_data=rerun_data
+            ) -> None:
                 with modified_sys_path(
                     self._main_script_path
                 ), self._set_execing_flag():
                     # Run callbacks for widgets whose values have changed.
+                    callbacks: dict[str, list[Callable[[], None]]] | None = {}
                     if rerun_data.widget_states is not None:
-                        self._session_state.on_script_will_rerun(
+                        callbacks = self._session_state.on_script_will_rerun(
                             rerun_data.widget_states
                         )
-
+                        if "main" in callbacks:
+                            for callback in callbacks["main"]:
+                                callback()
                     ctx.on_script_start()
-
                     if rerun_data.fragment_id_queue:
                         for fragment_id in rerun_data.fragment_id_queue:
                             try:
                                 wrapped_fragment = self._fragment_storage.get(
                                     fragment_id
                                 )
-                                wrapped_fragment()
+
+                                def call_callbacks(fragment_id=fragment_id):
+                                    if not callbacks or fragment_id not in callbacks:
+                                        return
+                                    for callback in callbacks[fragment_id]:
+                                        callback()
+
+                                wrapped_fragment(call_callbacks)
 
                             except FragmentStorageKeyError:
                                 # This can happen if the fragment_id is removed from the

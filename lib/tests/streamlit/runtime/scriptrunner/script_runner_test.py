@@ -20,7 +20,7 @@ import os
 import sys
 import time
 from typing import TYPE_CHECKING, Any
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import ANY, MagicMock, call, patch
 
 import pytest
 from parameterized import parameterized
@@ -334,7 +334,7 @@ class ScriptRunnerTest(AsyncTestCase):
             "my_fragment3",
         ]
 
-        fragment.assert_has_calls([call(), call(), call()])
+        fragment.assert_has_calls([call(ANY), call(ANY), call(ANY)])
         Runtime._instance.media_file_mgr.clear_session_refs.assert_not_called()
 
     def test_run_multiple_fragments_even_if_one_raised_an_exception(self):
@@ -344,7 +344,7 @@ class ScriptRunnerTest(AsyncTestCase):
 
         raised_exception = {"called": False}
 
-        def raise_exception():
+        def raise_exception(_):
             raised_exception["called"] = True
             raise RuntimeError("this fragment errored out")
 
@@ -373,13 +373,14 @@ class ScriptRunnerTest(AsyncTestCase):
         )
 
         self.assertTrue(raised_exception["called"])
-        fragment.assert_has_calls([call(), call()])
+        fragment.assert_has_calls([call(ANY), call(ANY)])
         Runtime._instance.media_file_mgr.clear_session_refs.assert_not_called()
 
     @patch("streamlit.runtime.scriptrunner.script_runner.get_script_run_ctx")
     @patch("streamlit.runtime.fragment.handle_uncaught_app_exception")
+    @patch("streamlit.runtime.fragment.hashlib.md5")
     def test_regular_KeyError_is_rethrown(
-        self, patched_handle_exception, patched_get_script_run_ctx
+        self, patched_hashlib_md5, patched_handle_exception, patched_get_script_run_ctx
     ):
         """Test that regular key-errors within a fragment are surfaced
         as such and not caught by the FragmentStorageKeyError.
@@ -387,14 +388,13 @@ class ScriptRunnerTest(AsyncTestCase):
 
         ctx = MagicMock()
         patched_get_script_run_ctx.return_value = ctx
-        ctx.current_fragment_id = "my_fragment_id"
 
-        def non_optional_func():
+        patched_hashlib_md5.return_value.hexdigest.return_value = "my_fragment"
+
+        def non_optional_func(callback):
             raise KeyError("kaboom")
 
-        def fragment():
-            _fragment(non_optional_func)()
-
+        fragment = _fragment(non_optional_func)
         scriptrunner = TestScriptRunner("good_script.py")
         scriptrunner._fragment_storage.set("my_fragment", fragment)
 
@@ -844,7 +844,7 @@ class ScriptRunnerTest(AsyncTestCase):
         )
         scriptrunner._fragment_storage.set(
             "my_fragment1",
-            lambda: context_dg_stack.set(dg_stack_set_by_fragment),
+            lambda _: context_dg_stack.set(dg_stack_set_by_fragment),
         )
 
         # trigger a run with fragment_id to avoid clearing the fragment_storage in the script runner

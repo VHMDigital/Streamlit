@@ -21,6 +21,7 @@ from dataclasses import dataclass, field, replace
 from typing import (
     TYPE_CHECKING,
     Any,
+    Callable,
     Final,
     Iterator,
     KeysView,
@@ -256,7 +257,7 @@ class WStates(MutableMapping[str, Any]):
         states = cast(List[WidgetStateProto], states)
         return states
 
-    def call_callback(self, widget_id: str) -> None:
+    def call_callback(self, widget_id: str) -> Callable[[], None] | None:
         """Call the given widget's callback and return the callback's
         return value. If the widget has no callback, return None.
 
@@ -266,11 +267,20 @@ class WStates(MutableMapping[str, Any]):
         assert metadata is not None
         callback = metadata.callback
         if callback is None:
-            return
+            return None
 
         args = metadata.callback_args or ()
         kwargs = metadata.callback_kwargs or {}
-        callback(*args, **kwargs)
+
+        def cb():
+            from streamlit.runtime.scriptrunner import RerunException
+
+            try:
+                callback(*args, **kwargs)  # type: ignore
+            except RerunException:
+                st.warning("Calling st.rerun() within a callback is a no-op.")
+
+        return cb
 
 
 def _missing_key_error_message(key: str) -> str:
@@ -546,7 +556,9 @@ class SessionState:
         for state in widget_states.widgets:
             self._new_widget_state.set_widget_from_proto(state)
 
-    def on_script_will_rerun(self, latest_widget_states: WidgetStatesProto) -> None:
+    def on_script_will_rerun(
+        self, latest_widget_states: WidgetStatesProto
+    ) -> dict[str, list[Callable[[], None]]]:
         """Called by ScriptRunner before its script re-runs.
 
         Update widget data and call callbacks on widgets whose value changed
@@ -556,22 +568,26 @@ class SessionState:
         self._reset_triggers()
         self._compact_state()
         self.set_widgets_from_proto(latest_widget_states)
-        self._call_callbacks()
+        return self._call_callbacks()
 
-    def _call_callbacks(self) -> None:
+    def _call_callbacks(self) -> dict[str, list[Callable[[], None]]]:
         """Call any callback associated with each widget whose value
         changed between the previous and current script runs.
         """
-        from streamlit.runtime.scriptrunner import RerunException
-
         changed_widget_ids = [
             wid for wid in self._new_widget_state if self._widget_changed(wid)
         ]
+        callbacks: dict[str, list[Callable[[], None]]] = {}
         for wid in changed_widget_ids:
-            try:
-                self._new_widget_state.call_callback(wid)
-            except RerunException:
-                st.warning("Calling st.rerun() within a callback is a no-op.")
+            id = "main"
+            metadata = self._new_widget_state.widget_metadata.get(wid)
+            if metadata is not None and metadata.fragment_id:
+                id = metadata.fragment_id
+            cb = self._new_widget_state.call_callback(wid)
+            if cb:
+                callbacks[id] = callbacks.get(id, [])
+                callbacks[id].append(cb)
+        return callbacks
 
     def _widget_changed(self, widget_id: str) -> bool:
         """True if the given widget's value changed between the previous

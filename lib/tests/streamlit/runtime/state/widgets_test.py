@@ -156,7 +156,9 @@ class WidgetManagerTests(unittest.TestCase):
         _create_widget("int", states).int_value = 321
         _create_widget("string", states).string_value = "!ydwoh"
 
-        session_state.on_script_will_rerun(states)
+        callbacks = session_state.on_script_will_rerun(states)
+        for cb in callbacks["main"]:
+            cb()
 
         mock_callback.assert_has_calls([call(), call(1), call(x=2), call(1, x=2)])
 

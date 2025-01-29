@@ -243,7 +243,7 @@ class WStateTests(unittest.TestCase):
             callback_kwargs={"y": 2},
         )
         self.wstates.widget_metadata["widget_id_1"] = metadata
-        self.wstates.call_callback("widget_id_1")
+        self.wstates.call_callback("widget_id_1")()
 
         metadata.callback.assert_called_once_with(1, y=2)
 

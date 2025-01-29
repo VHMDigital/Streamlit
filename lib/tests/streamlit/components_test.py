@@ -539,9 +539,11 @@ class InvokeComponentTest(DeltaGeneratorTestCase):
         new_widget_state.CopyFrom(current_widget_states[0])
         # update the widget's value so that the rerun will execute the callback
         new_widget_state.json_value = '{"key": "key", "default": "baz2"}'
-        self.script_run_ctx.session_state.on_script_will_rerun(
+        callbacks = self.script_run_ctx.session_state.on_script_will_rerun(
             WidgetStates(widgets=[new_widget_state])
         )
+        for callback in callbacks["main"]:
+            callback()
         self.assertEqual(callback_call_value[0], expected_element_value)
 
     def assertJSONEqual(self, a, b):
