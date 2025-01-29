@@ -302,7 +302,7 @@ def test_uploads_and_deletes_multiple_files(
     uploaded_file_names = uploaded_files.get_by_test_id("stChatInputFileName")
     expect(uploaded_file_names).to_have_count(1)
 
-    expect(uploaded_file_names).to_have_text(files[0]["name"], use_inner_text=True)
+    expect(uploaded_file_names).to_have_text(files[1]["name"], use_inner_text=True)
 
 
 def test_check_top_level_class(app: Page):
