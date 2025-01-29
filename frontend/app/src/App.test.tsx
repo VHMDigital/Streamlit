@@ -529,11 +529,12 @@ describe("App", () => {
     afterEach(() => {
       window.location = prevWindowLocation
 
-      // @ts-expect-error
-      window.streamlit = undefined
+      window.__streamlit = undefined
 
       // @ts-expect-error
-      PACKAGE_METADATA = undefined
+      PACKAGE_METADATA = {
+        version: "tbd",
+      }
     })
 
     it("triggers page reload", () => {

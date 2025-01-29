@@ -582,8 +582,7 @@ export class App extends PureComponent<Props, State> {
 
     if (
       window.__streamlit
-        ?.ENABLE_RELOAD_BASED_ON_HARDCODED_STREAMLIT_VERSION === true &&
-      PACKAGE_METADATA?.version
+        ?.ENABLE_RELOAD_BASED_ON_HARDCODED_STREAMLIT_VERSION === true
     ) {
       currentStreamlitVersion = PACKAGE_METADATA.version
     } else if (this.sessionInfo.isSet) {
