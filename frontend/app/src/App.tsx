@@ -64,7 +64,6 @@ import {
   measure,
   notNullOrUndefined,
   notUndefined,
-  PerformanceEvents,
   preserveEmbedQueryParams,
   PresetThemeName,
   ScriptRunState,
@@ -1555,11 +1554,6 @@ export class App extends PureComponent<Props, State> {
         },
       })
     )
-
-    PerformanceEvents.record({
-      name: "RequestedRerun",
-      scriptRunState: this.state.scriptRunState,
-    })
   }
 
   /** Requests that the server stop running the script */
