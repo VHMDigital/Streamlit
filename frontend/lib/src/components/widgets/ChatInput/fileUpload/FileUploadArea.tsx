@@ -24,7 +24,7 @@ import BaseButton, { BaseButtonKind } from "~lib/components/shared/BaseButton"
 import {
   StyledFileUploadDropzone,
   StyledVerticalDivider,
-} from "src/components/widgets/ChatInput/styled-components"
+} from "~lib/components/widgets/ChatInput/styled-components"
 
 export interface Props {
   getRootProps: any
