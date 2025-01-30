@@ -139,7 +139,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
     const { pathname, hostname } = this.requireServerUri()
     const portSection = port ? `:${port}` : ""
     // Empty path names are simply "/" Anything else must have more to it
-    const basePathSection = pathname !== "/" ? `${pathname}/` : "/"
+    const basePathSection = pathname === "/" ? "/" : `${pathname}/`
 
     return `${protocol}//${hostname}${portSection}${basePathSection}${navigateTo}`
   }

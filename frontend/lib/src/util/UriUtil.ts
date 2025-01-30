@@ -77,11 +77,6 @@ export function getPossibleBaseUris(): Array<URL> {
     parts.pop()
   }
 
-  const newURL = new URL(baseUriParts)
-
-  newURL.pathname = "/"
-  possibleBaseUris.push(newURL)
-
   return take(possibleBaseUris, 2)
 }
 
