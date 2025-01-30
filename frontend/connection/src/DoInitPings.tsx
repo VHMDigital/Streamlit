@@ -23,16 +23,15 @@
 import axios from "axios"
 import { getLogger } from "loglevel"
 
+import "./promiseWithResolversPolyfill"
 import {
   CORS_ERROR_MESSAGE_DOCUMENTATION_LINK,
   HOST_CONFIG_PATH,
   PING_TIMEOUT_MS,
   SERVER_PING_PATH,
-} from "@streamlit/app/src/connection/constants"
-import { OnRetry } from "@streamlit/app/src/connection/types"
-import { buildHttpUri, IHostConfigResponse } from "@streamlit/lib"
-
-import "./promiseWithResolversPolyfill"
+} from "./constants"
+import { OnRetry } from "./types"
+import { buildHttpUri } from "./utils"
 
 const log = getLogger("DoInitPings")
 

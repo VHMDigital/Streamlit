@@ -16,10 +16,11 @@
 
 import { getLogger } from "loglevel"
 
-import { localStorageAvailable, StreamlitEndpoints } from "@streamlit/lib"
 import { ForwardMsgList } from "@streamlit/protobuf"
 
 import { ConnectionState } from "./ConnectionState"
+import { StreamlitEndpoints } from "./types"
+import { localStorageAvailable } from "./utils"
 
 // TODO: Change this to a stable location and eventually make it configurable
 // Holds url for static asset location
