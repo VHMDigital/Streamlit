@@ -259,7 +259,7 @@ class ButtonMixin:
         mime: str | None = None,
         key: Key | None = None,
         help: str | None = None,
-        on_click: WidgetCallback | None = None,
+        on_click: WidgetCallback | Literal["rerun", "ignore"] | None = None,
         args: WidgetArgs | None = None,
         kwargs: WidgetKwargs | None = None,
         *,  # keyword-only arguments:
@@ -695,7 +695,7 @@ class ButtonMixin:
         mime: str | None = None,
         key: Key | None = None,
         help: str | None = None,
-        on_click: WidgetCallback | None = None,
+        on_click: WidgetCallback | Literal["rerun", "ignore"] | None = None,
         args: WidgetArgs | None = None,
         kwargs: WidgetKwargs | None = None,
         *,  # keyword-only arguments:
@@ -707,10 +707,15 @@ class ButtonMixin:
     ) -> bool:
         key = to_key(key)
 
+        if on_click == "ignore" or on_click == "rerun":
+            on_click_callback = None
+        else:
+            on_click_callback = on_click
+
         check_widget_policies(
             self.dg,
             key,
-            on_click,
+            on_click_callback,
             default_value=None,
             writes_allowed=False,
         )
@@ -751,11 +756,16 @@ class ButtonMixin:
         if icon is not None:
             download_button_proto.icon = validate_icon_or_emoji(icon)
 
+        if on_click == "ignore":
+            download_button_proto.ignore_rerun = True
+        else:
+            download_button_proto.ignore_rerun = False
+
         serde = ButtonSerde()
 
         button_state = register_widget(
             download_button_proto.id,
-            on_change_handler=on_click,
+            on_change_handler=on_click_callback,
             args=args,
             kwargs=kwargs,
             deserializer=serde.deserialize,
