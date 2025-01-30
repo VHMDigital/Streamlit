@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,11 @@ import { useTheme } from "@emotion/react"
 import { StyledComponent } from "@emotion/styled"
 import { Fullscreen, FullscreenExit } from "@emotion-icons/material-outlined"
 
-import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
-import Tooltip, {
-  Placement,
-} from "@streamlit/lib/src/components/shared/Tooltip"
-import Button, {
-  BaseButtonKind,
-} from "@streamlit/lib/src/components/shared/BaseButton"
-import Icon from "@streamlit/lib/src/components/shared/Icon"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
+import Tooltip, { Placement } from "~lib/components/shared/Tooltip"
+import Button, { BaseButtonKind } from "~lib/components/shared/BaseButton"
+import Icon from "~lib/components/shared/Icon"
+import { EmotionTheme } from "~lib/theme"
 
 import { StyledToolbar, StyledToolbarWrapper } from "./styled-components"
 

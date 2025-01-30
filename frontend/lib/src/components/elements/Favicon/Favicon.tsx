@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 import nodeEmoji from "node-emoji"
 
-import { grabTheRightIcon } from "@streamlit/lib/src/vendor/twemoji"
-import { IGuestToHostMessage } from "@streamlit/lib/src/hostComm/types"
-import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
+import { grabTheRightIcon } from "~lib/vendor/twemoji"
+import { IGuestToHostMessage } from "~lib/hostComm/types"
+import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
 
 function iconToUrl(icon: string): string {
   const iconRegexp = /^:(.+)\/(.+):$/

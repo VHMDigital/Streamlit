@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 
 import React, { ReactElement } from "react"
 
-import { Progress as ProgressProto } from "@streamlit/lib/src/proto"
-import ProgressBar from "@streamlit/lib/src/components/shared/ProgressBar"
-import { StyledCaptionText } from "@streamlit/lib/src/components/elements/Progress/styled-components"
-import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
+import { Progress as ProgressProto } from "@streamlit/protobuf"
+
+import ProgressBar from "~lib/components/shared/ProgressBar"
+import { StyledCaptionText } from "~lib/components/elements/Progress/styled-components"
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
 
 export interface ProgressProps {
   width: number

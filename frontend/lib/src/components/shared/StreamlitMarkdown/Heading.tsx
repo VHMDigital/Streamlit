@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 import React, { Fragment, ReactElement } from "react"
 
-import { Heading as HeadingProto } from "@streamlit/lib/src/proto"
-import IsSidebarContext from "@streamlit/lib/src/components/core/IsSidebarContext"
-import IsDialogContext from "@streamlit/lib/src/components/core/IsDialogContext"
+import { Heading as HeadingProto } from "@streamlit/protobuf"
+
+import IsSidebarContext from "~lib/components/core/IsSidebarContext"
+import IsDialogContext from "~lib/components/core/IsDialogContext"
 
 import {
   StyledHeaderDivider,

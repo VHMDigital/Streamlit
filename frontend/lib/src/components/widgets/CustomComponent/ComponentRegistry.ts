@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
-import { logWarning } from "@streamlit/lib/src/util/log"
-import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
+import { isNullOrUndefined } from "~lib/util/utils"
+import { logWarning } from "~lib/util/log"
+import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
 
 import { ComponentMessageType } from "./enums"
 

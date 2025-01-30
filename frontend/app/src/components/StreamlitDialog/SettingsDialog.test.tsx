@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,10 +53,7 @@ const getProps = (extend?: Partial<Props>): Props => ({
   developerMode: true,
   animateModal: true,
   openThemeCreator: vi.fn(),
-  metricsMgr: new MetricsManager(
-    // @ts-expect-error The mock seems to have a mismatched internal type to what's expected.
-    mockSessionInfo()
-  ),
+  metricsMgr: new MetricsManager(mockSessionInfo()),
   ...extend,
 })
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import { CancelToken } from "axios"
 import isEqual from "lodash/isEqual"
 import { v4 as uuidv4 } from "uuid"
 
-import { IFileURLs, IFileURLsResponse } from "@streamlit/lib/src/proto"
+import { IFileURLs, IFileURLsResponse } from "@streamlit/protobuf"
 
 import { SessionInfo } from "./SessionInfo"
 import { StreamlitEndpoints } from "./StreamlitEndpoints"

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ import {
   HandleMessageEvent,
   PerformanceEvent,
   RequestedRerunEvent,
-} from "@streamlit/lib/src/profiler/PerformanceEvents"
+} from "~lib/profiler/PerformanceEvents"
 import {
   findNextEventIndex,
   findPrevEvent,
   findPrevEventIndex,
   getTimeDelta,
   isHandleMessageEvent,
-} from "@streamlit/lib/src/profiler/Utils"
+} from "~lib/profiler/Utils"
 
 type JSON = any
 

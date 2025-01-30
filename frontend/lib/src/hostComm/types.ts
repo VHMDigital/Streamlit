@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@ import {
   IAppPage,
   ICustomThemeConfig,
   MetricsEvent,
-} from "@streamlit/lib/src/proto"
-import { ExportedTheme } from "@streamlit/lib/src/theme"
-import { ScriptRunState } from "@streamlit/lib/src/ScriptRunState"
-import { LibConfig } from "@streamlit/lib/src/components/core/LibContext"
-import { PresetThemeName } from "@streamlit/lib/src/theme/types"
+} from "@streamlit/protobuf"
+
+import { ExportedTheme } from "~lib/theme"
+import { ScriptRunState } from "~lib/ScriptRunState"
+import { LibConfig } from "~lib/components/core/LibContext"
+import { PresetThemeName } from "~lib/theme/types"
 
 export type DeployedAppMetadata = {
   hostedAt?: string
@@ -177,6 +178,10 @@ export type IGuestToHostMessage =
   | {
       type: "SCRIPT_RUN_STATE_CHANGED"
       scriptRunState: ScriptRunState
+    }
+  | {
+      type: "REDIRECT_TO_URL"
+      url: string
     }
   | {
       type: "CUSTOM_PARENT_MESSAGE"

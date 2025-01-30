@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ import {
   getGray90,
   getIncreasingGreen,
   getSequentialColorsArray,
-} from "@streamlit/lib/src/theme"
-import { ensureError } from "@streamlit/lib/src/util/ErrorHandling"
-import { logError } from "@streamlit/lib/src/util/log"
+} from "~lib/theme"
+import { ensureError } from "~lib/util/ErrorHandling"
+import { logError } from "~lib/util/log"
 
 /**
  * This applies general layout changes to things such as x axis,

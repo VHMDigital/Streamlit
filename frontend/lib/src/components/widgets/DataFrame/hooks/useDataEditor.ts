@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,13 @@ import {
   ValidatedGridCell,
 } from "@glideapps/glide-data-grid"
 
-import { logWarning } from "@streamlit/lib/src/util/log"
-import { notNullOrUndefined } from "@streamlit/lib/src/util/utils"
+import { logWarning } from "~lib/util/log"
+import { notNullOrUndefined } from "~lib/util/utils"
 import {
   BaseColumn,
   isErrorCell,
-} from "@streamlit/lib/src/components/widgets/DataFrame/columns"
-import EditingState from "@streamlit/lib/src/components/widgets/DataFrame/EditingState"
+} from "~lib/components/widgets/DataFrame/columns"
+import EditingState from "~lib/components/widgets/DataFrame/EditingState"
 
 /**
  * Create return type for useDataLoader hook based on the DataEditorProps.

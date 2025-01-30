@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 import { Mock } from "vitest"
 
-import { ForwardMsg } from "./proto"
+import { ForwardMsg } from "@streamlit/protobuf"
+
 import { ForwardMsgCache } from "./ForwardMessageCache"
 
 interface MockCache {
@@ -29,6 +30,7 @@ function createCache(): MockCache {
   const mockFetchCachedForwardMsg = vi.fn()
 
   const cache = new ForwardMsgCache({
+    setStaticConfigUrl: vi.fn(),
     buildComponentURL: vi.fn(),
     buildMediaURL: vi.fn(),
     buildFileUploadURL: vi.fn(),

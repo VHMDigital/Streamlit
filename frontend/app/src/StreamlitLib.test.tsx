@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,10 @@ import {
  * Example StreamlitEndpoints implementation.
  */
 class Endpoints implements StreamlitEndpoints {
+  public setStaticConfigUrl(url: string | null): void {
+    throw new Error("Unimplemented")
+  }
+
   public buildComponentURL(): string {
     throw new Error("Unimplemented")
   }

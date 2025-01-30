@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,16 @@ import React, { CSSProperties, ReactElement } from "react"
 import {
   ImageList as ImageListProto,
   Image as ImageProto,
-} from "@streamlit/lib/src/proto"
-import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
+} from "@streamlit/protobuf"
+
+import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
 import Toolbar, {
   StyledToolbarElementContainer,
-} from "@streamlit/lib/src/components/shared/Toolbar"
-import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
-import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
-import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
+} from "~lib/components/shared/Toolbar"
+import { ElementFullscreenContext } from "~lib/components/shared/ElementFullscreen/ElementFullscreenContext"
+import { useRequiredContext } from "~lib/hooks/useRequiredContext"
+import { withFullScreenWrapper } from "~lib/components/shared/FullScreenWrapper"
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
 
 import {
   StyledCaption,
@@ -139,7 +141,14 @@ function ImageList({
               />
               {image.caption && (
                 <StyledCaption data-testid="stImageCaption" style={imgStyle}>
-                  {` ${image.caption} `}
+                  <StreamlitMarkdown
+                    source={image.caption}
+                    allowHTML={false}
+                    isCaption
+                    // This is technically not a label but we want the same restrictions
+                    // as for labels (e.g. no Markdown tables or horizontal rule).
+                    isLabel
+                  />
                 </StyledCaption>
               )}
             </StyledImageContainer>

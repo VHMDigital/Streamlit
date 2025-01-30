@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import { IAppPage, mockEndpoints, render } from "@streamlit/lib"
 
 import SidebarNav, { Props } from "./SidebarNav"
 
-vi.mock("@streamlit/lib/src/util/Hooks", async () => ({
+vi.mock("~lib/util/Hooks", async () => ({
   __esModule: true,
-  ...(await vi.importActual("@streamlit/lib/src/util/Hooks")),
+  ...(await vi.importActual("~lib/util/Hooks")),
   useIsOverflowing: vi.fn(),
 }))
 

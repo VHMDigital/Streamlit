@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { ICustomThemeConfig, WidgetStates } from "@streamlit/lib/src/proto"
-import { isValidOrigin } from "@streamlit/lib/src/util/UriUtil"
-import { PresetThemeName } from "@streamlit/lib/src/theme/types"
-import Resolver from "@streamlit/lib/src/util/Resolver"
+import { ICustomThemeConfig, WidgetStates } from "@streamlit/protobuf"
+
+import { isValidOrigin } from "~lib/util/UriUtil"
+import { PresetThemeName } from "~lib/theme/types"
+import Resolver from "~lib/util/Resolver"
 
 import {
   AppConfig,
@@ -139,6 +140,22 @@ export default class HostCommunicationManager {
     this.allowedOrigins = allowedOrigins
 
     this.openHostCommunication()
+  }
+
+  /**
+   * Register a function to deliver a message to the Host
+   * that is on the same origin as the Guest
+   */
+  public sendMessageToSameOriginHost = (
+    message: IGuestToHostMessage
+  ): void => {
+    window.parent.postMessage(
+      {
+        stCommVersion: HOST_COMM_VERSION,
+        ...message,
+      } as VersionedMessage<IGuestToHostMessage>,
+      window.location.origin
+    )
   }
 
   /**

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 import React, { ReactElement } from "react"
 
-import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
-import { Markdown as MarkdownProto } from "@streamlit/lib/src/proto"
+import { Markdown as MarkdownProto } from "@streamlit/protobuf"
+
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
 import {
   InlineTooltipIcon,
   StyledLabelHelpWrapper,
-} from "@streamlit/lib/src/components/shared/TooltipIcon"
+} from "~lib/components/shared/TooltipIcon"
 
 export interface MarkdownProps {
   width: number

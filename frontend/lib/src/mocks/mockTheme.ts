@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
 import { lightThemePrimitives } from "baseui"
 import { transparentize } from "color2k"
 
-import { ThemeConfig } from "@streamlit/lib/src/theme"
-import { createBaseUiTheme } from "@streamlit/lib/src/theme/createThemeUtil"
-import { createEmotionColors } from "@streamlit/lib/src/theme/getColors"
+import { ThemeConfig } from "~lib/theme"
+import { createBaseUiTheme } from "~lib/theme/createThemeUtil"
+import { createEmotionColors } from "~lib/theme/getColors"
 import {
   breakpoints,
   colors,
@@ -35,7 +35,7 @@ import {
   sizes,
   spacing,
   zIndices,
-} from "@streamlit/lib/src/theme/primitives"
+} from "~lib/theme/primitives"
 
 const requiredThemeColors = {
   bgColor: colors.white,

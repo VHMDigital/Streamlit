@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,12 @@ import React, { ReactElement } from "react"
 
 import { useTheme } from "@emotion/react"
 
-import { Alert as AlertProto } from "@streamlit/lib/src/proto"
-import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
-import { DynamicIcon } from "@streamlit/lib/src/components/shared/Icon"
-import AlertContainer, {
-  Kind,
-} from "@streamlit/lib/src/components/shared/AlertContainer"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+import { Alert as AlertProto } from "@streamlit/protobuf"
+
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
+import { DynamicIcon } from "~lib/components/shared/Icon"
+import AlertContainer, { Kind } from "~lib/components/shared/AlertContainer"
+import { EmotionTheme } from "~lib/theme"
 
 import { StyledAlertContent } from "./styled-components"
 

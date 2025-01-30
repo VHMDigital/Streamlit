@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@ import { screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { enableAllPlugins } from "immer"
 
-import { render } from "@streamlit/lib/src/test_util"
-import { Button as ButtonProto } from "@streamlit/lib/src/proto"
+import { Button as ButtonProto } from "@streamlit/protobuf"
+
+import { render } from "~lib/test_util"
 import {
   createFormsData,
   FormsData,
   WidgetStateManager,
-} from "@streamlit/lib/src/WidgetStateManager"
+} from "~lib/WidgetStateManager"
 
 import { FormSubmitButton, Props } from "./FormSubmitButton"
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,17 @@
 
 import { MockInstance } from "vitest"
 
-import { CustomThemeConfig } from "@streamlit/lib/src/proto"
+import { CustomThemeConfig } from "@streamlit/protobuf"
+
 import {
   baseTheme,
   createAutoTheme,
   darkTheme,
   lightTheme,
-} from "@streamlit/lib/src/theme/index"
-import { fonts } from "@streamlit/lib/src/theme/primitives/typography"
-import { ThemeConfig } from "@streamlit/lib/src/theme/types"
-import { LocalStore } from "@streamlit/lib/src/util/storageUtils"
+} from "~lib/theme/index"
+import { fonts } from "~lib/theme/primitives/typography"
+import { ThemeConfig } from "~lib/theme/types"
+import { LocalStore } from "~lib/util/storageUtils"
 
 import { hasLightBackgroundColor } from "./getColors"
 import {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@ import React, { ComponentType, PureComponent, ReactNode } from "react"
 import hoistNonReactStatics from "hoist-non-react-statics"
 import axios from "axios"
 
-import { ensureError } from "@streamlit/lib/src/util/ErrorHandling"
 import {
   DeckGlJsonChart,
   Skeleton as SkeletonProto,
-} from "@streamlit/lib/src/proto"
-import { Skeleton } from "@streamlit/lib/src/components/elements/Skeleton"
-import { LibContext } from "@streamlit/lib/src/components/core/LibContext"
+} from "@streamlit/protobuf"
+
+import { ensureError } from "~lib/util/ErrorHandling"
+import { Skeleton } from "~lib/components/elements/Skeleton"
+import { LibContext } from "~lib/components/core/LibContext"
 
 import MapboxTokenError from "./MapboxTokenError"
 

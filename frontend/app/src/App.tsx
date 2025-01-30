@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import without from "lodash/without"
 import {
   AppConfig,
   AppRoot,
+  AuthRedirect,
   AutoRerun,
   BackMsg,
   BaseUriParts,
@@ -102,18 +103,19 @@ import {
   WidgetStates,
 } from "@streamlit/lib"
 import getBrowserInfo from "@streamlit/app/src/util/getBrowserInfo"
+import { isLocalhost } from "@streamlit/app/src/util/deploymentInfo"
 import { AppContext } from "@streamlit/app/src/components/AppContext"
 import AppView from "@streamlit/app/src/components/AppView"
 import StatusWidget from "@streamlit/app/src/components/StatusWidget"
-import MainMenu, { isLocalhost } from "@streamlit/app/src/components/MainMenu"
+import MainMenu from "@streamlit/app/src/components/MainMenu"
 import ToolbarActions from "@streamlit/app/src/components/ToolbarActions"
 import DeployButton from "@streamlit/app/src/components/DeployButton"
 import Header from "@streamlit/app/src/components/Header"
 import {
   DialogProps,
-  DialogType,
   StreamlitDialog,
 } from "@streamlit/app/src/components/StreamlitDialog"
+import { DialogType } from "@streamlit/app/src/components/StreamlitDialog/constants"
 import { ConnectionManager } from "@streamlit/app/src/connection/ConnectionManager"
 import { ConnectionState } from "@streamlit/app/src/connection/ConnectionState"
 import { SessionEventDispatcher } from "@streamlit/app/src/SessionEventDispatcher"
@@ -130,6 +132,11 @@ import { showDevelopmentOptions } from "./showDevelopmentOptions"
 import "@streamlit/app/src/assets/css/theme.scss"
 import { ThemeManager } from "./util/useThemeManager"
 import { AppNavigation, MaybeStateUpdate } from "./util/AppNavigation"
+
+// vite config builds global variable PACKAGE_METADATA
+declare const PACKAGE_METADATA: {
+  version: string
+}
 
 export interface Props {
   screenCast: ScreenCastHOC
@@ -571,8 +578,18 @@ export class App extends PureComponent<Props, State> {
    * Checks if the code version from the backend is different than the frontend
    */
   private hasStreamlitVersionChanged(initializeMsg: Initialize): boolean {
-    if (this.sessionInfo.isSet) {
-      const currentStreamlitVersion = this.sessionInfo.current.streamlitVersion
+    let currentStreamlitVersion: string | undefined = undefined
+
+    if (
+      window.__streamlit
+        ?.ENABLE_RELOAD_BASED_ON_HARDCODED_STREAMLIT_VERSION === true
+    ) {
+      currentStreamlitVersion = PACKAGE_METADATA.version
+    } else if (this.sessionInfo.isSet) {
+      currentStreamlitVersion = this.sessionInfo.current.streamlitVersion
+    }
+
+    if (currentStreamlitVersion) {
       const { environmentInfo } = initializeMsg
 
       if (
@@ -718,6 +735,16 @@ export class App extends PureComponent<Props, State> {
           this.handleLogo(logo, msgProto.metadata as ForwardMsgMetadata),
         navigation: (navigation: Navigation) =>
           this.handleNavigation(navigation),
+        authRedirect: (authRedirect: AuthRedirect) => {
+          if (isInChildFrame()) {
+            this.hostCommunicationMgr.sendMessageToSameOriginHost({
+              type: "REDIRECT_TO_URL",
+              url: authRedirect.url,
+            })
+          } else {
+            window.location.href = authRedirect.url
+          }
+        },
       })
     } catch (e) {
       const err = ensureError(e)
@@ -1359,7 +1386,7 @@ export class App extends PureComponent<Props, State> {
     // It's not a problem that we're mucking around with private fields since
     // this is a test-only method anyway.
     // @ts-expect-error
-    this.connectionManager?.connection?.cache.messages.clear()
+    this.connectionManager?.websocketConnection?.cache.messages.clear()
   }
 
   /**

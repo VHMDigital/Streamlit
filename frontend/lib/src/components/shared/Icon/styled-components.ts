@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,7 @@ import isPropValid from "@emotion/is-prop-valid"
 import styled from "@emotion/styled"
 import { Spinner } from "baseui/spinner"
 
-import {
-  computeSpacingStyle,
-  IconSize,
-  ThemeColor,
-} from "@streamlit/lib/src/theme"
+import { computeSpacingStyle, IconSize, ThemeColor } from "~lib/theme"
 
 interface StyledSpinnerIconProps {
   usingCustomTheme: boolean

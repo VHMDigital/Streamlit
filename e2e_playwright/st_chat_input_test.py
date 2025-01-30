@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ def test_embedded_app_with_bottom_chat_input(
 ):
     """Test that an embedded app with bottom chat input renders correctly."""
     page.goto(f"http://localhost:{app_port}/?embed=true")
-    wait_for_app_loaded(page, embedded=True)
+    wait_for_app_loaded(page)
 
     app_view_block = page.get_by_test_id("stMainBlockContainer")
     # Bottom padding should be 16px (1rem):

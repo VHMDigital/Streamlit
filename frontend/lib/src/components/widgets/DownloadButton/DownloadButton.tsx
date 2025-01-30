@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
 
 import React, { ReactElement } from "react"
 
-import createDownloadLinkElement from "@streamlit/lib/src/util/createDownloadLinkElement"
-import { DownloadButton as DownloadButtonProto } from "@streamlit/lib/src/proto"
+import { DownloadButton as DownloadButtonProto } from "@streamlit/protobuf"
+
+import createDownloadLinkElement from "~lib/util/createDownloadLinkElement"
 import BaseButton, {
   BaseButtonKind,
   BaseButtonSize,
   BaseButtonTooltip,
   DynamicButtonLabel,
-} from "@streamlit/lib/src/components/shared/BaseButton"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
-import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
-import { LibContext } from "@streamlit/lib/src/components/core/LibContext"
+} from "~lib/components/shared/BaseButton"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
+import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
+import { LibContext } from "~lib/components/core/LibContext"
 
 export interface Props {
   endpoints: StreamlitEndpoints

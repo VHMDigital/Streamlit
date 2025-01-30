@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import { MockInstance } from "vitest"
 
 import HostCommunicationManager, {
   HOST_COMM_VERSION,
-} from "@streamlit/lib/src/hostComm/HostCommunicationManager"
+} from "~lib/hostComm/HostCommunicationManager"
 
 // Mocking "message" event listeners on the window;
 // returns function to establish a listener

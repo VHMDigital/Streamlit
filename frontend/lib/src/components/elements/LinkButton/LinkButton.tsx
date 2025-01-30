@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
 
 import React, { MouseEvent, ReactElement } from "react"
 
-import { LinkButton as LinkButtonProto } from "@streamlit/lib/src/proto"
+import { LinkButton as LinkButtonProto } from "@streamlit/protobuf"
+
 import {
   BaseButtonKind,
   BaseButtonSize,
   BaseButtonTooltip,
   DynamicButtonLabel,
-} from "@streamlit/lib/src/components/shared/BaseButton"
+} from "~lib/components/shared/BaseButton"
 
 import BaseLinkButton from "./BaseLinkButton"
 

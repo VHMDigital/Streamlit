@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,11 @@ import React, {
 import { withTheme } from "@emotion/react"
 import { toaster, ToastOverrides } from "baseui/toast"
 
-import {
-  EmotionTheme,
-  hasLightBackgroundColor,
-} from "@streamlit/lib/src/theme"
-import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
-import { Kind } from "@streamlit/lib/src/components/shared/AlertContainer"
-import AlertElement from "@streamlit/lib/src/components/elements/AlertElement/AlertElement"
-import { DynamicIcon } from "@streamlit/lib/src/components/shared/Icon"
+import { EmotionTheme, hasLightBackgroundColor } from "~lib/theme"
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
+import { Kind } from "~lib/components/shared/AlertContainer"
+import AlertElement from "~lib/components/elements/AlertElement/AlertElement"
+import { DynamicIcon } from "~lib/components/shared/Icon"
 
 import {
   StyledMessageWrapper,

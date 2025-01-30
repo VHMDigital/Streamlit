@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,9 @@ import React from "react"
 
 import { ChevronLeft, ChevronRight } from "@emotion-icons/material-outlined"
 
-import BaseButton, {
-  BaseButtonKind,
-} from "@streamlit/lib/src/components/shared/BaseButton"
-import Icon from "@streamlit/lib/src/components/shared/Icon"
-import { Small } from "@streamlit/lib/src/components/shared/TextElements"
+import BaseButton, { BaseButtonKind } from "~lib/components/shared/BaseButton"
+import Icon from "~lib/components/shared/Icon"
+import { Small } from "~lib/components/shared/TextElements"
 
 import { StyledPagination, StyledPaginators } from "./styled-components"
 

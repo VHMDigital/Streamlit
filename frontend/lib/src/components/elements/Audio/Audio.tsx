@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@ import React, { ReactElement, useEffect, useMemo, useRef } from "react"
 
 import { useTheme } from "@emotion/react"
 
-import { Audio as AudioProto } from "@streamlit/lib/src/proto"
-import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
-import { WidgetStateManager as ElementStateManager } from "@streamlit/lib/src/WidgetStateManager"
-import { EmotionTheme } from "@streamlit/lib/src/theme/types"
+import { Audio as AudioProto } from "@streamlit/protobuf"
+
+import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
+import { WidgetStateManager as ElementStateManager } from "~lib/WidgetStateManager"
+import { EmotionTheme } from "~lib/theme/types"
 
 export interface AudioProps {
   endpoints: StreamlitEndpoints

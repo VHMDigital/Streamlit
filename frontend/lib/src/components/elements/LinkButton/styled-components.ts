@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import { darken, transparentize } from "color2k"
 import {
   BaseButtonKind,
   BaseButtonSize,
-} from "@streamlit/lib/src/components/shared/BaseButton/styled-components"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+} from "~lib/components/shared/BaseButton/styled-components"
+import { EmotionTheme } from "~lib/theme"
 
 export { BaseButtonKind, BaseButtonSize }
 

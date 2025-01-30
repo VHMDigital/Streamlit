@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@ import React from "react"
 import { screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 
-import { customRenderLibContext, render } from "@streamlit/lib/src/test_util"
-import IsSidebarContext from "@streamlit/lib/src/components/core/IsSidebarContext"
-import { PageLink as PageLinkProto } from "@streamlit/lib/src/proto"
+import { PageLink as PageLinkProto } from "@streamlit/protobuf"
+
+import { customRenderLibContext, render } from "~lib/test_util"
+import IsSidebarContext from "~lib/components/core/IsSidebarContext"
 
 import PageLink, { Props } from "./PageLink"
 

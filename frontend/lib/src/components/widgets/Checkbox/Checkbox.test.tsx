@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ import React from "react"
 import { act, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
-import { render } from "@streamlit/lib/src/test_util"
 import {
   Checkbox as CheckboxProto,
   LabelVisibilityMessage as LabelVisibilityMessageProto,
-} from "@streamlit/lib/src/proto"
+} from "@streamlit/protobuf"
+
+import { WidgetStateManager } from "~lib/WidgetStateManager"
+import { render } from "~lib/test_util"
 
 import Checkbox, { Props } from "./Checkbox"
 

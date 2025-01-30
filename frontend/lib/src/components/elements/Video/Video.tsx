@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 
 import React, { ReactElement, useEffect, useMemo, useRef } from "react"
 
-import { ISubtitleTrack, Video as VideoProto } from "@streamlit/lib/src/proto"
-import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
-import { IS_DEV_ENV } from "@streamlit/lib/src/baseconsts"
-import { WidgetStateManager as ElementStateManager } from "@streamlit/lib/src/WidgetStateManager"
+import { ISubtitleTrack, Video as VideoProto } from "@streamlit/protobuf"
+
+import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
+import { IS_DEV_ENV } from "~lib/baseconsts"
+import { WidgetStateManager as ElementStateManager } from "~lib/WidgetStateManager"
 
 import { StyledVideoIframe } from "./styled-components"
 

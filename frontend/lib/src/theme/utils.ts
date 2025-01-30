@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,8 @@ import isObject from "lodash/isObject"
 import merge from "lodash/merge"
 import once from "lodash/once"
 
-import {
-  CustomThemeConfig,
-  ICustomThemeConfig,
-} from "@streamlit/lib/src/proto"
+import { CustomThemeConfig, ICustomThemeConfig } from "@streamlit/protobuf"
+
 import {
   baseTheme,
   CachedTheme,
@@ -34,17 +32,14 @@ import {
   lightTheme,
   ThemeConfig,
   ThemeSpacing,
-} from "@streamlit/lib/src/theme"
-import { logError } from "@streamlit/lib/src/util/log"
-import {
-  localStorageAvailable,
-  LocalStore,
-} from "@streamlit/lib/src/util/storageUtils"
+} from "~lib/theme"
+import { logError } from "~lib/util/log"
+import { localStorageAvailable, LocalStore } from "~lib/util/storageUtils"
 import {
   isDarkThemeInQueryParams,
   isLightThemeInQueryParams,
-} from "@streamlit/lib/src/util/utils"
-import { CircularBuffer } from "@streamlit/lib/src/components/shared/Profiler/CircularBuffer"
+} from "~lib/util/utils"
+import { CircularBuffer } from "~lib/components/shared/Profiler/CircularBuffer"
 
 import { createBaseUiTheme } from "./createThemeUtil"
 import {
@@ -62,6 +57,7 @@ declare global {
     __streamlit?: {
       LIGHT_THEME: ICustomThemeConfig
       DARK_THEME: ICustomThemeConfig
+      ENABLE_RELOAD_BASED_ON_HARDCODED_STREAMLIT_VERSION?: boolean
     }
     __streamlit_profiles__?: Record<
       string,

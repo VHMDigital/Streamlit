@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@ import React from "react"
 
 import styled from "@emotion/styled"
 
-import { StyledCheckbox } from "@streamlit/lib/src/components/widgets/Checkbox/styled-components"
-import { Block as BlockProto } from "@streamlit/lib/src/proto"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+import { Block as BlockProto } from "@streamlit/protobuf"
+
+import { StyledCheckbox } from "~lib/components/widgets/Checkbox/styled-components"
+import { EmotionTheme, STALE_STYLES } from "~lib/theme"
 
 function translateGapWidth(gap: string, theme: EmotionTheme): string {
   let gapWidth = theme.spacing.lg
@@ -87,12 +88,7 @@ export const StyledElementContainer = styled.div<StyledElementContainerProps>(
       marginBottom: `-${theme.spacing.xs}`,
     },
 
-    ...(isStale && elementType !== "skeleton"
-      ? {
-          opacity: 0.33,
-          transition: "opacity 1s ease-in 0.5s",
-        }
-      : {}),
+    ...(isStale && elementType !== "skeleton" && STALE_STYLES),
     ...(elementType === "empty"
       ? {
           // Use display: none for empty elements to avoid the flexbox gap.
@@ -145,7 +141,7 @@ export const StyledColumn = styled.div<StyledColumnProps>(
       ...(verticalAlignment === VerticalAlignment.TOP && {
         // Add margin to the first checkbox/toggle within the column to align it
         // better with other input widgets.
-        [`& ${StyledElementContainer}:last-of-type > ${StyledCheckbox}`]: {
+        [`& ${StyledElementContainer}:first-of-type > ${StyledCheckbox}`]: {
           marginTop: theme.spacing.sm,
         },
       }),
