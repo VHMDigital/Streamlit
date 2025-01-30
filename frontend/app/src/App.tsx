@@ -980,7 +980,7 @@ export class App extends PureComponent<Props, State> {
         const queryString = preserveEmbedQueryParams()
         const qs = queryString ? `?${queryString}` : ""
 
-        const basePathPrefix = pathname !== "/" ? `/${pathname}` : ""
+        const basePathPrefix = pathname !== "/" ? pathname : ""
 
         const pageUrl = `${basePathPrefix}/${pagePath}${qs}`
 
