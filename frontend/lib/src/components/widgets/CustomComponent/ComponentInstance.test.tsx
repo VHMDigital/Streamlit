@@ -40,8 +40,8 @@ import ComponentInstance, {
   COMPONENT_READY_WARNING_TIME_MS,
 } from "./ComponentInstance"
 import {
-  CUSTOM_COMPONENT_API_VERSION,
   log as componentUtilsLog,
+  CUSTOM_COMPONENT_API_VERSION,
 } from "./componentUtils"
 import { ComponentRegistry } from "./ComponentRegistry"
 import { ComponentMessageType, StreamlitMessageType } from "./enums"
