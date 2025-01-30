@@ -59,7 +59,6 @@ export { WindowDimensionsProvider } from "./components/shared/WindowDimensions/P
 export { ComponentRegistry } from "./components/widgets/CustomComponent"
 export { Quiver } from "./dataframes/Quiver"
 export { FileUploadClient } from "./FileUploadClient"
-export { ForwardMsgCache } from "./ForwardMessageCache"
 export { default as useScrollToBottom } from "./hooks/useScrollToBottom"
 export { default as HostCommunicationManager } from "./hostComm"
 export { HOST_COMM_VERSION } from "./hostComm/HostCommunicationManager"
@@ -122,12 +121,6 @@ export {
 } from "./util/performance"
 export { localStorageAvailable, LocalStore } from "./util/storageUtils"
 export { Timer } from "./util/Timer"
-export {
-  buildHttpUri,
-  buildWsUri,
-  getPossibleBaseUris,
-  makePath,
-} from "./util/UriUtil"
 export {
   extractPageNameFromPathName,
   generateUID,

@@ -303,19 +303,19 @@ frontend-build-with-profiler:
 
 .PHONY: frontend-fast
 frontend-fast:
-	cd frontend/ ; yarn workspace @streamlit/app build
+	cd frontend/ ; yarn workspaces foreach --all --topological --exclude @streamlit/lib run build
 	rsync -av --delete --delete-excluded --exclude=reports \
 		frontend/app/build/ lib/streamlit/static/
 
 .PHONY: frontend-lib
 # Build the frontend library.
 frontend-lib:
-	cd frontend/ ; yarn workspace @streamlit/lib build;
+	cd frontend/ ; yarn workspaces foreach --topological --from=@streamlit/lib run build;
 
 .PHONY: frontend-app
 # Build the frontend app. One must build the frontend lib first before building the app.
 frontend-app:
-	cd frontend/ ; yarn workspace @streamlit/app build
+	cd frontend/ ; yarn workspace foreach --topological --exclude @streamlit/lib build
 
 .PHONY: jslint
 # Verify that our JS/TS code is formatted and that there are no lint errors.

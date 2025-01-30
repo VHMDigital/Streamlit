@@ -116,11 +116,13 @@ import {
   StreamlitDialog,
 } from "@streamlit/app/src/components/StreamlitDialog"
 import { DialogType } from "@streamlit/app/src/components/StreamlitDialog/constants"
-import { ConnectionManager } from "@streamlit/app/src/connection/ConnectionManager"
-import { ConnectionState } from "@streamlit/app/src/connection/ConnectionState"
+import {
+  ConnectionManager,
+  ConnectionState,
+  DefaultStreamlitEndpoints,
+} from "@streamlit/connection"
 import { SessionEventDispatcher } from "@streamlit/app/src/SessionEventDispatcher"
 import { UserSettings } from "@streamlit/app/src/components/StreamlitDialog/UserSettings"
-import { DefaultStreamlitEndpoints } from "@streamlit/app/src/connection/DefaultStreamlitEndpoints"
 import { MetricsManager } from "@streamlit/app/src/MetricsManager"
 import { StyledApp } from "@streamlit/app/src/styled-components"
 import withScreencast, {
