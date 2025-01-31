@@ -1,110 +1,55 @@
 import streamlit as st
-import joblib
 import numpy as np
-from PIL import Image
-import os
-import matplotlib.pyplot as plt
-from streamlit_drawable_canvas import st_canvas
+from PIL import Image  # Added import for image processing
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-# Specify the path to the folder containing the model
-models_dir = os.path.join(os.path.dirname(__file__), 'models')
-model_path = os.path.join(models_dir, 'best_model.joblib')
+# Function to normalize the image
+def normalize_image(image):
+    return image / 255.0
 
-# Load the model
-try:
-    model = joblib.load(model_path)
-except FileNotFoundError:
-    st.error(f"Model file not found at {model_path}. Please check the path.")
-    st.stop()
-
-# Function to preprocess the drawn image
-def preprocess_image(image):
-    """
-    Preprocess the drawn image to match the MNIST dataset format.
-    - Convert to grayscale.
-    - Resize to 28x28 pixels.
-    - Invert colors (MNIST uses white digits on a black background).
-    - Normalize pixel values to the range [0, 1].
-    - Flatten the image to a 1D array of 784 elements.
-    """
-    image = image.convert('L').resize((28, 28))  # Convert to grayscale and resize
-    image_array = np.array(image)
-    image_array = 255 - image_array  # Invert colors
-    image_array = image_array / 255.0  # Normalize
-    return image_array
-
-# Streamlit app title
-st.title("Digit Recognition with MNIST")
-
-# Create three columns: left (drawing canvas), middle (model's view), right (results)
-col1, col2, col3 = st.columns([1, 1, 1])  # Three equal-width columns
-
-# Left Column: Drawing Canvas
-with col1:
-    st.write("### 1. Draw a Digit")
-    
-    # Create a canvas component
-    canvas_result = st_canvas(
-        fill_color="rgba(255, 165, 0, 0.3)",  # Fill color (orange with transparency)
-        stroke_width=15,  # Stroke width
-        stroke_color="#FFFFFF",  # Stroke color (white)
-        background_color="#000000",  # Background color (black)
-        update_streamlit=True,  # Update Streamlit on every change
-        height=280,  # Canvas height
-        width=280,  # Canvas width
-        drawing_mode="freedraw",  # Allow free drawing
-        key="canvas",
+# Function to augment the image
+def augment_image(image):
+    datagen = ImageDataGenerator(
+        rotation_range=10,
+        width_shift_range=0.1,
+        height_shift_range=0.1,
+        zoom_range=0.1
     )
+    image = np.expand_dims(image, 0)
+    it = datagen.flow(image, batch_size=1)
+    return it[0].astype('float32')[0]
 
-# Middle Column: What the Model Sees
-with col2:
-    if canvas_result.image_data is not None:
-        st.write("### 2. What the Model Sees")
-        st.write("This is how the model processes your drawing:")
+# Upload image from input data
+uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+
+# Layout the columns
+col1, col2 = st.columns(2)
+
+# Clear button state
+clear_state = st.session_state.get('clear', False)
+
+with col1:
+    if st.button("Clear"):
+        st.session_state.clear = True
+
+if not clear_state:
+    if uploaded_file is not None:
+        image = np.array(Image.open(uploaded_file))
         
-        # Convert the canvas image to PIL format
-        drawn_image = Image.fromarray(canvas_result.image_data.astype('uint8'))
+        # Normalize the image
+        normalized_image = normalize_image(image)
         
-        # Preprocess the image
-        image_array = preprocess_image(drawn_image)
+        # Augment the image
+        augmented_image = augment_image(normalized_image)
         
-        # Display the preprocessed image (what the model sees)
-        fig, ax = plt.subplots()
-        ax.imshow(image_array, cmap='gray')
-        ax.axis('off')  # Hide axes
-        st.pyplot(fig)
-
-# Right Column: Prediction Results & Confusion Matrix
-with col3:
-    if canvas_result.image_data is not None:
-        st.write("### 3. Prediction Results")
+        # Display the original and processed image
+        st.image(image, caption="Original Image")
+        st.image(augmented_image, caption="Processed Image")
         
-        # Predict using the model
-        prediction = model.predict(image_array.reshape(1, -1))
-        prediction_proba = model.predict_proba(image_array.reshape(1, -1))  # Get probability scores
-        confidence = np.max(prediction_proba) * 100  # Calculate confidence percentage
+        # Your code for prediction on the processed image
+        # result = model.predict(augmented_image)
+        # st.write("Prediction:", result)
+else:
+    st.session_state.clear = False
 
-        # Display the prediction results
-        st.write(f"**Predicted Digit:** {prediction[0]}")
-        st.write(f"**Prediction Confidence:** {confidence:.2f}%")
-
-        # Display the probability distribution for each class
-        st.write("**Probability Distribution:**")
-        fig, ax = plt.subplots()
-        classes = np.arange(10)  # Digits 0-9
-        ax.bar(classes, prediction_proba[0], color='skyblue')
-        ax.set_xlabel("Digit")
-        ax.set_ylabel("Probability")
-        ax.set_xticks(classes)
-        ax.set_title("Probability for Each Digit")
-        st.pyplot(fig)
-
-        # Display the confusion matrix image (if available)
-        image_path = os.path.join(os.path.dirname(__file__), 'images', 'matrix.png')
-        if os.path.exists(image_path):
-            st.write("**Confusion Matrix:**")
-            st.image(image_path, caption="Confusion Matrix", use_container_width=True)
-
-        if st.button("Clear Canvas"):
-            canvas_result.image_data = None
-            st.experimental_rerun()    
+# Rest of your Streamlit app code
