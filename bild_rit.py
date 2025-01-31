@@ -39,15 +39,11 @@ st.title("Digit Recognition with MNIST")
 # Create three columns: left (drawing canvas), middle (model's view), right (results)
 col1, col2, col3 = st.columns([1, 1, 1])  # Three equal-width columns
 
-# Clear button state
-if 'clear' not in st.session_state:
-    st.session_state.clear = False
-
 # Left Column: Drawing Canvas
 with col1:
     st.write("### 1. Draw a Digit")
     
-    # Create a canvas component
+    # Create a canvas component with an update button
     canvas_result = st_canvas(
         fill_color="rgba(255, 165, 0, 0.3)",  # Fill color (orange with transparency)
         stroke_width=15,  # Stroke width
@@ -60,13 +56,17 @@ with col1:
         key="canvas",
     )
     
-    if st.button("Clear"):
+    if st.button("Clear Canvas"):
         st.session_state.clear = True
-        canvas_result.image_data = None
+
+# Check if clear state is True
+if 'clear' in st.session_state and st.session_state.clear:
+    canvas_result.image_data = None
+    st.session_state.clear = False
 
 # Middle Column: What the Model Sees
 with col2:
-    if canvas_result.image_data is not None and not st.session_state.clear:
+    if canvas_result.image_data is not None:
         st.write("### 2. What the Model Sees")
         st.write("This is how the model processes your drawing:")
         
@@ -84,7 +84,7 @@ with col2:
 
 # Right Column: Prediction Results & Confusion Matrix
 with col3:
-    if canvas_result.image_data is not None and not st.session_state.clear:
+    if canvas_result.image_data is not None:
         st.write("### 3. Prediction Results")
         
         # Predict using the model
@@ -112,6 +112,3 @@ with col3:
         if os.path.exists(image_path):
             st.write("**Confusion Matrix:**")
             st.image(image_path, caption="Confusion Matrix", use_container_width=True)
-
-if st.session_state.clear:
-    st.session_state.clear = False
