@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import "@ungap/with-resolvers"
-
 import { ICustomThemeConfig, WidgetStates } from "@streamlit/protobuf"
 
 import { isValidOrigin } from "~lib/util/UriUtil"

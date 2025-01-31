@@ -32,6 +32,8 @@ import {
 import { OnRetry } from "@streamlit/app/src/connection/types"
 import { buildHttpUri, IHostConfigResponse } from "@streamlit/lib"
 
+import "./promiseWithResolversPolyfill"
+
 const log = getLogger("DoInitPings")
 
 export function doInitPings(

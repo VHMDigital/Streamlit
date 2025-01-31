@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// We add some polyfills in order to support older browsers for the exports below
+import "./promiseWithResolversPolyfill"
 // These imports are each exported specifically in order to minimize public apis.
 export { AppRoot, BlockNode, ElementNode } from "./AppNode"
 export { IS_DEV_ENV, WEBSOCKET_PORT_DEV } from "./baseconsts"

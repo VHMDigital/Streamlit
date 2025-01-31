@@ -41,13 +41,3 @@ declare module "react-color/es/components/common/Saturation" {
     getContainerRenderWindow(): Window & typeof globalThis
   }
 }
-
-interface PromiseWithResolvers<T> {
-  promise: Promise<T>
-  resolve: (value: T | PromiseLike<T>) => void
-  reject: (reason?: any) => void
-}
-
-interface PromiseConstructor {
-  withResolvers<T>(): PromiseWithResolvers<T>
-}

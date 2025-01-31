@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import "@ungap/with-resolvers"
 import { CancelToken } from "axios"
 import isEqual from "lodash/isEqual"
 import { getLogger } from "loglevel"
