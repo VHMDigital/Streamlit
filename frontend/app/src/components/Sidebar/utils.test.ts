@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { PageConfig } from "@streamlit/lib"
+import { PageConfig } from "@streamlit/protobuf"
 
 import { shouldCollapse } from "./utils"
 
