@@ -5,6 +5,7 @@ from PIL import Image
 import os
 import matplotlib.pyplot as plt
 from streamlit_drawable_canvas import st_canvas
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # Specify the path to the folder containing the model
 models_dir = os.path.join(os.path.dirname(__file__), 'models')
@@ -33,11 +34,30 @@ def preprocess_image(image):
     image_array = image_array / 255.0  # Normalize
     return image_array
 
+# Function to augment the image
+def augment_image(image):
+    """
+    Augment the image to increase the variety in the dataset.
+    - Apply random rotations, shifts, and zooms.
+    """
+    datagen = ImageDataGenerator(
+        rotation_range=10,
+        width_shift_range=0.1,
+        height_shift_range=0.1,
+        zoom_range=0.1
+    )
+    image = np.expand_dims(image, 0)
+    it = datagen.flow(image, batch_size=1)
+    return it[0].astype('float32')[0]
+
 # Streamlit app title
 st.title("Digit Recognition with MNIST")
 
 # Create three columns: left (drawing canvas), middle (model's view), right (results)
 col1, col2, col3 = st.columns([1, 1, 1])  # Three equal-width columns
+
+# Clear button state
+clear_state = st.session_state.get('clear', False)
 
 # Left Column: Drawing Canvas
 with col1:
@@ -55,10 +75,13 @@ with col1:
         drawing_mode="freedraw",  # Allow free drawing
         key="canvas",
     )
+    
+    if st.button("Clear"):
+        st.session_state.clear = True
 
 # Middle Column: What the Model Sees
 with col2:
-    if canvas_result.image_data is not None:
+    if canvas_result.image_data is not None and not clear_state:
         st.write("### 2. What the Model Sees")
         st.write("This is how the model processes your drawing:")
         
@@ -68,20 +91,23 @@ with col2:
         # Preprocess the image
         image_array = preprocess_image(drawn_image)
         
+        # Augment the image
+        augmented_image = augment_image(image_array)
+        
         # Display the preprocessed image (what the model sees)
         fig, ax = plt.subplots()
-        ax.imshow(image_array, cmap='gray')
+        ax.imshow(augmented_image, cmap='gray')
         ax.axis('off')  # Hide axes
         st.pyplot(fig)
 
 # Right Column: Prediction Results & Confusion Matrix
 with col3:
-    if canvas_result.image_data is not None:
+    if canvas_result.image_data is not None and not clear_state:
         st.write("### 3. Prediction Results")
         
         # Predict using the model
-        prediction = model.predict(image_array.reshape(1, -1))
-        prediction_proba = model.predict_proba(image_array.reshape(1, -1))  # Get probability scores
+        prediction = model.predict(augmented_image.reshape(1, -1))
+        prediction_proba = model.predict_proba(augmented_image.reshape(1, -1))  # Get probability scores
         confidence = np.max(prediction_proba) * 100  # Calculate confidence percentage
 
         # Display the prediction results
@@ -105,6 +131,6 @@ with col3:
             st.write("**Confusion Matrix:**")
             st.image(image_path, caption="Confusion Matrix", use_container_width=True)
 
-        if st.button("Clear Canvas"):
-            canvas_result.image_data = None
-            st.experimental_rerun()    
+if clear_state:
+    st.session_state.clear = False
+    st.experimental_rerun()
