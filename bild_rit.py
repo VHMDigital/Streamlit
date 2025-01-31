@@ -5,7 +5,6 @@ from PIL import Image
 import os
 import matplotlib.pyplot as plt
 from streamlit_drawable_canvas import st_canvas
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # Specify the path to the folder containing the model
 models_dir = os.path.join(os.path.dirname(__file__), 'models')
@@ -33,22 +32,6 @@ def preprocess_image(image):
     image_array = 255 - image_array  # Invert colors
     image_array = image_array / 255.0  # Normalize
     return image_array
-
-# Function to augment the image
-def augment_image(image):
-    """
-    Augment the image to increase the variety in the dataset.
-    - Apply random rotations, shifts, and zooms.
-    """
-    datagen = ImageDataGenerator(
-        rotation_range=10,
-        width_shift_range=0.1,
-        height_shift_range=0.1,
-        zoom_range=0.1
-    )
-    image = np.expand_dims(image, 0)
-    it = datagen.flow(image, batch_size=1)
-    return it[0].astype('float32')[0]
 
 # Streamlit app title
 st.title("Digit Recognition with MNIST")
@@ -91,12 +74,9 @@ with col2:
         # Preprocess the image
         image_array = preprocess_image(drawn_image)
         
-        # Augment the image
-        augmented_image = augment_image(image_array)
-        
         # Display the preprocessed image (what the model sees)
         fig, ax = plt.subplots()
-        ax.imshow(augmented_image, cmap='gray')
+        ax.imshow(image_array, cmap='gray')
         ax.axis('off')  # Hide axes
         st.pyplot(fig)
 
@@ -106,8 +86,8 @@ with col3:
         st.write("### 3. Prediction Results")
         
         # Predict using the model
-        prediction = model.predict(augmented_image.reshape(1, -1))
-        prediction_proba = model.predict_proba(augmented_image.reshape(1, -1))  # Get probability scores
+        prediction = model.predict(image_array.reshape(1, -1))
+        prediction_proba = model.predict_proba(image_array.reshape(1, -1))  # Get probability scores
         confidence = np.max(prediction_proba) * 100  # Calculate confidence percentage
 
         # Display the prediction results
