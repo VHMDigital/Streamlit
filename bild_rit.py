@@ -40,7 +40,8 @@ st.title("Digit Recognition with MNIST")
 col1, col2, col3 = st.columns([1, 1, 1])  # Three equal-width columns
 
 # Clear button state
-clear_state = st.session_state.get('clear', False)
+if 'clear' not in st.session_state:
+    st.session_state.clear = False
 
 # Left Column: Drawing Canvas
 with col1:
@@ -61,10 +62,11 @@ with col1:
     
     if st.button("Clear"):
         st.session_state.clear = True
+        canvas_result.image_data = None
 
 # Middle Column: What the Model Sees
 with col2:
-    if canvas_result.image_data is not None and not clear_state:
+    if canvas_result.image_data is not None and not st.session_state.clear:
         st.write("### 2. What the Model Sees")
         st.write("This is how the model processes your drawing:")
         
@@ -82,7 +84,7 @@ with col2:
 
 # Right Column: Prediction Results & Confusion Matrix
 with col3:
-    if canvas_result.image_data is not None and not clear_state:
+    if canvas_result.image_data is not None and not st.session_state.clear:
         st.write("### 3. Prediction Results")
         
         # Predict using the model
@@ -111,6 +113,5 @@ with col3:
             st.write("**Confusion Matrix:**")
             st.image(image_path, caption="Confusion Matrix", use_container_width=True)
 
-if clear_state:
+if st.session_state.clear:
     st.session_state.clear = False
-    st.experimental_rerun()
