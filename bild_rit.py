@@ -1,10 +1,11 @@
 import streamlit as st
 import joblib
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 import os
 import matplotlib.pyplot as plt
 from streamlit_drawable_canvas import st_canvas
+import cv2
 
 # Specify the path to the folder containing the model
 models_dir = os.path.join(os.path.dirname(__file__), 'models')
@@ -25,12 +26,28 @@ def preprocess_image(image):
     - Resize to 28x28 pixels.
     - Invert colors (MNIST uses white digits on a black background).
     - Normalize pixel values to the range [0, 1].
+    - Apply thresholding to binarize the image.
+    - Remove noise using morphological operations.
     - Flatten the image to a 1D array of 784 elements.
     """
-    image = image.convert('L').resize((28, 28))  # Convert to grayscale and resize
+    # Convert to grayscale and resize
+    image = image.convert('L').resize((28, 28))
     image_array = np.array(image)
-    image_array = 255 - image_array  # Invert colors
-    image_array = image_array / 255.0  # Normalize
+    
+    # Invert colors (MNIST uses white digits on black background)
+    image_array = 255 - image_array
+    
+    # Apply Gaussian blur to reduce noise
+    image_array = cv2.GaussianBlur(image_array, (3, 3), 0)
+    
+    # Apply adaptive thresholding to binarize the image
+    image_array = cv2.adaptiveThreshold(
+        image_array, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2
+    )
+    
+    # Normalize pixel values to the range [0, 1]
+    image_array = image_array / 255.0
+    
     return image_array
 
 # Streamlit app title
@@ -43,7 +60,7 @@ col1, col2, col3 = st.columns([1, 1, 1])  # Three equal-width columns
 with col1:
     st.write("### 1. Draw a Digit")
     
-    # Create a canvas component with an update button
+    # Create a canvas component
     canvas_result = st_canvas(
         fill_color="rgba(255, 165, 0, 0.3)",  # Fill color (orange with transparency)
         stroke_width=15,  # Stroke width
@@ -56,13 +73,10 @@ with col1:
         key="canvas",
     )
     
+    # Add a reset button in the first column
     if st.button("Clear Canvas"):
-        st.session_state.clear = True
-
-# Check if clear state is True
-if 'clear' in st.session_state and st.session_state.clear:
-    canvas_result.image_data = None
-    st.session_state.clear = False
+        canvas_result.image_data = None
+        st.experimental_rerun()  # Reset the app
 
 # Middle Column: What the Model Sees
 with col2:
