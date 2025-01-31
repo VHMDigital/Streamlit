@@ -314,6 +314,12 @@ frontend-fast:
 	rsync -av --delete --delete-excluded --exclude=reports \
 		frontend/app/build/ lib/streamlit/static/
 
+.PHONY: frontend-dev
+frontend-dev:
+	VITE_WATCH=1 make frontend-dependencies
+	cd frontend/ ; yarn start
+
+
 .PHONY: frontend-lib
 # Build the frontend library.
 frontend-lib:
