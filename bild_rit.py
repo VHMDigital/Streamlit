@@ -9,7 +9,7 @@ import cv2
 
 # Specify the path to the folder containing the model
 models_dir = os.path.join(os.path.dirname(__file__), 'models')
-model_path = os.path.join(models_dir, 'best_model.joblib')
+model_path = os.path.join(models_dir, 'best_model_rf.joblib')
 
 # Load the model
 try:
