@@ -1025,6 +1025,31 @@ _create_option(
     """,
 )
 
+_create_option(
+    "theme.roundness",
+    description="""
+        The roundness of the corners for most UI elements. Can be between 0 and 1,
+        where 0 is no-roundness and 1 is maximum roundness.
+    """,
+    type_=float,
+)
+
+_create_option(
+    "theme.borderColor",
+    description="""
+        The color of the border around elements.
+    """,
+)
+
+_create_option(
+    "theme.showBorderAroundInputs",
+    description="""
+        Whether to show a border around input elements (e.g. text_input, number_input,
+        file_uploader, etc).
+    """,
+    type_=bool,
+)
+
 # Config Section: Secrets #
 
 _create_section("secrets", "Secrets configuration.")
