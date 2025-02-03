@@ -16,8 +16,6 @@
 
 import React, { ReactElement, useEffect, useMemo, useRef } from "react"
 
-import { useTheme } from "@emotion/react"
-
 import { Audio as AudioProto } from "@streamlit/protobuf"
 
 import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
