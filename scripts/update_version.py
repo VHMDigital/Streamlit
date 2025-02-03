@@ -70,6 +70,7 @@ NODE_PACKAGES = [
     {"frontend/lib/package.json": regex},
     {"frontend/protobuf/package.json": regex},
     {"frontend/typescript-config/package.json": regex},
+    {"frontend/utils/package.json": regex},
 ]
 
 
