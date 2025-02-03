@@ -1261,16 +1261,11 @@ def _unify_missing_values(df: DataFrame) -> DataFrame:
 
     Pandas uses a variety of values to represent missing values, including np.nan,
     NaT, None, and pd.NA. This function replaces all of these values with None,
-    which is the only missing value type that is supported by all data.
+    which is the only missing value type that is supported by all data
     """
     import numpy as np
 
-    # First fill NA values with np.nan
-    filled_df = df.fillna(np.nan)
-    # Then replace np.nan with None
-    replaced_df = filled_df.replace([np.nan], [None])
-    # Explicitly infer objects after operations
-    return replaced_df.infer_objects(copy=False)
+    return df.fillna(np.nan).replace([np.nan], [None]).infer_objects()
 
 
 def _pandas_df_to_series(df: DataFrame) -> Series[Any]:
