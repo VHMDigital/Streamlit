@@ -1018,6 +1018,11 @@ _create_option(
 )
 
 _create_option(
+    "theme.linkColor",
+    description="Color used for all links.",
+)
+
+_create_option(
     "theme.font",
     description="""
         Font family for all text in the app, except code blocks. One of "sans serif",
@@ -1034,6 +1039,21 @@ _create_option(
     type_=float,
 )
 
+_create_option(
+    "theme.borderColor",
+    description="""
+        The color of the border around elements.
+    """,
+)
+
+_create_option(
+    "theme.showBorderAroundInputs",
+    description="""
+        Whether to show a border around input elements (e.g. text_input, number_input,
+        file_uploader, etc).
+    """,
+    type_=bool,
+)
 
 # Config Section: Secrets #
 
