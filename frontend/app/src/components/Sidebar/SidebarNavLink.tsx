@@ -16,7 +16,9 @@
 
 import React, { MouseEvent, ReactElement } from "react"
 
-import { DynamicIcon } from "@streamlit/lib"
+import { useTheme } from "@emotion/react"
+
+import { DynamicIcon, EmotionTheme } from "@streamlit/lib"
 
 import {
   StyledSidebarLinkText,
@@ -40,6 +42,7 @@ const SidebarNavLink = ({
   onClick,
   children,
 }: SidebarNavLinkProps): ReactElement => {
+  const theme: EmotionTheme = useTheme()
   return (
     <StyledSidebarNavLinkContainer>
       <StyledSidebarNavLink
@@ -50,7 +53,13 @@ const SidebarNavLink = ({
       >
         {icon && icon.length && (
           <StyledSidebarNavIcon isActive={isActive}>
-            <DynamicIcon size="md" iconValue={icon} />
+            <DynamicIcon
+              size="md"
+              iconValue={icon}
+              color={
+                isActive ? theme.colors.bodyText : theme.colors.fadedText60
+              }
+            />
           </StyledSidebarNavIcon>
         )}
         <StyledSidebarLinkText isActive={isActive}>

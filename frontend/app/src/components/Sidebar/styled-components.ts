@@ -94,7 +94,6 @@ export const StyledSidebarNavIcon = styled.span<StyledSidebarNavIconProps>(
     return {
       display: "inline-flex",
       span: {
-        color: isActive ? theme.colors.bodyText : theme.colors.fadedText80,
         fontWeight: isActive
           ? theme.fontWeights.bold
           : theme.fontWeights.normal,
