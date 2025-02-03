@@ -22,7 +22,6 @@ import { Audio as AudioProto } from "@streamlit/protobuf"
 
 import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
 import { WidgetStateManager as ElementStateManager } from "~lib/WidgetStateManager"
-import { EmotionTheme } from "~lib/theme/types"
 
 import { StyledAudio, StyledAudioContainer } from "./styled-components"
 
@@ -35,12 +34,9 @@ export interface AudioProps {
 
 export default function Audio({
   element,
-  width,
   endpoints,
   elementMgr,
 }: Readonly<AudioProps>): ReactElement {
-  const theme: EmotionTheme = useTheme()
-
   const audioRef = useRef<HTMLAudioElement>(null)
 
   const { startTime, endTime, loop, autoplay } = element
