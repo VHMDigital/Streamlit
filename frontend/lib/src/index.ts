@@ -15,7 +15,7 @@
  */
 
 // We add some polyfills in order to support older browsers for the exports below
-import "./promiseWithResolversPolyfill"
+import "@streamlit/utils"
 // These imports are each exported specifically in order to minimize public apis.
 export { AppRoot, BlockNode, ElementNode } from "./AppNode"
 export { default as VerticalBlock } from "./components/core/Block"
@@ -106,12 +106,11 @@ export { default as emotionLightTheme } from "./theme/emotionLightTheme"
 export { fonts, spacing } from "./theme/primitives"
 export { ensureError } from "./util/ErrorHandling"
 export { useIsOverflowing } from "./util/Hooks"
-export { LocalStore, localStorageAvailable } from "./util/storageUtils"
+export { LocalStore } from "./util/storageUtils"
 export { Timer } from "./util/Timer"
 export {
   extractPageNameFromPathName,
   generateUID,
-  getCookie,
   getElementId,
   getEmbeddingIdClassName,
   getIFrameEnclosingApp,
@@ -121,12 +120,10 @@ export {
   isEmbed,
   isInChildFrame,
   isLightThemeInQueryParams,
-  isNullOrUndefined,
   isPaddingDisplayed,
   isScrollingHidden,
   isToolbarDisplayed,
   makeElementWithInfoText,
-  notNullOrUndefined,
   notUndefined,
   preserveEmbedQueryParams,
   setCookie,
