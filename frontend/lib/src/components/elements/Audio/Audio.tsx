@@ -24,6 +24,8 @@ import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
 import { WidgetStateManager as ElementStateManager } from "~lib/WidgetStateManager"
 import { EmotionTheme } from "~lib/theme/types"
 
+import { StyledAudio, StyledAudioContainer } from "./styled-components"
+
 export interface AudioProps {
   endpoints: StreamlitEndpoints
   width: number
@@ -153,21 +155,15 @@ export default function Audio({
   const uri = endpoints.buildMediaURL(element.url)
 
   return (
-    <div style={{ lineHeight: 0 }}>
-      <audio
+    <StyledAudioContainer>
+      <StyledAudio
         className="stAudio"
         data-testid="stAudio"
         ref={audioRef}
         controls
         autoPlay={autoplay && !preventAutoplay}
         src={uri}
-        style={{
-          width,
-          height: theme.sizes.minElementHeight,
-          margin: 0,
-          padding: 0,
-        }}
       />
-    </div>
+    </StyledAudioContainer>
   )
 }
