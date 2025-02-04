@@ -32,6 +32,7 @@ def configure_snowflake_light_theme():
     os.environ["STREAMLIT_THEME_TEXT_COLOR"] = "#1e252f"
     os.environ["STREAMLIT_THEME_BORDER_COLOR"] = "#d5dae4"
     os.environ["STREAMLIT_THEME_SHOW_BORDER_AROUND_INPUTS"] = "True"
+    os.environ["STREAMLIT_CLIENT_TOOLBAR_MODE"] = "minimal"
     # Todo: add bodyFont, codeFont & fontFaces
     yield
     del os.environ["STREAMLIT_THEME_BASE"]
@@ -41,6 +42,7 @@ def configure_snowflake_light_theme():
     del os.environ["STREAMLIT_THEME_TEXT_COLOR"]
     del os.environ["STREAMLIT_THEME_BORDER_COLOR"]
     del os.environ["STREAMLIT_THEME_SHOW_BORDER_AROUND_INPUTS"]
+    del os.environ["STREAMLIT_CLIENT_TOOLBAR_MODE"]
 
 
 def test_snowflake_light_theme(
