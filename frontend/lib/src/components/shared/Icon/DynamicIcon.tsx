@@ -57,7 +57,7 @@ export interface DynamicIconProps {
   margin?: string
   padding?: string
   testid?: string
-  color?: ThemeColor
+  color?: string
 }
 
 const DynamicIconDispatcher = ({

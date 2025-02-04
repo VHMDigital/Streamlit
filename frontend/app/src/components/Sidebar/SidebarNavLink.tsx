@@ -60,7 +60,7 @@ const SidebarNavLink = ({
                 !isActive && isMaterialIcon(icon)
                   ? // Apply color with opacity on material icons
                     // But we don't want to apply opacity on emoji icons
-                    theme.colors.fadedText60
+                    theme.colors.fadedText40
                   : theme.colors.bodyText
               }
             />

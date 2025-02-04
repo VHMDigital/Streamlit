@@ -19,7 +19,7 @@ import isPropValid from "@emotion/is-prop-valid"
 import styled from "@emotion/styled"
 import { Spinner } from "baseui/spinner"
 
-import { computeSpacingStyle, IconSize, ThemeColor } from "~lib/theme"
+import { computeSpacingStyle, IconSize } from "~lib/theme"
 
 interface StyledSpinnerIconProps {
   usingCustomTheme: boolean
@@ -49,7 +49,7 @@ export const StyledSpinnerIcon = styled(Spinner, {
 
 interface StyledIconProps {
   as?: EmotionIcon
-  color: ThemeColor
+  color: string
   size: IconSize
   margin: string
   padding: string
@@ -60,7 +60,7 @@ export const StyledIcon = styled("span", {
     isPropValid(prop) && !["size", "as"].includes(prop),
 })<StyledIconProps>(({ color, size, margin, padding, theme }) => {
   return {
-    color: theme.colors[color],
+    color,
     fill: "currentColor",
     display: "inline-flex",
     alignItems: "center",

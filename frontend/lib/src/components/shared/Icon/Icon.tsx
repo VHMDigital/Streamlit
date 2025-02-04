@@ -18,7 +18,7 @@ import React, { ReactElement, ReactNode } from "react"
 
 import { EmotionIcon } from "@emotion-icons/emotion-icon"
 
-import { IconSize, ThemeColor } from "~lib/theme"
+import { IconSize } from "~lib/theme"
 
 import { StyledEmojiIcon, StyledIcon } from "./styled-components"
 
@@ -51,7 +51,7 @@ const getDefaultProps = ({
 interface IconProps {
   content: EmotionIcon
   size?: IconSize
-  color?: ThemeColor
+  color?: string
   margin?: string
   padding?: string
   testid?: string
@@ -67,10 +67,10 @@ const Icon = ({
 }: IconProps): ReactElement => (
   <StyledIcon
     as={content}
-    color={color || "inherit"}
     aria-hidden="true"
     data-testid={testid}
-    {...getDefaultProps({ size, margin, padding })}
+    {...getDefaultProps({ size, margin, padding, color })}
+    color={color || "inherit"}
   />
 )
 
