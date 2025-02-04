@@ -39,6 +39,10 @@ function parseIconPackEntry(iconName: string): IconPackEntry {
   return { pack: iconPack, icon: iconNameInPack }
 }
 
+export function isMaterialIcon(iconName: string): boolean {
+  return parseIconPackEntry(iconName).pack === "material"
+}
+
 /**
  *
  * @returns returns an img tag with a yellow filled star icon svg as base64 data

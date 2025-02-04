@@ -26,22 +26,26 @@ interface GetDefaultPropsArgs {
   size?: IconSize
   margin?: string
   padding?: string
+  color?: string
 }
 
 interface DefaultProps {
   size: IconSize
   margin: string
   padding: string
+  color?: string
 }
 
 const getDefaultProps = ({
   size,
   margin,
   padding,
+  color,
 }: GetDefaultPropsArgs): DefaultProps => ({
   size: size || "md",
   margin: margin || "",
   padding: padding || "",
+  color: color || undefined,
 })
 
 interface IconProps {
@@ -76,6 +80,7 @@ interface EmojiIconProps {
   padding?: string
   children: ReactNode
   testid?: string
+  color?: string
 }
 
 export const EmojiIcon = ({
@@ -83,12 +88,13 @@ export const EmojiIcon = ({
   margin,
   padding,
   children,
+  color,
   testid,
 }: EmojiIconProps): ReactElement => (
   <StyledEmojiIcon
     data-testid={testid || "stIconEmoji"}
     aria-hidden="true"
-    {...getDefaultProps({ size, margin, padding })}
+    {...getDefaultProps({ size, margin, padding, color })}
   >
     {children}
   </StyledEmojiIcon>

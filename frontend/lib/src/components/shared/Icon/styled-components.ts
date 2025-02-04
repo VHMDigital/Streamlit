@@ -108,10 +108,11 @@ interface StyledEmojiIconProps {
   size: IconSize
   margin: string
   padding: string
+  color?: string
 }
 
 export const StyledEmojiIcon = styled.span<StyledEmojiIconProps>(
-  ({ size, margin, padding, theme }) => {
+  ({ size, margin, padding, theme, color }) => {
     return {
       display: "inline-flex",
       alignItems: "center",
@@ -121,6 +122,7 @@ export const StyledEmojiIcon = styled.span<StyledEmojiIconProps>(
       height: theme.iconSizes[size],
       margin: computeSpacingStyle(margin, theme),
       padding: computeSpacingStyle(padding, theme),
+      color: color,
     }
   }
 )
