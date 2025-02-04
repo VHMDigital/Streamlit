@@ -192,6 +192,7 @@ interface State {
   appConfig: AppConfig
   autoReruns: NodeJS.Timeout[]
   inputsDisabled: boolean
+  reconnectRequested: boolean
 }
 
 const ELEMENT_LIST_BUFFER_TIMEOUT_MS = 10
@@ -320,6 +321,7 @@ export class App extends PureComponent<Props, State> {
       appConfig: {},
       autoReruns: [],
       inputsDisabled: false,
+      reconnectRequested: false,
     }
 
     this.connectionManager = null
@@ -370,6 +372,7 @@ export class App extends PureComponent<Props, State> {
         this.setState({ deployedAppMetadata })
       },
       restartWebsocketConnection: () => {
+        this.setState({ reconnectRequested: true })
         if (!this.connectionManager) {
           this.initializeConnectionManager()
         }
@@ -642,11 +645,16 @@ export class App extends PureComponent<Props, State> {
       //   1. this is the first time we establish a websocket connection to the
       //      server, or
       //   2. our last script run attempt was interrupted by the websocket
-      //      connection dropping.
-      if (!this.sessionInfo.last || lastRunWasInterrupted) {
-        LOG.info("Requesting a script run.")
+      //      connection dropping, or
+      //   3. the host explicitly requested a reconnect
+      if (
+        !this.sessionInfo.last ||
+        lastRunWasInterrupted ||
+        this.state.reconnectRequested
+      ) {
+        log.info("Requesting a script run.")
         this.widgetMgr.sendUpdateWidgetsMessage(undefined)
-        this.setState({ dialog: null })
+        this.setState({ dialog: null, reconnectRequested: false })
       }
 
       this.hostCommunicationMgr.sendMessageToHost({

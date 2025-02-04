@@ -79,6 +79,8 @@ import {
 import { showDevelopmentOptions } from "./showDevelopmentOptions"
 import { App, LOG, Props } from "./App"
 
+type viMock = ReturnType<typeof vi.fn>
+
 vi.mock("~lib/baseconsts", async () => {
   return {
     ...(await vi.importActual("~lib/baseconsts")),
@@ -2512,7 +2514,7 @@ describe("App", () => {
   })
 
   describe("App.handleConnectionStateChanged", () => {
-    it("Sends WEBSOCKET_CONNECTED and WEBSOCKET_DISCONNECTED messages", () => {
+    it("sends WEBSOCKET_CONNECTED and WEBSOCKET_DISCONNECTED messages", () => {
       renderApp(getProps())
 
       const connectionManager = getMockConnectionManager(false)
@@ -2545,7 +2547,7 @@ describe("App", () => {
       })
     })
 
-    it("Correctly sets the data-test-connection-state attribute", () => {
+    it("correctly sets the data-test-connection-state attribute", () => {
       renderApp(getProps())
 
       const connectionManager = getMockConnectionManager(false)
@@ -2578,7 +2580,7 @@ describe("App", () => {
       )
     })
 
-    it("Sets attemptingToReconnect to false if DISCONNECTED_FOREVER", () => {
+    it("sets attemptingToReconnect to false if DISCONNECTED_FOREVER", () => {
       renderApp(getProps())
 
       const connectionManager = getMockConnectionManager(false)
@@ -2606,6 +2608,89 @@ describe("App", () => {
         type: "WEBSOCKET_DISCONNECTED",
         attemptingToReconnect: false,
       })
+    })
+
+    it("requests script rerun if this is the first time we've connected", () => {
+      renderApp(getProps())
+      const widgetStateManager =
+        getStoredValue<WidgetStateManager>(WidgetStateManager)
+      const sendUpdateWidgetsMessageMock =
+        widgetStateManager.sendUpdateWidgetsMessage as viMock
+
+      sendUpdateWidgetsMessageMock.mockReset()
+      act(() => {
+        getMockConnectionManagerProp("connectionStateChanged")(
+          ConnectionState.CONNECTED
+        )
+      })
+      expect(sendUpdateWidgetsMessageMock).toHaveBeenCalled()
+    })
+
+    it("does not request script rerun by default for second run", () => {
+      renderApp(getProps())
+      const widgetStateManager =
+        getStoredValue<WidgetStateManager>(WidgetStateManager)
+      const sendUpdateWidgetsMessageMock =
+        widgetStateManager.sendUpdateWidgetsMessage as viMock
+
+      act(() => {
+        getMockConnectionManagerProp("connectionStateChanged")(
+          ConnectionState.CONNECTED
+        )
+      })
+
+      sendForwardMessage("newSession", NEW_SESSION_JSON)
+
+      act(() => {
+        getMockConnectionManagerProp("connectionStateChanged")(
+          ConnectionState.DISCONNECTED_FOREVER
+        )
+      })
+
+      sendUpdateWidgetsMessageMock.mockReset()
+      act(() => {
+        getMockConnectionManagerProp("connectionStateChanged")(
+          ConnectionState.CONNECTED
+        )
+      })
+      expect(sendUpdateWidgetsMessageMock).not.toHaveBeenCalled()
+    })
+
+    it("requests script rerun if script was interrupted", () => {
+      renderApp(getProps())
+      const widgetStateManager =
+        getStoredValue<WidgetStateManager>(WidgetStateManager)
+      const sendUpdateWidgetsMessageMock =
+        widgetStateManager.sendUpdateWidgetsMessage as viMock
+
+      act(() => {
+        getMockConnectionManagerProp("connectionStateChanged")(
+          ConnectionState.CONNECTED
+        )
+      })
+
+      sendForwardMessage("newSession", NEW_SESSION_JSON)
+
+      // trigger a state transition to RERUN_REQUESTED
+      getMockConnectionManager(true)
+      fireEvent.keyDown(document.body, {
+        key: "r",
+        which: 82,
+      })
+
+      act(() => {
+        getMockConnectionManagerProp("connectionStateChanged")(
+          ConnectionState.DISCONNECTED_FOREVER
+        )
+      })
+
+      sendUpdateWidgetsMessageMock.mockReset()
+      act(() => {
+        getMockConnectionManagerProp("connectionStateChanged")(
+          ConnectionState.CONNECTED
+        )
+      })
+      expect(sendUpdateWidgetsMessageMock).toHaveBeenCalled()
     })
   })
 
@@ -3267,6 +3352,40 @@ describe("App", () => {
 
       const newConnectionManager = getMockConnectionManager()
       expect(newConnectionManager).not.toBe(originalConnectionManager)
+    })
+
+    it("requests script rerun if host is explicitly reconnecting", () => {
+      prepareHostCommunicationManager()
+      const widgetStateManager =
+        getStoredValue<WidgetStateManager>(WidgetStateManager)
+      const sendUpdateWidgetsMessageMock =
+        widgetStateManager.sendUpdateWidgetsMessage as viMock
+
+      act(() => {
+        getMockConnectionManagerProp("connectionStateChanged")(
+          ConnectionState.CONNECTED
+        )
+      })
+
+      sendForwardMessage("newSession", NEW_SESSION_JSON)
+
+      act(() => {
+        getMockConnectionManagerProp("connectionStateChanged")(
+          ConnectionState.DISCONNECTED_FOREVER
+        )
+      })
+
+      fireWindowPostMessage({
+        type: "RESTART_WEBSOCKET_CONNECTION",
+      })
+
+      sendUpdateWidgetsMessageMock.mockReset()
+      act(() => {
+        getMockConnectionManagerProp("connectionStateChanged")(
+          ConnectionState.CONNECTED
+        )
+      })
+      expect(sendUpdateWidgetsMessageMock).toHaveBeenCalled()
     })
   })
 })
