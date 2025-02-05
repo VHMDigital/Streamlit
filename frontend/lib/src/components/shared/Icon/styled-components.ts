@@ -49,7 +49,7 @@ export const StyledSpinnerIcon = styled(Spinner, {
 
 interface StyledIconProps {
   as?: EmotionIcon
-  color: string
+  color?: string
   size: IconSize
   margin: string
   padding: string
@@ -60,7 +60,7 @@ export const StyledIcon = styled("span", {
     isPropValid(prop) && !["size", "as"].includes(prop),
 })<StyledIconProps>(({ color, size, margin, padding, theme }) => {
   return {
-    color,
+    color: color || "inherit",
     fill: "currentColor",
     display: "inline-flex",
     alignItems: "center",

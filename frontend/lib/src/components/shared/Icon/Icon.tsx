@@ -33,7 +33,7 @@ interface DefaultProps {
   size: IconSize
   margin: string
   padding: string
-  color?: string
+  color: string | undefined
 }
 
 const getDefaultProps = ({
@@ -70,7 +70,6 @@ const Icon = ({
     aria-hidden="true"
     data-testid={testid}
     {...getDefaultProps({ size, margin, padding, color })}
-    color={color || "inherit"}
   />
 )
 
