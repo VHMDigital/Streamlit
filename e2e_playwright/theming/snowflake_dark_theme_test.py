@@ -99,4 +99,7 @@ def test_snowflake_dark_theme(
 ):
     # Make sure that all elements are rendered and no skeletons are shown:
     expect(app.get_by_test_id("stSkeleton")).to_have_count(0, timeout=25000)
+    # Add some additional timeout to ensure that fonts can load without
+    # creating flakiness:
+    app.wait_for_timeout(3000)
     assert_snapshot(app, name="snowflake_dark_theme")
