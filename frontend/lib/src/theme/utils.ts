@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import camelcase from "camelcase"
 import { getLuminance, parseToRgba, toHex, transparentize } from "color2k"
-import decamelize from "decamelize"
 import cloneDeep from "lodash/cloneDeep"
 import isObject from "lodash/isObject"
 import merge from "lodash/merge"
@@ -121,34 +119,6 @@ export const isPresetTheme = (themeConfig: ThemeConfig): boolean => {
   const presetThemeNames = createPresetThemes().map((t: ThemeConfig) => t.name)
   return presetThemeNames.includes(themeConfig.name)
 }
-
-export const fontToEnum = (font: string): CustomThemeConfig.FontFamily => {
-  const fontStyle = Object.keys(fonts).find(
-    (fontType: string) => fonts[fontType] === font
-  )
-  const defaultFont = CustomThemeConfig.FontFamily.SANS_SERIF
-  if (fontStyle) {
-    const parsedFontStyle = decamelize(fontStyle).toUpperCase()
-    return parsedFontStyle in CustomThemeConfig.FontFamily
-      ? // @ts-expect-error
-        CustomThemeConfig.FontFamily[parsedFontStyle]
-      : defaultFont
-  }
-  return defaultFont
-}
-
-export const fontEnumToString = (
-  font: CustomThemeConfig.FontFamily | null | undefined
-): string | undefined =>
-  font !== null &&
-  font !== undefined && // font can be 0 for sans serif
-  font in CustomThemeConfig.FontFamily
-    ? fonts[
-        camelcase(
-          CustomThemeConfig.FontFamily[font].toString()
-        ) as keyof typeof fonts
-      ]
-    : undefined
 
 export const bgColorToBaseString = (bgColor?: string): string =>
   bgColor === undefined || getLuminance(bgColor) > 0.5 ? "light" : "dark"
@@ -321,13 +291,12 @@ export const createEmotionTheme = (
 export const toThemeInput = (
   theme: EmotionTheme
 ): Partial<CustomThemeConfig> => {
-  const { colors, genericFonts } = theme
+  const { colors } = theme
   return {
     primaryColor: colors.primary,
     backgroundColor: colors.bgColor,
     secondaryBackgroundColor: colors.secondaryBg,
     textColor: colors.bodyText,
-    font: fontToEnum(genericFonts.bodyFont),
   }
 }
 
@@ -337,7 +306,6 @@ export type ExportedTheme = {
   backgroundColor: string
   secondaryBackgroundColor: string
   textColor: string
-  font: string
 } & DerivedColors
 
 export const toExportedTheme = (theme: EmotionTheme): ExportedTheme => {
@@ -354,7 +322,6 @@ export const toExportedTheme = (theme: EmotionTheme): ExportedTheme => {
     textColor: themeInput.textColor as string,
 
     base: bgColorToBaseString(themeInput.backgroundColor),
-    font: fontEnumToString(themeInput.font) as string,
 
     ...computeDerivedColors(colors),
   }
