@@ -51,7 +51,7 @@ def run_theme_tester_app():
             default="Option 1",
             label_visibility="collapsed",
         )
-        st.button("Primary Button", type="primary")
+        st.button("Primary", type="primary", use_container_width=True)
         st.divider()
         st.code("# st.code\na = 1234")
         st.chat_input("Chat Input")
@@ -81,7 +81,20 @@ def run_theme_tester_app():
                 horizontal=True,
                 label_visibility="collapsed",
             )
-            st.slider("Slider", min_value=0, max_value=100, value=50)
+            st.number_input(
+                "Number Input",
+                min_value=0,
+                max_value=100,
+                value=50,
+                label_visibility="collapsed",
+            )
+            st.slider(
+                "Slider",
+                min_value=0,
+                max_value=100,
+                value=50,
+                label_visibility="collapsed",
+            )
 
     with col3:
         tab1, _, _ = st.tabs(["Tab 1", "Tab 2", "Tab 3"])
