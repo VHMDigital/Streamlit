@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import json
 import os
 
 import pytest
@@ -32,6 +33,51 @@ def configure_snowflake_light_theme():
     os.environ["STREAMLIT_THEME_TEXT_COLOR"] = "#1e252f"
     os.environ["STREAMLIT_THEME_BORDER_COLOR"] = "#d5dae4"
     os.environ["STREAMLIT_THEME_SHOW_BORDER_AROUND_INPUTS"] = "True"
+    os.environ["STREAMLIT_THEME_FONT_FACES"] = json.dumps(
+        [
+            {
+                "family": "Inter",
+                "url": "https://raw.githubusercontent.com/rsms/inter/refs/heads/master/docs/font-files/Inter-Regular.woff2",
+                "weight": 400,
+            },
+            {
+                "family": "Inter",
+                "url": "https://raw.githubusercontent.com/rsms/inter/refs/heads/master/docs/font-files/Inter-SemiBold.woff2",
+                "weight": 600,
+            },
+            {
+                "family": "Inter",
+                "url": "https://raw.githubusercontent.com/rsms/inter/refs/heads/master/docs/font-files/Inter-Bold.woff2",
+                "weight": 700,
+            },
+            {
+                "family": "Inter",
+                "url": "https://raw.githubusercontent.com/rsms/inter/refs/heads/master/docs/font-files/Inter-Black.woff2",
+                "weight": 900,
+            },
+            {
+                "family": "Monaspace Argon",
+                "url": "https://raw.githubusercontent.com/githubnext/monaspace/refs/heads/main/fonts/webfonts/MonaspaceArgon-Regular.woff2",
+                "weight": 400,
+            },
+            {
+                "family": "Monaspace Argon",
+                "url": "https://raw.githubusercontent.com/githubnext/monaspace/refs/heads/main/fonts/webfonts/MonaspaceArgon-Medium.woff2",
+                "weight": 500,
+            },
+            {
+                "family": "Monaspace Argon",
+                "url": "https://raw.githubusercontent.com/githubnext/monaspace/refs/heads/main/fonts/webfonts/MonaspaceArgon-Bold.woff2",
+                "weight": 700,
+            },
+        ]
+    )
+    os.environ["STREAMLIT_THEME_FONT"] = (
+        "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'"
+    )
+    os.environ["STREAMLIT_THEME_CODE_FONT"] = (
+        '"Monaspace Argon", Menlo, Monaco, Consolas, "Courier New", monospace'
+    )
     os.environ["STREAMLIT_CLIENT_TOOLBAR_MODE"] = "minimal"
     # Todo: add bodyFont, codeFont & fontFaces
     yield
@@ -42,6 +88,9 @@ def configure_snowflake_light_theme():
     del os.environ["STREAMLIT_THEME_TEXT_COLOR"]
     del os.environ["STREAMLIT_THEME_BORDER_COLOR"]
     del os.environ["STREAMLIT_THEME_SHOW_BORDER_AROUND_INPUTS"]
+    del os.environ["STREAMLIT_THEME_FONT_FACES"]
+    del os.environ["STREAMLIT_THEME_FONT"]
+    del os.environ["STREAMLIT_THEME_CODE_FONT"]
     del os.environ["STREAMLIT_CLIENT_TOOLBAR_MODE"]
 
 

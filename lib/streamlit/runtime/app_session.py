@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import sys
 import uuid
 from enum import Enum
@@ -953,13 +954,27 @@ def _populate_theme_msg(msg: CustomThemeConfig) -> None:
         else:
             msg.base = base_map[base]
 
-    # Since body font uses the deprecated enum, we need to put the font
-    # config into the body_font field instead.
+    # Since the font field uses the deprecated enum, we need to put the font
+    # config into the body_font field instead:
     body_font = theme_opts["font"]
     if body_font:
         msg.body_font = body_font
 
     font_faces = theme_opts["fontFaces"]
+    # If fontFaces was configured via config.toml, it's already a parsed list of
+    # dictionaries. However, if it was provided via env variable or via CLI arg,
+    # it's a json string that still needs to be parsed.
+    if isinstance(font_faces, str):
+        try:
+            font_faces = json.loads(font_faces)
+        except Exception as e:
+            _LOGGER.warning(
+                "Failed to parse the theme.fontFaces config option with json.loads: "
+                f"{font_faces}.",
+                exc_info=e,
+            )
+            font_faces = None
+
     if font_faces is not None:
         for font_face in font_faces:
             try:
