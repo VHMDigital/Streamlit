@@ -842,7 +842,6 @@ describe("ComponentInstance", () => {
     theme = {
       ...toExportedTheme(mockTheme.emotion),
       base: bgColorToBaseString(mockTheme.emotion.colors.bgColor),
-      font: fonts.sansSerif,
     }
   ): any {
     return forwardMsg(StreamlitMessageType.RENDER, {
