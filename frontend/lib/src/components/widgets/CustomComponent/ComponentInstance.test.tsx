@@ -30,7 +30,6 @@ import {
 } from "~lib/util/IFrameUtil"
 import { WidgetStateManager } from "~lib/WidgetStateManager"
 import { bgColorToBaseString, toExportedTheme } from "~lib/theme"
-import { fonts } from "~lib/theme/primitives/typography"
 import { mockEndpoints } from "~lib/mocks/mocks"
 import { mockTheme } from "~lib/mocks/mockTheme"
 import { render } from "~lib/test_util"
