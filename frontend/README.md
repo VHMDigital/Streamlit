@@ -12,7 +12,7 @@ The following are packages:
 - **connection** - Code to establish the Websocket connection
 - **lib** - Right now, this is a catchall, but this is being refactored to be more focused. Namely, it supports a Streamlit "View" that contains elements, widgets, and layouts.
 - **protobuf** - Our protobuf code in one library.
-- **typescript-config** - configuration for typescript across all the repos.
+- **typescript-config** - configuration for typescript across all the packages.
 - **utils** - some shared utils used across Streamlit
 
 ## Getting Started
