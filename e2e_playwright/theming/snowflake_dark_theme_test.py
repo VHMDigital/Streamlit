@@ -20,6 +20,7 @@ import pytest
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction
+from e2e_playwright.shared.app_utils import expect_font
 
 
 @pytest.fixture(scope="module")
@@ -101,5 +102,7 @@ def test_snowflake_dark_theme(
     expect(app.get_by_test_id("stSkeleton")).to_have_count(0, timeout=25000)
     # Add some additional timeout to ensure that fonts can load without
     # creating flakiness:
-    app.wait_for_timeout(10000)
+    app.wait_for_timeout(5000)
+    expect_font(app, "Inter")
+    expect_font(app, "Monaspace Argon")
     assert_snapshot(app, name="snowflake_dark_theme")
