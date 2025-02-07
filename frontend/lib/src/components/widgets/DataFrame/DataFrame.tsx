@@ -1069,6 +1069,12 @@ function DataFrame({
               pinColumn(originalColumns[showMenu.columnIdx].id)
             }}
           />,
+          // We put the column menu into the portal element which is also
+          // used for the cell overlays. This allows us to correctly position
+          // the column menu also when the grid is used in a dialog, popover,
+          // or anything else that apply a transform (position fixed is influenced
+          // by the transform property of the parent element).
+          // The portal element is expected to always exist (-> PortalProvider).
           document.querySelector("#portal") as HTMLElement
         )}
     </StyledResizableContainer>
