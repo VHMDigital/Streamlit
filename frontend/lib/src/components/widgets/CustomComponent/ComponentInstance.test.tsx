@@ -28,10 +28,8 @@ import {
   DEFAULT_IFRAME_FEATURE_POLICY,
   DEFAULT_IFRAME_SANDBOX_POLICY,
 } from "~lib/util/IFrameUtil"
-import { buildHttpUri } from "~lib/util/UriUtil"
 import { WidgetStateManager } from "~lib/WidgetStateManager"
 import { bgColorToBaseString, toExportedTheme } from "~lib/theme"
-import { fonts } from "~lib/theme/primitives/typography"
 import { mockEndpoints } from "~lib/mocks/mocks"
 import { mockTheme } from "~lib/mocks/mockTheme"
 import { render } from "~lib/test_util"
@@ -50,9 +48,15 @@ import { ComponentMessageType, StreamlitMessageType } from "./enums"
 vi.useFakeTimers()
 
 // Mock uri utils.
-vi.mock("~lib/util/UriUtil")
-const mockedBuildHttpUri = buildHttpUri as Mock
-mockedBuildHttpUri.mockImplementation(() => "registry/url")
+vi.mock("@streamlit/utils", async () => {
+  const actualModule = await vi.importActual("@streamlit/utils")
+  const mockedBuildHttpUri = vi.fn().mockImplementation(() => "registry/url")
+
+  return {
+    ...actualModule,
+    buildHttpUri: mockedBuildHttpUri,
+  }
+})
 
 // Mock our WidgetStateManager
 vi.mock("~lib/WidgetStateManager")
@@ -816,7 +820,6 @@ describe("ComponentInstance", () => {
     theme = {
       ...toExportedTheme(mockTheme.emotion),
       base: bgColorToBaseString(mockTheme.emotion.colors.bgColor),
-      font: fonts.sansSerif,
     }
   ): any {
     return forwardMsg(StreamlitMessageType.RENDER, {

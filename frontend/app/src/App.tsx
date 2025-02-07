@@ -24,7 +24,6 @@ import without from "lodash/without"
 import { getLogger } from "loglevel"
 
 import {
-  AppConfig,
   AppRoot,
   CircularBuffer,
   ComponentRegistry,
@@ -46,28 +45,23 @@ import {
   handleFavicon,
   hashString,
   HostCommunicationManager,
-  IHostConfigResponse,
   IMenuItem,
   isColoredLineDisplayed,
   isEmbed,
   isInChildFrame,
-  isNullOrUndefined,
   isPaddingDisplayed,
   isPresetTheme,
   isScrollingHidden,
   isToolbarDisplayed,
   IToolbarItem,
-  LibConfig,
   LibContext,
   mark,
   measure,
-  notNullOrUndefined,
   notUndefined,
   preserveEmbedQueryParams,
   PresetThemeName,
   ScriptRunState,
   SessionInfo,
-  StreamlitEndpoints,
   StreamlitMarkdown,
   ThemeConfig,
   toExportedTheme,
@@ -102,6 +96,7 @@ import {
   SessionStatus,
   WidgetStates,
 } from "@streamlit/protobuf"
+import { isNullOrUndefined, notNullOrUndefined } from "@streamlit/utils"
 import getBrowserInfo from "@streamlit/app/src/util/getBrowserInfo"
 import { isLocalhost } from "@streamlit/app/src/util/deploymentInfo"
 import { AppContext } from "@streamlit/app/src/components/AppContext"
@@ -116,11 +111,17 @@ import {
   StreamlitDialog,
 } from "@streamlit/app/src/components/StreamlitDialog"
 import { DialogType } from "@streamlit/app/src/components/StreamlitDialog/constants"
-import { ConnectionManager } from "@streamlit/app/src/connection/ConnectionManager"
-import { ConnectionState } from "@streamlit/app/src/connection/ConnectionState"
+import {
+  AppConfig,
+  ConnectionManager,
+  ConnectionState,
+  DefaultStreamlitEndpoints,
+  IHostConfigResponse,
+  LibConfig,
+  StreamlitEndpoints,
+} from "@streamlit/connection"
 import { SessionEventDispatcher } from "@streamlit/app/src/SessionEventDispatcher"
 import { UserSettings } from "@streamlit/app/src/components/StreamlitDialog/UserSettings"
-import { DefaultStreamlitEndpoints } from "@streamlit/app/src/connection/DefaultStreamlitEndpoints"
 import { MetricsManager } from "@streamlit/app/src/MetricsManager"
 import { StyledApp } from "@streamlit/app/src/styled-components"
 import withScreencast, {
@@ -164,6 +165,7 @@ interface State {
   gitInfo: IGitInfo | null
   formsData: FormsData
   hideTopBar: boolean
+  hideColoredLine: boolean
   hideSidebarNav: boolean
   expandSidebarNav: boolean
   appPages: IAppPage[]
@@ -300,6 +302,7 @@ export class App extends PureComponent<Props, State> {
       // true as well for consistency.
       hideTopBar: true,
       hideSidebarNav: true,
+      hideColoredLine: false,
       expandSidebarNav: false,
       toolbarMode: Config.ToolbarMode.MINIMAL,
       latestRunTime: performance.now(),
@@ -1127,6 +1130,8 @@ export class App extends PureComponent<Props, State> {
    */
   setAndSendTheme = (themeConfig: ThemeConfig): void => {
     this.props.theme.setTheme(themeConfig)
+    // Hide the colored line if a custom theme is selected:
+    this.setState({ hideColoredLine: !isPresetTheme(themeConfig) })
     this.hostCommunicationMgr.sendMessageToHost({
       type: "SET_THEME_CONFIG",
       themeInfo: toExportedTheme(themeConfig.emotion),
@@ -1158,7 +1163,6 @@ export class App extends PureComponent<Props, State> {
     this.setState({ themeHash })
 
     const usingCustomTheme = !isPresetTheme(this.props.theme.activeTheme)
-
     if (themeInput) {
       const customTheme = createTheme(CUSTOM_THEME_NAME, themeInput)
       // For now, users can only add one custom theme.
@@ -1181,6 +1185,12 @@ export class App extends PureComponent<Props, State> {
         // aka embed query params.
         this.setAndSendTheme(getHostSpecifiedTheme())
       }
+    }
+
+    if (themeInput?.fontFaces) {
+      // If font faces are provided, we need to set the imported theme with the theme
+      // manager to make the font faces available.
+      this.props.theme.setImportedTheme(themeInput)
     }
   }
 
@@ -1870,6 +1880,7 @@ export class App extends PureComponent<Props, State> {
       userSettings,
       hideTopBar,
       hideSidebarNav,
+      hideColoredLine,
       expandSidebarNav,
       currentPageScriptHash,
       hostHideSidebarNav,
@@ -1916,7 +1927,8 @@ export class App extends PureComponent<Props, State> {
           showPadding: !isEmbed() || isPaddingDisplayed(),
           disableScrolling: isScrollingHidden(),
           showToolbar: !isEmbed() || isToolbarDisplayed(),
-          showColoredLine: !isEmbed() || isColoredLineDisplayed(),
+          showColoredLine:
+            (!hideColoredLine && !isEmbed()) || isColoredLineDisplayed(),
           // host communication manager elements
           pageLinkBaseUrl,
           sidebarChevronDownshift,
