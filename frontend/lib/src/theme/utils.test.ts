@@ -324,7 +324,6 @@ describe("createTheme", () => {
       primaryColor: "eee",
       secondaryBackgroundColor: "fc9231",
       bodyFont: "serif",
-      font: CustomThemeConfig.FontFamily.SERIF,
     })
     const customTheme = createTheme(
       CUSTOM_THEME_NAME,
