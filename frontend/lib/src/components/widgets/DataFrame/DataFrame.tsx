@@ -16,6 +16,7 @@
 
 import React, { ReactElement, useCallback } from "react"
 
+import { createPortal } from "react-dom"
 import {
   CompactSelection,
   DataEditorRef,
@@ -1042,32 +1043,34 @@ function DataFrame({
           clearTooltip={clearTooltip}
         ></Tooltip>
       )}
-      {showMenu && (
-        // A context menu that provides interactive features (sorting, pinning, show/hide)
-        // for a grid column.
-        <ColumnMenu
-          top={showMenu.headerBounds.y + showMenu.headerBounds.height}
-          left={showMenu.headerBounds.x + showMenu.headerBounds.width}
-          onCloseMenu={() => setShowMenu(undefined)}
-          onSortColumn={
-            isSortingEnabled
-              ? (direction: "asc" | "desc" | undefined) => {
-                  // Cell selection are kept on the old position,
-                  // which can be confusing. So we clear all cell selections before sorting.
-                  clearSelection(true, true)
-                  sortColumn(showMenu.columnIdx, direction, true)
-                }
-              : undefined
-          }
-          isColumnPinned={originalColumns[showMenu.columnIdx].isPinned}
-          onUnpinColumn={() => {
-            unpinColumn(originalColumns[showMenu.columnIdx].id)
-          }}
-          onPinColumn={() => {
-            pinColumn(originalColumns[showMenu.columnIdx].id)
-          }}
-        ></ColumnMenu>
-      )}
+      {showMenu &&
+        createPortal(
+          // A context menu that provides interactive features (sorting, pinning, show/hide)
+          // for a grid column.
+          <ColumnMenu
+            top={showMenu.headerBounds.y + showMenu.headerBounds.height}
+            left={showMenu.headerBounds.x + showMenu.headerBounds.width}
+            onCloseMenu={() => setShowMenu(undefined)}
+            onSortColumn={
+              isSortingEnabled
+                ? (direction: "asc" | "desc" | undefined) => {
+                    // Cell selection are kept on the old position,
+                    // which can be confusing. So we clear all cell selections before sorting.
+                    clearSelection(true, true)
+                    sortColumn(showMenu.columnIdx, direction, true)
+                  }
+                : undefined
+            }
+            isColumnPinned={originalColumns[showMenu.columnIdx].isPinned}
+            onUnpinColumn={() => {
+              unpinColumn(originalColumns[showMenu.columnIdx].id)
+            }}
+            onPinColumn={() => {
+              pinColumn(originalColumns[showMenu.columnIdx].id)
+            }}
+          />,
+          document.querySelector("#portal") as HTMLElement
+        )}
     </StyledResizableContainer>
   )
 }
