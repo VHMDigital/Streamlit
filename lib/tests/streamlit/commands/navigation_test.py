@@ -18,7 +18,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 import streamlit as st
+from streamlit.commands.navigation import convert_to_streamlit_page
 from streamlit.errors import StreamlitAPIException
+from streamlit.navigation.page import StreamlitPage
 from streamlit.proto.Navigation_pb2 import Navigation as NavigationProto
 from tests.delta_generator_test_case import DeltaGeneratorTestCase
 from tests.testutil import patch_config_options
@@ -189,3 +191,103 @@ class NavigationTest(DeltaGeneratorTestCase):
         assert c.position == NavigationProto.Position.SIDEBAR
         assert c.expanded
         assert c.sections == [""]
+
+    def test_convert_to_streamlit_page_with_string(self):
+        """Test converting string path to StreamlitPage"""
+        page = convert_to_streamlit_page("page1.py")
+        assert isinstance(page, StreamlitPage)
+        assert isinstance(page._page, Path)
+        assert str(page._page) == str(Path("page1.py").absolute())
+
+    def test_convert_to_streamlit_page_with_function(self):
+        """Test converting function to StreamlitPage"""
+
+        def test_page():
+            pass
+
+        page = convert_to_streamlit_page(test_page)
+        assert isinstance(page, StreamlitPage)
+        assert page._page == test_page
+
+    def test_convert_to_streamlit_page_with_streamlit_page(self):
+        """Test passing StreamlitPage directly"""
+        original_page = st.Page("page1.py")
+        page = convert_to_streamlit_page(original_page)
+        assert page == original_page
+
+    def test_convert_to_streamlit_page_invalid_type(self):
+        """Test that invalid types raise exception"""
+        with pytest.raises(StreamlitAPIException) as exc_info:
+            convert_to_streamlit_page(123)
+        assert "Invalid page type" in str(exc_info.value)
+
+    def test_navigation_with_string_list(self):
+        """Test navigation with list of strings"""
+        pages = ["page1.py", "page2.py", "page3.py"]
+        page = st.navigation(pages)
+        assert isinstance(page, StreamlitPage)
+        c = self.get_message_from_queue().navigation
+        assert len(c.app_pages) == 3
+        assert c.app_pages[0].is_default
+        assert not c.app_pages[1].is_default
+        assert not c.app_pages[2].is_default
+
+    def test_navigation_with_function_list(self):
+        """Test navigation with list of functions"""
+
+        def page1():
+            pass
+
+        def page2():
+            pass
+
+        pages = [page1, page2]
+        page = st.navigation(pages)
+        assert isinstance(page, StreamlitPage)
+        c = self.get_message_from_queue().navigation
+        assert len(c.app_pages) == 2
+        assert c.app_pages[0].is_default
+        assert not c.app_pages[1].is_default
+
+    def test_navigation_with_mixed_list(self):
+        """Test navigation with mixed list of strings, functions and StreamlitPages"""
+
+        def page2():
+            pass
+
+        pages = ["page1.py", page2, st.Page("page3.py")]
+        page = st.navigation(pages)
+        assert isinstance(page, StreamlitPage)
+        c = self.get_message_from_queue().navigation
+        assert len(c.app_pages) == 3
+        assert c.app_pages[0].is_default
+        assert not c.app_pages[1].is_default
+        assert not c.app_pages[2].is_default
+
+    def test_navigation_with_sections_and_mixed_types(self):
+        """Test navigation with sections containing mixed types"""
+
+        def page2():
+            pass
+
+        pages = {"Section 1": ["page1.py", page2], "Section 2": [st.Page("page3.py")]}
+        st.navigation(pages)
+        c = self.get_message_from_queue().navigation
+        assert len(c.app_pages) == 3
+        assert c.app_pages[0].section_header == "Section 1"
+        assert c.app_pages[1].section_header == "Section 1"
+        assert c.app_pages[2].section_header == "Section 2"
+
+    def test_navigation_duplicate_paths_with_mixed_types(self):
+        """Test that duplicate paths raise exception with mixed types"""
+
+        def foo():
+            pass
+
+        with pytest.raises(StreamlitAPIException):
+            st.navigation(
+                [
+                    "foo.py",
+                    foo,  # This should create same URL path as foo.py
+                ]
+            )
