@@ -45,6 +45,7 @@ export class LighthouseOrchestrator {
   constructor() {
     this.chrome = null
     this.streamlit = null
+    this._initialized = false
   }
 
   /**
@@ -67,6 +68,7 @@ export class LighthouseOrchestrator {
           chromeFlags: ["--headless"],
         })
         console.log(`Chrome launched successfully on port ${this.chrome.port}`)
+        this._initialized = true
         return
       } catch (error) {
         retryCount++
@@ -211,6 +213,7 @@ export class LighthouseOrchestrator {
     console.log(`Running Lighthouse for ${appBaseName} in ${mode} mode`)
 
     if (!this.chrome) {
+      console.error(`Initialization status: ${this._initialized}`)
       throw new Error(
         "Chrome instance is not available. Did initialize() succeed?"
       )
