@@ -252,6 +252,7 @@ export const createEmotionTheme = (
     conditionalOverrides.fontSizes = {
       ...baseThemeConfig.emotion.fontSizes,
     }
+    console.log("baseFontSize", baseFontSize)
 
     // Set the root font size to the configured value (used on global styles):
     conditionalOverrides.fontSizes.baseFontSize = baseFontSize
@@ -494,10 +495,6 @@ export function computeSpacingStyle(
       return theme.spacing[marginValue as ThemeSpacing]
     })
     .join(" ")
-}
-
-function addPxUnit(n: number): string {
-  return `${n}px`
 }
 
 function addRemUnit(n: number): string {
