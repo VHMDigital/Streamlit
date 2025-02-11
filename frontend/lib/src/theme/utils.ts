@@ -152,7 +152,7 @@ export const createEmotionTheme = (
 ): EmotionTheme => {
   const { colors, genericFonts } = baseThemeConfig.emotion
   const {
-    fontSizes,
+    baseFontSize,
     roundness,
     showBorderAroundInputs,
     bodyFont,
@@ -248,25 +248,24 @@ export const createEmotionTheme = (
     )
   }
 
-  if (fontSizes) {
+  if (baseFontSize) {
     conditionalOverrides.fontSizes = {
       ...baseThemeConfig.emotion.fontSizes,
     }
 
-    if (fontSizes.tinyFontSize) {
-      conditionalOverrides.fontSizes.twoSm = addPxUnit(fontSizes.tinyFontSize)
-      conditionalOverrides.fontSizes.twoSmPx = fontSizes.tinyFontSize
-    }
-
-    if (fontSizes.smallFontSize) {
-      conditionalOverrides.fontSizes.sm = addPxUnit(fontSizes.smallFontSize)
-      conditionalOverrides.fontSizes.smPx = fontSizes.smallFontSize
-    }
-
-    if (fontSizes.baseFontSize) {
-      conditionalOverrides.fontSizes.md = addPxUnit(fontSizes.baseFontSize)
-      conditionalOverrides.fontSizes.mdPx = fontSizes.baseFontSize
-    }
+    // Adapt all font sizes based on the configured base/root font size:
+    conditionalOverrides.fontSizes.twoSm = addPxUnit(baseFontSize * 0.75)
+    conditionalOverrides.fontSizes.twoSmPx = baseFontSize * 0.75
+    conditionalOverrides.fontSizes.sm = addPxUnit(baseFontSize * 0.875)
+    conditionalOverrides.fontSizes.smPx = baseFontSize * 0.875
+    conditionalOverrides.fontSizes.md = addPxUnit(baseFontSize)
+    conditionalOverrides.fontSizes.mdPx = baseFontSize
+    conditionalOverrides.fontSizes.mdLg = addPxUnit(baseFontSize * 1.125)
+    conditionalOverrides.fontSizes.lg = addPxUnit(baseFontSize * 1.25)
+    conditionalOverrides.fontSizes.xl = addPxUnit(baseFontSize * 1.5)
+    conditionalOverrides.fontSizes.twoXL = addPxUnit(baseFontSize * 1.75)
+    conditionalOverrides.fontSizes.threeXL = addPxUnit(baseFontSize * 2.25)
+    conditionalOverrides.fontSizes.fourXL = addPxUnit(baseFontSize * 2.75)
   }
 
   return {

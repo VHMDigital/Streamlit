@@ -1073,6 +1073,14 @@ _create_option(
     type_=bool,
 )
 
+_create_option(
+    "theme.baseFontSize",
+    description="""
+        The base font size for the app.
+    """,
+    type_=int,
+)
+
 # Config Section: Secrets #
 
 _create_section("secrets", "Secrets configuration.")
