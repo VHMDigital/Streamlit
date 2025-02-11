@@ -248,11 +248,10 @@ export const createEmotionTheme = (
     )
   }
 
-  if (baseFontSize) {
+  if (baseFontSize && baseFontSize > 0) {
     conditionalOverrides.fontSizes = {
       ...baseThemeConfig.emotion.fontSizes,
     }
-    console.log("baseFontSize", baseFontSize)
 
     // Set the root font size to the configured value (used on global styles):
     conditionalOverrides.fontSizes.baseFontSize = baseFontSize
