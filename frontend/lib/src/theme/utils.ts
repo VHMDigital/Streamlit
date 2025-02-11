@@ -253,19 +253,8 @@ export const createEmotionTheme = (
       ...baseThemeConfig.emotion.fontSizes,
     }
 
-    // Adapt all font sizes based on the configured base/root font size:
-    conditionalOverrides.fontSizes.twoSm = addPxUnit(baseFontSize * 0.75)
-    conditionalOverrides.fontSizes.twoSmPx = baseFontSize * 0.75
-    conditionalOverrides.fontSizes.sm = addPxUnit(baseFontSize * 0.875)
-    conditionalOverrides.fontSizes.smPx = baseFontSize * 0.875
-    conditionalOverrides.fontSizes.md = addPxUnit(baseFontSize)
-    conditionalOverrides.fontSizes.mdPx = baseFontSize
-    conditionalOverrides.fontSizes.mdLg = addPxUnit(baseFontSize * 1.125)
-    conditionalOverrides.fontSizes.lg = addPxUnit(baseFontSize * 1.25)
-    conditionalOverrides.fontSizes.xl = addPxUnit(baseFontSize * 1.5)
-    conditionalOverrides.fontSizes.twoXL = addPxUnit(baseFontSize * 1.75)
-    conditionalOverrides.fontSizes.threeXL = addPxUnit(baseFontSize * 2.25)
-    conditionalOverrides.fontSizes.fourXL = addPxUnit(baseFontSize * 2.75)
+    // Set the root font size to the configured value (used on global styles):
+    conditionalOverrides.fontSizes.baseFontSize = baseFontSize
   }
 
   return {
