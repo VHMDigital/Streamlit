@@ -1213,7 +1213,7 @@ export class App extends PureComponent<Props, State> {
         const { scriptRunId, fragmentIdsThisRun } = this.state
 
         // If we are running a fragment, we need to update the scriptRunId
-        // associated with logo to ensure it isn't cleared (Issue #10350)
+        // associated with logo to ensure it isn't cleared (Issue #10350/#10382)
         if (
           status ===
           ForwardMsg.ScriptFinishedStatus.FINISHED_FRAGMENT_RUN_SUCCESSFULLY
