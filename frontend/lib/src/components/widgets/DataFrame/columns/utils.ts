@@ -487,8 +487,13 @@ export function formatNumber(
   }
 
   if (format === "plain") {
-    return value.toString()
-  } else if (format === "locale") {
+    return numbro(value).format({
+      thousandSeparated: false,
+      // Use a large mantissa to avoid cutting off decimals
+      mantissa: 20,
+      trimMantissa: true,
+    })
+  } else if (format === "localized") {
     return new Intl.NumberFormat().format(value)
   } else if (format === "percent") {
     return new Intl.NumberFormat(undefined, {
@@ -513,6 +518,13 @@ export function formatNumber(
     return new Intl.NumberFormat(undefined, {
       notation: format as any,
     }).format(value)
+  } else if (format === "accounting") {
+    return numbro(value).format({
+      thousandSeparated: true,
+      negative: "parenthesis",
+      mantissa: 2,
+      trimMantissa: false,
+    })
   }
 
   return sprintf(format, value)
@@ -523,20 +535,21 @@ export function formatNumber(
  *
  * @param momentDate The moment date to format.
  * @param format The format to use.
- *   If the format is `locale` the date will be formatted according to the user's locale.
- *   If the format is `relative` the date will be formatted as a relative time (e.g. "2 hours ago").
+ *   If the format is `localized` the date will be formatted according to the user's locale.
+ *   If the format is `distance` the date will be formatted as a relative time distance (e.g. "2 hours ago").
+ *   If the format is `calendar` the date will be formatted as a calendar date (e.g. "Tomorrow 12:00").
  *   Otherwise, it is interpreted as momentJS format string: https://momentjs.com/docs/#/displaying/format/
  * @returns The formatted date as a string.
  */
 export function formatMoment(momentDate: Moment, format: string): string {
-  if (format === "locale") {
+  if (format === "localized") {
     return new Intl.DateTimeFormat(undefined, {
       dateStyle: "medium",
       timeStyle: "medium",
     }).format(momentDate.toDate())
   } else if (format === "distance") {
     return momentDate.fromNow()
-  } else if (format === "relative") {
+  } else if (format === "calendar") {
     return momentDate.calendar()
   }
   return momentDate.format(format)
