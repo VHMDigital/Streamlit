@@ -83,10 +83,12 @@ export const useLayoutStyles = <T>({
     }
 
     if (width && width < 0) {
+      // If we have an invalid width, we should treat it as if it has no width set
       width = undefined
     }
 
     if (width !== undefined && isNaN(width)) {
+      // If we have an invalid width, we should treat it as if it has no width set
       width = undefined
     }
 
@@ -96,6 +98,8 @@ export const useLayoutStyles = <T>({
       typeof containerWidth === "number" &&
       width > containerWidth
     ) {
+      // If the width is greater than the container width, we should use the
+      // container width to prevent overflows
       width = containerWidth
     }
 
