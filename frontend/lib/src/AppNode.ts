@@ -833,8 +833,12 @@ export class AppRoot {
       this.bottom.clearStaleNodes(currentScriptRunId, fragmentIdsThisRun) ||
       new BlockNode(this.mainScriptHash)
 
+    // Check if we're running a fragment, ensure logo isn't cleared as stale (Issue #10350/#10382)
+    const isFragmentRun = fragmentIdsThisRun && fragmentIdsThisRun.length > 0
     const appLogo =
-      this.appLogo?.scriptRunId === currentScriptRunId ? this.appLogo : null
+      isFragmentRun || this.appLogo?.scriptRunId === currentScriptRunId
+        ? this.appLogo
+        : null
 
     return new AppRoot(
       this.mainScriptHash,
