@@ -31,6 +31,12 @@ updates:
       - dependency-name: "ua-parser-js"
         # The license was changed to AGPLv3 with the 2.0 major version update.
         versions: [">=2.0.0"]
+      - dependency-name: "react"
+        # Updating react will need some extra work.
+        versions: [">=19.0.0"]
+      - dependency-name: "react-dom"
+        # Updating react will need some extra work.
+        versions: [">=19.0.0"]
 
   # Keep Pipfile up to date
   - package-ecosystem: "pip"
