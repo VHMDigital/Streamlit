@@ -577,3 +577,87 @@ st.dataframe(
     },
     row_height=100,
 )
+
+st.header("NumberColumn Formatting:")
+
+st.dataframe(
+    pd.DataFrame(
+        {
+            "default": [0.0123123, -1234.567, 12, 0],
+            "percent": [0.0123123, -1234.567, 12, 0],
+            "compact": [0.0123123, -1234.567, 12, 0],
+            "scientific": [0.0123123, -1234.567, 12, 0],
+            "engineering": [0.0123123, -1234.567, 12, 0],
+            "plain": [0.0123123, -1234.567, 12, 0],
+            "dollar": [0.0123123, -1234.567, 12, 0],
+            "euro": [0.0123123, -1234.567, 12, 0],
+            "localized": [0.0123123, -1234.567, 12, 0],
+            "accounting": [0.0123123, -1234.567, 12, 0],
+            "printf %.2f": [0.0123123, -1234.567, 12, 0],
+        }
+    ),
+    column_config={
+        "percent": st.column_config.NumberColumn(format="percent"),
+        "compact": st.column_config.NumberColumn(format="compact"),
+        "scientific": st.column_config.NumberColumn(format="scientific"),
+        "engineering": st.column_config.NumberColumn(format="engineering"),
+        "plain": st.column_config.NumberColumn(format="plain"),
+        "dollar": st.column_config.NumberColumn(format="dollar"),
+        "euro": st.column_config.NumberColumn(format="euro"),
+        "localized": st.column_config.NumberColumn(format="localized"),
+        "accounting": st.column_config.NumberColumn(format="accounting"),
+        "printf %.2f": st.column_config.NumberColumn(format="%.2f"),
+    },
+    hide_index=True,
+)
+
+st.header("Date Time Formatting:")
+
+st.dataframe(
+    pd.DataFrame(
+        {
+            "default": [
+                datetime.datetime(2024, 1, 1, 9, 30, 0),
+                datetime.datetime(2024, 1, 1, 15, 45, 30),
+                datetime.datetime(2024, 1, 2, 12, 0, 0),
+            ],
+            "localized": [
+                datetime.datetime(2024, 1, 1, 9, 30, 0),
+                datetime.datetime(2024, 1, 1, 15, 45, 30),
+                datetime.datetime(2024, 1, 2, 12, 0, 0),
+            ],
+            "calendar": [
+                datetime.datetime(2024, 1, 1, 9, 30, 0),
+                datetime.datetime(2024, 1, 1, 15, 45, 30),
+                datetime.datetime(2024, 1, 2, 12, 0, 0),
+            ],
+            "custom format": [
+                datetime.datetime(2024, 1, 1, 9, 30, 0),
+                datetime.datetime(2024, 1, 1, 15, 45, 30),
+                datetime.datetime(2024, 1, 2, 12, 0, 0),
+            ],
+            "localized date": [
+                datetime.date(2024, 1, 1),
+                datetime.date(2024, 1, 2),
+                datetime.date(2024, 1, 3),
+            ],
+            "localized time": [
+                datetime.time(9, 30, 0),
+                datetime.time(15, 45, 30),
+                datetime.time(12, 0, 0),
+            ],
+        }
+    ),
+    column_config={
+        "localized": st.column_config.DatetimeColumn(format="localized"),
+        "calendar": st.column_config.DatetimeColumn(format="calendar"),
+        "custom format": st.column_config.DatetimeColumn(
+            format="MMM DD, YYYY - hh:mm A"
+        ),
+        "localized date": st.column_config.DateColumn(format="localized"),
+        "localized time": st.column_config.TimeColumn(format="localized"),
+        # We cannot reliably test distance via e2e tests because it wouldn't
+        # stay stable.
+    },
+    hide_index=True,
+)

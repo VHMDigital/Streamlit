@@ -134,7 +134,7 @@ class TimeColumnConfig(TypedDict):
 
 class DateColumnConfig(TypedDict):
     type: Literal["date"]
-    format: NotRequired[str | Literal["localized"] | None]
+    format: NotRequired[str | Literal["localized", "distance"] | None]
     min_value: NotRequired[str | None]
     max_value: NotRequired[str | None]
     step: NotRequired[int | None]
@@ -1806,7 +1806,7 @@ def DateColumn(
     required: bool | None = None,
     pinned: bool | None = None,
     default: datetime.date | None = None,
-    format: str | Literal["localized"] | None = None,
+    format: str | Literal["localized", "distance"] | None = None,
     min_value: datetime.date | None = None,
     max_value: datetime.date | None = None,
     step: int | None = None,
@@ -1866,10 +1866,11 @@ def DateColumn(
         Specifies the default value in this column when a new row is added by
         the user. This defaults to ``None``.
 
-    format: str | "localized" | None
+    format: str, "localized", "distance", or None
         A format string controlling how the dates are displayed.
         Can be one of the following:
         - "localized": Shows the date in the default locale format.
+        - "distance": Shows the date in a relative format (e.g. "1 day ago").
         - A momentJS format string: See `momentJS docs <https://momentjs.com/docs/#/displaying/format/>`_
         for available formats.
         - ``None`` (default): uses ``YYYY-MM-DD`` as format.

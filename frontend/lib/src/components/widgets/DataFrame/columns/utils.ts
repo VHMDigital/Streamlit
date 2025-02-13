@@ -541,11 +541,15 @@ export function formatNumber(
  *   Otherwise, it is interpreted as momentJS format string: https://momentjs.com/docs/#/displaying/format/
  * @returns The formatted date as a string.
  */
-export function formatMoment(momentDate: Moment, format: string): string {
+export function formatMoment(
+  momentDate: Moment,
+  format: string,
+  momentKind: "date" | "time" | "datetime" = "datetime"
+): string {
   if (format === "localized") {
     return new Intl.DateTimeFormat(undefined, {
-      dateStyle: "medium",
-      timeStyle: "medium",
+      dateStyle: momentKind === "time" ? undefined : "medium",
+      timeStyle: momentKind === "date" ? undefined : "medium",
     }).format(momentDate.toDate())
   } else if (format === "distance") {
     return momentDate.fromNow()
