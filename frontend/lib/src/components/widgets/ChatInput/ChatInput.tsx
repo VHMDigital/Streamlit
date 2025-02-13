@@ -401,8 +401,6 @@ function ChatInput({
 
   const showDropzone = acceptFile !== AcceptFileValue.None && fileDragged
 
-  console.log("maxHeight", maxHeight)
-
   return (
     <>
       {acceptFile === AcceptFileValue.None ? null : (

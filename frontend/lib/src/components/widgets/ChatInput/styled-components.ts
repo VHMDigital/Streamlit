@@ -48,9 +48,9 @@ export const StyledChatInput = styled.div<StyledChatInputProps>(
       display: "flex",
       alignItems: "center",
       paddingLeft: theme.spacing.lg,
+      maxHeight: extended ? "none" : theme.sizes.minElementHeight,
       gap: theme.spacing.sm,
       overflow: "hidden",
-      maxHeight: extended ? "none" : theme.sizes.minElementHeight,
 
       ":focus-within": {
         borderColor: theme.colors.primary,
@@ -107,14 +107,16 @@ export const StyledSendIconButton = styled.button<StyledSendIconButtonProps>(
   }
 )
 
-export const StyledSendIconButtonContainer = styled.div({
+export const StyledSendIconButtonContainer = styled.div(({ theme }) => ({
   display: "flex",
   alignItems: "flex-end",
   height: "100%",
   position: "absolute",
   right: 0,
+  // Negative margin to offset the parent border width when we align button to end
+  marginBottom: `-${theme.sizes.borderWidth}`,
   pointerEvents: "none",
-})
+}))
 
 export const StyledInputInstructionsContainer = styled.div(({ theme }) => ({
   position: "absolute",

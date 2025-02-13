@@ -52,10 +52,12 @@ export const StyledFileUploadDropzone =
     fontWeight: theme.fontWeights.bold,
   }))
 
-export const StyledFileUploadButton = styled.div(({}) => ({
+export const StyledFileUploadButton = styled.div(({ theme }) => ({
   display: "flex",
   alignItems: "top",
   height: "100%",
+  // Negative margin to offset the parent border width when we align to top
+  marginTop: `-${theme.sizes.borderWidth}`,
 }))
 
 export const StyledVerticalDivider = styled.div(({ theme }) => ({
