@@ -617,34 +617,34 @@ st.dataframe(
     pd.DataFrame(
         {
             "default": [
-                datetime.datetime(2024, 1, 1, 9, 30, 0),
+                datetime.datetime(2022, 4, 6, 9, 30, 0),
                 datetime.datetime(2024, 1, 1, 15, 45, 30),
-                datetime.datetime(2024, 1, 2, 12, 0, 0),
+                datetime.datetime(2019, 8, 9, 12, 0, 0),
             ],
             "localized": [
-                datetime.datetime(2024, 1, 1, 9, 30, 0),
+                datetime.datetime(2022, 4, 6, 9, 30, 0),
                 datetime.datetime(2024, 1, 1, 15, 45, 30),
-                datetime.datetime(2024, 1, 2, 12, 0, 0),
+                datetime.datetime(2019, 8, 9, 12, 0, 0),
             ],
             "calendar": [
-                datetime.datetime(2024, 1, 1, 9, 30, 0),
+                datetime.datetime(2022, 4, 6, 9, 30, 0),
                 datetime.datetime(2024, 1, 1, 15, 45, 30),
-                datetime.datetime(2024, 1, 2, 12, 0, 0),
-            ],
-            "custom format": [
-                datetime.datetime(2024, 1, 1, 9, 30, 0),
-                datetime.datetime(2024, 1, 1, 15, 45, 30),
-                datetime.datetime(2024, 1, 2, 12, 0, 0),
+                datetime.datetime(2019, 8, 9, 12, 0, 0),
             ],
             "localized date": [
+                datetime.date(2022, 4, 6),
                 datetime.date(2024, 1, 1),
-                datetime.date(2024, 1, 2),
-                datetime.date(2024, 1, 3),
+                datetime.date(2019, 8, 9),
             ],
             "localized time": [
                 datetime.time(9, 30, 0),
                 datetime.time(15, 45, 30),
                 datetime.time(12, 0, 0),
+            ],
+            "custom format": [
+                datetime.datetime(2022, 4, 6, 9, 30, 0),
+                datetime.datetime(2024, 1, 1, 15, 45, 30),
+                datetime.datetime(2019, 8, 9, 12, 0, 0),
             ],
         }
     ),
@@ -658,6 +658,7 @@ st.dataframe(
         "localized time": st.column_config.TimeColumn(format="localized"),
         # We cannot reliably test distance via e2e tests because it wouldn't
         # stay stable.
+        # "distance": st.column_config.DatetimeColumn(format="distance"),
     },
     hide_index=True,
 )
