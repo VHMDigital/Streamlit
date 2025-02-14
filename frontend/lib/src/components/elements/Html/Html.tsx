@@ -16,6 +16,9 @@
 
 import React, { memo, ReactElement, useEffect, useRef, useState } from "react"
 
+// DOMPurify has an issue with typescript as reported here:
+// https://github.com/cure53/DOMPurify/issues/1052
+// eslint-disable-next-line import/no-named-as-default
 import DOMPurify from "dompurify"
 
 import { Html as HtmlProto } from "@streamlit/protobuf"
