@@ -498,7 +498,7 @@ export function formatNumber(
   } else if (format === "percent") {
     return new Intl.NumberFormat(undefined, {
       style: "percent",
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     }).format(value)
   } else if (format === "dollar") {
