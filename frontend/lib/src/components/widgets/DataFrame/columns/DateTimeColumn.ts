@@ -80,7 +80,7 @@ export interface DateTimeColumnParams {
  * @returns A BaseColumn object
  */
 function BaseDateTimeColumn(
-  kind: string,
+  kind: "datetime" | "time" | "date",
   props: BaseColumnProps,
   defaultFormat: string, // used for rendering and copy data
   defaultStep: number,
@@ -173,7 +173,22 @@ function BaseDateTimeColumn(
       return false
     }
 
-    // TODO: validate step size
+    // Validate step size
+    if (parameters.step) {
+      if (kind === "date") {
+        // The step for date is in days, so we need to convert it to milliseconds
+        const stepInMs = parameters.step * 24 * 60 * 60 * 1000
+        if (cellData.getTime() % stepInMs !== 0) {
+          return false
+        }
+      } else {
+        // The step for time / datetime is in seconds, so we need to convert it to milliseconds
+        const stepInMs = parameters.step * 1000
+        if (cellData.getTime() % stepInMs !== 0) {
+          return false
+        }
+      }
+    }
 
     return true
   }
