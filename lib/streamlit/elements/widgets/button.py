@@ -264,7 +264,7 @@ class ButtonMixin:
         mime: str | None = None,
         key: Key | None = None,
         help: str | None = None,
-        on_click: WidgetCallback | Literal["rerun", "ignore"] | None = None,
+        on_click: WidgetCallback | Literal["rerun", "ignore"] | None = "rerun",
         args: WidgetArgs | None = None,
         kwargs: WidgetKwargs | None = None,
         *,  # keyword-only arguments:
@@ -712,7 +712,7 @@ class ButtonMixin:
         mime: str | None = None,
         key: Key | None = None,
         help: str | None = None,
-        on_click: WidgetCallback | Literal["rerun", "ignore"] | None = None,
+        on_click: WidgetCallback | Literal["rerun", "ignore"] | None = "rerun",
         args: WidgetArgs | None = None,
         kwargs: WidgetKwargs | None = None,
         *,  # keyword-only arguments:

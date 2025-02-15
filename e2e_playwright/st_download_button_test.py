@@ -27,7 +27,7 @@ def test_download_button_widget_rendering(
 ):
     """Test that download buttons are correctly rendered via screenshot matching."""
     download_buttons = themed_app.get_by_test_id("stDownloadButton")
-    expect(download_buttons).to_have_count(13)
+    expect(download_buttons).to_have_count(14)
 
     assert_snapshot(download_buttons.nth(0), name="st_download_button-default")
     assert_snapshot(download_buttons.nth(1), name="st_download_button-disabled")
@@ -66,31 +66,39 @@ def test_value_not_reset_on_reclick(app: Page):
     expect(app.get_by_test_id("stMarkdown").first).to_have_text("value: True")
 
 
-def test_click_calls_callback(app: Page):
+def test_value_correct_on_ignore_click(app: Page):
     download_button = app.get_by_test_id("stDownloadButton").nth(12).locator("button")
-    expect(app.get_by_test_id("stMarkdown").nth(3)).to_contain_text(
+    download_button.click()
+    expect(app.get_by_test_id("stMarkdown").nth(1)).to_have_text(
+        "Ignore rerun download button value: False"
+    )
+
+
+def test_click_calls_callback(app: Page):
+    download_button = app.get_by_test_id("stDownloadButton").nth(13).locator("button")
+    expect(app.get_by_test_id("stMarkdown").nth(4)).to_contain_text(
         "Download Button was clicked: False"
     )
     download_button.click()
-    expect(app.get_by_test_id("stMarkdown").nth(3)).to_have_text(
+    expect(app.get_by_test_id("stMarkdown").nth(4)).to_have_text(
         "Download Button was clicked: True"
     )
-    expect(app.get_by_test_id("stMarkdown").nth(4)).to_have_text("times clicked: 1")
-    expect(app.get_by_test_id("stMarkdown").nth(5)).to_have_text("arg value: 1")
-    expect(app.get_by_test_id("stMarkdown").nth(6)).to_have_text("kwarg value: 2")
+    expect(app.get_by_test_id("stMarkdown").nth(5)).to_have_text("times clicked: 1")
+    expect(app.get_by_test_id("stMarkdown").nth(6)).to_have_text("arg value: 1")
+    expect(app.get_by_test_id("stMarkdown").nth(7)).to_have_text("kwarg value: 2")
 
 
 def test_reset_on_other_widget_change(app: Page):
-    download_button = app.get_by_test_id("stDownloadButton").nth(12).locator("button")
+    download_button = app.get_by_test_id("stDownloadButton").nth(13).locator("button")
     download_button.click()
-    expect(app.get_by_test_id("stMarkdown").nth(1)).to_have_text("value: True")
-    expect(app.get_by_test_id("stMarkdown").nth(2)).to_have_text(
+    expect(app.get_by_test_id("stMarkdown").nth(2)).to_have_text("value: True")
+    expect(app.get_by_test_id("stMarkdown").nth(3)).to_have_text(
         "value from state: True"
     )
 
     click_checkbox(app, "reset button return value")
-    expect(app.get_by_test_id("stMarkdown").nth(1)).to_have_text("value: False")
-    expect(app.get_by_test_id("stMarkdown").nth(2)).to_have_text(
+    expect(app.get_by_test_id("stMarkdown").nth(2)).to_have_text("value: False")
+    expect(app.get_by_test_id("stMarkdown").nth(3)).to_have_text(
         "value from state: False"
     )
 
