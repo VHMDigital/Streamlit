@@ -22,6 +22,7 @@ import streamlit as st
 import streamlit.elements.deck_gl_json_chart as deck_gl_json_chart
 from streamlit.errors import StreamlitAPIException
 from streamlit.proto.DeckGlJsonChart_pb2 import DeckGlJsonChart as PydeckProto
+from streamlit.testing.v1.util import patch_config_options
 from tests.delta_generator_test_case import DeltaGeneratorTestCase
 
 df1 = pd.DataFrame({"lat": [1, 2, 3, 4], "lon": [10, 20, 30, 40]})
@@ -226,3 +227,18 @@ class PyDeckTest(DeltaGeneratorTestCase):
             )
 
         self.assertTrue("Invalid selection mode: {'multi-object'}." in str(e.exception))
+
+    @patch_config_options({"mapbox.token": "MY_TOKEN"})
+    def test_mapbox_token(self):
+        """Test a Mapbox token is passed in the proto when properly configured."""
+
+        st.pydeck_chart(
+            pdk.Deck(
+                layers=[
+                    pdk.Layer("ScatterplotLayer", data=df1),
+                ]
+            )
+        )
+
+        el = self.get_delta_from_queue().new_element
+        self.assertEqual(el.mapbox_token, "MY_MAP_STYLE")

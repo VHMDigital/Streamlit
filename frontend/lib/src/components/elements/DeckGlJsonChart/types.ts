@@ -44,8 +44,8 @@ export interface DeckGLProps {
   disableFullscreenMode?: boolean
   element: DeckGlJsonChartProto
   fragmentId: string | undefined
-  mapboxToken: string
   widgetMgr: WidgetStateManager
+  width: number
 }
 
 export interface DeckObject {

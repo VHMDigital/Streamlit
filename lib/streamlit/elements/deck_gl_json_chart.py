@@ -269,7 +269,8 @@ class PydeckMixin:
         selection_mode: Literal[
             "single-object"
         ],  # Selection mode will only be activated by on_select param, this is a default value here to make it work with mypy
-        on_select: Literal["ignore"],  # No default value here to make it work with mypy
+        # No default value here to make it work with mypy
+        on_select: Literal["ignore"],
         key: Key | None = None,
     ) -> DeltaGenerator: ...
 
@@ -308,21 +309,18 @@ class PydeckMixin:
         - DeckGL docs: https://github.com/uber/deck.gl/tree/master/docs
         - DeckGL JSON docs: https://github.com/uber/deck.gl/tree/master/modules/json
 
-        When using this command, Mapbox provides the map tiles to render map
-        content. Note that Mapbox is a third-party product and Streamlit accepts
-        no responsibility or liability of any kind for Mapbox or for any content
-        or information made available by Mapbox.
+        When using this command, a service called Carto provides the map tiles to render
+        map content.
 
-        Mapbox requires users to register and provide a token before users can
-        request map tiles. Currently, Streamlit provides this token for you, but
-        this could change at any time. We strongly recommend all users create and
-        use their own personal Mapbox token to avoid any disruptions to their
-        experience. You can do this with the ``mapbox.token`` config option. The
-        use of Mapbox is governed by Mapbox's Terms of Use.
+        Another common provider for map tiles is Mapbox. If you prefer to use that,
+        you'll need to create an account at https://mapbox.com and specify your Mapbox
+        token in the Streamlit config file. For more info on how to set config options,
+        see https://docs.streamlit.io/develop/api-reference/configuration/config.toml.
 
-        To get a token for yourself, create an account at https://mapbox.com.
-        For more info on how to set config options, see
-        https://docs.streamlit.io/develop/api-reference/configuration/config.toml.
+        Carto and Mapbox are third-party products and Streamlit accepts no responsibility
+        or liability of any kind for Carto or Mapbox, or for any content or information
+        made available by Carto or Mapbox. The use of Carto or Mapbox is governed by
+        their respective Terms of Use.
 
         Parameters
         ----------
@@ -408,7 +406,7 @@ class PydeckMixin:
         >>>
         >>> st.pydeck_chart(
         ...     pdk.Deck(
-        ...         map_style=None,
+        ...         map_style=None,  # Use Streamlit theme to pick map style
         ...         initial_view_state=pdk.ViewState(
         ...             latitude=37.76,
         ...             longitude=-122.4,
@@ -476,7 +474,9 @@ class PydeckMixin:
 
         if on_select not in ["ignore", "rerun"] and not callable(on_select):
             raise StreamlitAPIException(
-                f"You have passed {on_select} to `on_select`. But only 'ignore', 'rerun', or a callable is supported."
+                f"You have passed {
+                    on_select
+                } to `on_select`. But only 'ignore', 'rerun', or a callable is supported."
             )
 
         if is_selection_activated:

@@ -63,7 +63,7 @@ type UseDeckGlShape = {
   width: number | string
 }
 
-export type UseDeckGlProps = Omit<DeckGLProps, "mapboxToken"> & {
+export type UseDeckGlProps = Omit<DeckGLProps, "width"> & {
   isLightTheme: boolean
   theme: EmotionTheme
 }
@@ -225,12 +225,11 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
   const deck = useMemo<DeckObject>(() => {
     const copy = { ...parsedPydeckJson }
 
-    // If unset, use either the Mapbox light or dark style based on Streamlit's theme
-    // For Mapbox styles, see https://docs.mapbox.com/api/maps/styles/#mapbox-styles
+    // If unset, use either the light or dark style based on Streamlit's theme.
     if (!copy.mapStyle) {
-      copy.mapStyle = `mapbox://styles/mapbox/${
-        isLightTheme ? "light" : "dark"
-      }-v9`
+      copy.mapStyle = isLightTheme
+        ? "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+        : "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
     }
 
     if (copy.layers) {

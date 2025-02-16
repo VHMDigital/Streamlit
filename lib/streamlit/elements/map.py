@@ -94,21 +94,18 @@ class MapMixin:
         This is a wrapper around ``st.pydeck_chart`` to quickly create
         scatterplot charts on top of a map, with auto-centering and auto-zoom.
 
-        When using this command, Mapbox provides the map tiles to render map
-        content. Note that Mapbox is a third-party product and Streamlit accepts
-        no responsibility or liability of any kind for Mapbox or for any content
-        or information made available by Mapbox.
+        When using this command, a service called Carto provides the map tiles to render
+        map content.
 
-        Mapbox requires users to register and provide a token before users can
-        request map tiles. Currently, Streamlit provides this token for you, but
-        this could change at any time. We strongly recommend all users create and
-        use their own personal Mapbox token to avoid any disruptions to their
-        experience. You can do this with the ``mapbox.token`` config option. The
-        use of Mapbox is governed by Mapbox's Terms of Use.
+        Another common provider for map tiles is Mapbox. If you prefer to use that,
+        you'll need to create an account at https://mapbox.com and specify your Mapbox
+        token in the Streamlit config file. For more info on how to set config options,
+        see https://docs.streamlit.io/develop/api-reference/configuration/config.toml.
 
-        To get a token for yourself, create an account at https://mapbox.com.
-        For more info on how to set config options, see
-        https://docs.streamlit.io/develop/api-reference/configuration/config.toml.
+        Carto and Mapbox are third-party products and Streamlit accepts no responsibility
+        or liability of any kind for Carto or Mapbox, or for any content or information
+        made available by Carto or Mapbox. The use of Carto or Mapbox is governed by
+        their respective Terms of Use.
 
         Parameters
         ----------
