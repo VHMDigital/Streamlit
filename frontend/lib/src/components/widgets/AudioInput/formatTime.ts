@@ -15,13 +15,27 @@
  */
 
 const formatTime = (timeMs: number): string => {
-  const date = new Date(timeMs)
+  const seconds = Math.floor(timeMs / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
 
-  return date.toLocaleTimeString(undefined, {
-    minute: "2-digit",
-    second: "2-digit",
-    timeZone: "UTC",
-  })
+  const remainingSeconds = seconds % 60
+  const remainingMinutes = minutes % 60
+
+  if (seconds < 60) {
+    // Less than a minute - return only seconds
+    return `${remainingSeconds.toString().padStart(2, "0")}`
+  } else if (minutes < 60) {
+    // Less than an hour - return minutes and seconds
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+      .toString()
+      .padStart(2, "0")}`
+  } else {
+    // More than an hour - return hours, minutes and seconds
+    return `${hours.toString().padStart(2, "0")}:${remainingMinutes
+      .toString()
+      .padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`
+  }
 }
 
 export default formatTime
