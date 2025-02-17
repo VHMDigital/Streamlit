@@ -654,6 +654,24 @@ function DataFrame({
     }, 1)
   }, [resizableSize, numRows, glideColumns])
 
+  const changeColumnFormat = React.useCallback(
+    (columnId: string, format: string) => {
+      setColumnConfigMapping(prevColumnConfigMapping => {
+        const newColumnConfigMapping = new Map(prevColumnConfigMapping)
+        const existingConfig = newColumnConfigMapping.get(columnId)
+        newColumnConfigMapping.set(columnId, {
+          ...(existingConfig || {}),
+          type_config: {
+            ...(existingConfig?.type_config || {}),
+            format: format,
+          },
+        })
+        return newColumnConfigMapping
+      })
+    },
+    [setColumnConfigMapping]
+  )
+
   return (
     <StyledResizableContainer
       className="stDataFrame"
@@ -1060,6 +1078,7 @@ function DataFrame({
           <ColumnMenu
             top={showMenu.headerBounds.y + showMenu.headerBounds.height}
             left={showMenu.headerBounds.x + showMenu.headerBounds.width}
+            columnKind={originalColumns[showMenu.columnIdx].kind}
             onCloseMenu={() => setShowMenu(undefined)}
             onSortColumn={
               isSortingEnabled
@@ -1077,6 +1096,12 @@ function DataFrame({
             }}
             onPinColumn={() => {
               pinColumn(originalColumns[showMenu.columnIdx].id)
+            }}
+            changeFormat={(format: string) => {
+              changeColumnFormat(
+                originalColumns[showMenu.columnIdx].id,
+                format
+              )
             }}
           />,
           // We put the column menu into the portal element which is also

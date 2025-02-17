@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-import React, { memo, ReactElement, useEffect } from "react"
+import React, { memo, ReactElement, useEffect, useState } from "react"
 
 import { useTheme } from "@emotion/react"
-import { ACCESSIBILITY_TYPE, PLACEMENT, Popover } from "baseui/popover"
+import {
+  ACCESSIBILITY_TYPE,
+  PLACEMENT,
+  Popover,
+  TRIGGER_TYPE,
+} from "baseui/popover"
 
 import {
   convertRemToPx,
@@ -32,11 +37,110 @@ import {
   StyledMenuListItem,
 } from "./styled-components"
 
+const COLUMN_KIND_FORMAT_MAPPING: Record<
+  string,
+  { format: string; label: string; icon: string }[]
+> = {
+  number: [
+    {
+      format: "",
+      label: "Default",
+      icon: ":material/123:",
+    },
+    {
+      format: "percent",
+      label: "Percent",
+      icon: ":material/percent:",
+    },
+    {
+      format: "compact",
+      label: "Compact",
+      icon: ":material/1k:",
+    },
+    {
+      format: "dollar",
+      label: "Dollar",
+      icon: ":material/attach_money:",
+    },
+    {
+      format: "euro",
+      label: "Euro",
+      icon: ":material/euro:",
+    },
+    {
+      format: "scientific",
+      label: "Scientific",
+      icon: ":material/experiment:",
+    },
+    {
+      format: "accounting",
+      label: "Accounting",
+      icon: ":material/finance_chip:",
+    },
+    {
+      format: "plain",
+      label: "Plain",
+      icon: ":material/speed_1_75:",
+    },
+    {
+      format: "localized",
+      label: "Localized",
+      icon: ":material/translate:",
+    },
+  ],
+  datetime: [
+    {
+      format: "",
+      label: "default",
+      icon: ":material/schedule:",
+    },
+    {
+      format: "localized",
+      label: "Localized",
+      icon: ":material/translate:",
+    },
+    {
+      format: "distance",
+      label: "Distance",
+      icon: ":material/search_activity:",
+    },
+    {
+      format: "calendar",
+      label: "Calendar",
+      icon: ":material/today:",
+    },
+  ],
+  date: [
+    {
+      format: "",
+      label: "default",
+      icon: ":material/schedule:",
+    },
+    {
+      format: "localized",
+      label: "Localized",
+      icon: ":material/translate:",
+    },
+    {
+      format: "distance",
+      label: "Distance",
+      icon: ":material/search_activity:",
+    },
+    {
+      format: "calendar",
+      label: "Calendar",
+      icon: ":material/today:",
+    },
+  ],
+}
+
 export interface ColumnMenuProps {
   // The top position of the menu
   top: number
   // The left position of the menu
   left: number
+  // The kind of the column
+  columnKind: string
   // Callback used to instruct the parent to close the menu
   onCloseMenu: () => void
   // Callback to sort column
@@ -48,6 +152,8 @@ export interface ColumnMenuProps {
   onPinColumn: () => void
   // Callback to unpin the column
   onUnpinColumn: () => void
+  // Callback to change the column format
+  changeFormat?: (format: string) => void
 }
 
 /**
@@ -61,8 +167,11 @@ function ColumnMenu({
   onUnpinColumn,
   onCloseMenu,
   onSortColumn,
+  columnKind,
+  changeFormat,
 }: ColumnMenuProps): ReactElement {
   const theme: EmotionTheme = useTheme()
+  const [formatMenuOpen, setFormatMenuOpen] = useState(false)
   const { colors, fontSizes, radii, fontWeights } = theme
 
   // Disable page scrolling while the menu is open to keep the menu und
@@ -89,6 +198,8 @@ function ColumnMenu({
   const closeMenu = React.useCallback((): void => {
     onCloseMenu()
   }, [onCloseMenu])
+
+  const formats = COLUMN_KIND_FORMAT_MAPPING[columnKind] || []
 
   return (
     <Popover
@@ -131,6 +242,88 @@ function ColumnMenu({
               <StyledMenuDivider />
             </>
           )}
+          {changeFormat && formats.length > 0 && (
+            <>
+              <Popover
+                triggerType={TRIGGER_TYPE.hover}
+                returnFocus
+                autoFocus
+                focusLock
+                isOpen={formatMenuOpen}
+                onMouseEnter={() => setFormatMenuOpen(true)}
+                onMouseLeave={() => setFormatMenuOpen(false)}
+                ignoreBoundary={true}
+                content={
+                  <StyledMenuList>
+                    {formats.map(format => (
+                      <StyledMenuListItem
+                        key={format.format}
+                        onClick={() => {
+                          changeFormat(format.format)
+                          closeMenu()
+                        }}
+                        role="menuitem"
+                      >
+                        <DynamicIcon
+                          size={"base"}
+                          margin="0"
+                          color="inherit"
+                          iconValue={format.icon}
+                        />
+                        {format.label}
+                      </StyledMenuListItem>
+                    ))}
+                  </StyledMenuList>
+                }
+                placement={PLACEMENT.right}
+                showArrow={false}
+                popoverMargin={2}
+                overrides={{
+                  Body: {
+                    style: {
+                      borderTopLeftRadius: radii.default,
+                      borderTopRightRadius: radii.default,
+                      borderBottomLeftRadius: radii.default,
+                      borderBottomRightRadius: radii.default,
+                      paddingTop: "0 !important",
+                      paddingBottom: "0 !important",
+                      paddingLeft: "0 !important",
+                      paddingRight: "0 !important",
+                      backgroundColor: "transparent",
+                      border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+                    },
+                  },
+                  Inner: {
+                    style: {
+                      backgroundColor: hasLightBackgroundColor(theme)
+                        ? colors.bgColor
+                        : colors.secondaryBg,
+                      color: colors.bodyText,
+                      fontSize: fontSizes.sm,
+                      fontWeight: fontWeights.normal,
+                      paddingTop: "0 !important",
+                      paddingBottom: "0 !important",
+                      paddingLeft: "0 !important",
+                      paddingRight: "0 !important",
+                    },
+                  },
+                }}
+              >
+                <StyledMenuListItem
+                  onMouseEnter={() => setFormatMenuOpen(true)}
+                  onMouseLeave={() => setFormatMenuOpen(false)}
+                >
+                  <DynamicIcon
+                    size={"base"}
+                    margin="0"
+                    color="inherit"
+                    iconValue=":material/format_list_numbered:"
+                  />
+                  Change format
+                </StyledMenuListItem>
+              </Popover>
+            </>
+          )}
           {isColumnPinned && (
             <StyledMenuListItem
               onClick={() => {
@@ -169,7 +362,7 @@ function ColumnMenu({
       accessibilityType={ACCESSIBILITY_TYPE.menu}
       showArrow={false}
       popoverMargin={convertRemToPx("0.375rem")}
-      onClickOutside={closeMenu}
+      onClickOutside={!formatMenuOpen ? closeMenu : undefined}
       onEsc={closeMenu}
       overrides={{
         Body: {
