@@ -44,6 +44,7 @@ SAFE_APP_STATIC_FILE_EXTENSIONS = (
     ".woff2",
     # Other types:
     ".pdf",
+    ".xml",
 )
 
 
