@@ -61,6 +61,10 @@ class AppStaticFileHandlerTest(tornado.testing.AsyncHTTPTestCase):
             dir=self._tmpdir.name, suffix="file.xml", delete=False
         )
 
+        self._tmp_json_file = tempfile.NamedTemporaryFile(
+            dir=self._tmpdir.name, suffix="file.json", delete=False
+        )
+
         self._tmp_dir_inside_static_folder = tempfile.TemporaryDirectory(
             dir=self._tmpdir.name
         )
@@ -83,6 +87,7 @@ class AppStaticFileHandlerTest(tornado.testing.AsyncHTTPTestCase):
         self._pdf_document_filename = os.path.basename(self._tmp_pdf_document_file.name)
         self._webp_image_filename = os.path.basename(self._tmp_webp_image_file.name)
         self._xml_filename = os.path.basename(self._tmp_xml_file.name)
+        self._json_filename = os.path.basename(self._tmp_json_file.name)
 
         super().setUp()
 
@@ -162,6 +167,17 @@ class AppStaticFileHandlerTest(tornado.testing.AsyncHTTPTestCase):
 
         assert response.code == 200
         assert response.headers["Content-Type"] == "application/xml"
+        assert response.headers["X-Content-Type-Options"] == "nosniff"
+
+    def test_static_json_file_200(self):
+        """Files with extensions listed in app_static_file_handler.py
+        `SAFE_APP_STATIC_FILE_EXTENSIONS` (e.g. json) should have the
+        `Content-Type` header based on their extension.
+        """
+        response = self.fetch(f"/app/static/{self._json_filename}")
+
+        assert response.code == 200
+        assert response.headers["Content-Type"] == "application/json"
         assert response.headers["X-Content-Type-Options"] == "nosniff"
 
     @patch("os.path.getsize", MagicMock(return_value=MAX_APP_STATIC_FILE_SIZE + 1))
