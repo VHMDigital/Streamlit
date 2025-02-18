@@ -188,10 +188,6 @@ export const StyledStreamlitMarkdown =
           marginRight: theme.spacing.none,
         },
 
-        code: {
-          whiteSpace: "pre-wrap",
-        },
-
         img: {
           // Images in markdown should never be wider
           // than the content area.
