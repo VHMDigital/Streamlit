@@ -54,23 +54,29 @@ export const StyledMenuList = styled.div(({ theme }) => ({
   paddingBottom: theme.spacing.xs,
 }))
 
+interface StyledMenuListItemProps {
+  isActive?: boolean
+}
 /**
  * A styled menu list item component used by the column menu.
  */
-export const StyledMenuListItem = styled.div(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  gap: theme.spacing.sm,
-  paddingLeft: theme.spacing.sm,
-  paddingRight: theme.spacing.sm,
-  paddingTop: theme.spacing.twoXS,
-  paddingBottom: theme.spacing.twoXS,
-  cursor: "pointer",
-  "&:hover": {
-    backgroundColor: theme.colors.darkenedBgMix15,
-  },
-  minWidth: theme.sizes.minMenuWidth,
-}))
+export const StyledMenuListItem = styled.div<StyledMenuListItemProps>(
+  ({ theme, isActive }) => ({
+    display: "flex",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+    paddingLeft: theme.spacing.sm,
+    paddingRight: theme.spacing.sm,
+    paddingTop: theme.spacing.twoXS,
+    paddingBottom: theme.spacing.twoXS,
+    cursor: "pointer",
+    backgroundColor: isActive ? theme.colors.darkenedBgMix15 : undefined,
+    "&:hover": {
+      backgroundColor: theme.colors.darkenedBgMix15,
+    },
+    minWidth: theme.sizes.minMenuWidth,
+  })
+)
 
 /**
  * A styled menu divider used by the column menu.

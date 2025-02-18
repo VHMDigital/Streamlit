@@ -91,7 +91,7 @@ const COLUMN_KIND_FORMAT_MAPPING: Record<
   datetime: [
     {
       format: "",
-      label: "default",
+      label: "Default",
       icon: ":material/schedule:",
     },
     {
@@ -113,7 +113,7 @@ const COLUMN_KIND_FORMAT_MAPPING: Record<
   date: [
     {
       format: "",
-      label: "default",
+      label: "Default",
       icon: ":material/schedule:",
     },
     {
@@ -312,6 +312,7 @@ function ColumnMenu({
                 <StyledMenuListItem
                   onMouseEnter={() => setFormatMenuOpen(true)}
                   onMouseLeave={() => setFormatMenuOpen(false)}
+                  isActive={formatMenuOpen}
                 >
                   <DynamicIcon
                     size={"base"}
