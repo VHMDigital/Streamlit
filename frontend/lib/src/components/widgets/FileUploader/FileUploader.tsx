@@ -20,6 +20,7 @@ import axios from "axios"
 import isEqual from "lodash/isEqual"
 import zip from "lodash/zip"
 import { FileRejection } from "react-dropzone"
+import { flushSync } from "react-dom"
 
 import {
   FileUploader as FileUploaderProto,
@@ -71,6 +72,16 @@ export interface State {
    * rejected files that will not be updated.
    */
   files: UploadFileInfo[]
+  /**
+   * A flag to handle the case where a file uploader that only accepts one file
+   * at a time has its file replaced, which we want to treat as a single change
+   * rather than the deletion of a file followed by the upload of another.
+   * Doing this ensures that the script (and thus callbacks, etc) is only run a
+   * single time when replacing a file.  Note that deleting a file and uploading
+   * a new one with two interactions (clicking the 'X', then dragging a file
+   * into the file uploader) will still cause the script to execute twice.
+   */
+  isUpdating: boolean
 }
 
 class FileUploader extends React.PureComponent<InnerProps, State> {
@@ -100,7 +111,7 @@ class FileUploader extends React.PureComponent<InnerProps, State> {
   }
 
   get initialValue(): State {
-    const emptyState = { files: [], newestServerFileId: 0 }
+    const emptyState = { files: [], isUpdating: false }
     const { widgetMgr, element } = this.props
 
     const widgetValue = widgetMgr.getFileUploaderStateValue(element)
@@ -127,6 +138,7 @@ class FileUploader extends React.PureComponent<InnerProps, State> {
           fileUrls,
         })
       }),
+      isUpdating: false,
     }
   }
 
@@ -150,9 +162,7 @@ class FileUploader extends React.PureComponent<InnerProps, State> {
     const isFileUpdating = (file: UploadFileInfo): boolean =>
       file.status.type === "uploading"
 
-    // If any of our files is Uploading or Deleting, then we're currently
-    // updating.
-    if (this.state.files.some(isFileUpdating) || this.forceUpdatingStatus) {
+    if (this.state.files.some(isFileUpdating) || this.state.isUpdating) {
       return "updating"
     }
 
@@ -220,13 +230,6 @@ class FileUploader extends React.PureComponent<InnerProps, State> {
   }
 
   /**
-   * Clear files and errors, and reset the widget to its READY state.
-   */
-  private reset = (): void => {
-    this.setState({ files: [] })
-  }
-
-  /**
    * Called by react-dropzone when files and drag-and-dropped onto the widget.
    *
    * @param acceptedFiles an array of files.
@@ -270,9 +273,15 @@ class FileUploader extends React.PureComponent<InnerProps, State> {
             f => f.status.type !== "error"
           )
           if (existingFile) {
-            this.forceUpdatingStatus = true
+            flushSync(() => {
+              this.setState({ isUpdating: true })
+            })
+
             this.deleteFile(existingFile.id)
-            this.forceUpdatingStatus = false
+
+            flushSync(() => {
+              this.setState({ isUpdating: false })
+            })
           }
         }
 
@@ -430,19 +439,25 @@ class FileUploader extends React.PureComponent<InnerProps, State> {
 
   /** Append the given file to `state.files`. */
   private addFile = (file: UploadFileInfo): void => {
-    this.setState(state => ({ files: [...state.files, file] }))
+    flushSync(() => {
+      this.setState(state => ({ files: [...state.files, file] }))
+    })
   }
 
   /** Append the given files to `state.files`. */
   private addFiles = (files: UploadFileInfo[]): void => {
-    this.setState(state => ({ files: [...state.files, ...files] }))
+    flushSync(() => {
+      this.setState(state => ({ files: [...state.files, ...files] }))
+    })
   }
 
   /** Remove the file with the given ID from `state.files`. */
   private removeFile = (idToRemove: number): void => {
-    this.setState(state => ({
-      files: state.files.filter(file => file.id !== idToRemove),
-    }))
+    flushSync(() => {
+      this.setState(state => ({
+        files: state.files.filter(file => file.id !== idToRemove),
+      }))
+    })
   }
 
   /**
@@ -454,12 +469,14 @@ class FileUploader extends React.PureComponent<InnerProps, State> {
 
   /** Replace the file with the given id in `state.files`. */
   private updateFile = (curFileId: number, newFile: UploadFileInfo): void => {
-    this.setState(curState => {
-      return {
-        files: curState.files.map(file =>
-          file.id === curFileId ? newFile : file
-        ),
-      }
+    flushSync(() => {
+      this.setState(curState => {
+        return {
+          files: curState.files.map(file =>
+            file.id === curFileId ? newFile : file
+          ),
+        }
+      })
     })
   }
 
@@ -494,20 +511,22 @@ class FileUploader extends React.PureComponent<InnerProps, State> {
    * form is submitted. Restore our default value and update the WidgetManager.
    */
   private onFormCleared = (): void => {
-    this.setState({ files: [] }, () => {
-      const newWidgetValue = this.createWidgetValue()
-      if (isNullOrUndefined(newWidgetValue)) {
-        return
-      }
-
-      const { widgetMgr, element, fragmentId } = this.props
-      widgetMgr.setFileUploaderStateValue(
-        element,
-        newWidgetValue,
-        { fromUi: true },
-        fragmentId
-      )
+    flushSync(() => {
+      this.setState({ files: [] })
     })
+
+    const newWidgetValue = this.createWidgetValue()
+    if (isNullOrUndefined(newWidgetValue)) {
+      return
+    }
+
+    const { widgetMgr, element, fragmentId } = this.props
+    widgetMgr.setFileUploaderStateValue(
+      element,
+      newWidgetValue,
+      { fromUi: true },
+      fragmentId
+    )
   }
 
   public render(): React.ReactNode {
