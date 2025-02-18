@@ -6,7 +6,7 @@ updates:
     directory: "/frontend"
     schedule:
       interval: "daily"
-    # Allow one update PR at a time:
+    # Allow a limited number of update PR's at a time:
     open-pull-requests-limit: 3
 
     labels:
