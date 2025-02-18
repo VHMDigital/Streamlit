@@ -151,6 +151,8 @@ class FileUploader extends React.PureComponent<InnerProps, State> {
     const isFileUpdating = (file: UploadFileInfo): boolean =>
       file.status.type === "uploading"
 
+    // If any of our files is Uploading or Deleting, then we're currently
+    // updating.
     if (this.state.files.some(isFileUpdating) || this.forceUpdatingStatus) {
       return "updating"
     }
