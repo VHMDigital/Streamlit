@@ -1102,6 +1102,11 @@ function DataFrame({
                 originalColumns[showMenu.columnIdx].id,
                 format
               )
+              setTimeout(() => {
+                dataEditorRef.current?.remeasureColumns(
+                  CompactSelection.fromSingleSelection(showMenu.columnIdx)
+                )
+              }, 100)
             }}
           />,
           // We put the column menu into the portal element which is also
