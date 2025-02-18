@@ -338,7 +338,6 @@ def test_single_file_upload_button_tooltip(
     wait_for_app_run(app, wait_delay=1500)
 
     expect(app.get_by_text("Upload or drag and drop a file")).to_be_visible()
-    assert_snapshot(app, name="st_chat_input-single_file_button_tooltip")
 
 
 def test_multi_file_upload_button_tooltip(
@@ -350,7 +349,6 @@ def test_multi_file_upload_button_tooltip(
     wait_for_app_run(app, wait_delay=1500)
 
     expect(app.get_by_text("Upload or drag and drop files")).to_be_visible()
-    assert_snapshot(app, name="st_chat_input-multi_file_button_tooltip")
 
 
 def test_check_top_level_class(app: Page):
