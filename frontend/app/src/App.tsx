@@ -664,6 +664,11 @@ export class App extends PureComponent<Props, State> {
       }
     }
 
+    // We are using `flushSync` here because there is code that expects every
+    // state to be observed. With React batched updates, it is possible that
+    // multiple `connectionState` changes are applied in 1 render cycle, leading
+    // to the last state change being the only one observed. Utilizing
+    // `flushSync` ensures that we apply every state change.
     flushSync(() => {
       this.setState({ connectionState: newState })
     })
