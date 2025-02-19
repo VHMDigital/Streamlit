@@ -18,7 +18,6 @@ import { GridCell, GridCellKind, TextCell } from "@glideapps/glide-data-grid"
 
 import { isNullOrUndefined, notNullOrUndefined } from "~lib/util/utils"
 
-import { JsonCell } from "./cells/JsonCell"
 import {
   BaseColumn,
   BaseColumnProps,
@@ -142,11 +141,7 @@ function TextColumn(props: BaseColumnProps): BaseColumn {
         )
       }
     },
-    getCellValue(cell: TextCell | JsonCell): string | null {
-      if (cell.kind === GridCellKind.Custom) {
-        return cell.copyData
-      }
-
+    getCellValue(cell: TextCell): string | null {
       return cell.data === undefined ? null : cell.data
     },
   }
