@@ -56,6 +56,7 @@ ColumnType: TypeAlias = Literal[
     "area_chart",
     "image",
     "progress",
+    "json",
 ]
 
 
