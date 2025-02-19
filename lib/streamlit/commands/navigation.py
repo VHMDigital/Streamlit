@@ -37,15 +37,14 @@ SectionHeader: TypeAlias = str
 
 
 def convert_to_streamlit_page(
-    page_input: str | Callable[[], None] | StreamlitPage,
+    page_input: str | Path | Callable[[], None] | StreamlitPage,
 ) -> StreamlitPage:
     """Convert various input types to StreamlitPage objects."""
     if isinstance(page_input, StreamlitPage):
         return page_input
 
     if isinstance(page_input, str):
-        # Convert string path to StreamlitPage
-        return Page(Path(page_input))
+        return Page(page_input)
 
     if isinstance(page_input, Path):
         return Page(page_input)
