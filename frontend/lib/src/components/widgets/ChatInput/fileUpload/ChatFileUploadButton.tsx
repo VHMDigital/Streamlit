@@ -27,6 +27,7 @@ import { Placement } from "~lib/components/shared/Tooltip"
 
 import {
   StyledFileUploadButton,
+  StyledFileUploadButtonContainer,
   StyledVerticalDivider,
 } from "./styled-components"
 
@@ -45,8 +46,12 @@ const ChatFileUploadButton = ({
   disabled,
   theme,
 }: Props): React.ReactElement => (
-  <StyledFileUploadButton disabled={disabled}>
-    <div data-testid="stChatInputFileUploadButton" {...getRootProps()}>
+  <StyledFileUploadButtonContainer disabled={disabled}>
+    <StyledFileUploadButton
+      data-testid="stChatInputFileUploadButton"
+      disabled={disabled}
+      {...getRootProps()}
+    >
       <input {...getInputProps()} />
       <TooltipIcon
         content={`Upload or drag and drop ${
@@ -65,9 +70,9 @@ const ChatFileUploadButton = ({
           />
         </BaseButton>
       </TooltipIcon>
-    </div>
+    </StyledFileUploadButton>
     <StyledVerticalDivider />
-  </StyledFileUploadButton>
+  </StyledFileUploadButtonContainer>
 )
 
 export default ChatFileUploadButton

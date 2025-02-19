@@ -53,17 +53,26 @@ export const StyledChatFileUploadDropzoneLabel =
     fontWeight: theme.fontWeights.bold,
   }))
 
-export interface StyledFileUploadButtonProps {
+export interface StyledFileUploadButtonContainerProps {
   disabled: boolean
 }
 
-export const StyledFileUploadButton = styled.div<StyledFileUploadButtonProps>(
-  ({ theme, disabled }) => ({
+export const StyledFileUploadButtonContainer =
+  styled.div<StyledFileUploadButtonContainerProps>(({ theme, disabled }) => ({
     display: "flex",
     alignItems: "top",
     height: "100%",
     // Negative margin to offset the parent border width when we align to top
     marginTop: `-${theme.sizes.borderWidth}`,
+    cursor: disabled ? "not-allowed" : "auto",
+  }))
+
+export interface StyledFileUploadButtonProps {
+  disabled: boolean
+}
+
+export const StyledFileUploadButton = styled.div<StyledFileUploadButtonProps>(
+  ({ disabled }) => ({
     pointerEvents: disabled ? "none" : "auto",
   })
 )
