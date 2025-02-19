@@ -45,7 +45,7 @@ const ChatFileUploadButton = ({
   disabled,
   theme,
 }: Props): React.ReactElement => (
-  <StyledFileUploadButton>
+  <StyledFileUploadButton disabled={disabled}>
     <div data-testid="stChatInputFileUploadButton" {...getRootProps()}>
       <input {...getInputProps()} />
       <TooltipIcon
@@ -59,7 +59,9 @@ const ChatFileUploadButton = ({
           <Icon
             content={AttachFile}
             size="lg"
-            color={theme.colors.fadedText60}
+            color={
+              disabled ? theme.colors.fadedText40 : theme.colors.fadedText60
+            }
           />
         </BaseButton>
       </TooltipIcon>

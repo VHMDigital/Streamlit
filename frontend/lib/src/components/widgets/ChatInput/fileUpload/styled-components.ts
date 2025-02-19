@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import styled from "@emotion/styled"
+import { disableAll } from "loglevel"
 
 import { FileStatus } from "~lib/components/widgets/FileUploader/UploadFileInfo"
 
@@ -53,13 +54,20 @@ export const StyledChatFileUploadDropzoneLabel =
     fontWeight: theme.fontWeights.bold,
   }))
 
-export const StyledFileUploadButton = styled.div(({ theme }) => ({
-  display: "flex",
-  alignItems: "top",
-  height: "100%",
-  // Negative margin to offset the parent border width when we align to top
-  marginTop: `-${theme.sizes.borderWidth}`,
-}))
+export interface StyledFileUploadButtonProps {
+  disabled: boolean
+}
+
+export const StyledFileUploadButton = styled.div<StyledFileUploadButtonProps>(
+  ({ theme, disabled }) => ({
+    display: "flex",
+    alignItems: "top",
+    height: "100%",
+    // Negative margin to offset the parent border width when we align to top
+    marginTop: `-${theme.sizes.borderWidth}`,
+    pointerEvents: disabled ? "none" : "auto",
+  })
+)
 
 export const StyledVerticalDivider = styled.div(({ theme }) => ({
   // We need to use hard-coded in order to align the divider centered
