@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "streamlit": "file:frontend"
+  }
+}

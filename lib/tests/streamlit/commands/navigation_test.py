@@ -89,9 +89,7 @@ class NavigationTest(DeltaGeneratorTestCase):
 
     def test_page_found_by_hash(self):
         found_page = st.Page("page2.py")
-        self.script_run_ctx.pages_manager.set_script_intent(
-            found_page._script_hash, ""
-        )
+        self.script_run_ctx.pages_manager.set_script_intent(found_page._script_hash, "")
         page = st.navigation([st.Page("page1.py"), found_page, st.Page("page3.py")])
         assert page == found_page
 
@@ -355,10 +353,10 @@ class NavigationTest(DeltaGeneratorTestCase):
             )
 
     def test_navigation_with_path_and_string_same_name(self):
-       with pytest.raises(StreamlitAPIException):
+        with pytest.raises(StreamlitAPIException):
             st.navigation(
                 [
-                   Path("foo.py"),
+                    Path("foo.py"),
                     "foo.py",
                 ]
             )
