@@ -18,22 +18,12 @@ from e2e_playwright.conftest import ImageCompareFunction, rerun_app, wait_for_ap
 from e2e_playwright.shared.app_utils import check_top_level_class, get_element_by_key
 
 
-def _assert_file_uploaders_rendered(app: Page):
-    """
-    Assert that the all the file uploaders are rendered to prevent accessing
-    things out of order.
-    """
-    file_uploaders = app.get_by_test_id("stFileUploader")
-    expect(file_uploaders).to_have_count(10)
-
-    return file_uploaders
-
-
 def test_file_uploader_render_correctly(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
     """Test that the file uploader render as expected via screenshot matching."""
-    file_uploaders = _assert_file_uploaders_rendered(themed_app)
+    file_uploaders = themed_app.get_by_test_id("stFileUploader")
+    expect(file_uploaders).to_have_count(10)
 
     assert_snapshot(file_uploaders.nth(0), name="st_file_uploader-single_file")
     assert_snapshot(file_uploaders.nth(1), name="st_file_uploader-disabled")
@@ -52,7 +42,6 @@ def test_file_uploader_error_message_disallowed_files(
     file_name1 = "example.json"
     file_content1 = b"{}"
 
-    _assert_file_uploaders_rendered(app)
     uploader_index = 0
 
     with app.expect_file_chooser() as fc_info:
@@ -92,7 +81,6 @@ def test_uploads_and_deletes_single_file_only(
     file_name2 = "file2.txt"
     file_content2 = b"file2content"
 
-    _assert_file_uploaders_rendered(app)
     uploader_index = 0
 
     with app.expect_file_chooser() as fc_info:
@@ -181,7 +169,6 @@ def test_uploads_and_deletes_multiple_files(
         FilePayload(name=file_name2, mimeType="text/plain", buffer=file_content2),
     ]
 
-    _assert_file_uploaders_rendered(app)
     uploader_index = 2
 
     with app.expect_file_chooser() as fc_info:
@@ -243,7 +230,6 @@ def test_uploads_multiple_files_one_by_one_quickly(app: Page):
         FilePayload(name=file_name2, mimeType="text/plain", buffer=file_content2),
     ]
 
-    _assert_file_uploaders_rendered(app)
     uploader_index = 2
 
     with app.expect_file_chooser() as fc_info:
@@ -316,7 +302,6 @@ def test_uploads_multiple_files_one_by_one_slowly(app: Page):
         FilePayload(name=file_name2, mimeType="text/plain", buffer=file_content2),
     ]
 
-    _assert_file_uploaders_rendered(app)
     uploader_index = 2
 
     with app.expect_file_chooser() as fc_info:
@@ -380,7 +365,6 @@ def test_does_not_call_callback_when_not_changed(app: Page):
     file_name1 = "example5.txt"
     file_content1 = b"Hello world!"
 
-    _assert_file_uploaders_rendered(app)
     uploader_index = 6
 
     # Script contains counter variable stored in session_state with
@@ -424,7 +408,6 @@ def test_works_inside_form(app: Page):
     file_name1 = "form_file1.txt"
     file_content1 = b"form_file1content"
 
-    _assert_file_uploaders_rendered(app)
     uploader_index = 3
 
     with app.expect_file_chooser() as fc_info:
@@ -490,7 +473,6 @@ def test_file_uploader_works_with_fragments(app: Page):
     expect(app.get_by_text("Runs: 1")).to_be_visible()
     expect(app.get_by_text("File uploader in Fragment: False")).to_be_visible()
 
-    _assert_file_uploaders_rendered(app)
     uploader_index = 7
 
     with app.expect_file_chooser() as fc_info:
