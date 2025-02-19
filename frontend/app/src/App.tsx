@@ -198,7 +198,7 @@ const ELEMENT_LIST_BUFFER_TIMEOUT_MS = 10
 
 const INITIAL_SCRIPT_RUN_ID = "<null>"
 
-export const log = getLogger("App")
+export const LOG = getLogger("App")
 
 // eslint-disable-next-line
 declare global {
@@ -371,6 +371,9 @@ export class App extends PureComponent<Props, State> {
       },
       restartWebsocketConnection: () => {
         if (!this.connectionManager) {
+          // Performing an intentional restart - we want the script to rerun on load
+          // so setting RERUN_REQUESTED so handleConnectionStateChanged triggers it
+          this.setState({ scriptRunState: ScriptRunState.RERUN_REQUESTED })
           this.initializeConnectionManager()
         }
       },
@@ -554,7 +557,7 @@ export class App extends PureComponent<Props, State> {
   }
 
   showError(title: string, errorMarkdown: string): void {
-    log.error(errorMarkdown)
+    LOG.error(errorMarkdown)
     const newDialog: DialogProps = {
       type: DialogType.WARNING,
       title,
@@ -627,24 +630,29 @@ export class App extends PureComponent<Props, State> {
    * Called by ConnectionManager when our connection state changes
    */
   handleConnectionStateChanged = (newState: ConnectionState): void => {
-    log.info(
+    LOG.info(
       `Connection state changed from ${this.state.connectionState} to ${newState}`
     )
 
     if (newState === ConnectionState.CONNECTED) {
-      log.info("Reconnected to server.")
-
-      const lastRunWasInterrupted =
-        this.state.scriptRunState === ScriptRunState.RERUN_REQUESTED ||
-        this.state.scriptRunState === ScriptRunState.RUNNING
-
+      LOG.info("Reconnected to server.")
       // We request a script rerun if:
       //   1. this is the first time we establish a websocket connection to the
       //      server, or
       //   2. our last script run attempt was interrupted by the websocket
-      //      connection dropping.
-      if (!this.sessionInfo.last || lastRunWasInterrupted) {
-        log.info("Requesting a script run.")
+      //      connection dropping, or
+      //   3. the host explicitly requested a reconnect (we trigger scriptRunState to be RERUN_REQUESTED)
+      const lastRunWasInterrupted =
+        this.state.scriptRunState === ScriptRunState.RUNNING
+      const wasRerunRequested =
+        this.state.scriptRunState === ScriptRunState.RERUN_REQUESTED
+
+      if (
+        !this.sessionInfo.last ||
+        lastRunWasInterrupted ||
+        wasRerunRequested
+      ) {
+        LOG.info("Requesting a script run.")
         this.widgetMgr.sendUpdateWidgetsMessage(undefined)
         this.setState({ dialog: null })
       }
@@ -684,7 +692,7 @@ export class App extends PureComponent<Props, State> {
         message: parentMessage.message,
       })
     } else {
-      log.error(
+      LOG.error(
         "Sending messages to the host is disabled in line with the platform policy."
       )
     }
@@ -753,7 +761,7 @@ export class App extends PureComponent<Props, State> {
       })
     } catch (e) {
       const err = ensureError(e)
-      log.error(err)
+      LOG.error(err)
       this.showError("Bad message format", err.message)
     }
   }
@@ -1186,6 +1194,12 @@ export class App extends PureComponent<Props, State> {
         this.setAndSendTheme(getHostSpecifiedTheme())
       }
     }
+
+    if (themeInput?.fontFaces) {
+      // If font faces are provided, we need to set the imported theme with the theme
+      // manager to make the font faces available.
+      this.props.theme.setImportedTheme(themeInput)
+    }
   }
 
   /**
@@ -1418,7 +1432,7 @@ export class App extends PureComponent<Props, State> {
     this.closeDialog()
 
     if (!this.isServerConnected()) {
-      log.error("Cannot rerun script when disconnected from server.")
+      LOG.error("Cannot rerun script when disconnected from server.")
       return
     }
 
@@ -1447,7 +1461,7 @@ export class App extends PureComponent<Props, State> {
 
   sendLoadGitInfoBackMsg = (): void => {
     if (!this.isServerConnected()) {
-      log.error("Cannot load git information when disconnected from server.")
+      LOG.error("Cannot load git information when disconnected from server.")
       return
     }
 
@@ -1508,7 +1522,7 @@ export class App extends PureComponent<Props, State> {
       // websocket connection to the server (in which case
       // connectionManager.getBaseUriParts() returns undefined), we can't send a
       // rerun backMessage so just return early.
-      log.error("Cannot send rerun backMessage when disconnected from server.")
+      LOG.error("Cannot send rerun backMessage when disconnected from server.")
       return
     }
 
@@ -1566,7 +1580,7 @@ export class App extends PureComponent<Props, State> {
   /** Requests that the server stop running the script */
   stopScript = (): void => {
     if (!this.isServerConnected()) {
-      log.error("Cannot stop app when disconnected from server.")
+      LOG.error("Cannot stop app when disconnected from server.")
       return
     }
 
@@ -1598,7 +1612,7 @@ export class App extends PureComponent<Props, State> {
       // This will be called if enter is pressed.
       this.openDialog(newDialog)
     } else {
-      log.error("Cannot clear cache: disconnected from server")
+      LOG.error("Cannot clear cache: disconnected from server")
     }
   }
 
@@ -1640,7 +1654,7 @@ export class App extends PureComponent<Props, State> {
       backMsg.type = "clearCache"
       this.sendBackMsg(backMsg)
     } else {
-      log.error("Cannot clear cache: disconnected from server")
+      LOG.error("Cannot clear cache: disconnected from server")
     }
   }
 
@@ -1653,7 +1667,7 @@ export class App extends PureComponent<Props, State> {
       backMsg.type = "appHeartbeat"
       this.sendBackMsg(backMsg)
     } else {
-      log.error("Cannot send app heartbeat: disconnected from server")
+      LOG.error("Cannot send app heartbeat: disconnected from server")
     }
   }
 
@@ -1662,10 +1676,10 @@ export class App extends PureComponent<Props, State> {
    */
   private sendBackMsg = (msg: BackMsg): void => {
     if (this.connectionManager) {
-      log.info(msg)
+      LOG.info(msg)
       this.connectionManager.sendMessage(msg)
     } else {
-      log.error(`Not connected. Cannot send back message: ${msg}`)
+      LOG.error(`Not connected. Cannot send back message: ${msg}`)
     }
   }
 
@@ -2039,4 +2053,5 @@ export class App extends PureComponent<Props, State> {
   }
 }
 
-export default withScreencast(App)
+const AppWithScreenCast = withScreencast(App)
+export default AppWithScreenCast

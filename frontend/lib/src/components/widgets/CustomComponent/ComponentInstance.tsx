@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useEffect, useRef, useState } from "react"
+import React, { memo, ReactElement, useEffect, useRef, useState } from "react"
 
-import { withTheme } from "@emotion/react"
+import { useTheme } from "@emotion/react"
 import { getLogger } from "loglevel"
 import queryString from "query-string"
 
@@ -40,6 +40,7 @@ import { WidgetStateManager } from "~lib/WidgetStateManager"
 import { COMMUNITY_URL, COMPONENT_DEVELOPER_URL } from "~lib/urls"
 import { ensureError } from "~lib/util/ErrorHandling"
 import { isNullOrUndefined, notNullOrUndefined } from "~lib/util/utils"
+import { withCalculatedWidth } from "~lib/components/core/Layout/withCalculatedWidth"
 
 import { ComponentRegistry } from "./ComponentRegistry"
 import {
@@ -66,7 +67,6 @@ export interface Props {
   disabled: boolean
   element: ComponentInstanceProto
   width: number
-  theme: EmotionTheme
   fragmentId?: string
 }
 
@@ -170,10 +170,10 @@ function compareDataframeArgs(
  * by {@link COMPONENT_READY_WARNING_TIME_MS}, a warning element is rendered instead.
  */
 function ComponentInstance(props: Props): ReactElement {
+  const theme: EmotionTheme = useTheme()
   const [componentError, setComponentError] = useState<Error>()
 
-  const { disabled, element, registry, theme, widgetMgr, width, fragmentId } =
-    props
+  const { disabled, element, registry, widgetMgr, width, fragmentId } = props
   const { componentName, jsonArgs, specialArgs, url } = element
 
   const [parsedNewArgs, parsedDataframeArgs] = tryParseArgs(
@@ -369,7 +369,6 @@ function ComponentInstance(props: Props): ReactElement {
     // eslint-disable-next-line react-compiler/react-compiler
     !isReadyRef.current && isReadyTimeout ? (
       <AlertElement
-        width={width}
         body={getWarnMessage(componentName, url)}
         kind={Kind.WARNING}
       />
@@ -413,4 +412,4 @@ function ComponentInstance(props: Props): ReactElement {
   )
 }
 
-export default withTheme(ComponentInstance)
+export default withCalculatedWidth(memo(ComponentInstance))

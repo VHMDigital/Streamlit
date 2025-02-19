@@ -14,7 +14,21 @@
  * limitations under the License.
  */
 
-export { FormSubmitButton } from "./FormSubmitButton"
-export { FormSubmitContent } from "./FormSubmitContent"
-export { Form } from "./Form"
-export { FormClearHelper, useFormClearHelper } from "./FormClearHelper"
+import { Alert as AlertProto } from "@streamlit/protobuf"
+
+import { Kind } from "~lib/components/shared/AlertContainer"
+
+export function getAlertElementKind(format: AlertProto.Format): Kind {
+  switch (format) {
+    case AlertProto.Format.ERROR:
+      return Kind.ERROR
+    case AlertProto.Format.INFO:
+      return Kind.INFO
+    case AlertProto.Format.SUCCESS:
+      return Kind.SUCCESS
+    case AlertProto.Format.WARNING:
+      return Kind.WARNING
+    default:
+      throw new Error(`Unexpected alert type: ${format}`)
+  }
+}

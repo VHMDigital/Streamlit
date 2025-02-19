@@ -13,8 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Alert as AlertProto } from "@streamlit/protobuf"
 
-import ThemedSidebar from "./ThemedSidebar"
+import { getAlertElementKind } from "./utils"
 
-export { default } from "./Sidebar"
-export { ThemedSidebar }
+describe("getAlertElementKind", () => {
+  it("getAlertElementKind throws an error on invalid format", () => {
+    expect(() => getAlertElementKind(AlertProto.Format.UNUSED)).toThrow(
+      `Unexpected alert type: ${AlertProto.Format.UNUSED}`
+    )
+  })
+})

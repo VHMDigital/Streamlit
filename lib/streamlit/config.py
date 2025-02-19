@@ -1026,10 +1026,27 @@ _create_option(
 _create_option(
     "theme.font",
     description="""
-        Font family for all text in the app, except code blocks. One of "sans serif",
+        The font family for all text in the app, except code blocks. One of "sans serif",
         "serif", or "monospace".
+        To use a custom font, it needs to be added via [theme.fontFaces].
     """,
 )
+
+_create_option(
+    "theme.codeFont",
+    description="""
+        The font family to use for code (monospace) in the app.
+        To use a custom font, it needs to be added via [theme.fontFaces].
+    """,
+)
+
+_create_option(
+    "theme.fontFaces",
+    description="""
+    Configure a list of font faces that you can use for the app & code fonts.
+""",
+)
+
 
 _create_option(
     "theme.roundness",
@@ -1054,6 +1071,15 @@ _create_option(
         file_uploader, etc).
     """,
     type_=bool,
+)
+
+_create_option(
+    "theme.baseFontSize",
+    description="""
+        Sets the root font size (in pixels) for the app, which determines the overall
+        scale of text and UI elements. The default base font size is 16.
+    """,
+    type_=int,
 )
 
 # Config Section: Secrets #

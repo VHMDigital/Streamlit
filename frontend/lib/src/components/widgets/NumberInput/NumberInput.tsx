@@ -15,15 +15,17 @@
  */
 
 import React, {
+  memo,
   ReactElement,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react"
 
 import { Minus, Plus } from "@emotion-icons/open-iconic"
-import { withTheme } from "@emotion/react"
+import { useTheme } from "@emotion/react"
 import { sprintf } from "sprintf-js"
 import { Input as UIInput } from "baseui/input"
 import uniqueId from "lodash/uniqueId"
@@ -48,6 +50,7 @@ import {
   WidgetLabel,
 } from "~lib/components/widgets/BaseWidget"
 import { EmotionTheme } from "~lib/theme"
+import { useResizeObserver } from "~lib/hooks/useResizeObserver"
 
 import {
   StyledInputContainer,
@@ -166,19 +169,17 @@ export interface Props {
   disabled: boolean
   element: NumberInputProto
   widgetMgr: WidgetStateManager
-  width: number
-  theme: EmotionTheme
   fragmentId?: string
 }
 
-export const NumberInput: React.FC<Props> = ({
+const NumberInput: React.FC<Props> = ({
   disabled,
   element,
   widgetMgr,
-  width,
-  theme,
   fragmentId,
 }: Props): ReactElement => {
+  const theme: EmotionTheme = useTheme()
+
   const {
     dataType: elementDataType,
     id: elementId,
@@ -188,6 +189,11 @@ export const NumberInput: React.FC<Props> = ({
   } = element
   const min = element.hasMin ? element.min : -Infinity
   const max = element.hasMax ? element.max : +Infinity
+
+  const {
+    values: [width],
+    elementRef,
+  } = useResizeObserver(useMemo(() => ["width"], []))
 
   const [step, setStep] = useState<number>(getStep(element))
   const initialValue = getInitialValue({ element, widgetMgr })
@@ -401,7 +407,7 @@ export const NumberInput: React.FC<Props> = ({
     <div
       className="stNumberInput"
       data-testid="stNumberInput"
-      style={{ width }}
+      ref={elementRef}
     >
       <WidgetLabel
         label={element.label}
@@ -550,4 +556,4 @@ export const NumberInput: React.FC<Props> = ({
   )
 }
 
-export default withTheme(NumberInput)
+export default memo(NumberInput)
