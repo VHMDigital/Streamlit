@@ -28,10 +28,22 @@ import {
   TextCellEntry,
 } from "@glideapps/glide-data-grid"
 import ReactJson from "react-json-view"
+import styled from "@emotion/styled"
 
 import { isNullOrUndefined } from "@streamlit/utils"
 
 import { toJsonString } from "~lib/components/widgets/DataFrame/columns/utils"
+
+const StyledJsonWrapper = styled.div(({ theme }) => ({
+  overflowY: "auto",
+  padding: theme.spacing.sm,
+  ".react-json-view .copy-icon svg": {
+    // Make the copy icon responsive to the root font size.
+    fontSize: `0.9em !important`,
+    marginRight: `${theme.spacing.threeXS} !important`,
+    verticalAlign: "middle !important",
+  },
+}))
 
 interface JsonViewerProps {
   jsonValue: string | object | undefined | null
@@ -74,10 +86,7 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
   }
 
   return (
-    <div
-      style={{ padding: theme.cellHorizontalPadding }}
-      data-testid="stJsonColumnViewer"
-    >
+    <StyledJsonWrapper data-testid="stJsonColumnViewer">
       <ReactJson
         src={parsedJson}
         collapsed={2}
@@ -93,7 +102,7 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
           whiteSpace: "pre-wrap", // preserve whitespace
         }}
       />
-    </div>
+    </StyledJsonWrapper>
   )
 }
 
