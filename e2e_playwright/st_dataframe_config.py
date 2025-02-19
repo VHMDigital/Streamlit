@@ -709,7 +709,9 @@ st.dataframe(
     ),
     column_config={
         "dict": st.column_config.JsonColumn(width="medium"),
-        "string json": st.column_config.JsonColumn(width="medium"),
+        # We explicitly don't set the string json column to json
+        # to test the behavior that text based columns should auto activate
+        # the json renderer.
         "list": st.column_config.JsonColumn(width="medium"),
         "string list": st.column_config.JsonColumn(width="medium"),
         "incompatible values": st.column_config.JsonColumn(width="medium"),
