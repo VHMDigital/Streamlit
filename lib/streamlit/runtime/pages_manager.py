@@ -231,7 +231,7 @@ class PagesManager:
         self._intended_page_script_hash: PageHash | None = None
         self._intended_page_name: PageName | None = None
         self._current_page_script_hash: PageHash = ""
-        self._has_pages_directory = self.main_script_parent / "pages"
+        self._has_pages_directory = Path(self.main_script_parent / "pages").exists()
 
     @property
     def main_script_path(self) -> ScriptPath:
