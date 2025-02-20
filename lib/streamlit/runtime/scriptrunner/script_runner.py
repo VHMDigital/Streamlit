@@ -21,7 +21,7 @@ import types
 from contextlib import contextmanager
 from enum import Enum
 from timeit import default_timer as timer
-from typing import TYPE_CHECKING, Callable, Final, Literal
+from typing import TYPE_CHECKING, Callable, Final, Literal, cast
 
 from blinker import Signal
 
@@ -128,7 +128,7 @@ def _mpa_v1(main_script_path: str):
     PAGES_FOLDER = Path(main_script_path).parent / "pages"
 
     if PAGES_FOLDER.exists():
-        from streamlit.commands.navigation import _navigation
+        from streamlit.commands.navigation import PageType, _navigation
         from streamlit.navigation.page import StreamlitPage
 
         # Read out the my_pages folder and create a page for every script:
@@ -139,6 +139,7 @@ def _mpa_v1(main_script_path: str):
 
         # Use this script as the main page and
         main_page = StreamlitPage(main_script_path, default=True)
+        all_pages = [main_page] + [StreamlitPage(page) for page in pages]
         # Initialize the navigation with all the pages:
         position: Literal["sidebar", "hidden"] = (
             "hidden"
@@ -146,7 +147,7 @@ def _mpa_v1(main_script_path: str):
             else "sidebar"
         )
         page = _navigation(
-            [main_page] + [StreamlitPage(page) for page in pages],
+            cast(list[PageType], all_pages),
             position=position,
             expanded=False,
         )
