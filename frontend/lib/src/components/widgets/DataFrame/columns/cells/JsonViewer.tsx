@@ -70,7 +70,8 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
 
   if (isNullOrUndefined(parsedJson)) {
     // If the provided value cannot be parsed into a JSON object
-    // or is empty/null/undefined, display the value as raw text.
+    // or is empty/null/undefined, display the value as raw text
+    // or just empty string.
     return (
       <TextCellEntry
         highlight={true}
