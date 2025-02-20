@@ -124,39 +124,39 @@ it in the future.
 def _mpa_v1(main_script_path: str):
     from pathlib import Path
 
+    from streamlit.commands.navigation import PageType, _navigation
+    from streamlit.navigation.page import StreamlitPage
+
     # Select the folder that should be used for the pages:
-    PAGES_FOLDER = Path(main_script_path).parent / "pages"
+    MAIN_SCRIPT_PATH = Path(main_script_path)
+    PAGES_FOLDER = MAIN_SCRIPT_PATH.parent / "pages"
 
-    if PAGES_FOLDER.exists():
-        from streamlit.commands.navigation import PageType, _navigation
-        from streamlit.navigation.page import StreamlitPage
+    # Read out the my_pages folder and create a page for every script:
+    pages = PAGES_FOLDER.glob("*.py")
+    pages = sorted(
+        [page for page in pages if page.name.endswith(".py")], key=page_sort_key
+    )
 
-        # Read out the my_pages folder and create a page for every script:
-        pages = PAGES_FOLDER.glob("*.py")
-        pages = sorted(
-            [page for page in pages if page.name.endswith(".py")], key=page_sort_key
-        )
+    # Use this script as the main page and
+    main_page = StreamlitPage(main_script_path, default=True)
+    all_pages = [main_page] + [StreamlitPage(page) for page in pages]
+    # Initialize the navigation with all the pages:
+    position: Literal["sidebar", "hidden"] = (
+        "hidden"
+        if config.get_option("client.showSidebarNavigation") is False
+        else "sidebar"
+    )
+    page = _navigation(
+        cast(list[PageType], all_pages),
+        position=position,
+        expanded=False,
+    )
 
-        # Use this script as the main page and
-        main_page = StreamlitPage(main_script_path, default=True)
-        all_pages = [main_page] + [StreamlitPage(page) for page in pages]
-        # Initialize the navigation with all the pages:
-        position: Literal["sidebar", "hidden"] = (
-            "hidden"
-            if config.get_option("client.showSidebarNavigation") is False
-            else "sidebar"
-        )
-        page = _navigation(
-            cast(list[PageType], all_pages),
-            position=position,
-            expanded=False,
-        )
-
-        if page._page != main_page._page:
-            # Only run the page if it is not pointing to this script:
-            page.run()
-            # Finish the script execution here to only run the selected page
-            raise StopException()
+    if page._page != main_page._page:
+        # Only run the page if it is not pointing to this script:
+        page.run()
+        # Finish the script execution here to only run the selected page
+        raise StopException()
 
 
 class ScriptRunner:
@@ -631,7 +631,8 @@ class ScriptRunner:
                                 pass
 
                     else:
-                        _mpa_v1(self._main_script_path)
+                        if ctx.pages_manager.has_pages_directory:
+                            _mpa_v1(self._main_script_path)
                         exec(code, module.__dict__)
                         self._fragment_storage.clear(
                             new_fragment_ids=ctx.new_fragment_ids

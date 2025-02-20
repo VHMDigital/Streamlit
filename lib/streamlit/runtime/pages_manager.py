@@ -231,6 +231,7 @@ class PagesManager:
         self._intended_page_script_hash: PageHash | None = None
         self._intended_page_name: PageName | None = None
         self._current_page_script_hash: PageHash = ""
+        self._has_pages_directory = self.main_script_parent / "pages"
 
     @property
     def main_script_path(self) -> ScriptPath:
@@ -259,6 +260,10 @@ class PagesManager:
     @property
     def initial_active_script_hash(self) -> PageHash:
         return self.pages_strategy.initial_active_script_hash
+
+    @property
+    def has_pages_directory(self) -> bool:
+        return self._has_pages_directory
 
     @property
     def mpa_version(self) -> int:
