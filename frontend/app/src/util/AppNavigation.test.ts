@@ -31,7 +31,6 @@ import {
   PageNotFoundCallback,
   PageUrlUpdateCallback,
   SetIconCallback,
-  StrategyV1,
 } from "./AppNavigation"
 
 function generateNewSession(changes = {}): NewSession {

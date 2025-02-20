@@ -1476,8 +1476,7 @@ export class App extends PureComponent<Props, State> {
     // from the common script
     const nextPageElements = this.appNavigation.clearPageElements(
       elements,
-      mainScriptHash,
-      undefined
+      mainScriptHash
     )
     const activeWidgetIds = new Set(
       Array.from(nextPageElements.getElements())
