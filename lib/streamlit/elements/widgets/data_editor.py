@@ -170,14 +170,14 @@ class DataEditorSerde:
 
 
 def _parse_value(
-    value: str | int | float | bool | None,
+    value: str | int | float | bool | list[str] | None,
     column_data_kind: ColumnDataKind,
 ) -> Any:
     """Convert a value to the correct type.
 
     Parameters
     ----------
-    value : str | int | float | bool | None
+    value : str | int | float | bool | list[str] | None
         The value to convert.
 
     column_data_kind : ColumnDataKind
@@ -612,7 +612,7 @@ class DataEditorMixin:
                   precedence over text and number formatting from ``pandas.Styler``.
                 - Mixing data types within a column can make the column uneditable.
                 - Additionally, the following data types are not yet supported for editing:
-                  ``complex``, ``list``, ``tuple``, ``bytes``, ``bytearray``,
+                  ``complex``, ``tuple``, ``bytes``, ``bytearray``,
                   ``memoryview``, ``dict``, ``set``, ``frozenset``,
                   ``fractions.Fraction``, ``pandas.Interval``, and
                   ``pandas.Period``.

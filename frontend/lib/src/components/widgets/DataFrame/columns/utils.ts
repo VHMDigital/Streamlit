@@ -427,6 +427,26 @@ export function toSafeNumber(value: any): number | null {
 }
 
 /**
+ * Converts an array to a string representation suitable for copying.
+ *
+ * @param array - The array to convert.
+ * @returns The string representation of the array.
+ */
+export function arrayToCopyValue(array?: any[] | null): string {
+  if (isNullOrUndefined(array)) {
+    return ""
+  }
+
+  return toSafeString(
+    array.map((x: any) =>
+      // Replace commas with spaces since commas are used to
+      // separate the list items.
+      typeof x === "string" && x.includes(",") ? x.replace(/,/g, " ") : x
+    )
+  )
+}
+
+/**
  * Determines the default mantissa to use for the given number.
  *
  * @param value - The number to determine the mantissa for.
