@@ -2802,7 +2802,11 @@ describe("App", () => {
         widgetStateManager,
         "sendUpdateWidgetsMessage"
       )
+      // Somehow the spy still registers one previous call to the function.
+      // To work around this, we clear the spy
       sendUpdateWidgetsMessageSpy.mockClear()
+      expect(sendUpdateWidgetsMessageSpy).not.toHaveBeenCalled()
+
       act(() => {
         getMockConnectionManagerProp("connectionStateChanged")(
           ConnectionState.CONNECTED
