@@ -58,6 +58,7 @@ from streamlit.runtime.state import (
     SafeSessionState,
     SessionState,
 )
+from streamlit.source_util import page_sort_key
 
 if TYPE_CHECKING:
     from streamlit.runtime.fragment import FragmentStorage
@@ -129,7 +130,7 @@ def _mpa_v1(main_script_path: str):
         # Read out the my_pages folder and create a page for every script:
         pages = PAGES_FOLDER.glob("*.py")
         pages = sorted(
-            [page for page in pages if page.name.endswith(".py")], key=lambda p: p.name
+            [page for page in pages if page.name.endswith(".py")], key=page_sort_key
         )
 
         # Use this script as the main page and
