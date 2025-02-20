@@ -117,16 +117,20 @@ it in the future.
 """
 
 
+# For projects that have a pages folder, we assume that this is a script that
+# is designed to leverage our original v1 version of multi-page apps. This
+# function will be called to run the script in lieu of the main script. This
+# function simulates the v1 setup using the modern v2 commands (st.navigation)
 def _mpa_v1(main_script_path: str):
     from pathlib import Path
-
-    from streamlit.commands.navigation import _navigation
-    from streamlit.navigation.page import StreamlitPage
 
     # Select the folder that should be used for the pages:
     PAGES_FOLDER = Path(main_script_path).parent / "pages"
 
     if PAGES_FOLDER.exists():
+        from streamlit.commands.navigation import _navigation
+        from streamlit.navigation.page import StreamlitPage
+
         # Read out the my_pages folder and create a page for every script:
         pages = PAGES_FOLDER.glob("*.py")
         pages = sorted(

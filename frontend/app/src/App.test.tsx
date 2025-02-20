@@ -1135,6 +1135,265 @@ describe("App", () => {
       expect(element).toBeInTheDocument()
     })
 
+    describe.skip("page change URL handling", () => {
+      let pushStateSpy: any
+
+      beforeEach(() => {
+        window.history.pushState({}, "", "/")
+        pushStateSpy = vi.spyOn(window.history, "pushState")
+      })
+
+      afterEach(() => {
+        pushStateSpy.mockRestore()
+        window.history.pushState({}, "", "/")
+      })
+
+      it("can switch to the main page from a different page", () => {
+        renderApp(getProps())
+        window.history.replaceState({}, "", "/page2")
+
+        sendForwardMessage("newSession", NEW_SESSION_JSON)
+
+        expect(window.history.pushState).toHaveBeenLastCalledWith({}, "", "/")
+      })
+
+      it("can switch to a non-main page", () => {
+        renderApp(getProps())
+        sendForwardMessage("newSession", {
+          ...NEW_SESSION_JSON,
+          appPages: [
+            {
+              pageScriptHash: "page_script_hash",
+              pageName: "streamlit app",
+              urlPathname: "streamlit_app",
+            },
+            {
+              pageScriptHash: "hash2",
+              pageName: "page2",
+              urlPathname: "page2",
+            },
+          ],
+          pageScriptHash: "hash2",
+        })
+
+        expect(window.history.pushState).toHaveBeenLastCalledWith(
+          {},
+          "",
+          "/page2"
+        )
+      })
+
+      it("does not retain the query string without embed params", () => {
+        renderApp(getProps())
+        window.history.pushState({}, "", "/?foo=bar")
+
+        sendForwardMessage("newSession", NEW_SESSION_JSON)
+
+        expect(window.history.pushState).toHaveBeenLastCalledWith(
+          {},
+          "",
+          "/?foo=bar"
+        )
+      })
+
+      it("retains embed query params even if the page hash is different", () => {
+        const embedParams =
+          "embed=true&embed_options=disable_scrolling&embed_options=show_colored_line"
+        window.history.pushState({}, "", `/?${embedParams}`)
+
+        renderApp(getProps())
+
+        const hostCommunicationMgr = getStoredValue<HostCommunicationManager>(
+          HostCommunicationManager
+        )
+
+        const appPages = [
+          {
+            pageScriptHash: "toppage_hash",
+            pageName: "streamlit app",
+            urlPathname: "streamlit_app",
+          },
+          {
+            pageScriptHash: "subpage_hash",
+            pageName: "page2",
+            urlPathname: "page2",
+          },
+        ]
+
+        // Because the page URL is already "/" pointing to the main page, no new history is pushed.
+        sendForwardMessage("newSession", {
+          ...NEW_SESSION_JSON,
+          appPages,
+          pageScriptHash: "toppage_hash",
+        })
+
+        const navLinks = screen.queryAllByTestId("stSidebarNavLink")
+        expect(navLinks).toHaveLength(2)
+
+        // TODO: Utilize user-event instead of fireEvent
+        // eslint-disable-next-line testing-library/prefer-user-event
+        fireEvent.click(navLinks[1])
+
+        const connectionManager = getMockConnectionManager()
+
+        expect(
+          // @ts-expect-error
+          connectionManager.sendMessage.mock.calls[0][0].rerunScript
+            .queryString
+        ).toBe(embedParams)
+
+        expect(hostCommunicationMgr.sendMessageToHost).toHaveBeenCalledWith({
+          type: "SET_QUERY_PARAM",
+          queryParams: embedParams,
+        })
+      })
+
+      it("works with baseUrlPaths", () => {
+        renderApp(getProps())
+        vi.spyOn(
+          getMockConnectionManager(),
+          "getBaseUriParts"
+        ).mockReturnValue({
+          pathname: "/foo",
+          hostname: "",
+          port: "8501",
+        } as URL)
+
+        sendForwardMessage("newSession", {
+          ...NEW_SESSION_JSON,
+          appPages: [
+            {
+              pageScriptHash: "page_script_hash",
+              pageName: "streamlit app",
+              urlPathname: "streamlit_app",
+            },
+            {
+              pageScriptHash: "hash2",
+              pageName: "page2",
+              urlPathname: "page2",
+            },
+          ],
+          pageScriptHash: "hash2",
+        })
+
+        expect(window.history.pushState).toHaveBeenLastCalledWith(
+          {},
+          "",
+          "/foo/page2"
+        )
+      })
+
+      it("doesn't push a new history when the same page URL is already set", () => {
+        renderApp(getProps())
+        history.replaceState({}, "", "/") // The URL is set to the main page from the beginning.
+
+        const appPages = [
+          {
+            pageScriptHash: "toppage_hash",
+            pageName: "streamlit app",
+            urlPathname: "streamlit_app",
+          },
+          {
+            pageScriptHash: "subpage_hash",
+            pageName: "page2",
+            urlPathname: "page2",
+          },
+        ]
+
+        // Because the page URL is already "/" pointing to the main page, no new history is pushed.
+        sendForwardMessage("newSession", {
+          ...NEW_SESSION_JSON,
+          appPages,
+          pageScriptHash: "toppage_hash",
+        })
+
+        expect(window.history.pushState).not.toHaveBeenCalled()
+        // @ts-expect-error
+        window.history.pushState.mockClear()
+
+        // When accessing a different page, a new history for that page is pushed.
+        sendForwardMessage("newSession", {
+          ...NEW_SESSION_JSON,
+          appPages,
+          pageScriptHash: "subpage_hash",
+        })
+        expect(window.history.pushState).toHaveBeenLastCalledWith(
+          {},
+          "",
+          "/page2"
+        )
+        // @ts-expect-error
+        window.history.pushState.mockClear()
+      })
+
+      it("doesn't push a duplicated history when rerunning", () => {
+        renderApp(getProps())
+        history.replaceState({}, "", "/page2") // Starting from a not main page.
+
+        const appPages = [
+          {
+            pageScriptHash: "toppage_hash",
+            pageName: "streamlit app",
+            urlPathname: "streamlit_app",
+          },
+          {
+            pageScriptHash: "subpage_hash",
+            pageName: "page2",
+            urlPathname: "page2",
+          },
+        ]
+
+        // Because the page URL is already "/" pointing to the main page, no new history is pushed.
+        sendForwardMessage("newSession", {
+          ...NEW_SESSION_JSON,
+          appPages,
+          pageScriptHash: "toppage_hash",
+        })
+
+        expect(window.history.pushState).toHaveBeenLastCalledWith({}, "", "/")
+        // @ts-expect-error
+        window.history.pushState.mockClear()
+
+        // When running the same, e.g. clicking the "rerun" button,
+        // the history is not pushed again.
+        sendForwardMessage("newSession", {
+          ...NEW_SESSION_JSON,
+          appPages,
+          pageScriptHash: "toppage_hash",
+        })
+        expect(window.history.pushState).not.toHaveBeenCalled()
+        // @ts-expect-error
+        window.history.pushState.mockClear()
+
+        // When accessing a different page, a new history for that page is pushed.
+        sendForwardMessage("newSession", {
+          ...NEW_SESSION_JSON,
+          appPages,
+          pageScriptHash: "subpage_hash",
+        })
+        expect(window.history.pushState).toHaveBeenLastCalledWith(
+          {},
+          "",
+          "/page2"
+        )
+        // @ts-expect-error
+        window.history.pushState.mockClear()
+      })
+    })
+
+    it.skip("resets document title if not fragment", () => {
+      renderApp(getProps())
+
+      document.title = "some title"
+
+      sendForwardMessage("newSession", {
+        ...NEW_SESSION_JSON,
+        fragmentIdsThisRun: [],
+      })
+
+      expect(document.title).toBe("streamlit_app")
+    })
+
     it("does *not* reset document title if fragment", () => {
       renderApp(getProps())
 
