@@ -21,16 +21,16 @@ import formatTime from "./formatTime"
 withTimezones(() => {
   describe("formatTime", () => {
     // Test cases for seconds only (< 1 minute)
-    it('should format 0 milliseconds as "00"', () => {
-      expect(formatTime(0)).toBe("00")
+    it('should format 0 milliseconds as "00:00"', () => {
+      expect(formatTime(0)).toBe("00:00")
     })
 
-    it('should format 1000 milliseconds as "01"', () => {
-      expect(formatTime(1000)).toBe("01")
+    it('should format 1000 milliseconds as "00:01"', () => {
+      expect(formatTime(1000)).toBe("00:01")
     })
 
-    it('should format 59000 milliseconds as "59"', () => {
-      expect(formatTime(59000)).toBe("59")
+    it('should format 59000 milliseconds as "00:59"', () => {
+      expect(formatTime(59000)).toBe("00:59")
     })
 
     // Test cases for minutes and seconds (< 1 hour)
