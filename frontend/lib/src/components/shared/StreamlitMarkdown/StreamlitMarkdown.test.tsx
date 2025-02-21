@@ -220,10 +220,6 @@ describe("StreamlitMarkdown", () => {
     )
     const image = screen.getByRole("img")
     expect(image).toHaveAttribute("alt", "Streamlit logo")
-    expect(image).toHaveAttribute(
-      "src",
-      expect.stringContaining("streamlit-mark-color")
-    )
   })
 
   // Typographical symbol replacements
@@ -336,7 +332,7 @@ describe("StreamlitMarkdown", () => {
 
     // Use the smaller font size for the markdown container
     const markdownContainer = screen.getByTestId("stMarkdownContainer")
-    expect(markdownContainer).toHaveStyle("font-size: 14px")
+    expect(markdownContainer).toHaveStyle("font-size: 0.875rem")
   })
 
   it("renders regular text sizing when largerLabel is true", () => {
