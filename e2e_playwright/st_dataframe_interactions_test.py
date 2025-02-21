@@ -560,7 +560,7 @@ def test_row_hover_highlight(themed_app: Page, assert_snapshot: ImageCompareFunc
 
 def test_autosize_column_via_ui(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that a column can be autosized via the UI via the column menu."""
-    df = get_element_by_key(app, "column-menu-test").get_by_test_id("stDataFrame").first
+    df = app.get_by_test_id("stDataFrame").nth(0)
     expect_canvas_to_be_visible(df)
 
     initial_canvas_bounding_box = df.locator("canvas").first.bounding_box()
@@ -640,7 +640,7 @@ def test_opening_column_menu(themed_app: Page, assert_snapshot: ImageCompareFunc
 def test_column_pinning_via_ui(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that a column can be pinned via the column menu."""
 
-    df = get_element_by_key(app, "column-menu-test").get_by_test_id("stDataFrame").first
+    df = app.get_by_test_id("stDataFrame").nth(0)
     expect_canvas_to_be_visible(df)
 
     unfocus_dataframe(app)
