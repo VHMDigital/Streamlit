@@ -217,6 +217,7 @@ class PagesManager:
     """
 
     DefaultStrategy: type[PagesStrategyV1 | PagesStrategyV2] = PagesStrategyV2
+    uses_pages_directory: bool = False
 
     def __init__(
         self,
@@ -231,7 +232,13 @@ class PagesManager:
         self._intended_page_script_hash: PageHash | None = None
         self._intended_page_name: PageName | None = None
         self._current_page_script_hash: PageHash = ""
-        self._has_pages_directory = Path(self.main_script_parent / "pages").exists()
+        # A relic of v1 of Multipage apps, we performed special handling
+        # for apps with a pages directory. We will keep this flag around
+        # for now to maintain the behavior for apps that were created with
+        # the pages directory feature.
+        PagesManager.uses_pages_directory = Path(
+            self.main_script_parent / "pages"
+        ).exists()
 
     @property
     def main_script_path(self) -> ScriptPath:
@@ -260,10 +267,6 @@ class PagesManager:
     @property
     def initial_active_script_hash(self) -> PageHash:
         return self.pages_strategy.initial_active_script_hash
-
-    @property
-    def has_pages_directory(self) -> bool:
-        return self._has_pages_directory
 
     @property
     def mpa_version(self) -> int:

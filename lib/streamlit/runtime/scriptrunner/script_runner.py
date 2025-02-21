@@ -34,6 +34,7 @@ from streamlit.runtime.metrics_util import (
     create_page_profile_message,
     to_microseconds,
 )
+from streamlit.runtime.pages_manager import PagesManager
 from streamlit.runtime.scriptrunner.exec_code import (
     exec_func_with_error_handling,
     modified_sys_path,
@@ -62,7 +63,6 @@ from streamlit.source_util import page_sort_key
 
 if TYPE_CHECKING:
     from streamlit.runtime.fragment import FragmentStorage
-    from streamlit.runtime.pages_manager import PagesManager
     from streamlit.runtime.scriptrunner.script_cache import ScriptCache
     from streamlit.runtime.uploaded_file_manager import UploadedFileManager
 
@@ -633,7 +633,7 @@ class ScriptRunner:
                                 pass
 
                     else:
-                        if ctx.pages_manager.has_pages_directory:
+                        if PagesManager.uses_pages_directory:
                             _mpa_v1(self._main_script_path)
                         exec(code, module.__dict__)
                         self._fragment_storage.clear(

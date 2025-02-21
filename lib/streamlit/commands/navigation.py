@@ -25,6 +25,7 @@ from streamlit.navigation.page import StreamlitPage
 from streamlit.proto.ForwardMsg_pb2 import ForwardMsg
 from streamlit.proto.Navigation_pb2 import Navigation as NavigationProto
 from streamlit.runtime.metrics_util import gather_metrics
+from streamlit.runtime.pages_manager import PagesManager
 from streamlit.runtime.scriptrunner_utils.script_run_context import (
     ScriptRunContext,
     get_script_run_ctx,
@@ -214,6 +215,9 @@ def navigation(
     - The first page is automatically set as default if none specified
     - Common widgets should be defined in the entrypoint file for state sharing
     """
+    # Disable the use of the pages feature (ie disregard v1 behavior of Multipage Apps)
+    PagesManager.uses_pages_directory = False
+
     return _navigation(pages, position=position, expanded=expanded)
 
 
