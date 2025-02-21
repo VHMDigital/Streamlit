@@ -311,7 +311,10 @@ def _test_csv_download(
         content = f.read()
         # the app uses a fixed seed, so the data is always the same. This is the reason
         # why we can check it here.
-        some_row = "1,1.8227236001279594,-0.5215796779933731,-1.184686590411552,0.9606933984606597,1.3290628465396823"
+        some_row = (
+            "1,-0.977277879876411,0.9500884175255894,-0.1513572082976979,"
+            "-0.10321885179355784,0.41059850193837233"
+        )
         # we usually try to avoid assert in playwright tests, but since we don't have to
         # wait for any UI interaction or DOM state, it's ok here
         assert some_row in content
@@ -557,7 +560,7 @@ def test_row_hover_highlight(themed_app: Page, assert_snapshot: ImageCompareFunc
 
 def test_autosize_column_via_ui(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that a column can be autosized via the UI via the column menu."""
-    df = app.get_by_test_id("stDataFrame").nth(0)
+    df = get_element_by_key(app, "column-menu-test").get_by_test_id("stDataFrame").first
     expect_canvas_to_be_visible(df)
 
     initial_canvas_bounding_box = df.locator("canvas").first.bounding_box()
@@ -622,7 +625,11 @@ def test_sorting_column_via_ui(app: Page, assert_snapshot: ImageCompareFunction)
 
 def test_opening_column_menu(themed_app: Page, assert_snapshot: ImageCompareFunction):
     """Test that the column menu can be opened."""
-    df = themed_app.get_by_test_id("stDataFrame").nth(0)
+    df = (
+        get_element_by_key(themed_app, "column-menu-test")
+        .get_by_test_id("stDataFrame")
+        .first
+    )
     expect_canvas_to_be_visible(df)
 
     open_column_menu(df, 2, "small")
@@ -633,7 +640,7 @@ def test_opening_column_menu(themed_app: Page, assert_snapshot: ImageCompareFunc
 def test_column_pinning_via_ui(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that a column can be pinned via the column menu."""
 
-    df = app.get_by_test_id("stDataFrame").nth(0)
+    df = get_element_by_key(app, "column-menu-test").get_by_test_id("stDataFrame").first
     expect_canvas_to_be_visible(df)
 
     unfocus_dataframe(app)

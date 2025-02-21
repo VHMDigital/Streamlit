@@ -26,6 +26,11 @@ random.seed(0)
 DF_SIZE = 30
 
 
+random_df = pd.DataFrame(
+    np.random.randn(5, 5),
+    columns=["Column A", "Column B", "Column C", "Column D", "Column E"],
+)
+
 fullscreen_df = pd.DataFrame(
     np.random.randn(DF_SIZE, DF_SIZE),
     columns=[f"Column {i}" for i in range(DF_SIZE)],
@@ -33,10 +38,7 @@ fullscreen_df = pd.DataFrame(
 
 # Configure all columns to be use small width to allow reliable interaction testing:
 st.dataframe(
-    pd.DataFrame(
-        np.random.randn(7, 5),
-        columns=["Column A", "Column B", "Column C", "Column D", "Column E"],
-    ),
+    random_df,
     column_config={
         "_index": st.column_config.Column(width="small"),
         "Column A": st.column_config.Column(width="small"),
@@ -56,14 +58,7 @@ if st.button("Create some elements to unmount component"):
         st.write("Another element")
 
 
-st.data_editor(
-    pd.DataFrame(
-        np.random.randn(5, 5),
-        columns=["Column A", "Column B", "Column C", "Column D", "Column E"],
-    ),
-    num_rows="dynamic",
-    key="data_editor",
-)
+st.data_editor(random_df, num_rows="dynamic", key="data_editor")
 
 
 cell_overlay_test_df = pd.DataFrame(
@@ -99,3 +94,21 @@ result = st.data_editor(
 st.write("Edited DF:", str(result))
 
 st.dataframe(fullscreen_df)
+
+st.header("Column menu interaction")
+
+st.container(key="column-menu-test").dataframe(
+    pd.DataFrame(
+        # We need a couple more rows than random_df to fully cover the column menu
+        np.random.randn(8, 5),
+        columns=["Column A", "Column B", "Column C", "Column D", "Column E"],
+    ),
+    column_config={
+        "_index": st.column_config.Column(width="small"),
+        "Column A": st.column_config.Column(width="small"),
+        "Column B": st.column_config.Column(width="small"),
+        "Column C": st.column_config.Column(width="small"),
+        "Column D": st.column_config.Column(width="small"),
+        "Column E": st.column_config.Column(width="small"),
+    },
+)
