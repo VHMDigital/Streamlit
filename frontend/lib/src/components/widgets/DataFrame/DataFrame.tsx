@@ -58,6 +58,7 @@ import {
   useColumnReordering,
   useColumnSizer,
   useColumnSort,
+  useCustomEditors,
   useCustomRenderer,
   useCustomTheme,
   useDataEditor,
@@ -104,7 +105,6 @@ export interface DataFrameProps {
   widgetMgr: WidgetStateManager
   disableFullscreenMode?: boolean
   fragmentId?: string
-  width: number
   height?: number
 }
 
@@ -540,7 +540,7 @@ function DataFrame({
   )
 
   const { drawCell, customRenderers } = useCustomRenderer(columns)
-
+  const { provideEditor } = useCustomEditors()
   // Callback that can be used to configure the column menu for the columns
   const configureColumnMenu = useCallback(
     (column: GridColumn): GridColumn => {
@@ -576,7 +576,7 @@ function DataFrame({
     gridTheme,
     numRows,
     usesGroupRow,
-    containerWidth,
+    containerWidth || 0,
     containerHeight,
     isFullScreen
   )
@@ -610,7 +610,7 @@ function DataFrame({
   const { pinColumn, unpinColumn, freezeColumns } = useColumnPinning(
     columns,
     isEmptyTable,
-    containerWidth,
+    containerWidth || 0,
     gridTheme.minColumnWidth,
     clearSelection,
     setColumnConfigMapping
@@ -948,6 +948,7 @@ function DataFrame({
                 : undefined,
             }),
           }}
+          provideEditor={provideEditor}
           // Apply custom rendering (e.g. for missing or required cells):
           drawCell={drawCell}
           // Add support for additional cells:
