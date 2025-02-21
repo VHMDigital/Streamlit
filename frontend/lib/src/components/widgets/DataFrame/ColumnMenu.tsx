@@ -53,6 +53,8 @@ export interface ColumnMenuProps {
   onUnpinColumn: () => void
   // Callback to change the column format
   onChangeFormat?: (format: string) => void
+  // Callback to autosize the column
+  onAutosize?: () => void
 }
 
 /**
@@ -68,6 +70,7 @@ function ColumnMenu({
   onSortColumn,
   columnKind,
   onChangeFormat,
+  onAutosize,
 }: ColumnMenuProps): ReactElement {
   const theme: EmotionTheme = useTheme()
   const [formatMenuOpen, setFormatMenuOpen] = useState(false)
@@ -138,6 +141,22 @@ function ColumnMenu({
               </StyledMenuListItem>
               <StyledMenuDivider />
             </>
+          )}
+          {onAutosize && (
+            <StyledMenuListItem
+              onClick={() => {
+                onAutosize()
+                closeMenu()
+              }}
+            >
+              <DynamicIcon
+                size={"base"}
+                margin="0"
+                color="inherit"
+                iconValue=":material/fit_width:"
+              />
+              Autosize
+            </StyledMenuListItem>
           )}
           {onChangeFormat && (
             <FormattingMenu
