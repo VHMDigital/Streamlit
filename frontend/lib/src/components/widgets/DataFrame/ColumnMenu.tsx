@@ -17,12 +17,7 @@
 import React, { memo, ReactElement, useEffect, useState } from "react"
 
 import { useTheme } from "@emotion/react"
-import {
-  ACCESSIBILITY_TYPE,
-  PLACEMENT,
-  Popover,
-  TRIGGER_TYPE,
-} from "baseui/popover"
+import { ACCESSIBILITY_TYPE, PLACEMENT, Popover } from "baseui/popover"
 
 import {
   convertRemToPx,
@@ -36,110 +31,7 @@ import {
   StyledMenuList,
   StyledMenuListItem,
 } from "./styled-components"
-
-const COLUMN_KIND_FORMAT_MAPPING: Record<
-  string,
-  { format: string; label: string; icon: string }[]
-> = {
-  number: [
-    {
-      format: "",
-      label: "Automatic",
-      icon: ":material/123:",
-    },
-    {
-      format: "localized",
-      label: "Localized",
-      icon: ":material/translate:",
-    },
-    {
-      format: "plain",
-      label: "Plain",
-      icon: ":material/speed_1_75:",
-    },
-    {
-      format: "compact",
-      label: "Compact",
-      icon: ":material/1k:",
-    },
-    {
-      format: "dollar",
-      label: "Dollar",
-      icon: ":material/attach_money:",
-    },
-    {
-      format: "euro",
-      label: "Euro",
-      icon: ":material/euro:",
-    },
-    {
-      format: "percent",
-      label: "Percent",
-      icon: ":material/percent:",
-    },
-    {
-      format: "scientific",
-      label: "Scientific",
-      icon: ":material/experiment:",
-    },
-    {
-      format: "accounting",
-      label: "Accounting",
-      icon: ":material/finance_chip:",
-    },
-  ],
-  datetime: [
-    {
-      format: "",
-      label: "Automatic",
-      icon: ":material/schedule:",
-    },
-    {
-      format: "localized",
-      label: "Localized",
-      icon: ":material/translate:",
-    },
-    {
-      format: "distance",
-      label: "Distance",
-      icon: ":material/search_activity:",
-    },
-    {
-      format: "calendar",
-      label: "Calendar",
-      icon: ":material/today:",
-    },
-  ],
-  date: [
-    {
-      format: "",
-      label: "Automatic",
-      icon: ":material/schedule:",
-    },
-    {
-      format: "localized",
-      label: "Localized",
-      icon: ":material/translate:",
-    },
-    {
-      format: "distance",
-      label: "Distance",
-      icon: ":material/search_activity:",
-    },
-  ],
-  time: [
-    {
-      format: "",
-      label: "Automatic",
-      icon: ":material/schedule:",
-    },
-    {
-      format: "localized",
-      label: "Localized",
-      icon: ":material/translate:",
-    },
-  ],
-}
+import FormattingMenu from "./FormattingMenu"
 
 export interface ColumnMenuProps {
   // The top position of the menu
@@ -160,9 +52,7 @@ export interface ColumnMenuProps {
   // Callback to unpin the column
   onUnpinColumn: () => void
   // Callback to change the column format
-  changeFormat?: (format: string) => void
-  // Callback to autosize the column
-  onAutosize?: () => void
+  onChangeFormat?: (format: string) => void
 }
 
 /**
@@ -177,8 +67,7 @@ function ColumnMenu({
   onCloseMenu,
   onSortColumn,
   columnKind,
-  changeFormat,
-  onAutosize,
+  onChangeFormat,
 }: ColumnMenuProps): ReactElement {
   const theme: EmotionTheme = useTheme()
   const [formatMenuOpen, setFormatMenuOpen] = useState(false)
@@ -208,8 +97,6 @@ function ColumnMenu({
   const closeMenu = React.useCallback((): void => {
     onCloseMenu()
   }, [onCloseMenu])
-
-  const formats = COLUMN_KIND_FORMAT_MAPPING[columnKind] || []
 
   return (
     <Popover
@@ -252,114 +139,38 @@ function ColumnMenu({
               <StyledMenuDivider />
             </>
           )}
-          {changeFormat && formats.length > 0 && (
-            <>
-              <Popover
-                triggerType={TRIGGER_TYPE.hover}
-                returnFocus
-                autoFocus
-                focusLock
-                isOpen={formatMenuOpen}
+          {onChangeFormat && (
+            <FormattingMenu
+              columnKind={columnKind}
+              isOpen={formatMenuOpen}
+              onMouseEnter={() => setFormatMenuOpen(true)}
+              onMouseLeave={() => setFormatMenuOpen(false)}
+              onChangeFormat={onChangeFormat}
+              onCloseMenu={closeMenu}
+            >
+              <StyledMenuListItem
                 onMouseEnter={() => setFormatMenuOpen(true)}
                 onMouseLeave={() => setFormatMenuOpen(false)}
-                ignoreBoundary={true}
-                content={
-                  <StyledMenuList>
-                    {formats.map(format => (
-                      <StyledMenuListItem
-                        key={format.format}
-                        onClick={() => {
-                          changeFormat(format.format)
-                          closeMenu()
-                        }}
-                        role="menuitem"
-                      >
-                        <DynamicIcon
-                          size={"base"}
-                          margin="0"
-                          color="inherit"
-                          iconValue={format.icon}
-                        />
-                        {format.label}
-                      </StyledMenuListItem>
-                    ))}
-                  </StyledMenuList>
-                }
-                placement={PLACEMENT.right}
-                showArrow={false}
-                popoverMargin={2}
-                overrides={{
-                  Body: {
-                    style: {
-                      borderTopLeftRadius: radii.default,
-                      borderTopRightRadius: radii.default,
-                      borderBottomLeftRadius: radii.default,
-                      borderBottomRightRadius: radii.default,
-                      paddingTop: "0 !important",
-                      paddingBottom: "0 !important",
-                      paddingLeft: "0 !important",
-                      paddingRight: "0 !important",
-                      backgroundColor: "transparent",
-                      border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
-                    },
-                  },
-                  Inner: {
-                    style: {
-                      backgroundColor: hasLightBackgroundColor(theme)
-                        ? colors.bgColor
-                        : colors.secondaryBg,
-                      color: colors.bodyText,
-                      fontSize: fontSizes.sm,
-                      fontWeight: fontWeights.normal,
-                      paddingTop: "0 !important",
-                      paddingBottom: "0 !important",
-                      paddingLeft: "0 !important",
-                      paddingRight: "0 !important",
-                    },
-                  },
-                }}
+                isActive={formatMenuOpen}
+                hasSubmenu={true}
               >
-                <StyledMenuListItem
-                  onMouseEnter={() => setFormatMenuOpen(true)}
-                  onMouseLeave={() => setFormatMenuOpen(false)}
-                  isActive={formatMenuOpen}
-                  hasSubmenu={true}
-                >
-                  <div className="left-content">
-                    <DynamicIcon
-                      size={"base"}
-                      margin="0"
-                      color="inherit"
-                      iconValue=":material/format_list_numbered:"
-                    />
-                    Format
-                  </div>
+                <div className="left-content">
                   <DynamicIcon
                     size={"base"}
                     margin="0"
                     color="inherit"
-                    iconValue=":material/chevron_right:"
+                    iconValue=":material/format_list_numbered:"
                   />
-                </StyledMenuListItem>
-              </Popover>
-            </>
-          )}
-          {onAutosize && (
-            <StyledMenuListItem
-              onClick={() => {
-                onAutosize()
-                closeMenu()
-              }}
-              hasSubmenu={false}
-            >
-              <DynamicIcon
-                size={"base"}
-                margin="0"
-                color="inherit"
-                iconValue=":material/fit_width:"
-              />
-              Autosize
-            </StyledMenuListItem>
+                  Format
+                </div>
+                <DynamicIcon
+                  size={"base"}
+                  margin="0"
+                  color="inherit"
+                  iconValue=":material/chevron_right:"
+                />
+              </StyledMenuListItem>
+            </FormattingMenu>
           )}
           {isColumnPinned && (
             <StyledMenuListItem
@@ -367,7 +178,6 @@ function ColumnMenu({
                 onUnpinColumn()
                 closeMenu()
               }}
-              hasSubmenu={false}
             >
               <DynamicIcon
                 size={"base"}
@@ -384,7 +194,6 @@ function ColumnMenu({
                 onPinColumn()
                 closeMenu()
               }}
-              hasSubmenu={false}
             >
               <DynamicIcon
                 size={"base"}

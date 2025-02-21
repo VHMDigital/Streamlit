@@ -1,0 +1,237 @@
+/**
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import React, { memo, ReactElement } from "react"
+
+import { useTheme } from "@emotion/react"
+import { PLACEMENT, Popover, TRIGGER_TYPE } from "baseui/popover"
+
+import { EmotionTheme, hasLightBackgroundColor } from "~lib/theme"
+import { DynamicIcon } from "~lib/components/shared/Icon"
+
+import { StyledMenuList, StyledMenuListItem } from "./styled-components"
+
+const COLUMN_KIND_FORMAT_MAPPING: Record<
+  string,
+  { format: string; label: string; icon: string }[]
+> = {
+  number: [
+    {
+      format: "",
+      label: "Automatic",
+      icon: ":material/123:",
+    },
+    {
+      format: "localized",
+      label: "Localized",
+      icon: ":material/translate:",
+    },
+    {
+      format: "plain",
+      label: "Plain",
+      icon: ":material/speed_1_75:",
+    },
+    {
+      format: "compact",
+      label: "Compact",
+      icon: ":material/1k:",
+    },
+    {
+      format: "dollar",
+      label: "Dollar",
+      icon: ":material/attach_money:",
+    },
+    {
+      format: "euro",
+      label: "Euro",
+      icon: ":material/euro:",
+    },
+    {
+      format: "percent",
+      label: "Percent",
+      icon: ":material/percent:",
+    },
+    {
+      format: "scientific",
+      label: "Scientific",
+      icon: ":material/experiment:",
+    },
+    {
+      format: "accounting",
+      label: "Accounting",
+      icon: ":material/finance_chip:",
+    },
+  ],
+  datetime: [
+    {
+      format: "",
+      label: "Automatic",
+      icon: ":material/schedule:",
+    },
+    {
+      format: "localized",
+      label: "Localized",
+      icon: ":material/translate:",
+    },
+    {
+      format: "distance",
+      label: "Distance",
+      icon: ":material/search_activity:",
+    },
+    {
+      format: "calendar",
+      label: "Calendar",
+      icon: ":material/today:",
+    },
+  ],
+  date: [
+    {
+      format: "",
+      label: "Automatic",
+      icon: ":material/schedule:",
+    },
+    {
+      format: "localized",
+      label: "Localized",
+      icon: ":material/translate:",
+    },
+    {
+      format: "distance",
+      label: "Distance",
+      icon: ":material/search_activity:",
+    },
+  ],
+  time: [
+    {
+      format: "",
+      label: "Automatic",
+      icon: ":material/schedule:",
+    },
+    {
+      format: "localized",
+      label: "Localized",
+      icon: ":material/translate:",
+    },
+  ],
+}
+export interface FormattingMenuProps {
+  columnKind: string
+  isOpen: boolean
+  onMouseEnter: () => void
+  onMouseLeave: () => void
+  onChangeFormat: (format: string) => void
+  onCloseMenu: () => void
+  children: ReactElement
+}
+
+/**
+ * FormattingMenu is a component that displays a list of formats for a given column kind.
+ * It allows to change the format of a column from the data grid UI.
+ *
+ * @param columnKind - The kind of the column to format.
+ * @param isOpen - Whether the menu is open.
+ * @param onMouseEnter - The function to call when the mouse enters the menu.
+ * @param onMouseLeave - The function to call when the mouse leaves the menu.
+ * @param onChangeFormat - The function to call when the format changes.
+ * @param onCloseMenu - The function to call when the menu is closed.
+ * @param children - The menu item that triggers the menu to open.
+ */
+function FormattingMenu({
+  columnKind,
+  isOpen,
+  onMouseEnter,
+  onMouseLeave,
+  onChangeFormat,
+  onCloseMenu,
+  children,
+}: FormattingMenuProps): ReactElement {
+  const theme: EmotionTheme = useTheme()
+  const { colors, fontSizes, radii, fontWeights } = theme
+
+  const formats = COLUMN_KIND_FORMAT_MAPPING[columnKind] || []
+
+  return (
+    <Popover
+      triggerType={TRIGGER_TYPE.hover}
+      returnFocus
+      autoFocus
+      focusLock
+      isOpen={isOpen}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      ignoreBoundary={true}
+      content={
+        <StyledMenuList>
+          {formats.map(format => (
+            <StyledMenuListItem
+              key={format.format}
+              onClick={() => {
+                onChangeFormat(format.format)
+                onCloseMenu()
+              }}
+              role="menuitem"
+            >
+              <DynamicIcon
+                size={"base"}
+                margin="0"
+                color="inherit"
+                iconValue={format.icon}
+              />
+              {format.label}
+            </StyledMenuListItem>
+          ))}
+        </StyledMenuList>
+      }
+      placement={PLACEMENT.right}
+      showArrow={false}
+      popoverMargin={2}
+      overrides={{
+        Body: {
+          style: {
+            borderTopLeftRadius: radii.default,
+            borderTopRightRadius: radii.default,
+            borderBottomLeftRadius: radii.default,
+            borderBottomRightRadius: radii.default,
+            paddingTop: "0 !important",
+            paddingBottom: "0 !important",
+            paddingLeft: "0 !important",
+            paddingRight: "0 !important",
+            backgroundColor: "transparent",
+            border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+          },
+        },
+        Inner: {
+          style: {
+            backgroundColor: hasLightBackgroundColor(theme)
+              ? colors.bgColor
+              : colors.secondaryBg,
+            color: colors.bodyText,
+            fontSize: fontSizes.sm,
+            fontWeight: fontWeights.normal,
+            paddingTop: "0 !important",
+            paddingBottom: "0 !important",
+            paddingLeft: "0 !important",
+            paddingRight: "0 !important",
+          },
+        },
+      }}
+    >
+      {children}
+    </Popover>
+  )
+}
+
+export default memo(FormattingMenu)

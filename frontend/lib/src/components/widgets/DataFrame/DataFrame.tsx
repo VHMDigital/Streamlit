@@ -1098,7 +1098,7 @@ function DataFrame({
             onPinColumn={() => {
               pinColumn(originalColumns[showMenu.columnIdx].id)
             }}
-            changeFormat={(format: string) => {
+            onChangeFormat={(format: string) => {
               changeColumnFormat(
                 originalColumns[showMenu.columnIdx].id,
                 format
@@ -1108,11 +1108,6 @@ function DataFrame({
                   CompactSelection.fromSingleSelection(showMenu.columnIdx)
                 )
               }, 100)
-            }}
-            onAutosize={() => {
-              dataEditorRef.current?.remeasureColumns(
-                CompactSelection.fromSingleSelection(showMenu.columnIdx)
-              )
             }}
           />,
           // We put the column menu into the portal element which is also
