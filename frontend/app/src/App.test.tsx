@@ -78,6 +78,7 @@ import {
 
 import { showDevelopmentOptions } from "./showDevelopmentOptions"
 import { App, LOG, Props } from "./App"
+import { a } from "vitest/dist/chunks/suite.B2jumIFP"
 
 vi.mock("~lib/baseconsts", async () => {
   return {
@@ -259,6 +260,20 @@ const NEW_SESSION_JSON: INewSession = {
   mainScriptHash: "page_hash",
   scriptRunId: "script_run_id",
   fragmentIdsThisRun: [],
+}
+
+const NAVIGATION_JSON: INavigation = {
+  appPages: [
+    {
+      pageScriptHash: "page_script_hash",
+      pageName: "streamlit app",
+      urlPathname: "streamlit_app",
+      isDefault: true,
+    },
+  ],
+  pageScriptHash: "page_script_hash",
+  position: Navigation.Position.SIDEBAR,
+  sections: [],
 }
 
 // Prevent "moment-timezone requires moment" exception when mocking "moment".
@@ -656,13 +671,13 @@ describe("App", () => {
       sendForwardMessage("navigation", {
         appPages: [
           {
-            pageScriptHash: "hash1",
-            pageName: "page1",
-            urlPathname: "page1",
+            pageScriptHash: "page_script_hash",
+            pageName: "streamlit app",
+            urlPathname: "streamlit_app",
             isDefault: true,
           },
         ],
-        pageScriptHash: "hash1",
+        pageScriptHash: "page_script_hash",
         position: Navigation.Position.SIDEBAR,
         sections: [],
       })
@@ -679,7 +694,7 @@ describe("App", () => {
             },
           },
         },
-        { deltaPath: [0, 0] }
+        { deltaPath: [0, 0], activeScriptHash: "hash1" }
       )
 
       sendForwardMessage(
@@ -694,7 +709,7 @@ describe("App", () => {
             },
           },
         },
-        { deltaPath: [0, 1] }
+        { deltaPath: [0, 1], activeScriptHash: "hash1" }
       )
 
       // Delta Messages handle on a timer, so we make it async
@@ -1160,7 +1175,7 @@ describe("App", () => {
       ).not.toBeInTheDocument()
     })
 
-    it.skip("doesn't clear app elements if currentPageScriptHash doesn't change", async () => {
+    it("doesn't clear app elements if currentPageScriptHash doesn't change", async () => {
       await waitFor(() => {
         makeAppWithElements()
       })
@@ -1198,7 +1213,7 @@ describe("App", () => {
             },
           ],
           pageScriptHash: "page_script_hash",
-          position: 1,
+          position: Navigation.Position.SIDEBAR,
           sections: [],
         })
 
@@ -1228,7 +1243,7 @@ describe("App", () => {
             },
           ],
           pageScriptHash: "hash2",
-          position: 1,
+          position: Navigation.Position.SIDEBAR,
           sections: [],
         })
 
@@ -1259,7 +1274,7 @@ describe("App", () => {
             },
           ],
           pageScriptHash: "page_script_hash",
-          position: 1,
+          position: Navigation.Position.SIDEBAR,
           sections: [],
         })
 
@@ -1305,7 +1320,7 @@ describe("App", () => {
         sendForwardMessage("navigation", {
           appPages,
           pageScriptHash: "toppage_hash",
-          position: 1,
+          position: Navigation.Position.SIDEBAR,
           sections: [],
         })
 
@@ -1362,7 +1377,7 @@ describe("App", () => {
             },
           ],
           pageScriptHash: "hash2",
-          position: 1,
+          position: Navigation.Position.SIDEBAR,
           sections: [],
         })
 
@@ -1400,7 +1415,7 @@ describe("App", () => {
         sendForwardMessage("navigation", {
           appPages,
           pageScriptHash: "toppage_hash",
-          position: 1,
+          position: Navigation.Position.SIDEBAR,
           sections: [],
         })
 
@@ -1417,7 +1432,7 @@ describe("App", () => {
         sendForwardMessage("navigation", {
           appPages,
           pageScriptHash: "subpage_hash",
-          position: 1,
+          position: Navigation.Position.SIDEBAR,
           sections: [],
         })
         expect(window.history.pushState).toHaveBeenLastCalledWith(
@@ -1457,7 +1472,7 @@ describe("App", () => {
         sendForwardMessage("navigation", {
           appPages,
           pageScriptHash: "toppage_hash",
-          position: 1,
+          position: Navigation.Position.SIDEBAR,
           sections: [],
         })
 
@@ -1475,7 +1490,7 @@ describe("App", () => {
         sendForwardMessage("navigation", {
           appPages,
           pageScriptHash: "toppage_hash",
-          position: 1,
+          position: Navigation.Position.SIDEBAR,
           sections: [],
         })
         expect(window.history.pushState).not.toHaveBeenCalled()
@@ -1491,7 +1506,7 @@ describe("App", () => {
         sendForwardMessage("navigation", {
           appPages,
           pageScriptHash: "subpage_hash",
-          position: 1,
+          position: Navigation.Position.SIDEBAR,
           sections: [],
         })
         expect(window.history.pushState).toHaveBeenLastCalledWith(
@@ -1528,7 +1543,7 @@ describe("App", () => {
           },
         ],
         pageScriptHash: "page_script_hash",
-        position: 1,
+        position: Navigation.Position.SIDEBAR,
         sections: [],
       })
 
@@ -1603,7 +1618,7 @@ describe("App", () => {
     })
   })
 
-  describe.skip("App.onHistoryChange", () => {
+  describe("App.onHistoryChange", () => {
     const NEW_SESSION_JSON = {
       config: {
         gatherUsageStats: false,
@@ -1632,6 +1647,11 @@ describe("App", () => {
         sessionId: "sessionId",
         isHello: false,
       },
+      appPages: [],
+      pageScriptHash: "top_hash",
+      fragmentIdsThisRun: [],
+    }
+    const NAVIGATION_JSON = {
       appPages: [
         {
           pageScriptHash: "top_hash",
@@ -1659,14 +1679,26 @@ describe("App", () => {
         ...NEW_SESSION_JSON,
         pageScriptHash: "sub_hash",
       })
+      sendForwardMessage("navigation", {
+        ...NAVIGATION_JSON,
+        pageScriptHash: "sub_hash",
+      })
 
       sendForwardMessage("newSession", {
         ...NEW_SESSION_JSON,
         pageScriptHash: "top_hash",
       })
+      sendForwardMessage("navigation", {
+        ...NAVIGATION_JSON,
+        pageScriptHash: "top_hash",
+      })
 
       sendForwardMessage("newSession", {
         ...NEW_SESSION_JSON,
+        pageScriptHash: "sub_hash",
+      })
+      sendForwardMessage("navigation", {
+        ...NAVIGATION_JSON,
         pageScriptHash: "sub_hash",
       })
 
@@ -1719,6 +1751,10 @@ describe("App", () => {
 
       sendForwardMessage("newSession", {
         ...NEW_SESSION_JSON,
+        pageScriptHash: "sub_hash",
+      })
+      sendForwardMessage("navigation", {
+        ...NAVIGATION_JSON,
         pageScriptHash: "sub_hash",
       })
       window.history.back()
@@ -1835,13 +1871,31 @@ describe("App", () => {
       window.history.pushState({}, "", "/")
     })
 
-    it.skip("sends the currentPageScriptHash if no pageScriptHash is given", () => {
+    it("sends the currentPageScriptHash if no pageScriptHash is given", () => {
       renderApp(getProps())
 
       // Set initial pageScriptHash
       sendForwardMessage("newSession", {
         ...NEW_SESSION_JSON,
         pageScriptHash: "some_other_page_hash",
+      })
+      sendForwardMessage("navigation", {
+        appPages: [
+          {
+            pageScriptHash: "top_hash",
+            pageName: "streamlit app",
+            urlPathname: "",
+            isDefault: true,
+          },
+          {
+            pageScriptHash: "some_other_page_hash",
+            pageName: "page2",
+            urlPathname: "page2",
+          },
+        ],
+        pageScriptHash: "some_other_page_hash",
+        position: Navigation.Position.SIDEBAR,
+        sections: [],
       })
 
       const widgetStateManager =
@@ -1932,7 +1986,7 @@ describe("App", () => {
       ).toBe("baz")
     })
 
-    it.skip("sets queryString to an empty string if the page hash is different", () => {
+    it("sets queryString to an empty string if the page hash is different", () => {
       renderApp(getProps())
 
       const hostCommunicationMgr = getStoredValue<HostCommunicationManager>(
@@ -1944,6 +1998,7 @@ describe("App", () => {
           pageScriptHash: "toppage_hash",
           pageName: "streamlit app",
           urlPathname: "streamlit_app",
+          isDefault: true,
         },
         {
           pageScriptHash: "subpage_hash",
@@ -1955,8 +2010,14 @@ describe("App", () => {
       // Because the page URL is already "/" pointing to the main page, no new history is pushed.
       sendForwardMessage("newSession", {
         ...NEW_SESSION_JSON,
+        appPages: [],
+        pageScriptHash: "toppage_hash",
+      })
+      sendForwardMessage("navigation", {
         appPages,
         pageScriptHash: "toppage_hash",
+        sections: [],
+        position: Navigation.Position.SIDEBAR,
       })
       sendForwardMessage("pageInfoChanged", {
         queryString: "foo=bar",
@@ -2038,14 +2099,15 @@ describe("App", () => {
       expect(connectionManager.incrementMessageCacheRunCount).toBeCalled()
     })
 
-    it.skip("will clear stale nodes if finished successfully", async () => {
+    it("will clear stale nodes if finished successfully", async () => {
       renderApp(getProps())
-      sendForwardMessage("newSession", NEW_SESSION_JSON)
       // Run the script with one new element
       sendForwardMessage("sessionStatusChanged", {
         runOnSave: false,
         scriptIsRunning: true,
       })
+      sendForwardMessage("newSession", NEW_SESSION_JSON)
+      sendForwardMessage("navigation", NAVIGATION_JSON)
       // this message now belongs to this^ session
       sendForwardMessage(
         "delta",
@@ -2082,9 +2144,10 @@ describe("App", () => {
       })
     })
 
-    it.skip("will not clear stale nodes if finished with rerun", async () => {
+    it("will not clear stale nodes if finished with rerun", async () => {
       renderApp(getProps())
       sendForwardMessage("newSession", NEW_SESSION_JSON)
+      sendForwardMessage("navigation", NAVIGATION_JSON)
       // Run the script with one new element
       sendForwardMessage("sessionStatusChanged", {
         runOnSave: false,
@@ -2261,7 +2324,7 @@ describe("App", () => {
           { pageScriptHash: "other_page_script_hash", pageName: "Page 1" },
         ],
         pageScriptHash: "other_page_script_hash",
-        position: 0,
+        position: Navigation.Position.HIDDEN,
       })
 
       // Logo outside common script
@@ -2322,11 +2385,24 @@ describe("App", () => {
       })
     })
 
-    it.skip("will not clear logo as stale on fragment re-run", async () => {
+    it("will not clear logo as stale on fragment re-run", async () => {
       renderApp(getProps())
 
       // Initial script run, creates logo
       sendForwardMessage("newSession", NEW_SESSION_JSON)
+      sendForwardMessage("navigation", {
+        appPages: [
+          {
+            pageScriptHash: "page_script_hash",
+            pageName: "streamlit app",
+            urlPathname: "streamlit_app",
+            isDefault: true,
+          },
+        ],
+        pageScriptHash: "page_script_hash",
+        position: Navigation.Position.SIDEBAR,
+        sections: [],
+      })
       sendForwardMessage(
         "logo",
         {
@@ -2515,7 +2591,7 @@ describe("App", () => {
       expect(clearInterval).toHaveBeenCalled()
     })
 
-    it.skip("triggers rerunScript with is_auto_rerun set to true", () => {
+    it("triggers rerunScript with is_auto_rerun set to true", () => {
       renderApp(getProps())
 
       const connectionManager = getMockConnectionManager()
@@ -3036,7 +3112,7 @@ describe("App", () => {
       openCacheModal()
     })
 
-    it.skip("changes scriptRunState and triggers stopScript when STOP_SCRIPT message has been received", () => {
+    it("changes scriptRunState and triggers stopScript when STOP_SCRIPT message has been received", () => {
       const hostCommunicationMgr = prepareHostCommunicationManager()
 
       const connectionManager = getMockConnectionManager(true)
@@ -3064,7 +3140,7 @@ describe("App", () => {
       })
     })
 
-    it.skip("changes scriptRunState and triggers rerunScript when scriptRerunRequested message has been received", () => {
+    it("changes scriptRunState and triggers rerunScript when scriptRerunRequested message has been received", () => {
       const hostCommunicationMgr = prepareHostCommunicationManager()
 
       const connectionManager = getMockConnectionManager(true)
@@ -3452,20 +3528,31 @@ describe("App", () => {
       expect(screen.getByTestId("stToolbarActionButton")).toBeInTheDocument()
     })
 
-    it.skip("sets hideSidebarNav based on the server config option and host setting", () => {
+    it("sets hideSidebarNav based on the server config option and host setting", () => {
       prepareHostCommunicationManager()
 
       expect(screen.queryByTestId("stSidebarNav")).not.toBeInTheDocument()
 
       const appPages = [
-        { pageScriptHash: "hash1", pageName: "page1", urlPathname: "page1" },
+        {
+          pageScriptHash: "hash1",
+          pageName: "page1",
+          urlPathname: "page1",
+          isDefault: true,
+        },
         { pageScriptHash: "hash2", pageName: "page2", urlPathname: "page2" },
       ]
 
       sendForwardMessage("newSession", {
         ...NEW_SESSION_JSON,
+        appPages: [],
+        pageScriptHash: "hash1",
+      })
+      sendForwardMessage("navigation", {
         appPages,
         pageScriptHash: "hash1",
+        position: Navigation.Position.SIDEBAR,
+        sections: [],
       })
 
       expect(screen.getByTestId("stSidebarNav")).toBeInTheDocument()
