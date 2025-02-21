@@ -1176,9 +1176,7 @@ describe("App", () => {
     })
 
     it("doesn't clear app elements if currentPageScriptHash doesn't change", async () => {
-      await waitFor(() => {
-        makeAppWithElements()
-      })
+      await makeAppWithElements()
 
       sendForwardMessage("newSession", NEW_SESSION_JSON)
 
