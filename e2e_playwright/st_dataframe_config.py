@@ -159,7 +159,6 @@ st.dataframe(
         ),
         "col_1": st.column_config.CheckboxColumn(),
     },
-    hide_index=True,
 )
 
 st.header("Selectbox column:")
@@ -183,7 +182,6 @@ st.dataframe(
         ),
         "col_1": st.column_config.SelectboxColumn(options=["a", "b", "c", "d"]),
     },
-    hide_index=True,
 )
 
 st.header("Link column:")
@@ -233,7 +231,6 @@ st.dataframe(
             display_text="Open link",
         ),
     },
-    hide_index=True,
 )
 
 st.header("Datetime column:")
@@ -409,7 +406,6 @@ st.dataframe(
         ),
         "col_1": st.column_config.ListColumn(),
     },
-    hide_index=True,
 )
 
 st.header("Bar chart column:")
@@ -431,7 +427,6 @@ st.dataframe(
         ),
         "col_1": st.column_config.BarChartColumn(),
     },
-    hide_index=True,
 )
 
 
@@ -454,7 +449,6 @@ st.dataframe(
         ),
         "col_1": st.column_config.LineChartColumn(),
     },
-    hide_index=True,
 )
 
 st.header("Area chart column:")
@@ -476,7 +470,6 @@ st.dataframe(
         ),
         "col_1": st.column_config.AreaChartColumn(),
     },
-    hide_index=True,
 )
 
 
@@ -501,7 +494,6 @@ st.dataframe(
             help="This is a image column",
         ),
     },
-    hide_index=True,
 )
 
 st.subheader("Long colum header")
