@@ -17,10 +17,11 @@
 import React, { FC, PropsWithChildren, ReactElement } from "react"
 
 /* eslint-disable import/no-extraneous-dependencies */
-import { RenderOptions, RenderResult } from "@testing-library/react"
 import {
   renderHook as reactTestingLibraryRenderHook,
   RenderHookOptions,
+  RenderOptions,
+  RenderResult,
 } from "@testing-library/react"
 
 import ElementFullscreenWrapper from "~lib/components/shared/ElementFullscreen/ElementFullscreenWrapper"
