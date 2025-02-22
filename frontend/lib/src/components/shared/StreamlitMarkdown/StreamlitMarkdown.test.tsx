@@ -15,6 +15,7 @@
  */
 
 import React, { ReactElement } from "react"
+import { useTheme } from "@emotion/react"
 
 import ReactMarkdown from "react-markdown"
 // eslint-disable-next-line testing-library/no-manual-cleanup
@@ -33,6 +34,8 @@ import StreamlitMarkdown, {
   CustomPreTag,
   LinkWithTargetBlank,
 } from "./StreamlitMarkdown"
+
+const theme = useTheme()
 
 // Fixture Generator
 const getMarkdownElement = (body: string): ReactElement => {
@@ -466,6 +469,77 @@ describe("StreamlitMarkdown", () => {
       expect(markdown).toHaveStyle(`background: ${style}`)
 
       // Removes rendered StreamlitMarkdown component before next case run
+      cleanup()
+    })
+  })
+
+  it("renders small text properly", () => {
+    const source = `:small[text]`
+    render(<StreamlitMarkdown source={source} allowHTML={false} />)
+    const markdown = screen.getByText("text")
+    const tagName = markdown.nodeName.toLowerCase()
+    expect(tagName).toBe("span")
+    expect(markdown).toHaveStyle(`font-size: ${theme.fontSizes.sm}`)
+  })
+
+  it("properly handles combinations of small text, colors, and backgrounds", () => {
+    const testCases = [
+      // Small text combinations
+      {
+        source: `:small[**bold text**]`,
+        text: "bold text",
+        style: `font-size: ${theme.fontSizes.sm}`,
+      },
+      {
+        source: `:small[:blue[colored text]]`,
+        text: "colored text",
+        style: `font-size: ${theme.fontSizes.sm}`,
+      },
+      {
+        source: `:blue[:small[colored text]]`,
+        text: "colored text",
+        style: `font-size: ${theme.fontSizes.sm}`,
+      },
+      {
+        source: `:small[\`code text\`]`,
+        text: "code text",
+        style: `font-size: ${theme.fontSizes.sm}`,
+      },
+
+      // Color combinations
+      {
+        source: `:red[**bold red**]`,
+        text: "bold red",
+        style: `color: ${colors.red80}`,
+      },
+      {
+        source: `:blue[\`code blue\`]`,
+        text: "code blue",
+        style: `color: ${colors.blue80}`,
+      },
+      {
+        source: `:green[:blue[nested colors]]`,
+        text: "nested colors",
+        style: `color: ${colors.blue80}`,
+      },
+
+      // Background combinations
+      {
+        source: `:red-background[**bold with bg**]`,
+        text: "bold with bg",
+        style: `background-color: ${transparentize(colors.red80, 0.9)}`,
+      },
+      {
+        source: `:blue-background[:red[color with bg]]`,
+        text: "color with bg",
+        style: `color: ${colors.red80}`,
+      },
+    ]
+
+    testCases.forEach(({ source, text, style }) => {
+      render(<StreamlitMarkdown source={source} allowHTML={false} />)
+      const markdown = screen.getByText(text)
+      expect(markdown).toHaveStyle(style)
       cleanup()
     })
   })
