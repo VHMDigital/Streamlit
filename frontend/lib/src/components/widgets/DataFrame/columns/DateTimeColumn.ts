@@ -160,7 +160,7 @@ function BaseDateTimeColumn(
     if (
       notNullOrUndefined(minDate) &&
       // We compare on a string level so that it also works correctly for time and date values
-      toISOString(cellData) < toISOString(minDate)
+      cellData.getSeconds() < minDate.getSeconds()
     ) {
       return false
     }
@@ -168,7 +168,7 @@ function BaseDateTimeColumn(
     // Apply min_value configuration option:
     if (
       notNullOrUndefined(maxDate) &&
-      toISOString(cellData) > toISOString(maxDate)
+      cellData.getSeconds() > maxDate.getSeconds()
     ) {
       return false
     }
