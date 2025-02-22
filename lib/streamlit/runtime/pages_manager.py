@@ -35,7 +35,7 @@ class PagesManager:
     to set the set of pages that make up the app.
     """
 
-    uses_pages_directory: bool = False
+    uses_pages_directory: bool | None = None
 
     def __init__(
         self,
@@ -54,9 +54,14 @@ class PagesManager:
         # for apps with a pages directory. We will keep this flag around
         # for now to maintain the behavior for apps that were created with
         # the pages directory feature.
-        PagesManager.uses_pages_directory = Path(
-            self.main_script_parent / "pages"
-        ).exists()
+        #
+        # NOTE: we will update the feature if the flag has not been set
+        #       this means that if users use v2 behavior, the flag will
+        #       always be set to False
+        if PagesManager.uses_pages_directory is None:
+            PagesManager.uses_pages_directory = Path(
+                self.main_script_parent / "pages"
+            ).exists()
 
     @property
     def main_script_path(self) -> ScriptPath:
