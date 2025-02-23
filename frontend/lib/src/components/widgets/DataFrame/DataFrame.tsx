@@ -53,6 +53,7 @@ import { useDebouncedCallback } from "~lib/hooks/useDebouncedCallback"
 import ColumnMenu from "./ColumnMenu"
 import EditingState, { getColumnName } from "./EditingState"
 import {
+  useColumnFormatting,
   useColumnLoader,
   useColumnPinning,
   useColumnReordering,
@@ -72,7 +73,6 @@ import {
 import { getTextCell, ImageCellEditor, toGlideColumn } from "./columns"
 import Tooltip from "./Tooltip"
 import { StyledResizableContainer } from "./styled-components"
-import { updateColumnConfigTypeProps } from "./columnConfigUtils"
 
 import "@glideapps/glide-data-grid/dist/index.css"
 import "@glideapps/glide-data-grid-cells/dist/index.css"
@@ -617,6 +617,8 @@ function DataFrame({
     setColumnConfigMapping
   )
 
+  const { changeColumnFormat } = useColumnFormatting(setColumnConfigMapping)
+
   const { onColumnMoved } = useColumnReordering(
     columns,
     freezeColumns,
@@ -654,24 +656,6 @@ function DataFrame({
       }
     }, 1)
   }, [resizableSize, numRows, glideColumns])
-
-  const changeColumnFormat = React.useCallback(
-    (columnId: string, format: string) => {
-      // Update the format parameter in the column config mapping:
-      setColumnConfigMapping(prevColumnConfigMapping => {
-        return updateColumnConfigTypeProps({
-          columnId,
-          columnConfigMapping: prevColumnConfigMapping,
-          updatedProps: {
-            type_config: {
-              format: format,
-            },
-          },
-        })
-      })
-    },
-    [setColumnConfigMapping]
-  )
 
   return (
     <StyledResizableContainer
