@@ -19,21 +19,21 @@ import React from "react"
 import { updateColumnConfigTypeProps } from "~lib/components/widgets/DataFrame/columnConfigUtils"
 
 type ColumnVisibilityReturn = {
-  // A callback to hide a column
+  // Hides a column.
   hideColumn: (columnId: string) => void
-  // A callback to show a column
+  // Shows a column.
   showColumn: (columnId: string) => void
 }
 
 /**
- * A React hook that adds the ability to interactively hide and show a column.
+ * A React hook that adds the ability to interactively hide and show columns from UI.
  *
  * @param clearSelection - A callback to clear current selections in the table
  * @param setColumnConfigMapping - A callback to set the column config mapping state
  *
  * @returns An object containing the following properties:
- * - `hideColumn`: A callback to hide a column
- * - `showColumn`: A callback to show a column
+ * - `hideColumn`: Hides a column.
+ * - `showColumn`: Shows a column.
  */
 function useColumnVisibility(
   clearSelection: (keepRows?: boolean, keepColumns?: boolean) => void,
