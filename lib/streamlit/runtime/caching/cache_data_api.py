@@ -117,7 +117,7 @@ class CachedDataFuncInfo(CachedFuncInfo):
         return f"{self.func.__module__}.{self.func.__qualname__}"
 
     def get_function_cache(self, function_key: str) -> Cache:
-        return _data_caches.get_cache(
+        return get_data_cache_provider().get_cache(
             key=function_key,
             persist=self.persist,
             max_entries=self.max_entries,
@@ -132,7 +132,7 @@ class CachedDataFuncInfo(CachedFuncInfo):
         When called, this method could log warnings if cache params are invalid
         for current storage.
         """
-        _data_caches.validate_cache_params(
+        get_data_cache_provider().validate_cache_params(
             function_name=self.func.__name__,
             persist=self.persist,
             max_entries=self.max_entries,
@@ -305,13 +305,20 @@ class DataCaches(CacheStatsProvider):
             return MemoryCacheStorageManager()
 
 
-# Singleton DataCaches instance
-_data_caches = DataCaches()
+# Singleton DataCaches instance used when we are running "raw mode"
+_raw_mode_data_cache_provider = DataCaches()
+
+
+def get_data_cache_provider() -> DataCaches:
+    """Return the cache provider for all @st.cache_data functions."""
+    if runtime.exists():
+        return runtime.get_instance().data_cache_provider
+    return _raw_mode_data_cache_provider
 
 
 def get_data_cache_stats_provider() -> CacheStatsProvider:
     """Return the StatsProvider for all @st.cache_data functions."""
-    return _data_caches
+    return get_data_cache_provider()
 
 
 class CacheDataAPI:
@@ -593,7 +600,7 @@ class CacheDataAPI:
     @gather_metrics("clear_data_caches")
     def clear(self) -> None:
         """Clear all in-memory and on-disk data caches."""
-        _data_caches.clear_all()
+        get_data_cache_provider().clear_all()
 
 
 class DataCache(Cache):

@@ -24,6 +24,8 @@ from urllib import parse
 
 from streamlit import source_util
 from streamlit.runtime import Runtime
+from streamlit.runtime.caching.cache_data_api import DataCaches
+from streamlit.runtime.caching.cache_resource_api import ResourceCaches
 from streamlit.runtime.caching.storage.dummy_cache_storage import (
     MemoryCacheStorageManager,
 )
@@ -174,6 +176,9 @@ class AppTest:
         tree._runner = self
         self._tree = tree
 
+        self._data_cache_provider = DataCaches()
+        self._resource_cache_provider = ResourceCaches()
+
     @classmethod
     def from_string(cls, script: str, *, default_timeout: float = 3) -> AppTest:
         """
@@ -321,12 +326,8 @@ class AppTest:
             timeout = self.default_timeout
 
         # setup
-        mock_runtime = MagicMock(spec=Runtime)
-        mock_runtime.media_file_mgr = MediaFileManager(
-            MemoryMediaFileStorage("/mock/media")
-        )
-        mock_runtime.cache_storage_manager = MemoryCacheStorageManager()
-        Runtime._instance = mock_runtime
+        self._setup_runtime()
+
         pages_manager = PagesManager(self._script_path, setup_watcher=False)
         with source_util._pages_cache_lock:
             saved_cached_pages = source_util._cached_pages
@@ -363,9 +364,32 @@ class AppTest:
             if st.secrets._secrets is not None:
                 self.secrets = dict(st.secrets._secrets)
             st.secrets = saved_secrets
-        Runtime._instance = None
+
+        self._teardown_runtime()
 
         return self
+
+    def _setup_runtime(self):
+        """Configure a mock runtime instance and inject it into the Runtime module as the current singleton.
+
+        This method should be called at the start of each AppTest run.
+        """
+        mock_runtime = MagicMock(spec=Runtime)
+        mock_runtime.media_file_mgr = MediaFileManager(
+            MemoryMediaFileStorage("/mock/media")
+        )
+        mock_runtime.cache_storage_manager = MemoryCacheStorageManager()
+        mock_runtime.data_cache_provider = self._data_cache_provider
+        mock_runtime.resource_cache_provider = self._resource_cache_provider
+
+        Runtime._instance = mock_runtime
+
+    def _teardown_runtime(self) -> None:
+        """Remove any runtime instance configured for this test.
+
+        This method should be called at the end of each AppTest run.
+        """
+        Runtime._instance = None
 
     def run(self, *, timeout: float | None = None) -> AppTest:
         """Run the script from the current state.
@@ -416,6 +440,19 @@ class AppTest:
             )
         page_path_str = str(full_page_path.resolve())
         self._page_hash = calc_md5(page_path_str)
+        return self
+
+    def clear_all_caches(self) -> AppTest:
+        """Clear the internal `st.cache_data` and `st.cache_resource` function decorator caches associated with this
+        `AppTest` instance.
+
+        Returns
+        -------
+        AppTest
+            self
+        """
+        self._data_cache_provider.clear_all()
+        self._resource_cache_provider.clear_all()
         return self
 
     @property

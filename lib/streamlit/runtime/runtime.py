@@ -30,6 +30,8 @@ from streamlit.runtime.caching import (
     get_data_cache_stats_provider,
     get_resource_cache_stats_provider,
 )
+from streamlit.runtime.caching.cache_data_api import DataCaches
+from streamlit.runtime.caching.cache_resource_api import ResourceCaches
 from streamlit.runtime.caching.storage.local_disk_cache_storage import (
     LocalDiskCacheStorageManager,
 )
@@ -207,6 +209,8 @@ class Runtime:
         self._uploaded_file_mgr = config.uploaded_file_manager
         self._media_file_mgr = MediaFileManager(storage=config.media_file_storage)
         self._cache_storage_manager = config.cache_storage_manager
+        self._data_cache_provider: DataCaches = DataCaches()
+        self._resource_cache_provider: ResourceCaches = ResourceCaches()
         self._script_cache = ScriptCache()
 
         self._session_mgr = config.session_manager_class(
@@ -242,6 +246,14 @@ class Runtime:
     @property
     def cache_storage_manager(self) -> CacheStorageManager:
         return self._cache_storage_manager
+
+    @property
+    def data_cache_provider(self) -> DataCaches:
+        return self._data_cache_provider
+
+    @property
+    def resource_cache_provider(self) -> ResourceCaches:
+        return self._resource_cache_provider
 
     @property
     def media_file_mgr(self) -> MediaFileManager:

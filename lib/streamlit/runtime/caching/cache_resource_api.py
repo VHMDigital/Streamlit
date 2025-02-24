@@ -25,6 +25,7 @@ from cachetools import TTLCache
 from typing_extensions import TypeAlias
 
 import streamlit as st
+from streamlit import runtime
 from streamlit.logger import get_logger
 from streamlit.runtime.caching import cache_utils
 from streamlit.runtime.caching.cache_errors import CacheKeyNotFoundError
@@ -132,12 +133,19 @@ class ResourceCaches(CacheStatsProvider):
 
 
 # Singleton ResourceCaches instance
-_resource_caches = ResourceCaches()
+_raw_mode_resource_cache_provider = ResourceCaches()
+
+
+def get_resource_cache_provider() -> ResourceCaches:
+    """Return the cache provider for all @st.cache_resource functions."""
+    if runtime.exists():
+        return runtime.get_instance().resource_cache_provider
+    return _raw_mode_resource_cache_provider
 
 
 def get_resource_cache_stats_provider() -> CacheStatsProvider:
     """Return the StatsProvider for all @st.cache_resource functions."""
-    return _resource_caches
+    return get_resource_cache_provider()
 
 
 class CachedResourceFuncInfo(CachedFuncInfo):
@@ -175,7 +183,7 @@ class CachedResourceFuncInfo(CachedFuncInfo):
         return f"{self.func.__module__}.{self.func.__qualname__}"
 
     def get_function_cache(self, function_key: str) -> Cache:
-        return _resource_caches.get_cache(
+        return get_resource_cache_provider().get_cache(
             key=function_key,
             display_name=self.display_name,
             max_entries=self.max_entries,
@@ -442,7 +450,7 @@ class CacheResourceAPI:
     @gather_metrics("clear_resource_caches")
     def clear(self) -> None:
         """Clear all cache_resource caches."""
-        _resource_caches.clear_all()
+        get_resource_cache_provider().clear_all()
 
 
 class ResourceCache(Cache):
