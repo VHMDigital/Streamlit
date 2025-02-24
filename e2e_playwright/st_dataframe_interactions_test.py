@@ -655,7 +655,7 @@ def test_column_hiding_via_column_menu(
     unfocus_dataframe(app)
     # The column menu should be closed after hiding a column:
     expect(app.get_by_test_id("stDataFrameColumnMenu")).not_to_be_visible()
-    assert_snapshot(df_element, name="st_dataframe-column_hidden_via_ui")
+    assert_snapshot(df_element, name="st_dataframe-column_hidden_via_column_menu")
 
 
 def test_column_hiding_via_visibility_menu(
