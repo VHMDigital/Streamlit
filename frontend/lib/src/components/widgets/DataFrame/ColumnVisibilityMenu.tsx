@@ -171,18 +171,14 @@ const ColumnVisibilityMenu: React.FC<ColumnVisibilityMenuProps> = ({
           }}
         >
           {columns.map(column => {
+            // A column can be hidden if configured in column config
+            // or if the user has configured a column order that doesn't
+            // include the column.
             const hiddenViaColumnOrder =
               columnOrder.length && !column.isIndex
                 ? !columnOrder.includes(column.id) &&
                   !columnOrder.includes(column.name)
                 : false
-
-            let initialValue = true
-            if (column.isHidden === true) {
-              initialValue = false
-            } else if (hiddenViaColumnOrder) {
-              initialValue = false
-            }
 
             return (
               <CheckboxItem
@@ -192,7 +188,9 @@ const ColumnVisibilityMenu: React.FC<ColumnVisibilityMenuProps> = ({
                     ? NAMELESS_INDEX_NAME
                     : column.title
                 }
-                initialValue={initialValue}
+                initialValue={
+                  !(column.isHidden === true || hiddenViaColumnOrder)
+                }
                 onChange={checked => {
                   if (checked) {
                     showColumn(column.id)
