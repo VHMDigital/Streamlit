@@ -641,6 +641,54 @@ def test_opening_column_menu(themed_app: Page, assert_snapshot: ImageCompareFunc
     assert_snapshot(df, name="st_dataframe-column_menu")
 
 
+def test_column_hiding_via_column_menu(
+    app: Page, assert_snapshot: ImageCompareFunction
+):
+    """Test that a column can be hidden via the column menu."""
+    df_element = (
+        get_element_by_key(app, "column-menu-test").get_by_test_id("stDataFrame").first
+    )
+    expect_canvas_to_be_visible(df_element)
+    open_column_menu(df_element, 2, "small")
+    expect(app.get_by_test_id("stDataFrameColumnMenu")).to_be_visible()
+    app.get_by_test_id("stDataFrameColumnMenu").get_by_text("Hide column").click()
+    unfocus_dataframe(app)
+    # The column menu should be closed after hiding a column:
+    expect(app.get_by_test_id("stDataFrameColumnMenu")).not_to_be_visible()
+    assert_snapshot(df_element, name="st_dataframe-column_hidden_via_ui")
+
+
+def test_column_hiding_via_visibility_menu(
+    app: Page, assert_snapshot: ImageCompareFunction
+):
+    """Test that a column can be hidden via the visibility menu."""
+    df_element = (
+        get_element_by_key(app, "column-menu-test").get_by_test_id("stDataFrame").first
+    )
+    expect_canvas_to_be_visible(df_element)
+
+    df_toolbar = df_element.get_by_test_id("stElementToolbar")
+
+    # Open toolbar:
+    df_element.hover()
+    expect(df_toolbar).to_have_css("opacity", "1")
+    # Open columns visibility menu:
+    open_visibility_menu_button = df_toolbar.get_by_test_id(
+        "stElementToolbarButton"
+    ).get_by_label("Show/hide columns")
+    open_visibility_menu_button.click()
+    column_visibility_menu = app.get_by_test_id("stDataFrameColumnVisibilityMenu")
+    expect(column_visibility_menu).to_be_visible()
+
+    # Make a screenshot of the column visibility menu:
+    assert_snapshot(column_visibility_menu, name="st_dataframe-column_visibility_menu")
+
+    # Hide Column A:
+    column_visibility_menu.get_by_text("Column A").click()
+    unfocus_dataframe(app)
+    assert_snapshot(df_element, name="st_dataframe-column_hidden_via_visibility_menu")
+
+
 def test_column_pinning_via_ui(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that a column can be pinned via the column menu."""
 
