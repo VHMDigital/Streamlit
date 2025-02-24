@@ -26,8 +26,7 @@ import {
 import { transparentize } from "color2k"
 
 import { EmotionTheme, hasLightBackgroundColor } from "~lib/theme"
-
-import { BaseColumn } from "./columns"
+import { BaseColumn } from "~lib/components/widgets/DataFrame/columns"
 
 const NAMELESS_INDEX_NAME = "(index)"
 

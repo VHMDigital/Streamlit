@@ -51,7 +51,8 @@ import { ElementFullscreenContext } from "~lib/components/shared/ElementFullscre
 import { useRequiredContext } from "~lib/hooks/useRequiredContext"
 import { useDebouncedCallback } from "~lib/hooks/useDebouncedCallback"
 
-import ColumnMenu from "./ColumnMenu"
+import ColumnMenu from "./menus/ColumnMenu"
+import ColumnVisibilityMenu from "./menus/ColumnVisibilityMenu"
 import EditingState, { getColumnName } from "./EditingState"
 import {
   useColumnFormatting,
@@ -75,7 +76,6 @@ import {
 import { getTextCell, ImageCellEditor, toGlideColumn } from "./columns"
 import Tooltip from "./Tooltip"
 import { StyledResizableContainer } from "./styled-components"
-import ColumnVisibilityMenu from "./ColumnVisibilityMenu"
 
 import "@glideapps/glide-data-grid/dist/index.css"
 import "@glideapps/glide-data-grid-cells/dist/index.css"

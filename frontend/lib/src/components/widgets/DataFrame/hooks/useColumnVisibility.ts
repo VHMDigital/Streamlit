@@ -16,7 +16,7 @@
 
 import React from "react"
 
-import { updateColumnConfigTypeProps } from "~lib/components/widgets/DataFrame/columnConfigUtils"
+import { updateColumnConfigTypeProps } from "./columnConfigUtils"
 
 type ColumnVisibilityReturn = {
   // Hides a column.

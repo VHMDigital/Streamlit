@@ -21,12 +21,16 @@ import { userEvent } from "@testing-library/user-event"
 import { Field, Int64, Utf8 } from "apache-arrow"
 
 import { DataFrameCellType } from "~lib/dataframes/arrowTypeUtils"
+import {
+  BaseColumn,
+  NumberColumn,
+  TextColumn,
+} from "~lib/components/widgets/DataFrame/columns"
 import { render } from "~lib/test_util"
 
 import ColumnVisibilityMenu, {
   ColumnVisibilityMenuProps,
 } from "./ColumnVisibilityMenu"
-import { BaseColumn, NumberColumn, TextColumn } from "./columns"
 
 const MOCK_COLUMNS: BaseColumn[] = [
   TextColumn({
