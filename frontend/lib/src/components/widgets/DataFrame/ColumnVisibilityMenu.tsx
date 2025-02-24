@@ -25,7 +25,7 @@ import {
 } from "baseui/checkbox"
 import { transparentize } from "color2k"
 
-import { hasLightBackgroundColor } from "~lib/theme"
+import { EmotionTheme, hasLightBackgroundColor } from "~lib/theme"
 
 import { BaseColumn } from "./columns"
 
@@ -40,6 +40,91 @@ export interface ColumnVisibilityMenuProps {
   onClose: () => void
 }
 
+interface CheckboxItemProps {
+  column: BaseColumn
+  onToggle: (checked: boolean) => void
+}
+
+const CheckboxItem: React.FC<CheckboxItemProps> = ({ column, onToggle }) => {
+  const theme: EmotionTheme = useTheme()
+
+  return (
+    <UICheckbox
+      key={column.id}
+      checked={column.isHidden !== true}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>): void => {
+        onToggle(e.target.checked)
+      }}
+      aria-label={column.title}
+      checkmarkType={STYLE_TYPE.default}
+      labelPlacement={LABEL_PLACEMENT.right}
+      overrides={{
+        Root: {
+          style: ({ $isFocusVisible }: { $isFocusVisible: boolean }) => ({
+            marginBottom: theme.spacing.none,
+            marginTop: theme.spacing.none,
+            paddingLeft: theme.spacing.md,
+            paddingRight: theme.spacing.md,
+            paddingTop: theme.spacing.twoXS,
+            paddingBottom: theme.spacing.twoXS,
+            backgroundColor: $isFocusVisible
+              ? theme.colors.darkenedBgMix25
+              : "",
+            display: "flex",
+            alignItems: "start",
+          }),
+        },
+        Checkmark: {
+          style: ({
+            $isFocusVisible,
+            $checked,
+          }: {
+            $isFocusVisible: boolean
+            $checked: boolean
+          }) => {
+            const borderColor = $checked
+              ? theme.colors.primary
+              : theme.colors.fadedText40
+
+            return {
+              outline: 0,
+              width: theme.sizes.checkbox,
+              height: theme.sizes.checkbox,
+              marginTop: theme.spacing.twoXS,
+              marginLeft: 0,
+              marginBottom: 0,
+              boxShadow:
+                $isFocusVisible && $checked
+                  ? `0 0 0 0.2rem ${transparentize(theme.colors.primary, 0.5)}`
+                  : "",
+              borderLeftWidth: theme.sizes.borderWidth,
+              borderRightWidth: theme.sizes.borderWidth,
+              borderTopWidth: theme.sizes.borderWidth,
+              borderBottomWidth: theme.sizes.borderWidth,
+              borderLeftColor: borderColor,
+              borderRightColor: borderColor,
+              borderTopColor: borderColor,
+              borderBottomColor: borderColor,
+            }
+          },
+        },
+        Label: {
+          style: {
+            lineHeight: theme.lineHeights.small,
+            paddingLeft: theme.spacing.sm,
+            position: "relative",
+            color: theme.colors.bodyText,
+            fontSize: theme.fontSizes.sm,
+            fontWeight: theme.fontWeights.normal,
+          },
+        },
+      }}
+    >
+      {!column.title && column.isIndex ? NAMELESS_INDEX_NAME : column.title}
+    </UICheckbox>
+  )
+}
+
 const ColumnVisibilityMenu: React.FC<ColumnVisibilityMenuProps> = ({
   columns,
   hideColumn,
@@ -48,7 +133,7 @@ const ColumnVisibilityMenu: React.FC<ColumnVisibilityMenuProps> = ({
   isOpen,
   onClose,
 }): ReactElement => {
-  const theme = useTheme()
+  const theme: EmotionTheme = useTheme()
 
   return (
     <UIPopover
@@ -64,96 +149,17 @@ const ColumnVisibilityMenu: React.FC<ColumnVisibilityMenuProps> = ({
           }}
         >
           {columns.map(column => (
-            <UICheckbox
+            <CheckboxItem
               key={column.id}
-              checked={column.isHidden !== true}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>): void => {
-                if (e.target.checked) {
+              column={column}
+              onToggle={checked => {
+                if (checked) {
                   showColumn(column.id)
                 } else {
                   hideColumn(column.id)
                 }
               }}
-              aria-label={column.title}
-              checkmarkType={STYLE_TYPE.default}
-              labelPlacement={LABEL_PLACEMENT.right}
-              overrides={{
-                Root: {
-                  style: ({
-                    $isFocusVisible,
-                  }: {
-                    $isFocusVisible: boolean
-                  }) => ({
-                    marginBottom: theme.spacing.none,
-                    marginTop: theme.spacing.none,
-                    paddingLeft: theme.spacing.md,
-                    paddingRight: theme.spacing.md,
-                    paddingTop: theme.spacing.twoXS,
-                    paddingBottom: theme.spacing.twoXS,
-                    backgroundColor: $isFocusVisible
-                      ? theme.colors.darkenedBgMix25
-                      : "",
-                    display: "flex",
-                    alignItems: "start",
-                  }),
-                },
-                Checkmark: {
-                  style: ({
-                    $isFocusVisible,
-                    $checked,
-                  }: {
-                    $isFocusVisible: boolean
-                    $checked: boolean
-                  }) => {
-                    const borderColor = $checked
-                      ? theme.colors.primary
-                      : theme.colors.fadedText40
-
-                    return {
-                      outline: 0,
-                      width: theme.sizes.checkbox,
-                      height: theme.sizes.checkbox,
-                      marginTop: theme.spacing.twoXS,
-                      marginLeft: 0,
-                      marginBottom: 0,
-                      boxShadow:
-                        $isFocusVisible && $checked
-                          ? `0 0 0 0.2rem ${transparentize(
-                              theme.colors.primary,
-                              0.5
-                            )}`
-                          : "",
-                      // This is painfully verbose, but baseweb seems to internally
-                      // use the long-hand version, which means we can't use the
-                      // shorthand names here as if we do we'll end up with warn
-                      // logs spamming us every time a checkbox is rendered.
-                      borderLeftWidth: theme.sizes.borderWidth,
-                      borderRightWidth: theme.sizes.borderWidth,
-                      borderTopWidth: theme.sizes.borderWidth,
-                      borderBottomWidth: theme.sizes.borderWidth,
-                      borderLeftColor: borderColor,
-                      borderRightColor: borderColor,
-                      borderTopColor: borderColor,
-                      borderBottomColor: borderColor,
-                    }
-                  },
-                },
-                Label: {
-                  style: {
-                    lineHeight: theme.lineHeights.small,
-                    paddingLeft: theme.spacing.sm,
-                    position: "relative",
-                    color: theme.colors.bodyText,
-                    fontSize: theme.fontSizes.sm,
-                    fontWeight: theme.fontWeights.normal,
-                  },
-                },
-              }}
-            >
-              {!column.title && column.isIndex
-                ? NAMELESS_INDEX_NAME
-                : column.title}
-            </UICheckbox>
+            />
           ))}
         </div>
       )}
@@ -191,11 +197,9 @@ const ColumnVisibilityMenu: React.FC<ColumnVisibilityMenuProps> = ({
             fontSize: theme.fontSizes.sm,
             fontWeight: theme.fontWeights.normal,
             minWidth: theme.sizes.minMenuWidth,
-            maxWidth: "15rem",
+            maxWidth: `calc(${theme.sizes.minMenuWidth} * 2)`,
             maxHeight: theme.sizes.maxDropdownHeight,
             overflow: "auto",
-            // See the long comment about `borderRadius`. The same applies here
-            // to `padding`.
             paddingTop: "0 !important",
             paddingBottom: "0 !important",
             paddingLeft: "0 !important",
