@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from .safe_pickle import SafeUnpickler
 import pickle
 import threading
 import types
@@ -634,15 +635,19 @@ class DataCache(Cache):
             raise CacheError(str(e)) from e
 
         try:
-            entry = pickle.loads(pickled_entry)
+            entry = SafeUnpickler.loads(pickled_entry)
+
             if not isinstance(entry, CachedResult):
                 # Loaded an old cache file format, remove it and let the caller
                 # rerun the function.
                 self.storage.delete(key)
                 raise CacheKeyNotFoundError()
+            
             return entry
+        
         except pickle.UnpicklingError as exc:
-            raise CacheError(f"Failed to unpickle {key}") from exc
+            self.storage.delete(key)
+            raise CacheKeyNotFoundError(f"Cache entry {key} was corrupted and removed.") from exc
 
     @gather_metrics("_cache_data_object")
     def write_result(self, key: str, value: Any, messages: list[MsgData]) -> None:
@@ -653,7 +658,7 @@ class DataCache(Cache):
             main_id = st._main.id
             sidebar_id = st.sidebar.id
             entry = CachedResult(value, messages, main_id, sidebar_id)
-            pickled_entry = pickle.dumps(entry)
+            pickled_entry = pickle.dumps(entry, protocol=pickle.HIGHEST_PROTOCOL)
         except (pickle.PicklingError, TypeError) as exc:
             raise CacheError(f"Failed to pickle {key}") from exc
         self.storage.set(key, pickled_entry)
