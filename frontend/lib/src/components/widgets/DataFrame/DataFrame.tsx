@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 
-import React, {
-  memo,
-  ReactElement,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import React, { memo, ReactElement, useCallback, useEffect } from "react"
 
 import { createPortal } from "react-dom"
 import {
@@ -145,9 +136,9 @@ function DataFrame({
     height: containerHeight,
   } = useRequiredContext(ElementFullscreenContext)
 
-  const resizableRef = useRef<Resizable>(null)
-  const dataEditorRef = useRef<DataEditorRef>(null)
-  const resizableContainerRef = useRef<HTMLDivElement>(null)
+  const resizableRef = React.useRef<Resizable>(null)
+  const dataEditorRef = React.useRef<DataEditorRef>(null)
+  const resizableContainerRef = React.useRef<HTMLDivElement>(null)
 
   const gridTheme = useCustomTheme()
 
@@ -156,14 +147,15 @@ function DataFrame({
 
   const {
     libConfig: { enforceDownloadInNewTab = false }, // Default to false, if no libConfig, e.g. for tests
-  } = useContext(LibContext)
+  } = React.useContext(LibContext)
 
-  const [isFocused, setIsFocused] = useState<boolean>(true)
-  const [showSearch, setShowSearch] = useState(false)
-  const [hasVerticalScroll, setHasVerticalScroll] = useState<boolean>(false)
+  const [isFocused, setIsFocused] = React.useState<boolean>(true)
+  const [showSearch, setShowSearch] = React.useState(false)
+  const [hasVerticalScroll, setHasVerticalScroll] =
+    React.useState<boolean>(false)
   const [hasHorizontalScroll, setHasHorizontalScroll] =
-    useState<boolean>(false)
-  const [showMenu, setShowMenu] = useState<{
+    React.useState<boolean>(false)
+  const [showMenu, setShowMenu] = React.useState<{
     // The index number of the column that the menu is shown for:
     columnIdx: number
     // The bounds of the column header:
@@ -173,14 +165,14 @@ function DataFrame({
     React.useState(false)
 
   // Determine if the device is primary using touch as input:
-  const isTouchDevice = useMemo<boolean>(
+  const isTouchDevice = React.useMemo<boolean>(
     () => window.matchMedia && window.matchMedia("(pointer: coarse)").matches,
     []
   )
 
   // Determine if it uses customized scrollbars (webkit browsers):
   // https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar#css.selectors.-webkit-scrollbar
-  const hasCustomizedScrollbars = useMemo<boolean>(
+  const hasCustomizedScrollbars = React.useMemo<boolean>(
     () =>
       (window.navigator.userAgent.includes("Mac OS") &&
         window.navigator.userAgent.includes("Safari")) ||
@@ -218,29 +210,34 @@ function DataFrame({
   const isDynamicAndEditable =
     !isEmptyTable && element.editingMode === DYNAMIC && !disabled
 
-  const editingState = useRef<EditingState>(new EditingState(originalNumRows))
+  const editingState = React.useRef<EditingState>(
+    new EditingState(originalNumRows)
+  )
 
-  const [numRows, setNumRows] = useState(editingState.current.getNumRows())
+  const [numRows, setNumRows] = React.useState(
+    editingState.current.getNumRows()
+  )
 
-  useEffect(() => {
+  React.useEffect(() => {
     editingState.current = new EditingState(originalNumRows)
     setNumRows(editingState.current.getNumRows())
   }, [originalNumRows])
 
-  const resetEditingState = useCallback(() => {
+  const resetEditingState = React.useCallback(() => {
     editingState.current = new EditingState(originalNumRows)
     setNumRows(editingState.current.getNumRows())
   }, [originalNumRows])
 
-  const [columnOrder, setColumnOrder] = useState(element.columnOrder)
+  const [columnOrder, setColumnOrder] = React.useState(element.columnOrder)
 
-  // Update the column order
-  useEffect(() => {
+  // Update the column order if the element.columnOrder value changes
+  // e.g. if the user has applied changes to the column order in the code.
+  React.useEffect(() => {
     setColumnOrder(element.columnOrder)
 
     // eslint-disable-next-line react-compiler/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(element.columnOrder)])
+  }, [element.columnOrder.join(",")])
 
   const {
     columns: originalColumns,
@@ -256,7 +253,7 @@ function DataFrame({
    * its state. Once the same element is rendered again, we try to
    * reconstruct the state from the widget manager values.
    */
-  useEffect(
+  React.useEffect(
     () => {
       if (element.editingMode === READ_ONLY) {
         // We don't need to load the initial widget state
@@ -305,7 +302,7 @@ function DataFrame({
    *
    * @param newSelection - The new selection state
    */
-  const innerSyncSelectionState = useCallback(
+  const innerSyncSelectionState = React.useCallback(
     (newSelection: GridSelection) => {
       // If we want to support selections also with the editable mode,
       // we would need to integrate the `syncEditState` and `syncSelections` functions
@@ -386,7 +383,7 @@ function DataFrame({
     syncSelectionState
   )
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Clear cell selections if fullscreen mode changes
     // but keep row & column selections.
     // In the past we saw some weird side-effects, so we decided to clean
@@ -400,7 +397,7 @@ function DataFrame({
   }, [isFullScreen])
 
   // This callback is used to refresh the rendering of specified cells
-  const refreshCells = useCallback(
+  const refreshCells = React.useCallback(
     (
       cells: {
         cell: GridCellPosition
@@ -419,7 +416,7 @@ function DataFrame({
    * This effect needs to run after the fullscreen effect that
    * clears cell selections, since both modify the same state object.
    */
-  useEffect(
+  React.useEffect(
     () => {
       if (!isRowSelectionActivated && !isColumnSelectionActivated) {
         // Only run this if selections are activated.
@@ -473,7 +470,7 @@ function DataFrame({
    * on the latest editing state. This is required to keep the
    * component state in sync with the editing state.
    */
-  const updateNumRows = useCallback(() => {
+  const updateNumRows = React.useCallback(() => {
     if (numRows !== editingState.current.getNumRows()) {
       // Reset the number of rows if it has been changed in the editing state
       setNumRows(editingState.current.getNumRows())
@@ -488,7 +485,7 @@ function DataFrame({
    * This is the inner version to be used by the debounce callback below.
    * Its split out to allow better dependency inspection.
    */
-  const innerSyncEditState = useCallback(() => {
+  const innerSyncEditState = React.useCallback(() => {
     const currentEditingState = editingState.current.toJson(columns)
     let currentWidgetState = widgetMgr.getStringValue({
       id: element.id,
@@ -570,7 +567,7 @@ function DataFrame({
   )
 
   // Convert columns from our structure into the glide-data-grid compatible structure
-  const transformedColumns = useMemo(
+  const transformedColumns = React.useMemo(
     () => columns.map(column => configureColumnMenu(toGlideColumn(column))),
     [columns, configureColumnMenu]
   )
@@ -600,7 +597,7 @@ function DataFrame({
 
   // This is used as fallback in case the table is empty to
   // insert cells indicating this state:
-  const getEmptyStateContent = useCallback(
+  const getEmptyStateContent = React.useCallback(
     ([_col, _row]: readonly [number, number]): GridCell => {
       return {
         ...getTextCell(true, false),
@@ -616,7 +613,7 @@ function DataFrame({
     [columns, gridTheme.glideTheme.textLight]
   )
 
-  const onFormCleared = useCallback(() => {
+  const onFormCleared = React.useCallback(() => {
     // Clear the editing state and the selection state
     resetEditingState()
     clearSelection()
@@ -646,7 +643,7 @@ function DataFrame({
   )
 
   // Determine if the table requires horizontal or vertical scrolling:
-  useEffect(() => {
+  React.useEffect(() => {
     // The setTimeout is a workaround to get the scroll area bounding box
     // after the grid has been rendered. Otherwise, the scroll area div
     // (dvn-stack) might not have been created yet.
