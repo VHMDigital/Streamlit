@@ -845,7 +845,8 @@ export class App extends PureComponent<Props, State> {
   }
 
   handlePageNotFound = (pageNotFound: PageNotFound): void => {
-    this.maybeSetState(this.appNavigation.handlePageNotFound(pageNotFound))
+    const { pageName } = pageNotFound
+    this.maybeSetState(this.appNavigation.handlePageNotFound(pageName))
   }
 
   onPageIconChanged = (iconUrl: string): void => {

@@ -23,7 +23,6 @@ import {
   Navigation,
   NewSession,
   PageConfig,
-  PageNotFound,
 } from "@streamlit/protobuf"
 
 import {
@@ -170,9 +169,7 @@ describe("AppNavigation", () => {
   it("sets currentPageScriptHash on page not found", () => {
     // Initialize navigation from the new session proto
     appNavigation.handleNewSession(generateNewSession())
-    const maybeState = appNavigation.handlePageNotFound(
-      new PageNotFound({ pageName: "" })
-    )
+    const maybeState = appNavigation.handlePageNotFound("")
     expect(maybeState).not.toBeUndefined()
 
     const [newState] = maybeState!
@@ -182,9 +179,7 @@ describe("AppNavigation", () => {
   it("calls host communication on page not found", () => {
     // Initialize navigation from the new session proto
     appNavigation.handleNewSession(generateNewSession())
-    const maybeState = appNavigation.handlePageNotFound(
-      new PageNotFound({ pageName: "" })
-    )
+    const maybeState = appNavigation.handlePageNotFound("")
     expect(maybeState).not.toBeUndefined()
 
     const callback = maybeState![1]
@@ -200,7 +195,7 @@ describe("AppNavigation", () => {
   it("calls onPageNotFound when page not found", () => {
     // Initialize navigation from the new session proto
     appNavigation.handleNewSession(generateNewSession())
-    appNavigation.handlePageNotFound(new PageNotFound({ pageName: "" }))
+    appNavigation.handlePageNotFound("")
     expect(onPageNotFound).toHaveBeenCalledWith("")
   })
 

@@ -20,7 +20,6 @@ import {
   Navigation,
   NewSession,
   PageConfig,
-  PageNotFound,
 } from "@streamlit/protobuf"
 
 interface AppNavigationState {
@@ -164,8 +163,7 @@ export class AppNavigation {
     ]
   }
 
-  handlePageNotFound(pageNotFound: PageNotFound): MaybeStateUpdate {
-    const { pageName } = pageNotFound
+  handlePageNotFound(pageName: string): MaybeStateUpdate {
     this.onPageNotFound(pageName)
 
     return [

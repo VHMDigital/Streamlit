@@ -18,6 +18,7 @@ import os
 from typing import Any, Literal
 
 from streamlit import util
+from streamlit.runtime.pages_manager import PagesManager
 
 
 class Error(Exception):
@@ -385,8 +386,6 @@ class StreamlitPageNotFoundError(LocalizableStreamlitException):
             "previously defined by `st.Page` and passed to `st.navigation` are "
             "allowed."
         )
-
-        from streamlit.runtime.pages_manager import PagesManager
 
         if PagesManager.uses_pages_directory:
             message = (
