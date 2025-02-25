@@ -26,9 +26,6 @@ jobs:
       run:
         shell: bash
 
-    env:
-      USE_CONSTRAINTS_FILE: "false"
-
     steps:
       - name: Checkout Streamlit code
         uses: actions/checkout@v4

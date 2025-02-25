@@ -86,7 +86,6 @@ jobs:
             (matrix.python_version == 'max' && needs.build_info.outputs.PYTHON_MAX_VERSION || matrix.python_version)
           )
         }}
-      USE_CONSTRAINTS_FILE: "false"
       CONSTRAINTS_BRANCH: ${{ inputs.constraints-branch || 'constraints-develop' }}
 
     steps:
@@ -218,7 +217,6 @@ jobs:
 
     env:
       CONSTRAINTS_BRANCH: ${{ inputs.constraints-branch || 'constraints-develop' }}
-      USE_CONSTRAINTS_FILE: "false"
 
     steps:
       - name: Checkout Streamlit code
