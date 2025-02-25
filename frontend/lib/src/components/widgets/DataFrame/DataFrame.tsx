@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { memo, ReactElement, useCallback } from "react"
+import React, { memo, ReactElement, useCallback, useEffect } from "react"
 
 import { createPortal } from "react-dom"
 import {
@@ -35,6 +35,7 @@ import {
   Delete,
   FileDownload,
   Search,
+  Visibility,
 } from "@emotion-icons/material-outlined"
 
 import { Arrow as ArrowProto } from "@streamlit/protobuf"
@@ -50,14 +51,18 @@ import { ElementFullscreenContext } from "~lib/components/shared/ElementFullscre
 import { useRequiredContext } from "~lib/hooks/useRequiredContext"
 import { useDebouncedCallback } from "~lib/hooks/useDebouncedCallback"
 
-import ColumnMenu from "./ColumnMenu"
+import ColumnMenu from "./menus/ColumnMenu"
+import ColumnVisibilityMenu from "./menus/ColumnVisibilityMenu"
 import EditingState, { getColumnName } from "./EditingState"
 import {
+  useColumnFormatting,
   useColumnLoader,
   useColumnPinning,
   useColumnReordering,
   useColumnSizer,
   useColumnSort,
+  useColumnVisibility,
+  useCustomEditors,
   useCustomRenderer,
   useCustomTheme,
   useDataEditor,
@@ -156,6 +161,8 @@ function DataFrame({
     // The bounds of the column header:
     headerBounds: Rectangle
   }>()
+  const [showColumnVisibilityMenu, setShowColumnVisibilityMenu] =
+    React.useState(false)
 
   // Determine if the device is primary using touch as input:
   const isTouchDevice = React.useMemo<boolean>(
@@ -223,12 +230,11 @@ function DataFrame({
 
   const [columnOrder, setColumnOrder] = React.useState(element.columnOrder)
 
-  const { columns: originalColumns, setColumnConfigMapping } = useColumnLoader(
-    element,
-    data,
-    disabled,
-    columnOrder
-  )
+  const {
+    columns: originalColumns,
+    allColumns,
+    setColumnConfigMapping,
+  } = useColumnLoader(element, data, disabled, columnOrder)
 
   /**
    * On the first rendering, try to load initial widget state if
@@ -539,7 +545,7 @@ function DataFrame({
   )
 
   const { drawCell, customRenderers } = useCustomRenderer(columns)
-
+  const { provideEditor } = useCustomEditors()
   // Callback that can be used to configure the column menu for the columns
   const configureColumnMenu = useCallback(
     (column: GridColumn): GridColumn => {
@@ -614,7 +620,11 @@ function DataFrame({
     clearSelection,
     setColumnConfigMapping
   )
-
+  const { changeColumnFormat } = useColumnFormatting(setColumnConfigMapping)
+  const { hideColumn, showColumn } = useColumnVisibility(
+    clearSelection,
+    setColumnConfigMapping
+  )
   const { onColumnMoved } = useColumnReordering(
     columns,
     freezeColumns,
@@ -652,6 +662,13 @@ function DataFrame({
       }
     }, 1)
   }, [resizableSize, numRows, glideColumns])
+
+  // Hide the column visibility menu if all columns are visible:
+  useEffect(() => {
+    if (allColumns.length == columns.length) {
+      setShowColumnVisibilityMenu(false)
+    }
+  }, [allColumns.length, columns.length])
 
   return (
     <StyledResizableContainer
@@ -710,7 +727,8 @@ function DataFrame({
         locked={
           (isRowSelected && !isRowSelectionActivated) ||
           isCellSelected ||
-          (isTouchDevice && isFocused)
+          (isTouchDevice && isFocused) ||
+          showColumnVisibilityMenu
         }
         onExpand={expand}
         onCollapse={collapse}
@@ -757,6 +775,23 @@ function DataFrame({
               }
             }}
           />
+        )}
+        {!isEmptyTable && allColumns.length > columns.length && (
+          <ColumnVisibilityMenu
+            columns={allColumns}
+            columnOrder={columnOrder}
+            setColumnOrder={setColumnOrder}
+            hideColumn={hideColumn}
+            showColumn={showColumn}
+            isOpen={showColumnVisibilityMenu}
+            onClose={() => setShowColumnVisibilityMenu(false)}
+          >
+            <ToolbarAction
+              label="Show/hide columns"
+              icon={Visibility}
+              onClick={() => setShowColumnVisibilityMenu(true)}
+            />
+          </ColumnVisibilityMenu>
         )}
         {!isLargeTable && !isEmptyTable && (
           <ToolbarAction
@@ -947,6 +982,7 @@ function DataFrame({
                 : undefined,
             }),
           }}
+          provideEditor={provideEditor}
           // Apply custom rendering (e.g. for missing or required cells):
           drawCell={drawCell}
           // Add support for additional cells:
@@ -1059,6 +1095,7 @@ function DataFrame({
           <ColumnMenu
             top={showMenu.headerBounds.y + showMenu.headerBounds.height}
             left={showMenu.headerBounds.x + showMenu.headerBounds.width}
+            columnKind={originalColumns[showMenu.columnIdx].kind}
             onCloseMenu={() => setShowMenu(undefined)}
             onSortColumn={
               isSortingEnabled
@@ -1077,6 +1114,30 @@ function DataFrame({
             onPinColumn={() => {
               pinColumn(originalColumns[showMenu.columnIdx].id)
             }}
+            onHideColumn={() => {
+              hideColumn(originalColumns[showMenu.columnIdx].id)
+            }}
+            onChangeFormat={(format: string) => {
+              changeColumnFormat(
+                originalColumns[showMenu.columnIdx].id,
+                format
+              )
+              // After changing the format, remeasure the column to ensure that
+              // the column width is updated to the new format.
+              // We need to apply a short timeout here to ensure that
+              // the column format already has been fully applied to all cells
+              // before we remeasure the column.
+              setTimeout(() => {
+                dataEditorRef.current?.remeasureColumns(
+                  CompactSelection.fromSingleSelection(showMenu.columnIdx)
+                )
+              }, 100)
+            }}
+            onAutosize={() => {
+              dataEditorRef.current?.remeasureColumns(
+                CompactSelection.fromSingleSelection(showMenu.columnIdx)
+              )
+            }}
           />,
           // We put the column menu into the portal element which is also
           // used for the cell overlays. This allows us to correctly position
@@ -1090,4 +1151,5 @@ function DataFrame({
   )
 }
 
-export default memo(withFullScreenWrapper(DataFrame))
+const DataFrameWithFullscreen = withFullScreenWrapper(DataFrame)
+export default memo(DataFrameWithFullscreen)

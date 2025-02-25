@@ -33,11 +33,11 @@ df = pd.DataFrame(
 
 
 st.header("Hide index parameter:")
-st.dataframe(df, hide_index=True)
-st.dataframe(df, hide_index=False)
+st.dataframe(df, hide_index=True, use_container_width=False)
+st.dataframe(df, hide_index=False, use_container_width=False)
 
 st.header("Column order parameter:")
-st.dataframe(df, column_order=["col_4", "col_3", "col_0"])
+st.dataframe(df, column_order=["col_4", "col_3", "col_0"], use_container_width=False)
 
 st.header("Set column labels:")
 st.dataframe(
@@ -50,7 +50,11 @@ st.dataframe(
 )
 
 st.header("Hide columns:")
-st.dataframe(df, column_config={"col_1": None, "col_3": {"hidden": True}})
+st.dataframe(
+    df,
+    column_config={"col_1": None, "col_3": {"hidden": True}},
+    use_container_width=False,
+)
 
 st.header("Set column width:")
 st.dataframe(
@@ -60,6 +64,7 @@ st.dataframe(
         "col_1": st.column_config.Column(width="medium"),
         "col_4": {"width": "large"},
     },
+    use_container_width=False,
 )
 
 st.header("Set help tooltips:")
@@ -74,6 +79,7 @@ st.dataframe(
         "col_0": st.column_config.Column(help="This :red[is] a **tooltip** 🌟"),
         "_index": {"help": "Index tooltip!"},
     },
+    use_container_width=False,
 )
 
 
@@ -85,6 +91,7 @@ st.dataframe(
         }
     ),
     column_config={"col_0": st.column_config.Column(disabled=False, required=True)},
+    use_container_width=False,
 )
 
 
@@ -93,7 +100,7 @@ st.header("Text column:")
 st.dataframe(
     pd.DataFrame(
         {
-            "col_0": ["Hello World", "Lorem ipsum", "", None],
+            "col_0": ["Hello World", "{'foo': 'bar', 'baz': 123}", "", None],
             "col_1": [1, 2, 3, None],
         }
     ),
@@ -110,6 +117,8 @@ st.dataframe(
         ),
         "col_1": st.column_config.TextColumn(),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.header("Number column:")
@@ -136,6 +145,8 @@ st.dataframe(
             format="%.2f%%",
         ),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.header("Checkbox column:")
@@ -157,6 +168,8 @@ st.dataframe(
         ),
         "col_1": st.column_config.CheckboxColumn(),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.header("Selectbox column:")
@@ -180,6 +193,8 @@ st.dataframe(
         ),
         "col_1": st.column_config.SelectboxColumn(options=["a", "b", "c", "d"]),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.header("Link column:")
@@ -229,6 +244,8 @@ st.dataframe(
             display_text="Open link",
         ),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.header("Datetime column:")
@@ -274,6 +291,8 @@ st.dataframe(
         ),
         "col_2": st.column_config.DatetimeColumn(),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.header("Date column:")
@@ -316,6 +335,8 @@ st.dataframe(
         "col_1": st.column_config.DateColumn(),
         "col_2": st.column_config.DateColumn(),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.header("Time column:")
@@ -360,6 +381,8 @@ st.dataframe(
         ),
         "col_2": st.column_config.TimeColumn(),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.header("Progress column:")
@@ -381,6 +404,8 @@ st.dataframe(
             format="$%f", min_value=0, max_value=1000
         ),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.header("List column:")
@@ -400,6 +425,8 @@ st.dataframe(
         ),
         "col_1": st.column_config.ListColumn(),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.header("Bar chart column:")
@@ -421,6 +448,8 @@ st.dataframe(
         ),
         "col_1": st.column_config.BarChartColumn(),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 
@@ -443,6 +472,8 @@ st.dataframe(
         ),
         "col_1": st.column_config.LineChartColumn(),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.header("Area chart column:")
@@ -464,6 +495,8 @@ st.dataframe(
         ),
         "col_1": st.column_config.AreaChartColumn(),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 
@@ -488,6 +521,8 @@ st.dataframe(
             help="This is a image column",
         ),
     },
+    use_container_width=False,
+    hide_index=True,
 )
 
 st.subheader("Long colum header")
@@ -515,6 +550,7 @@ st.dataframe(
             "K",
         ],
     ),
+    use_container_width=False,
 )
 
 st.subheader("Hierarchical headers")
@@ -534,7 +570,8 @@ st.dataframe(
             ],
             names=["first", "second", "third"],
         ),
-    )
+    ),
+    use_container_width=False,
 )
 
 df = pd.DataFrame(
@@ -553,6 +590,7 @@ st.dataframe(
     # Use reversed column order to test that pinned columns
     # use the column order as well.
     column_order=reversed(df.columns.tolist()),
+    use_container_width=False,
 )
 
 st.header("Configurable row height:")
@@ -576,6 +614,7 @@ st.dataframe(
         "col_1": st.column_config.ImageColumn("Logo", width="medium"),
     },
     row_height=100,
+    use_container_width=False,
 )
 
 st.header("NumberColumn Formatting:")
@@ -609,6 +648,7 @@ st.dataframe(
         "custom format": st.column_config.NumberColumn(format="%.2f"),
     },
     hide_index=True,
+    use_container_width=False,
 )
 
 st.header("Date Time Formatting:")
@@ -667,4 +707,55 @@ st.dataframe(
         # "distance": st.column_config.DatetimeColumn(format="distance"),
     },
     hide_index=True,
+    use_container_width=False,
+)
+
+st.header("Json column:")
+
+st.dataframe(
+    pd.DataFrame(
+        {
+            "dict": [
+                {"name": "test", "value": 123},
+                {"name": "test2", "value": 456},
+                {},
+                None,
+            ],
+            "string json": [
+                '{"name": {"foo": "bar"}, "value": 456}',
+                '{"name": "test", "value": 123}',
+                "",
+                None,
+            ],
+            "list": [
+                ["Foo", "Bar", "Baz"],
+                ["Hello", "World"],
+                [],
+                None,
+            ],
+            "string list": [
+                "[1, 2, 3]",
+                "[4, 5]",
+                "[]",
+                None,
+            ],
+            "incompatible values": [
+                "{hello world}",
+                "foo",
+                "{ this is no JSON!",
+                None,
+            ],
+        }
+    ),
+    column_config={
+        "dict": st.column_config.JsonColumn(width="medium"),
+        # We explicitly don't set the string json column to json
+        # to test the behavior that text based columns should auto activate
+        # the json renderer.
+        "list": st.column_config.JsonColumn(width="medium"),
+        "string list": st.column_config.JsonColumn(width="medium"),
+        "incompatible values": st.column_config.JsonColumn(width="medium"),
+    },
+    hide_index=True,
+    use_container_width=False,
 )
