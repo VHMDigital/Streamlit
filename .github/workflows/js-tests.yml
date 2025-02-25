@@ -12,6 +12,10 @@ on:
       ref:
         required: true
         type: string
+      use-constraints-file:
+        description: "Flag to use constraints file"
+        default: false
+        type: boolean
 
 # Avoid duplicate workflows on same branch
 concurrency:
@@ -21,6 +25,8 @@ concurrency:
 jobs:
   js-unit-tests:
     runs-on: ubuntu-latest
+    env:
+      USE_CONSTRAINTS_FILE: ${{ inputs.use-constraints-file || false }}
 
     defaults:
       run:

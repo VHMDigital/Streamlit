@@ -22,6 +22,10 @@ on:
         description: "The name of the branch from which the constraints files will be downloaded or compared with."
         default: "constraints-develop"
         type: string
+      use-constraints-file:
+        description: "Flag to use constraints file"
+        default: false
+        type: boolean
     secrets:
       SNOWFLAKE_ACCOUNT:
         description: "Snowflake account passed from caller workflows for snowflake integration tests"
@@ -87,7 +91,7 @@ jobs:
             (matrix.python_version == 'max' && needs.build_info.outputs.PYTHON_MAX_VERSION || matrix.python_version)
           )
         }}
-      USE_CONSTRAINTS_FILE: "${{ fromJson(needs.build_info.outputs.USE_CONSTRAINTS_FILE )}}"
+      USE_CONSTRAINTS_FILE: "${{ inputs.use-constraints-file || needs.build_info.outputs.USE_CONSTRAINTS_FILE }}"
       CONSTRAINTS_BRANCH: ${{ inputs.constraints-branch || 'constraints-develop' }}
 
     steps:
@@ -218,7 +222,7 @@ jobs:
       )
 
     env:
-      USE_CONSTRAINTS_FILE: "${{ fromJson(needs.build_info.outputs.USE_CONSTRAINTS_FILE )}}"
+      USE_CONSTRAINTS_FILE: "${{ inputs.use-constraints-file || false }}"
       CONSTRAINTS_BRANCH: ${{ inputs.constraints-branch || 'constraints-develop' }}
 
     steps:
