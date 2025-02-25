@@ -44,6 +44,7 @@ import {
   Delete,
   FileDownload,
   Search,
+  Visibility,
 } from "@emotion-icons/material-outlined"
 
 import { Arrow as ArrowProto } from "@streamlit/protobuf"
@@ -59,7 +60,8 @@ import { ElementFullscreenContext } from "~lib/components/shared/ElementFullscre
 import { useRequiredContext } from "~lib/hooks/useRequiredContext"
 import { useDebouncedCallback } from "~lib/hooks/useDebouncedCallback"
 
-import ColumnMenu from "./ColumnMenu"
+import ColumnMenu from "./menus/ColumnMenu"
+import ColumnVisibilityMenu from "./menus/ColumnVisibilityMenu"
 import EditingState, { getColumnName } from "./EditingState"
 import {
   useColumnFormatting,
@@ -68,6 +70,7 @@ import {
   useColumnReordering,
   useColumnSizer,
   useColumnSort,
+  useColumnVisibility,
   useCustomEditors,
   useCustomRenderer,
   useCustomTheme,
@@ -166,6 +169,8 @@ function DataFrame({
     // The bounds of the column header:
     headerBounds: Rectangle
   }>()
+  const [showColumnVisibilityMenu, setShowColumnVisibilityMenu] =
+    React.useState(false)
 
   // Determine if the device is primary using touch as input:
   const isTouchDevice = useMemo<boolean>(
@@ -237,12 +242,11 @@ function DataFrame({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(element.columnOrder)])
 
-  const { columns: originalColumns, setColumnConfigMapping } = useColumnLoader(
-    element,
-    data,
-    disabled,
-    columnOrder
-  )
+  const {
+    columns: originalColumns,
+    allColumns,
+    setColumnConfigMapping,
+  } = useColumnLoader(element, data, disabled, columnOrder)
 
   /**
    * On the first rendering, try to load initial widget state if
@@ -628,9 +632,11 @@ function DataFrame({
     clearSelection,
     setColumnConfigMapping
   )
-
   const { changeColumnFormat } = useColumnFormatting(setColumnConfigMapping)
-
+  const { hideColumn, showColumn } = useColumnVisibility(
+    clearSelection,
+    setColumnConfigMapping
+  )
   const { onColumnMoved } = useColumnReordering(
     columns,
     freezeColumns,
@@ -668,6 +674,13 @@ function DataFrame({
       }
     }, 1)
   }, [resizableSize, numRows, glideColumns])
+
+  // Hide the column visibility menu if all columns are visible:
+  useEffect(() => {
+    if (allColumns.length == columns.length) {
+      setShowColumnVisibilityMenu(false)
+    }
+  }, [allColumns.length, columns.length])
 
   return (
     <StyledResizableContainer
@@ -726,7 +739,8 @@ function DataFrame({
         locked={
           (isRowSelected && !isRowSelectionActivated) ||
           isCellSelected ||
-          (isTouchDevice && isFocused)
+          (isTouchDevice && isFocused) ||
+          showColumnVisibilityMenu
         }
         onExpand={expand}
         onCollapse={collapse}
@@ -773,6 +787,23 @@ function DataFrame({
               }
             }}
           />
+        )}
+        {!isEmptyTable && allColumns.length > columns.length && (
+          <ColumnVisibilityMenu
+            columns={allColumns}
+            columnOrder={columnOrder}
+            setColumnOrder={setColumnOrder}
+            hideColumn={hideColumn}
+            showColumn={showColumn}
+            isOpen={showColumnVisibilityMenu}
+            onClose={() => setShowColumnVisibilityMenu(false)}
+          >
+            <ToolbarAction
+              label="Show/hide columns"
+              icon={Visibility}
+              onClick={() => setShowColumnVisibilityMenu(true)}
+            />
+          </ColumnVisibilityMenu>
         )}
         {!isLargeTable && !isEmptyTable && (
           <ToolbarAction
@@ -1094,6 +1125,9 @@ function DataFrame({
             }}
             onPinColumn={() => {
               pinColumn(originalColumns[showMenu.columnIdx].id)
+            }}
+            onHideColumn={() => {
+              hideColumn(originalColumns[showMenu.columnIdx].id)
             }}
             onChangeFormat={(format: string) => {
               changeColumnFormat(
