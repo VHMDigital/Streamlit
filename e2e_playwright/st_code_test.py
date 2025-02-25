@@ -67,6 +67,8 @@ def test_code_blocks_render_correctly(
     assert_snapshot(code_blocks.nth(15), name="st_code-height-long-code")
     assert_snapshot(code_blocks.nth(16), name="st_code-height-short-code")
 
+    raise AssertionError("Stop here")
+
 
 def test_correct_bottom_spacing_for_code_blocks(app: Page):
     """Test that the code blocks have the correct bottom spacing."""
