@@ -81,7 +81,7 @@ def wait_for_react_stability(page: Page, timeout_ms: int = 1000):
 
 def take_stable_snapshot(
     page: Page,
-    locator: Locator,
+    locator: Locator | Page,
     assert_snapshot,
     name: str,
     pixel_threshold: float = 0.05,
