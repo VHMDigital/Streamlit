@@ -13,16 +13,18 @@
 # limitations under the License.
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
+
+from e2e_playwright.shared.app_utils import expect_markdown
 
 
 @pytest.mark.browser_context_args(timezone_id="Europe/Berlin")
 def test_timezone(app: Page):
     """Test that the timezone is correctly set."""
-    expect(app.get_by_test_id("stMarkdown").nth(0)).to_have_text("Europe/Berlin")
+    expect_markdown(app, "Europe/Berlin")
 
 
 @pytest.mark.browser_context_args(timezone_id="Asia/Yerevan")
 def test_timezone_offset(app: Page):
     """Test that the timezone offset is correctly set."""
-    expect(app.get_by_test_id("stMarkdown").nth(1)).to_have_text("-240")
+    expect_markdown(app, "-240")
