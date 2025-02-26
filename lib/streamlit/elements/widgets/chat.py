@@ -450,14 +450,14 @@ class ChatMixin:
             When the widget is confugired to accept files and the user submits
             something in the last rerun, you can access the user's submission
             with key or attribute notation from the dict-like object. This is
-            shown in the examples below.
+            shown in Example 3 below.
 
             The ``text`` attribute holds a string, which is the user's message.
             This is an empty string if the user only submitted one or more
             files.
 
             The ``files`` attribute holds a list of UploadedFile objects.
-            The list can be empty if the user only subitted a message. Unlike
+            The list is empty if the user only subitted a message. Unlike
             ``st.file_uploader``, this attribute always returns a list, even
             when the widget is configured to accept only one file at a time.
 
