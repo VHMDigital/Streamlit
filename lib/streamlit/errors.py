@@ -376,7 +376,9 @@ class StreamlitMissingPageLabelError(LocalizableStreamlitException):
 class StreamlitPageNotFoundError(LocalizableStreamlitException):
     """Exception raised the linked page can not be found."""
 
-    def __init__(self, page: str, main_script_directory: str):
+    def __init__(
+        self, page: str, main_script_directory: str, uses_pages_directory: bool
+    ):
         directory = os.path.basename(main_script_directory)
 
         message = (
@@ -386,9 +388,7 @@ class StreamlitPageNotFoundError(LocalizableStreamlitException):
             "allowed."
         )
 
-        from streamlit.runtime.pages_manager import PagesManager
-
-        if PagesManager.uses_pages_directory:
+        if uses_pages_directory:
             message = (
                 "Could not find page: `{page}`. You must provide a file path "
                 "relative to the entrypoint file (from the directory `{directory}`). "

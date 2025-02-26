@@ -50,7 +50,6 @@ from streamlit.watcher import LocalSourcesWatcher
 
 if TYPE_CHECKING:
     from streamlit.proto.BackMsg_pb2 import BackMsg
-    from streamlit.proto.PagesChanged_pb2 import PagesChanged
     from streamlit.runtime.script_data import ScriptData
     from streamlit.runtime.scriptrunner.script_cache import ScriptCache
     from streamlit.runtime.state import SessionState
@@ -870,7 +869,7 @@ class AppSession:
         self._enqueue_forward_msg(msg)
 
     def _populate_app_pages(
-        self, msg: NewSession | PagesChanged, pages: dict[PageHash, PageInfo]
+        self, msg: NewSession, pages: dict[PageHash, PageInfo]
     ) -> None:
         for page_script_hash, page_info in pages.items():
             page_proto = msg.app_pages.add()
