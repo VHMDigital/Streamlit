@@ -58,7 +58,7 @@ class RerunData:
     is_fragment_scoped_rerun: bool = False
     # set to true when a script is rerun by the fragment auto-rerun mechanism
     is_auto_rerun: bool = False
-    # TODO[kajarenc]: add explanatory comment here
+    # context_info is used to store information from the user browser (e.g. timezone)
     context_info: ContextInfo | None = None
 
     def __repr__(self) -> str:

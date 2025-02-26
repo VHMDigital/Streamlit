@@ -211,21 +211,16 @@ class ContextProxy:
     def timezone(self) -> str | None:
         """The timezone of the user's browser, read-only."""
         ctx = get_script_run_ctx()
-        if ctx is None:
+
+        if ctx is None or ctx.context_info is None:
             return None
-        if ctx.context_info is not None:
-            return ctx.context_info.timezone
-        else:
-            return None
+        return ctx.context_info.timezone
 
     @property
     @gather_metrics("context.timezone_offset")
     def timezone_offset(self) -> int | None:
         """The timezone offset of the user's browser, read-only."""
         ctx = get_script_run_ctx()
-        if ctx is None:
+        if ctx is None or ctx.context_info is None:
             return None
-        if ctx.context_info is not None:
-            return ctx.context_info.timezone_offset
-        else:
-            return None
+        return ctx.context_info.timezone_offset
