@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.shared.app_utils import get_checkbox
@@ -34,8 +33,6 @@ def test_tooltip_does_not_overflow_on_the_left_side(app: Page):
     assert bounding_box["x"] >= 0
 
 
-# The snapshots are flaky on Firefox in CI.
-@pytest.mark.skip_browser("firefox")
 def test_tooltip_does_not_overflow_on_the_right_side(app: Page):
     # Resize the viewport to make sure there is not a lot of space on the right side
     viewport_width = 750
@@ -53,7 +50,15 @@ def test_tooltip_does_not_overflow_on_the_right_side(app: Page):
 
     toggle = get_checkbox(app, "Right-toggle with help")
     expect(toggle).to_be_visible()
-    toggle.get_by_test_id("stTooltipHoverTarget").hover()
+
+    # Get the tooltip hover target and ensure it's visible before hovering
+    hover_target = toggle.get_by_test_id("stTooltipHoverTarget")
+    expect(hover_target).to_be_visible()
+
+    app.wait_for_timeout(100)
+
+    # Hover over the tooltip target
+    hover_target.hover()
 
     tooltip = app.get_by_test_id("stTooltipContent")
     expect(tooltip).to_be_visible()
