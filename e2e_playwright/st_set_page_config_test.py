@@ -15,6 +15,7 @@ import re
 
 from playwright.sync_api import Page, expect
 
+from e2e_playwright.conftest import wait_until
 from e2e_playwright.shared.app_utils import (
     click_button,
     expect_exception,
@@ -22,7 +23,6 @@ from e2e_playwright.shared.app_utils import (
     get_expander,
 )
 from e2e_playwright.shared.react18_utils import wait_for_react_stability
-from e2e_playwright.shared.timeout_utils import wait_for_bounding_box
 
 
 def test_wide_layout(app: Page):
@@ -42,8 +42,10 @@ def test_wide_layout(app: Page):
 
     expect(expander_container).to_be_visible()
     # Wait until the expander width becomes greater than the narrow width.
-    expander_dimensions = wait_for_bounding_box(
-        expander_container, lambda bbox: bbox["width"] > narrow_expander_width
+    wait_until(
+        app,
+        lambda: (bbox := expander_container.bounding_box()) is not None
+        and bbox["width"] > narrow_expander_width,
     )
 
 
@@ -70,8 +72,10 @@ def test_wide_layout_with_small_viewport(app: Page):
     expect(app_view_container).to_have_attribute("data-layout", "wide")
     wait_for_react_stability(app)
     # Wait until the expander width equals the narrow width.
-    expander_dimensions = wait_for_bounding_box(
-        expander_container, lambda bbox: bbox["width"] == narrow_expander_width
+    wait_until(
+        app,
+        lambda: (bbox := expander_container.bounding_box()) is not None
+        and bbox["width"] == narrow_expander_width,
     )
 
 
