@@ -24,6 +24,8 @@ from playwright.sync_api import (
     expect,
 )
 
+from e2e_playwright.shared.react18_utils import wait_for_react_stability
+
 # Determined by measuring a screenshot
 ROW_MARKER_COLUMN_WIDTH_PX: Final = 30
 
@@ -111,6 +113,10 @@ def open_column_menu(
 ) -> None:
     """Open the column menu for the specified column.
 
+    This function uses a robust approach to click on the column header menu icon
+    by directly interacting with the canvas element. It includes retry logic to
+    handle potential timing issues with canvas rendering.
+
     Parameters
     ----------
     dataframe_element : Locator
@@ -127,19 +133,42 @@ def open_column_menu(
         Whether the dataframe has a row marker column (used when row selections are
         activated).
     """
-    column_middle_width_px, row_middle_height_px = calc_middle_cell_position(
-        0, col_pos, column_width, has_row_marker_col
-    )
-    position: Position = {
-        # We need to click on the menu icon on the right side of the column header:
-        "x": column_middle_width_px + (COLUMN_SIZE_MAPPING[column_width] / 2) - 4,
-        "y": row_middle_height_px,
-    }
+    # First ensure the canvas is stable
+    expect_canvas_to_be_stable(dataframe_element)
 
-    dataframe_element.click(position=position)
-    expect(
-        dataframe_element.page.get_by_test_id("stDataFrameColumnMenu")
-    ).to_be_visible()
+    canvas = dataframe_element.locator("canvas").first
+    expect(canvas).to_be_visible()
+
+    def attempt_open_menu():
+        # Get the bounding box of the canvas
+        bbox = canvas.bounding_box()
+        if not bbox:
+            raise Exception("Canvas bounding box not found")
+
+        column_middle_width_px, row_middle_height_px = calc_middle_cell_position(
+            0, col_pos, column_width, has_row_marker_col
+        )
+
+        canvas.click(
+            position={
+                # We need to click on the menu icon on the right side of the column header:
+                "x": column_middle_width_px
+                + (COLUMN_SIZE_MAPPING[column_width] / 2)
+                - 10,
+                "y": row_middle_height_px,
+            },
+            force=True,
+        )
+
+        wait_for_react_stability(dataframe_element.page)
+
+        # Verify the column menu appeared
+        menu = dataframe_element.page.get_by_test_id("stDataFrameColumnMenu")
+        if not menu.is_visible():
+            raise Exception("Column menu did not appear after click")
+        return True
+
+    retry_interaction(attempt_open_menu)
 
 
 def click_on_cell(

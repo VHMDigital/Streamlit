@@ -31,10 +31,8 @@ from e2e_playwright.shared.app_utils import (
     is_child_bounding_box_inside_parent,
 )
 from e2e_playwright.shared.dataframe_utils import (
-    expect_canvas_to_be_stable,
     open_column_menu,
 )
-from e2e_playwright.shared.react18_utils import wait_for_react_stability
 
 modal_test_id = "stDialog"
 
@@ -435,15 +433,9 @@ def test_dialog_with_dataframe_shows_column_menu_correctly(app: Page):
     expect(dialog).to_be_visible()
     df_element = dialog.get_by_test_id("stDataFrame")
     expect(df_element).to_be_visible()
-    # Ensure canvas is stable before interacting with the dataframe
-    expect_canvas_to_be_stable(df_element)
 
     open_column_menu(df_element, 1, "small")
 
-    # Wait for React rendering to stabilize
-    wait_for_react_stability(app)
-
-    # Check that the column menu is within the bounds of the dataframe
     column_menu = app.get_by_test_id("stDataFrameColumnMenu")
     expect(column_menu).to_be_visible()
     expect(column_menu).to_be_in_viewport()
