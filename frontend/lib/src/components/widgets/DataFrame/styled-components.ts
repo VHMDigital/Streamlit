@@ -43,5 +43,14 @@ export const StyledResizableContainer =
         ["overflowX" as any]: "auto !important",
         ["overflowY" as any]: "auto !important",
       },
+      // Make the search field a bit more responsive to the width of the dataframe:
+      "& .gdg-seveqep": {
+        maxWidth: "19rem",
+        width: "80%",
+        minWidth: "6rem",
+        "& input": {
+          width: "100%",
+        },
+      },
     })
   )
