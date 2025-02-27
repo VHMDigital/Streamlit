@@ -21,7 +21,6 @@ from e2e_playwright.conftest import (
     wait_for_app_run,
 )
 from e2e_playwright.shared.app_utils import check_top_level_class, get_element_by_key
-from streamlit import config
 
 
 def file_upload_helper(
@@ -348,9 +347,6 @@ def test_file_upload_error_message_file_too_large(
 ):
     """Test that shows error message for files exceeding max size limit."""
     app.set_viewport_size({"width": 750, "height": 2000})
-
-    # Set max upload size to 1MB (globally)
-    config.set_option("server.maxUploadSize", 1)
 
     file_name1 = "large.txt"
     file1 = FilePayload(
