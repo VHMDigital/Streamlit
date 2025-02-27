@@ -46,8 +46,10 @@ export const StyledResizableContainer =
       "& .gdg-seveqep": {
         // Make the search field more responsive to the grid width and use
         // rem units for everything.
+        // 19rem is the closest rem withou decimals to the original size:
         maxWidth: "19rem",
         width: "80%",
+        // 6rem was manually determined as the smallest size thats still somewhat usuable:
         minWidth: "6rem",
         top: theme.spacing.sm,
         right: theme.spacing.sm,
@@ -58,6 +60,9 @@ export const StyledResizableContainer =
           fontSize: theme.fontSizes.twoSm,
         },
         "& .gdg-search-progress": {
+          // We are disabling the search progress bar since it 
+          // looks a bit weired in its current state and doesn't work
+          // with rounded corners
           display: "none",
         },
         "& input": {
