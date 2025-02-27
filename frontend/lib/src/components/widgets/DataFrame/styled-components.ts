@@ -50,7 +50,7 @@ export const StyledResizableContainer =
         width: "80%",
         minWidth: "6rem",
         top: theme.spacing.twoXS,
-        right: theme.spacing.xl,
+        right: theme.spacing.md,
         padding: theme.spacing.sm,
         borderRadius: theme.radii.default,
         "& .gdg-search-status": {
