@@ -21,7 +21,7 @@ import { FileURLs as FileURLsProto, IFileURLs } from "@streamlit/protobuf"
 
 import { FileUploadClient } from "~lib/FileUploadClient"
 import { UploadFileInfo } from "~lib/components/widgets/FileUploader/UploadFileInfo"
-import { getErrorMessage } from "~lib/util/FileHelper"
+import { getRejectedFileInfo } from "~lib/util/FileHelper"
 
 interface CreateDropHandlerParams {
   acceptMultipleFiles: boolean
@@ -91,21 +91,8 @@ export const createDropHandler =
     // Create an UploadFileInfo for each of our rejected files, and add them to
     // our state.
     if (rejectedFiles.length > 0) {
-      const rejectedInfos = rejectedFiles.map(
-        rejected =>
-          new UploadFileInfo(
-            rejected.file.name,
-            rejected.file.size,
-            getNextLocalFileId(),
-            {
-              type: "error",
-              errorMessage: getErrorMessage(
-                rejected.errors[0].code,
-                rejected.file,
-                maxFileSize
-              ),
-            }
-          )
+      const rejectedInfos = rejectedFiles.map(rejected =>
+        getRejectedFileInfo(rejected, getNextLocalFileId(), maxFileSize)
       )
       addFiles(rejectedInfos)
     }

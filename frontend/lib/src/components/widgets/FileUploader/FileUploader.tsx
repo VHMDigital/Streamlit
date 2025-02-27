@@ -34,7 +34,11 @@ import {
   labelVisibilityProtoValueToEnum,
 } from "~lib/util/utils"
 import { FormClearHelper } from "~lib/components/widgets/Form"
-import { FileSize, getErrorMessage, sizeConverter } from "~lib/util/FileHelper"
+import {
+  FileSize,
+  getRejectedFileInfo,
+  sizeConverter,
+} from "~lib/util/FileHelper"
 import { FileUploadClient } from "~lib/FileUploadClient"
 import { WidgetStateManager } from "~lib/WidgetStateManager"
 import {
@@ -296,22 +300,13 @@ class FileUploader extends React.PureComponent<InnerProps, State> {
     // Create an UploadFileInfo for each of our rejected files, and add them to
     // our state.
     if (rejectedFiles.length > 0) {
-      const rejectedInfos = rejectedFiles.map(rejected => {
-        const { file } = rejected
-        return new UploadFileInfo(
-          file.name,
-          file.size,
+      const rejectedInfos = rejectedFiles.map(rejected =>
+        getRejectedFileInfo(
+          rejected,
           this.nextLocalFileId(),
-          {
-            type: "error",
-            errorMessage: getErrorMessage(
-              rejected.errors[0].code,
-              rejected.file,
-              this.maxUploadSizeInBytes
-            ),
-          }
+          this.maxUploadSizeInBytes
         )
-      })
+      )
       this.addFiles(rejectedInfos)
     }
   }

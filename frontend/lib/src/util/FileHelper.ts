@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import { FileRejection } from "react-dropzone/."
+
+import { UploadFileInfo } from "~lib/components/widgets/FileUploader/UploadFileInfo"
 import { isFromWindows } from "~lib/util/utils"
 
 export enum FileSize {
@@ -98,7 +101,7 @@ export const sizeConverter = (
 /**
  * Return a human-readable message for the given error.
  */
-export const getErrorMessage = (
+const getErrorMessage = (
   errorCode: string,
   file: File,
   maxUploadSizeInBytes: number
@@ -119,4 +122,21 @@ export const getErrorMessage = (
     default:
       return "Unexpected error. Please try again."
   }
+}
+
+/**
+ * Returns an `UploadFileInfo` object for a rejected file
+ */
+export const getRejectedFileInfo = (
+  rejected: FileRejection,
+  fileId: number,
+  maxUploadSizeInBytes: number
+): UploadFileInfo => {
+  const { file, errors } = rejected
+  return new UploadFileInfo(file.name, file.size, fileId, {
+    type: "error",
+    errorMessage: errors
+      .map(error => getErrorMessage(error.code, file, maxUploadSizeInBytes))
+      .join(" "),
+  })
 }
