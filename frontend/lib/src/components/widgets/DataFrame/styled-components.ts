@@ -49,8 +49,8 @@ export const StyledResizableContainer =
         maxWidth: "19rem",
         width: "80%",
         minWidth: "6rem",
-        top: theme.spacing.twoXS,
-        right: theme.spacing.md,
+        top: theme.spacing.sm,
+        right: theme.spacing.sm,
         padding: theme.spacing.sm,
         borderRadius: theme.radii.default,
         "& .gdg-search-status": {
