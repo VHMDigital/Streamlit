@@ -326,6 +326,65 @@ def test_uploads_and_deletes_multiple_files(
     expect(uploaded_file_names).to_have_text(files[1]["name"], use_inner_text=True)
 
 
+def test_file_upload_error_message_disallowed_files(
+    app: Page, assert_snapshot: ImageCompareFunction
+):
+    """Test that shows error message for disallowed files."""
+    app.set_viewport_size({"width": 750, "height": 2000})
+
+    file_name1 = "file1.txt"
+    file1 = FilePayload(
+        name=file_name1,
+        mimeType="application/json",
+        buffer=b"{}",
+    )
+
+    chat_input = app.get_by_test_id("stChatInput").nth(3)
+    with app.expect_file_chooser() as fc_info:
+        chat_input.get_by_role("button").nth(0).click()
+        file_chooser = fc_info.value
+        file_chooser.set_files(files=[file1])
+
+    # take away hover focus of button
+    app.get_by_test_id("stApp").click(position={"x": 0, "y": 0})
+    wait_for_app_run(app, wait_delay=500)
+
+    uploaded_files = app.get_by_test_id("stChatUploadedFiles").nth(1)
+    expect(uploaded_files.get_by_text(file_name1)).to_be_visible()
+    assert_snapshot(uploaded_files, name="st_chat_input-file_uploaded_error")
+
+    uploaded_files.get_by_test_id("stTooltipHoverTarget").nth(0).hover()
+    wait_for_app_run(app, wait_delay=1500)
+    expect(app.get_by_text("json files are not allowed.")).to_be_visible()
+
+
+def test_file_upload_error_message_file_too_large(
+    app: Page, assert_snapshot: ImageCompareFunction
+):
+    """Test that shows error message for disallowed files."""
+    app.set_viewport_size({"width": 750, "height": 2000})
+
+    file_name1 = "file1.txt"
+    file1 = FilePayload(
+        name=file_name1,
+        mimeType="text/plain",
+        buffer=b"x" * (201 * 1024 * 1024),  # Create 201MB file to exceed 200MB limit
+    )
+
+    chat_input = app.get_by_test_id("stChatInput").nth(3)
+    with app.expect_file_chooser() as fc_info:
+        chat_input.get_by_role("button").nth(0).click()
+        file_chooser = fc_info.value
+        file_chooser.set_files(files=[file1])
+
+    wait_for_app_run(app, wait_delay=500)
+
+    uploaded_files = app.get_by_test_id("stChatUploadedFiles").nth(1)
+    uploaded_files.get_by_test_id("stTooltipHoverTarget").nth(0).hover()
+    wait_for_app_run(app, wait_delay=1500)
+    expect(app.get_by_text("File must be 200.00MB or smaller.")).to_be_visible()
+
+
 def test_single_file_upload_button_tooltip(
     app: Page, assert_snapshot: ImageCompareFunction
 ):
