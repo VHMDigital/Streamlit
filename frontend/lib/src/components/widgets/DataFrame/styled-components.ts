@@ -43,13 +43,33 @@ export const StyledResizableContainer =
         ["overflowX" as any]: "auto !important",
         ["overflowY" as any]: "auto !important",
       },
-      // Make the search field a bit more responsive to the width of the dataframe:
       "& .gdg-seveqep": {
+        // Make the search field more responsive to the grid width and use
+        // rem units for everything.
         maxWidth: "19rem",
         width: "80%",
         minWidth: "6rem",
+        top: theme.spacing.twoXS,
+        right: theme.spacing.xl,
+        padding: theme.spacing.sm,
+        borderRadius: theme.radii.default,
+        "& .gdg-search-status": {
+          paddingTop: theme.spacing.twoXS,
+          fontSize: theme.fontSizes.twoSm,
+        },
+        "& .gdg-search-progress": {
+          display: "none",
+        },
         "& input": {
           width: "100%",
+        },
+        "& button": {
+          width: theme.iconSizes.xl,
+          height: theme.iconSizes.xl,
+          "& .button-icon": {
+            width: theme.iconSizes.base,
+            height: theme.iconSizes.base,
+          },
         },
       },
     })
