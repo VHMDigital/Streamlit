@@ -18,6 +18,7 @@ import asyncio
 import os
 import signal
 import sys
+import threading
 from typing import Any, Final
 
 from streamlit import cli_util, config, env_util, file_util, net_util, secrets
@@ -42,11 +43,21 @@ def _set_up_signal_handler(server: Server) -> None:
     def signal_handler(signal_number, stack_frame):
         # The server will shut down its threads and exit its loop.
         _LOGGER.debug(f"Received signal {signal_number}")
-        server.stop()
-        # On Windows, force exit after server stop
-        if sys.platform == "win32":
-            import os
+        try:
+            server.stop()
+        except SystemExit:
+            # Normal exit path
+            raise
+        except Exception:
+            _LOGGER.exception("Error during server shutdown")
 
+        # On Windows, if we're not in the main thread and server.stop() didn't exit,
+        # we need to force an exit as a last resort
+        if (
+            sys.platform == "win32"
+            and threading.current_thread() is not threading.main_thread()
+        ):
+            _LOGGER.warning("Forcing Windows process termination from non-main thread")
             os._exit(0)
 
     signal.signal(signal.SIGTERM, signal_handler)
