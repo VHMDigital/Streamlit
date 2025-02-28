@@ -360,7 +360,7 @@ export class App extends PureComponent<Props, State> {
           // Performing an intentional restart - we want the script to rerun on load
           // so setting RERUN_REQUESTED so handleConnectionStateChanged triggers it
           this.setState({ scriptRunState: ScriptRunState.RERUN_REQUESTED })
-          this.initializeConnectionManager()
+          this.initializeConnectionManager(false)
         }
       },
       terminateWebsocketConnection: () => {
@@ -402,13 +402,14 @@ export class App extends PureComponent<Props, State> {
     }
   }
 
-  initializeConnectionManager(): void {
+  initializeConnectionManager(isInitialMount: boolean): void {
     this.connectionManager = new ConnectionManager({
       getLastSessionId: () => this.sessionInfo.last?.sessionId,
       endpoints: this.endpoints,
       onMessage: this.handleMessage,
       onConnectionError: this.handleConnectionError,
-      connectionStateChanged: this.handleConnectionStateChanged,
+      connectionStateChanged: (newState: ConnectionState) =>
+        this.handleConnectionStateChanged(newState, isInitialMount),
       claimHostAuthToken: this.hostCommunicationMgr.claimAuthToken,
       resetHostAuthToken: this.hostCommunicationMgr.resetAuthToken,
       onHostConfigResp: (response: IHostConfigResponse) => {
@@ -448,7 +449,7 @@ export class App extends PureComponent<Props, State> {
   componentDidMount(): void {
     // Initialize connection manager here, to avoid
     // "Can't call setState on a component that is not yet mounted." error.
-    this.initializeConnectionManager()
+    this.initializeConnectionManager(true)
 
     mark(this.state.scriptRunState)
     this.hostCommunicationMgr.sendMessageToHost({
@@ -617,7 +618,18 @@ export class App extends PureComponent<Props, State> {
   /**
    * Called by ConnectionManager when our connection state changes
    */
-  handleConnectionStateChanged = (newState: ConnectionState): void => {
+  handleConnectionStateChanged = (
+    newState: ConnectionState,
+    /**
+     * Whether the component is being mounted for the first time.
+     *
+     * This is used to determine whether to use `flushSync` or not.
+     *
+     * If `flushSync` is used while the component is mounting, we will see a warning about
+     * "Warning: flushSync was called from inside a lifecycle method."
+     */
+    isInitialMount: boolean
+  ): void => {
     LOG.info(
       `Connection state changed from ${this.state.connectionState} to ${newState}`
     )
@@ -664,14 +676,21 @@ export class App extends PureComponent<Props, State> {
       }
     }
 
-    // We are using `flushSync` here because there is code that expects every
-    // state to be observed. With React batched updates, it is possible that
-    // multiple `connectionState` changes are applied in 1 render cycle, leading
-    // to the last state change being the only one observed. Utilizing
-    // `flushSync` ensures that we apply every state change.
-    flushSync(() => {
+    if (isInitialMount) {
+      // If we use `flushSync` while the component is mounting, we will see a warning about
+      // "Warning: flushSync was called from inside a lifecycle method."
+      // The setState will be applied in the expected render cycle after the component mounts.
       this.setState({ connectionState: newState })
-    })
+    } else {
+      // We are using `flushSync` here because there is code that expects every
+      // state to be observed. With React batched updates, it is possible that
+      // multiple `connectionState` changes are applied in 1 render cycle, leading
+      // to the last state change being the only one observed. Utilizing
+      // `flushSync` ensures that we apply every state change.
+      flushSync(() => {
+        this.setState({ connectionState: newState })
+      })
+    }
   }
 
   handleGitInfoChanged = (gitInfo: IGitInfo): void => {
