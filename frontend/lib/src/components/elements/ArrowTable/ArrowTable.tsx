@@ -158,7 +158,7 @@ function generateTableCell(
     // we need to convert the specific HTML element (used for tooltips) from
     // the display value into an actual span element.
     formattedContent = formattedContent.replace(
-      `<span class="pd-t"></span>`,
+      /<span class="pd-t"><\/span>$/,
       ""
     )
     hasStylerTooltip = true
