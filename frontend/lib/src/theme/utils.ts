@@ -157,6 +157,7 @@ export const createEmotionTheme = (
     showBorderAroundInputs,
     bodyFont,
     codeFont,
+    showSidebarSeparator,
     ...customColors
   } = themeInput
 
@@ -292,6 +293,7 @@ export const createEmotionTheme = (
         codeFont: parseFont(codeFont),
       }),
     },
+    showSidebarSeparator,
     ...conditionalOverrides,
   }
 }

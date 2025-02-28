@@ -1093,6 +1093,7 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
         assert new_session_msg.custom_theme.show_border_around_inputs is True
         assert new_session_msg.custom_theme.link_color == "#2EC163"
         assert new_session_msg.custom_theme.base_font_size == 14
+        assert new_session_msg.custom_theme.show_sidebar_separator is True
         # The value from `theme.font` will be placed in body_font since
         # font uses a deprecated enum:
         assert new_session_msg.custom_theme.body_font == "Inter"
