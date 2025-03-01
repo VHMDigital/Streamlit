@@ -125,6 +125,9 @@ def login(provider: str | None = None) -> None:
         ``cookie_secret``, while ignoring any other values in the ``[auth]``
         dictionary.
 
+        Due to internal implementation details, Streamlit does not support
+        using an underscore within ``provider`` at this time.
+
     Examples
     --------
 
@@ -143,9 +146,7 @@ def login(provider: str | None = None) -> None:
     >>> cookie_secret = "xxx"
     >>> client_id = "xxx"
     >>> client_secret = "xxx"
-    >>> server_metadata_url = (
-    ...     "https://accounts.google.com/.well-known/openid-configuration"
-    ... )
+    >>> server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"  # fmt: skip
 
     Your app code:
 
@@ -216,9 +217,7 @@ def login(provider: str | None = None) -> None:
     >>> [auth.okta]
     >>> client_id = "xxx"
     >>> client_secret = "xxx"
-    >>> server_metadata_url = (
-    ...     "https://{subdomain}.okta.com/.well-known/openid-configuration"
-    ... )
+    >>> server_metadata_url = "https://{subdomain}.okta.com/.well-known/openid-configuration"  # fmt: skip
 
     Your app code:
 
@@ -257,9 +256,7 @@ def login(provider: str | None = None) -> None:
     >>> [auth.auth0]
     >>> client_id = "xxx"
     >>> client_secret = "xxx"
-    >>> server_metadata_url = (
-    ...     "https://{account}.{region}.auth0.com/.well-known/openid-configuration"
-    ... )
+    >>> server_metadata_url = "https://{account}.{region}.auth0.com/.well-known/openid-configuration"  # fmt: skip
     >>> client_kwargs = { "prompt" = "login" }
 
     Your app code:
@@ -316,9 +313,7 @@ def logout() -> None:
     >>> cookie_secret = "xxx"
     >>> client_id = "xxx"
     >>> client_secret = "xxx"
-    >>> server_metadata_url = (
-    ...     "https://accounts.google.com/.well-known/openid-configuration"
-    ... )
+    >>> server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"  # fmt: skip
 
     Your app code:
 

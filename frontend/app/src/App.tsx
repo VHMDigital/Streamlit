@@ -729,8 +729,8 @@ export class App extends PureComponent<Props, State> {
           this.handlePageConfigChanged(pageConfig),
         pageInfoChanged: (pageInfo: PageInfo) =>
           this.handlePageInfoChanged(pageInfo),
-        pagesChanged: (pagesChangedMsg: PagesChanged) =>
-          this.handlePagesChanged(pagesChangedMsg),
+        // Deprecated protobuf option as navigation will always inform us of pages
+        pagesChanged: (_pagesChangedMsg: PagesChanged) => {},
         pageNotFound: (pageNotFound: PageNotFound) =>
           this.handlePageNotFound(pageNotFound),
         gitInfoChanged: (gitInfo: GitInfo) =>
@@ -845,7 +845,8 @@ export class App extends PureComponent<Props, State> {
   }
 
   handlePageNotFound = (pageNotFound: PageNotFound): void => {
-    this.maybeSetState(this.appNavigation.handlePageNotFound(pageNotFound))
+    const { pageName } = pageNotFound
+    this.maybeSetState(this.appNavigation.handlePageNotFound(pageName))
   }
 
   onPageIconChanged = (iconUrl: string): void => {
@@ -854,10 +855,6 @@ export class App extends PureComponent<Props, State> {
       this.hostCommunicationMgr.sendMessageToHost,
       this.endpoints
     )
-  }
-
-  handlePagesChanged = (pagesChangedMsg: PagesChanged): void => {
-    this.maybeSetState(this.appNavigation.handlePagesChanged(pagesChangedMsg))
   }
 
   handleNavigation = (navigationMsg: Navigation): void => {
@@ -1281,10 +1278,6 @@ export class App extends PureComponent<Props, State> {
     scriptName: string,
     mainScriptHash: string
   ): void {
-    const { hideSidebarNav, elements } = this.state
-    // Handle hideSidebarNav = true -> retain sidebar elements to avoid flicker
-    const sidebarElements = (hideSidebarNav && elements.sidebar) || undefined
-
     this.setState(
       {
         scriptRunId,
@@ -1292,8 +1285,7 @@ export class App extends PureComponent<Props, State> {
         appHash,
         elements: this.appNavigation.clearPageElements(
           this.pendingElementsBuffer,
-          mainScriptHash,
-          sidebarElements
+          mainScriptHash
         ),
       },
       () => {
@@ -1485,8 +1477,7 @@ export class App extends PureComponent<Props, State> {
     // from the common script
     const nextPageElements = this.appNavigation.clearPageElements(
       elements,
-      mainScriptHash,
-      undefined
+      mainScriptHash
     )
     const activeWidgetIds = new Set(
       Array.from(nextPageElements.getElements())
@@ -1531,6 +1522,11 @@ export class App extends PureComponent<Props, State> {
     let queryString = this.getQueryString()
     let pageName = ""
 
+    const contextInfo = {
+      timezone: this.getTimezone(),
+      timezoneOffset: this.getTimezoneOffset(),
+    }
+
     if (pageScriptHash) {
       // The user specified exactly which page to run. We can simply use this
       // value in the BackMsg we send to the server.
@@ -1569,6 +1565,7 @@ export class App extends PureComponent<Props, State> {
           pageName,
           fragmentId,
           isAutoRerun,
+          contextInfo,
         },
       })
     )
@@ -1803,6 +1800,14 @@ export class App extends PureComponent<Props, State> {
     this.connectionManager
       ? this.connectionManager.getBaseUriParts()
       : undefined
+
+  getTimezone = (): string => {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone
+  }
+
+  getTimezoneOffset = (): number => {
+    return new Date().getTimezoneOffset()
+  }
 
   getQueryString = (): string => {
     const { queryParams } = this.state
