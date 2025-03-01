@@ -352,7 +352,7 @@ def _apply_row_deletions(df: pd.DataFrame, deleted_rows: list[int]) -> None:
         A list of row numbers to delete.
     """
     # Drop rows based in numeric row positions
-    df = df.drop(df.index[deleted_rows])
+    df.drop(df.index[deleted_rows], inplace=True)  # noqa: PD002
 
 
 def _apply_dataframe_edits(
@@ -437,8 +437,9 @@ def _fix_column_headers(data_df: pd.DataFrame) -> None:
     elif pd.api.types.infer_dtype(data_df.columns) != "string":
         # If the column names are not all strings, we need to convert them to strings
         # to avoid issues with editing:
-        data_df = data_df.rename(
+        data_df.rename(
             columns={column: str(column) for column in data_df.columns},
+            inplace=True,  # noqa: PD002
         )
 
 

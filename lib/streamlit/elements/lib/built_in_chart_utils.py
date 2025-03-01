@@ -567,7 +567,7 @@ def _maybe_reset_index_in_place(
             x_column = df.index.name
 
         df.index.name = x_column
-        df = df.reset_index()
+        df.reset_index(inplace=True)  # noqa: PD002
 
     return x_column
 
