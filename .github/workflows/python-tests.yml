@@ -270,6 +270,67 @@ jobs:
           path: lib/htmlcov
           retention-days: 7
 
+
+  py-min-deps-test:
+    needs:
+      - build_info
+
+    # The min pillow version we support in Streamlit cannot be installed on
+    # Ubuntu 24 -> thats why we use Ubuntu 22.04 here instead.
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+
+    env:
+      PYTHON_VERSION: "${{needs.build_info.outputs.PYTHON_MIN_VERSION}}"
+
+    steps:
+      - name: Checkout Streamlit code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+          submodules: "recursive"
+          fetch-depth: 2
+      - name: Set up Python ${{ env.PYTHON_MIN_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.PYTHON_MIN_VERSION }}"
+      - name: Setup virtual env
+        uses: ./.github/actions/make_init
+        with:
+          use_cached_venv: false
+      - name: Install min dependencies (force reinstall)
+        run: |
+          source venv/bin/activate
+          uv pip install -r lib/min-constraints-gen.txt --force-reinstall
+      - name: Generate Protobufs
+        run: make protobuf
+      - name: Make local modules visible
+        run: |
+          source venv/bin/activate
+          uv pip install --editable ./lib --no-deps
+      - name: Run Python Tests
+        run: make pytest
+      - name: CLI Smoke Tests
+        run: make cli-smoke-tests
+      - name: Validate min-constraints-gen
+        run: |
+          make gen-min-dep-constraints
+
+          git_status=$(git status --porcelain -- lib/min-constraints-gen.txt)
+          if [[ -n $git_status ]]; then
+            echo "::error::The min constraints file is out of date! Please run \`make gen-min-dep-constraints\` and commit the result."
+            echo "::group::git diff lib/min-constraints-gen.txt"
+            git diff lib/min-constraints-gen.txt
+            echo "::endgroup::"
+            exit 1
+          else
+            echo "min constraints file is up to date."
+          fi
+
+
   py-coverage-report:
     name: Combine & check coverage
     if: always()
@@ -295,7 +356,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: coverage_data_*
-          merge-multiple: false
+          merge-multiple: true
           path: coverage_files  # Download to a shared folder in root
 
       - name: Combine coverage & generate report
@@ -314,9 +375,6 @@ jobs:
 
           # Report and write to summary
           python -m coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
-
-          # Optional: Fail if coverage is below a threshold (adjust as needed)
-          # python -m coverage report --fail-under=60
         working-directory: coverage_files
 
       - name: Upload combined coverage data
