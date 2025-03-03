@@ -442,9 +442,12 @@ debug-e2e-test:
 		exit 1; \
 	fi
 	@echo "Running test: $(filter-out $@,$(MAKECMDGOALS)) in debug mode."
-	@echo "If you implemented changes in the frontend, make sure to call \`make frontend-fast\` to use the up-to-date frontend build in the test."
 	@TEST_SCRIPT=$$(echo $(filter-out $@,$(MAKECMDGOALS)) | sed 's|^e2e_playwright/||'); \
-	cd e2e_playwright && PWDEBUG=1 pytest $$TEST_SCRIPT
+	cd e2e_playwright && PWDEBUG=1 pytest $$TEST_SCRIPT || ( \
+		echo "If you implemented changes in the frontend, make sure to call \`make frontend-fast\` to use the up-to-date frontend build in the test."; \
+		echo "You can find test-results in ./e2e_playwright/test-results"; \
+		exit 1 \
+	)
 
 .PHONY: run-e2e-test
 # Run an e2e playwright test. Use it via make run-e2e-test st_command_test.py
@@ -454,6 +457,9 @@ run-e2e-test:
 		exit 1; \
 	fi
 	@echo "Running test: $(filter-out $@,$(MAKECMDGOALS))"
-	@echo "If you implemented changes in the frontend, make sure to call \`make frontend-fast\` to use the up-to-date frontend build in the test."
 	@TEST_SCRIPT=$$(echo $(filter-out $@,$(MAKECMDGOALS)) | sed 's|^e2e_playwright/||'); \
-	cd e2e_playwright && pytest $$TEST_SCRIPT --tracing retain-on-failure --reruns 0
+	cd e2e_playwright && pytest $$TEST_SCRIPT --tracing retain-on-failure --reruns 0 || ( \
+		echo "If you implemented changes in the frontend, make sure to call \`make frontend-fast\` to use the up-to-date frontend build in the test."; \
+		echo "You can find test-results in ./e2e_playwright/test-results"; \
+		exit 1 \
+	)
