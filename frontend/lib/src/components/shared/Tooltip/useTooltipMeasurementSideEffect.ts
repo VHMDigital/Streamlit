@@ -29,6 +29,9 @@ import { useEffect } from "react"
  *
  * @param tooltipElement The tooltip element ref
  * @param isOpen Whether the tooltip is currently open
+ *
+ * @deprecated This is not a pattern we should use. Only here so until we move
+ * off of BaseWeb.
  */
 export function useTooltipMeasurementSideEffect(
   tooltipElement: HTMLDivElement | null,
