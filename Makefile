@@ -434,3 +434,26 @@ streamlit-lib-prod:
 	make mini-init;
 	make frontend-lib-prod;
 
+.PHONY: debug-e2e-test
+# Run an e2e playwright test in debug mode with Playwright Inspector. Use it via make debug-e2e-test st_command_test.py
+debug-e2e-test:
+	@if [[ ! "$(filter-out $@,$(MAKECMDGOALS))" == *"_test"* ]]; then \
+		echo "Error: Test script name must contain '_test' in the filename"; \
+		exit 1; \
+	fi
+	@echo "Running test: $(filter-out $@,$(MAKECMDGOALS)) in debug mode."
+	@echo "If you implemented changes in the frontend, make sure to call \`make frontend-fast\` to use the up-to-date frontend build in the test."
+	@TEST_SCRIPT=$$(echo $(filter-out $@,$(MAKECMDGOALS)) | sed 's|^e2e_playwright/||'); \
+	cd e2e_playwright && PWDEBUG=1 pytest $$TEST_SCRIPT
+
+.PHONY: run-e2e-test
+# Run an e2e playwright test. Use it via make run-e2e-test st_command_test.py
+run-e2e-test:
+	@if [[ ! "$(filter-out $@,$(MAKECMDGOALS))" == *"_test"* ]]; then \
+		echo "Error: Test script name must contain '_test' in the filename"; \
+		exit 1; \
+	fi
+	@echo "Running test: $(filter-out $@,$(MAKECMDGOALS))"
+	@echo "If you implemented changes in the frontend, make sure to call \`make frontend-fast\` to use the up-to-date frontend build in the test."
+	@TEST_SCRIPT=$$(echo $(filter-out $@,$(MAKECMDGOALS)) | sed 's|^e2e_playwright/||'); \
+	cd e2e_playwright && pytest $$TEST_SCRIPT --tracing retain-on-failure --reruns 0
