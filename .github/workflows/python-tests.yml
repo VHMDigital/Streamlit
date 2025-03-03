@@ -366,6 +366,9 @@ jobs:
           # Combine all coverage files
           python -m coverage combine
 
+          # Generate JSON report
+          python -m coverage json -o coverage.json
+
           # Generate HTML report
           python -m coverage html --directory=htmlcov
 
@@ -377,12 +380,16 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: combined_coverage_data
-          path: .coverage
+          path: lib/.coverage
           include-hidden-files: true
-
-      - name: Upload combined coverage report
+      - name: Upload combined coverage JSON report
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined_coverage_json
+          path: lib/coverage.json
+      - name: Upload combined coverage HTML report
         uses: actions/upload-artifact@v4
         with:
           name: combined_coverage_report
-          path: htmlcov
-          retention-days: 7
+          path: lib/htmlcov
+          retention-days: 14
