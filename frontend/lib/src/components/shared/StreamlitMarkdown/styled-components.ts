@@ -134,7 +134,7 @@ function getMarkdownHeadingDefinitions(
         useSmallerHeadings,
         isCaption
       ),
-      padding: `0 0 ${theme.spacing.lg} 0`,
+      padding: `${theme.spacing.xs} 0 ${theme.spacing.lg} 0`,
     },
     h6: {
       fontSize: convertFontSizes(
@@ -145,7 +145,7 @@ function getMarkdownHeadingDefinitions(
         useSmallerHeadings,
         isCaption
       ),
-      padding: `0 0 ${theme.spacing.lg} 0`,
+      padding: `${theme.spacing.twoXS} 0 ${theme.spacing.lg} 0`,
     },
   }
 }
