@@ -81,12 +81,7 @@ jobs:
         with:
           name: playwright_test_results
           path: e2e_playwright/test-results
-      - name: Upload coverage file
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage_file
-          path: e2e_playwright/.coverage
-      - name: Upload coverage report
+      - name: Upload coverage HTML report
         uses: actions/upload-artifact@v4
         with:
           name: coverage_report_e2e
