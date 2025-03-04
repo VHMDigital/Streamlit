@@ -159,9 +159,17 @@ class SliderSerde:
     single_value: bool
     orig_tz: tzinfo | None
 
-    def deserialize(self, ui_value: list[float] | None, widget_id: str = ""):
-        if ui_value is not None:
-            val: Any = ui_value
+    def deserialize(
+        self,
+        ui_value: float | list[float] | None,
+        widget_id: str = "",
+        error_deserialize: bool = False,
+    ):
+        if error_deserialize:
+            # Pass single value for deserializing value/max/min for error messages
+            val: Any = [ui_value]
+        elif ui_value is not None:
+            val = ui_value
         else:
             # Widget has not been used; fallback to the original value,
             val = self.value
@@ -180,7 +188,7 @@ class SliderSerde:
                 .replace(tzinfo=self.orig_tz)
                 for v in val
             ]
-        return val[0] if self.single_value else tuple(val)
+        return val[0] if self.single_value or error_deserialize else tuple(val)
 
     def serialize(self, v: Any) -> list[Any]:
         range_value = isinstance(v, (list, tuple))
@@ -849,33 +857,27 @@ class SliderMixin:
         )
 
         if widget_state.value_changed:
-            try:
-                # Min/Max bounds checks when the value is updated.
-                for value in widget_state.value:
-                    if value < slider_proto.min:
-                        raise StreamlitValueBelowMinError(
-                            value=value, min_value=slider_proto.min
-                        )
-
-                    if value > slider_proto.max:
-                        raise StreamlitValueAboveMaxError(
-                            value=value, max_value=slider_proto.max
-                        )
-            except TypeError:
-                # Value is not iterable.
-                if widget_state.value < slider_proto.min:
+            # Min/Max bounds checks when the value is updated.
+            serialized_values = serde.serialize(widget_state.value)
+            for value in serialized_values:
+                # Use the deserialized values for more readable error messages for dates/times
+                deserialized_value = serde.deserialize(value, error_deserialize=True)
+                if value < slider_proto.min:
                     raise StreamlitValueBelowMinError(
-                        value=serde.serialize(widget_state.value),
-                        min_value=slider_proto.min,
+                        value=deserialized_value,
+                        min_value=serde.deserialize(
+                            slider_proto.min, error_deserialize=True
+                        ),
                     )
-
-                if widget_state.value > slider_proto.max:
+                if value > slider_proto.max:
                     raise StreamlitValueAboveMaxError(
-                        value=serde.serialize(widget_state.value),
-                        max_value=slider_proto.max,
+                        value=deserialized_value,
+                        max_value=serde.deserialize(
+                            slider_proto.max, error_deserialize=True
+                        ),
                     )
 
-            slider_proto.value[:] = serde.serialize(widget_state.value)
+            slider_proto.value[:] = serialized_values
             slider_proto.set_value = True
 
         self.dg._enqueue("slider", slider_proto)
