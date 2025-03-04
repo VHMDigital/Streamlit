@@ -100,7 +100,7 @@
     "react-webcam": "7.2.0",
     "react-window": "^1.8.11",
     "rehype-katex": "^6.0.2",
-    "rehype-raw": "^6.1.1",
+    "rehype-raw": "^7.0.0",
     "remark-directive": "^4.0.0",
     "remark-emoji": "^3.1.2",
     "remark-gfm": "^3.0.1",
