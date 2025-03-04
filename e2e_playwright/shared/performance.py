@@ -122,6 +122,10 @@ def measure_performance(
         # Calculate execution time
         execution_time = time.time() - start_time
 
+        # Add custom metric for test execution time
+        custom_metrics = [{"name": "TestExecutionTime", "value": execution_time}]
+
+        # Get metrics from Chrome DevTools Protocol
         metrics_response = client.send("Performance.getMetrics")
         captured_traces_result = client.send(
             "Runtime.evaluate",
@@ -144,8 +148,7 @@ def measure_performance(
         ) as f:
             json.dump(
                 {
-                    "metrics": metrics_response["metrics"]
-                    + [{"name": "TestExecutionTime", "value": execution_time}],
+                    "metrics": metrics_response["metrics"] + custom_metrics,
                     "capturedTraces": parsed_captured_traces,
                 },
                 f,
