@@ -17,6 +17,7 @@ from __future__ import annotations
 import datetime
 import json
 import os
+import time
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
@@ -112,8 +113,14 @@ def measure_performance(
 
         client.send("Performance.enable")
 
+        # Start timing
+        start_time = time.time()
+
         # Run the test
         yield
+
+        # Calculate execution time
+        execution_time = time.time() - start_time
 
         metrics_response = client.send("Performance.getMetrics")
         captured_traces_result = client.send(
@@ -137,7 +144,8 @@ def measure_performance(
         ) as f:
             json.dump(
                 {
-                    "metrics": metrics_response["metrics"],
+                    "metrics": metrics_response["metrics"]
+                    + [{"name": "TestExecutionTime", "value": execution_time}],
                     "capturedTraces": parsed_captured_traces,
                 },
                 f,
