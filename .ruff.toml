@@ -43,7 +43,7 @@ select = [
   "ISC",    # Encourage correct string literal concatenation.
   "LOG",    # Checks for issues using the standard library logging module.
   "NPY",    # Linting rules for numpy
-  "PD",     # Opinionated linting for pandas
+  "PD",     # Opinionated linting for pandas.
   "PIE",    # Miscellaneous linting rules.
   "PLC",    # pycodestyle conventions
   "PLE",    # Pylint error rules.
