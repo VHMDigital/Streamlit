@@ -469,22 +469,31 @@ def _logger_message_format() -> str:
         return "%(asctime)s %(message)s"
 
 
-_create_option(
+@_create_option(
     "logger.enableRich",
-    description="""
-        Controls whether uncaught app exceptions are logged via the rich library.
-
-        If True and if rich is installed, exception tracebacks will be logged with
-        syntax highlighting and formatting. Rich tracebacks are easier to read and
-        show more code than standard Python tracebacks.
-
-        If set to False, the default Python traceback formatting will be used.
-    """,
-    default_val=False,
     visibility="hidden",
     type_=bool,
     scriptable=True,
 )
+def _logger_enable_rich() -> bool:
+    """
+    Controls whether uncaught app exceptions are logged via the rich library.
+
+    If True and if rich is installed, exception tracebacks will be logged with
+    syntax highlighting and formatting. Rich tracebacks are easier to read and
+    show more code than standard Python tracebacks.
+
+    If set to False, the default Python traceback formatting will be used.
+
+    Defaults to True if rich is installed, False otherwise.
+    """
+    try:
+        import rich  # noqa: F401
+
+        return True
+    except Exception:
+        return False
+
 
 # Config Section: Client #
 
