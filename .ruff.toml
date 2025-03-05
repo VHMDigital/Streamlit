@@ -29,7 +29,7 @@ docstring-code-line-length = "dynamic"
 
 [lint]
 select = [
-  "ASYNC",  # opinionated linting for asyncio.
+  "ASYNC",  # Opinionated linting for asyncio.
   "B",      # flake8-bugbear
   "C4",     # Helps you write better list/set/dict comprehensions.
   "E",      # pycodestyle errors
