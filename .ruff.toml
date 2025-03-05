@@ -44,7 +44,7 @@ select = [
   "LOG",    # Checks for issues using the standard library logging module.
   "NPY",    # Linting rules for numpy
   "PD",     # Opinionated linting for pandas.
-  "PIE",    # Miscellaneous linting rules.
+  "PIE",    # Rules to prevent unnecessary code logic.
   "PLC",    # pycodestyle conventions
   "PLE",    # Pylint error rules.
   "PYI",    # Linting rules for type annotations.
