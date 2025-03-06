@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ class ArrowTest(DeltaGeneratorTestCase):
 
         proto = self.get_delta_from_queue().new_element.arrow_table
         self.assertEqual(
-            proto.styler.styles, "#T_FAKE_UUIDrow1_col2 { background-color: yellow }"
+            proto.styler.styles, "#T_FAKE_UUID_row1_col2 { background-color: yellow }"
         )
 
     def test_display_values(self):

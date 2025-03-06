@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,37 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useCallback, useState } from "react"
+import React, {
+  memo,
+  ReactElement,
+  useCallback,
+  useMemo,
+  useState,
+} from "react"
 
 import uniqueId from "lodash/uniqueId"
 import { Input as UIInput } from "baseui/input"
 import { useTheme } from "@emotion/react"
 
-import useOnInputChange from "@streamlit/lib/src/hooks/useOnInputChange"
-import { TextInput as TextInputProto } from "@streamlit/lib/src/proto"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+import { TextInput as TextInputProto } from "@streamlit/protobuf"
+
+import useOnInputChange from "~lib/hooks/useOnInputChange"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
 import {
   useBasicWidgetState,
   ValueWithSource,
-} from "@streamlit/lib/src/hooks/useBasicWidgetState"
-import useUpdateUiValue from "@streamlit/lib/src/hooks/useUpdateUiValue"
-import useSubmitFormViaEnterKey from "@streamlit/lib/src/hooks/useSubmitFormViaEnterKey"
-import InputInstructions from "@streamlit/lib/src/components/shared/InputInstructions/InputInstructions"
+} from "~lib/hooks/useBasicWidgetState"
+import useUpdateUiValue from "~lib/hooks/useUpdateUiValue"
+import useSubmitFormViaEnterKey from "~lib/hooks/useSubmitFormViaEnterKey"
+import InputInstructions from "~lib/components/shared/InputInstructions/InputInstructions"
 import {
   StyledWidgetLabelHelp,
   WidgetLabel,
-} from "@streamlit/lib/src/components/widgets/BaseWidget"
-import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
-import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
-import {
-  isInForm,
-  labelVisibilityProtoValueToEnum,
-} from "@streamlit/lib/src/util/utils"
+} from "~lib/components/widgets/BaseWidget"
+import TooltipIcon from "~lib/components/shared/TooltipIcon"
+import { Placement } from "~lib/components/shared/Tooltip"
+import { isInForm, labelVisibilityProtoValueToEnum } from "~lib/util/utils"
+import { useResizeObserver } from "~lib/hooks/useResizeObserver"
 
 import { StyledTextInput } from "./styled-components"
 
@@ -47,7 +52,6 @@ export interface Props {
   disabled: boolean
   element: TextInputProto
   widgetMgr: WidgetStateManager
-  width: number
   fragmentId?: string
 }
 
@@ -55,7 +59,6 @@ function TextInput({
   disabled,
   element,
   widgetMgr,
-  width,
   fragmentId,
 }: Props): ReactElement {
   /**
@@ -65,6 +68,11 @@ function TextInput({
   const [uiValue, setUiValue] = useState<string | null>(
     getStateFromWidgetMgr(widgetMgr, element) ?? null
   )
+
+  const {
+    values: [width],
+    elementRef,
+  } = useResizeObserver(useMemo(() => ["width"], []))
 
   /**
    * True if the user-specified state.value has not yet been synced to the WidgetStateManager.
@@ -146,7 +154,7 @@ function TextInput({
     <StyledTextInput
       className="stTextInput"
       data-testid="stTextInput"
-      width={width}
+      ref={elementRef}
     >
       <WidgetLabel
         label={element.label}
@@ -257,4 +265,4 @@ function getTypeString(element: TextInputProto): string {
   return element.type === TextInputProto.Type.PASSWORD ? "password" : "text"
 }
 
-export default TextInput
+export default memo(TextInput)

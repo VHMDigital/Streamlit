@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,18 +21,13 @@ import { userEvent } from "@testing-library/user-event"
 import {
   LabelVisibilityMessage as LabelVisibilityMessageProto,
   NumberInput as NumberInputProto,
-} from "@streamlit/lib/src/proto"
-import { render } from "@streamlit/lib/src/test_util"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
-import { mockTheme } from "@streamlit/lib/src/mocks/mockTheme"
+} from "@streamlit/protobuf"
 
-import {
-  canDecrement,
-  canIncrement,
-  formatValue,
-  NumberInput,
-  Props,
-} from "./NumberInput"
+import { render } from "~lib/test_util"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
+import * as UseResizeObserver from "~lib/hooks/useResizeObserver"
+
+import NumberInput, { Props } from "./NumberInput"
 
 const getProps = (elementProps: Partial<NumberInputProto> = {}): Props => ({
   element: NumberInputProto.create({
@@ -42,9 +37,7 @@ const getProps = (elementProps: Partial<NumberInputProto> = {}): Props => ({
     hasMax: false,
     ...elementProps,
   }),
-  width: 300,
   disabled: false,
-  theme: mockTheme.emotion,
   widgetMgr: new WidgetStateManager({
     sendRerunBackMsg: vi.fn(),
     formsDataChanged: vi.fn(),
@@ -74,6 +67,14 @@ const getFloatProps = (
 }
 
 describe("NumberInput widget", () => {
+  beforeEach(() => {
+    vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
+      elementRef: React.createRef(),
+      forceRecalculate: vitest.fn(),
+      values: [250],
+    })
+  })
+
   it("renders without crashing", () => {
     const props = getIntProps()
     render(<NumberInput {...props} />)
@@ -608,8 +609,14 @@ describe("NumberInput widget", () => {
     })
 
     it("hides stepUp and stepDown buttons when width is smaller than 120px", () => {
+      vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
+        elementRef: React.createRef(),
+        forceRecalculate: vitest.fn(),
+        values: [100],
+      })
+
       const props = getIntProps({ default: 1, step: 1, max: 2, hasMax: true })
-      render(<NumberInput {...props} width={100} />)
+      render(<NumberInput {...props} />)
 
       expect(
         screen.queryByTestId("stNumberInputStepUp")
@@ -621,16 +628,22 @@ describe("NumberInput widget", () => {
 
     it("shows stepUp and stepDown buttons when width is bigger than 120px", () => {
       const props = getIntProps({ default: 1, step: 1, max: 2, hasMax: true })
-      render(<NumberInput {...props} width={185} />)
+      render(<NumberInput {...props} />)
 
       expect(screen.getByTestId("stNumberInputStepUp")).toBeInTheDocument()
       expect(screen.getByTestId("stNumberInputStepDown")).toBeInTheDocument()
     })
 
     it("hides Please enter to apply text when width is smaller than 120px", async () => {
+      vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
+        elementRef: React.createRef(),
+        forceRecalculate: vitest.fn(),
+        values: [100],
+      })
+
       const user = userEvent.setup()
       const props = getIntProps({ default: 1, step: 1, max: 20, hasMax: true })
-      render(<NumberInput {...props} width={100} />)
+      render(<NumberInput {...props} />)
       const numberInput = screen.getByTestId("stNumberInputField")
 
       // userEvent necessary to trigger dirty state
@@ -643,7 +656,7 @@ describe("NumberInput widget", () => {
     it("shows Please enter to apply text when width is bigger than 120px", async () => {
       const user = userEvent.setup()
       const props = getIntProps({ default: 1, step: 1, max: 20, hasMax: true })
-      render(<NumberInput {...props} width={185} />)
+      render(<NumberInput {...props} />)
       const numberInput = screen.getByTestId("stNumberInputField")
 
       // userEvent necessary to trigger dirty state
@@ -684,84 +697,5 @@ describe("NumberInput widget", () => {
     const forId2 = numberInputLabel2.getAttribute("for")
 
     expect(forId2).toBe(forId1)
-  })
-
-  describe("utilities", () => {
-    describe("canDecrement function", () => {
-      it("returns true if decrementing stays above min", () => {
-        expect(canDecrement(5, 1, 0)).toBe(true)
-      })
-
-      it("returns false if decrementing goes below min", () => {
-        expect(canDecrement(0, 1, 0)).toBe(false)
-      })
-    })
-
-    describe("canIncrement function", () => {
-      it("returns true if incrementing stays below max", () => {
-        expect(canIncrement(5, 1, 10)).toBe(true)
-      })
-
-      it("returns false if incrementing goes above max", () => {
-        expect(canIncrement(10, 1, 10)).toBe(false)
-      })
-    })
-
-    describe("formatValue function", () => {
-      it("returns null for null value", () => {
-        expect(
-          formatValue({
-            value: null,
-            format: null,
-            step: 1,
-            dataType: NumberInputProto.DataType.INT,
-          })
-        ).toBeNull()
-      })
-
-      it("formats integer without specified format", () => {
-        expect(
-          formatValue({
-            value: 123,
-            format: null,
-            step: 1,
-            dataType: NumberInputProto.DataType.INT,
-          })
-        ).toBe("123")
-      })
-
-      it("formats float without specified format, considering step for precision", () => {
-        expect(
-          formatValue({
-            value: 123.456,
-            format: null,
-            step: 0.01,
-            dataType: NumberInputProto.DataType.FLOAT,
-          })
-        ).toBe("123.46")
-      })
-
-      it("respects format string for integers", () => {
-        expect(
-          formatValue({
-            value: 123,
-            format: "%04d",
-            step: 1,
-            dataType: NumberInputProto.DataType.INT,
-          })
-        ).toBe("0123")
-      })
-
-      it("respects format string for floats", () => {
-        expect(
-          formatValue({
-            value: 123.456,
-            format: "%.2f",
-            step: 0.01,
-            dataType: NumberInputProto.DataType.FLOAT,
-          })
-        ).toBe("123.46")
-      })
-    })
   })
 })

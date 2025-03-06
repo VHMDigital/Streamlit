@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ SHELL=/bin/bash
 
 INSTALL_DEV_REQS ?= true
 INSTALL_TEST_REQS ?= true
-USE_CONSTRAINTS_FILE ?= true
+USE_CONSTRAINTS_FILE ?= false
 PYTHON_VERSION := $(shell python --version | cut -d " " -f 2 | cut -d "." -f 1-2)
 GITHUB_REPOSITORY ?= streamlit/streamlit
 CONSTRAINTS_BRANCH ?= constraints-develop
@@ -47,7 +47,7 @@ all: init frontend install
 
 .PHONY: all-devel
 # Get dependencies and install Streamlit into Python environment -- but do not build the frontend.
-all-devel: init develop pre-commit-install
+all-devel: init develop pre-commit-install frontend-dependencies
 	@echo ""
 	@echo "    The frontend has *not* been rebuilt."
 	@echo "    If you need to make a wheel file or test S3 sharing, run:"
@@ -57,7 +57,7 @@ all-devel: init develop pre-commit-install
 
 .PHONY: mini-devel
 # Get minimal dependencies for development and install Streamlit into Python environment -- but do not build the frontend.
-mini-devel: mini-init develop pre-commit-install
+mini-devel: mini-init develop pre-commit-install frontend-dependencies
 
 .PHONY: build-deps
 # An even smaller installation than mini-devel. Installs the bare minimum necessary to build Streamlit (by leaving out some dependencies necessary for the development process). Does not build the frontend.
@@ -74,6 +74,11 @@ mini-init: python-init-dev-only react-init protobuf
 .PHONY: frontend
 # Build frontend into static files.
 frontend: react-build
+
+.PHONY: frontend-dependencies
+# Build frontend dependent libraries (excluding app and lib)
+frontend-dependencies:
+	cd frontend/ ; yarn workspaces foreach --all --exclude @streamlit/app --exclude @streamlit/lib --topological run build
 
 .PHONY: install
 # Install Streamlit into your Python environment.
@@ -146,6 +151,19 @@ pytest:
 		PYTHONPATH=. \
 		pytest -v \
 			-l tests/ \
+			-m "not performance" \
+			$(PYTHON_MODULES)
+
+.PHONY: performance-pytest
+# Run Python benchmark tests
+performance-pytest:
+	cd lib; \
+		PYTHONPATH=. \
+		pytest -v \
+			-l tests/ \
+			-m "performance" \
+			--benchmark-autosave \
+			--benchmark-storage file://../.benchmarks/pytest \
 			$(PYTHON_MODULES)
 
 # Run Python integration tests.
@@ -218,6 +236,7 @@ clean:
 	find . -name '*.pyc' -type f -delete || true
 	find . -name __pycache__ -type d -delete || true
 	find . -name .pytest_cache -exec rm -rfv {} \; || true
+	find . -name '.benchmarks' -type d -exec rm -rfv {} \; || true
 	rm -rf .mypy_cache
 	rm -rf .ruff_cache
 	rm -f lib/streamlit/proto/*_pb2.py*
@@ -228,11 +247,13 @@ clean:
 	rm -rf frontend/app/performance/lighthouse/reports
 	rm -rf frontend/app/node_modules
 	rm -rf frontend/lib/node_modules
+	rm -rf frontend/connection/node_modules
 	rm -rf frontend/test_results
-	rm -f frontend/lib/src/proto.js
-	rm -f frontend/lib/src/proto.d.ts
+	rm -f frontend/protobuf/src/proto.js
+	rm -f frontend/protobuf/src/proto.d.ts
 	rm -rf frontend/public/reports
 	rm -rf frontend/lib/dist
+	rm -rf frontend/connection/dist
 	rm -rf ~/.cache/pre-commit
 	rm -rf e2e_playwright/test-results
 	rm -rf e2e_playwright/performance-results
@@ -251,10 +272,10 @@ check-protoc:
 	PROTOC_VERSION=$$(protoc --version | cut -d ' ' -f 2); \
 	\
 	if [[ $$(echo -e "$$PROTOC_VERSION\n$(MIN_PROTOC_VERSION)" | sort -V | head -n1) != $(MIN_PROTOC_VERSION) ]]; then \
-	  echo "Error: protoc version $${PROTOC_VERSION} is < $(MIN_PROTOC_VERSION)"; \
-	  exit 1; \
+		echo "Error: protoc version $${PROTOC_VERSION} is < $(MIN_PROTOC_VERSION)"; \
+		exit 1; \
 	else \
-	  echo "protoc version $${PROTOC_VERSION} is >= than $(MIN_PROTOC_VERSION)"; \
+		echo "protoc version $${PROTOC_VERSION} is >= than $(MIN_PROTOC_VERSION)"; \
 	fi
 
 .PHONY: protobuf
@@ -266,102 +287,79 @@ protobuf: check-protoc
 		--mypy_out=lib \
 		proto/streamlit/proto/*.proto
 
-	@# JS protobuf generation. The --es6 flag generates a proper es6 module.
-	cd frontend/ ; ( \
-		echo "/* eslint-disable */" ; \
-		echo ; \
-		yarn --silent pbjs \
-			../proto/streamlit/proto/*.proto \
-			--path ../proto -t static-module --wrap es6 \
-	) > ./lib/src/proto.js
-
-	@# Typescript type declarations for our generated protobufs
-	cd frontend/ ; ( \
-		echo "/* eslint-disable */" ; \
-		echo ; \
-		yarn --silent pbts ./lib/src/proto.js \
-	) > ./lib/src/proto.d.ts
+	@# JS/TS protobuf generation
+	cd frontend/ ; yarn workspace @streamlit/protobuf run generate-protobuf
 
 .PHONY: react-init
 # React init.
 react-init:
-	cd frontend/ ; yarn install --frozen-lockfile
+	cd frontend/ ; yarn install --immutable
 
 .PHONY: react-build
 # React build.
 react-build:
-	cd frontend/ ; yarn run build
+	cd frontend/ ; yarn workspaces foreach --all --topological run build
 	rsync -av --delete --delete-excluded --exclude=reports \
 		frontend/app/build/ lib/streamlit/static/
 
 .PHONY: frontend-build-with-profiler
-frontend-build-with-profiler:
-	cd frontend/ ; yarn run buildWithProfiler
+frontend-build-with-profiler: frontend-dependencies
+	cd frontend/ ; yarn workspace @streamlit/app buildWithProfiler
 	rsync -av --delete --delete-excluded --exclude=reports \
 		frontend/app/build/ lib/streamlit/static/
+
+.PHONY: frontend-fast
+frontend-fast:
+	cd frontend/ ; yarn workspaces foreach --recursive --topological --from @streamlit/app --exclude @streamlit/lib run build
+	rsync -av --delete --delete-excluded --exclude=reports \
+		frontend/app/build/ lib/streamlit/static/
+
+.PHONY: frontend-dev
+frontend-dev: frontend-dependencies
+	cd frontend/ ; yarn dev
+
 
 .PHONY: frontend-lib
 # Build the frontend library.
 frontend-lib:
-	cd frontend/ ; yarn run buildLib;
-
-.PHONY: frontend-app
-# Build the frontend app. One must build the frontend lib first before building the app.
-frontend-app:
-	cd frontend/ ; yarn run buildApp
+	cd frontend/ ; yarn workspaces foreach --recursive --topological --from @streamlit/lib run build;
 
 .PHONY: jslint
 # Verify that our JS/TS code is formatted and that there are no lint errors.
-jslint:
-	cd frontend/ ; yarn run formatCheck
-	cd frontend/ ; yarn run lint
+jslint: frontend-dependencies
+	cd frontend/ ; yarn workspaces foreach --all run formatCheck
+	cd frontend/ ; yarn workspaces foreach --all run lint
 
 .PHONY: tstypecheck
 # Typecheck the JS/TS code.
-tstypecheck:
-	cd frontend/ ; yarn run typecheck
+tstypecheck: frontend-dependencies
+	cd frontend/ ; yarn workspaces foreach --all --exclude @streamlit/lib --exclude @streamlit/app run typecheck
+	cd frontend/ ; yarn workspaces foreach --all run typecheck
 
 .PHONY: jsformat
 # Fix formatting issues in our JavaScript & TypeScript files.
 jsformat:
-	cd frontend/ ; yarn run format
+	cd frontend/ ; yarn workspaces foreach --all run format
 
 .PHONY: jstest
 # Run JS unit tests.
-jstest:
-	cd frontend; TESTPATH=$(TESTPATH) yarn run test
+jstest: frontend-dependencies
+	cd frontend; TESTPATH=$(TESTPATH) yarn workspaces foreach --all run test
 
 .PHONY: jstestcoverage
 # Run JS unit tests and generate a coverage report.
-jstestcoverage:
-	cd frontend; TESTPATH=$(TESTPATH) yarn run testcoverage
-
-.PHONY: playwright
-# Run playwright E2E tests (without custom component tests).
-custom_components_test_folder = ./custom_components
-playwright:
-	cd e2e_playwright; \
-	rm -rf ./test-results; \
-	pytest --ignore ${custom_components_test_folder} --browser webkit --browser chromium --browser firefox --video retain-on-failure --screenshot only-on-failure --output ./test-results/ -n auto --reruns 1 --reruns-delay 1 --rerun-except "Missing snapshot" --durations=5 -r aR -v
-.PHONY: playwright-custom-components
-# Run playwright custom component E2E tests.
-playwright-custom-components:
-	cd e2e_playwright; \
-	rm -rf ./test-results; \
-	pip_args="extra-streamlit-components streamlit-ace streamlit-antd-components streamlit-aggrid streamlit-autorefresh streamlit-chat streamlit-echarts streamlit-folium streamlit-option-menu streamlit-url-fragment"; \
-	if command -v "uv" > /dev/null; then \
-		echo "Running command: uv pip install $${pip_args}"; \
-		uv pip install $${pip_args}; \
-	else \
-		echo "Running command: pip install $${pip_args}"; \
-		pip install $${pip_args}; \
-	fi; \
-	pytest ${custom_components_test_folder} --browser webkit --browser chromium --browser firefox --video retain-on-failure --screenshot only-on-failure --output ./test-results/ -n auto --reruns 1 --reruns-delay 1 --rerun-except "Missing snapshot" --durations=5 -r aR -v
+jstestcoverage: frontend-dependencies
+	cd frontend; TESTPATH=$(TESTPATH) yarn workspaces foreach --all run test --coverage
 
 .PHONY: update-snapshots
 # Update e2e playwright snapshots based on the latest completed CI run.
 update-snapshots:
 	python ./scripts/update_e2e_snapshots.py
+
+.PHONY: update-snapshots-changed
+# Update e2e playwright snapshots of changed files based on the latest completed CI run.
+update-snapshots-changed:
+	python ./scripts/update_e2e_snapshots.py --changed
 
 .PHONY: update-material-icons
 # Update material icon names and font file based on latest google material symbol rounded font version.
@@ -387,14 +385,7 @@ distribute:
 # Rebuild the NOTICES file.
 notices:
 	cd frontend; \
-		yarn licenses generate-disclaimer --silent --production --ignore-platform > ../NOTICES
-
-	@# When `yarn licenses` is run in a yarn workspace, it misnames the project as
-	@# "WORKSPACE AGGREGATOR 2B7C80A7 6734 4A68 BB93 8CC72B9A5DEA". We fix that here.
-	@# There also isn't a portable way to invoke `sed` to edit files in-place, so we have
-	@# sed create a NOTICES.bak backup file that we immediately delete afterwards.
-	sed -i'.bak' 's/PORTIONS OF THE .*PRODUCT/PORTIONS OF THE STREAMLIT PRODUCT/' NOTICES
-	rm -f NOTICES.bak
+		yarn licenses generate-disclaimer --production --recursive > ../NOTICES
 
 	./scripts/append_license.sh frontend/app/src/assets/fonts/Source_Code_Pro/Source-Code-Pro.LICENSE
 	./scripts/append_license.sh frontend/app/src/assets/fonts/Source_Sans_Pro/Source-Sans-Pro.LICENSE
@@ -402,9 +393,7 @@ notices:
 	./scripts/append_license.sh frontend/app/src/assets/img/Material-Icons.LICENSE
 	./scripts/append_license.sh frontend/app/src/assets/img/Open-Iconic.LICENSE
 	./scripts/append_license.sh frontend/lib/src/vendor/bokeh/bokeh-LICENSE.txt
-	./scripts/append_license.sh frontend/lib/src/vendor/twemoji-LICENSE.txt
 	./scripts/append_license.sh frontend/lib/src/vendor/react-bootstrap-LICENSE.txt
-	./scripts/append_license.sh lib/streamlit/vendor/ipython/IPython-LICENSE.txt
 
 .PHONY: headers
 # Update the license header on all source files.
@@ -424,7 +413,7 @@ pre-commit-install:
 	pre-commit install
 
 .PHONY: ensure-relative-imports
-# Ensure relative imports exist within the lib/dist folder when doing yarn buildLibProd.
+# Ensure relative imports exist within the lib/dist folder when doing building lib for production.
 ensure-relative-imports:
 	./scripts/ensure_relative_imports.sh
 
@@ -436,8 +425,8 @@ performance-lighthouse:
 
 .PHONY frontend-lib-prod:
 # Build the production version for @streamlit/lib.
-frontend-lib-prod:
-	cd frontend/ ; yarn run buildLibProd;
+frontend-lib-prod: frontend-dependencies
+	cd frontend/ ; yarn workspace @streamlit/lib build;
 
 .PHONY streamlit-lib-prod:
 # Build the production version for @streamlit/lib while also doing a make init so it's a single command.
@@ -445,3 +434,32 @@ streamlit-lib-prod:
 	make mini-init;
 	make frontend-lib-prod;
 
+.PHONY: debug-e2e-test
+# Run an e2e playwright test in debug mode with Playwright Inspector. Use it via make debug-e2e-test st_command_test.py
+debug-e2e-test:
+	@if [[ ! "$(filter-out $@,$(MAKECMDGOALS))" == *"_test"* ]]; then \
+		echo "Error: Test script name must contain '_test' in the filename"; \
+		exit 1; \
+	fi
+	@echo "Running test: $(filter-out $@,$(MAKECMDGOALS)) in debug mode."
+	@TEST_SCRIPT=$$(echo $(filter-out $@,$(MAKECMDGOALS)) | sed 's|^e2e_playwright/||'); \
+	cd e2e_playwright && PWDEBUG=1 pytest $$TEST_SCRIPT || ( \
+		echo "If you implemented changes in the frontend, make sure to call \`make frontend-fast\` to use the up-to-date frontend build in the test."; \
+		echo "You can find test-results in ./e2e_playwright/test-results"; \
+		exit 1 \
+	)
+
+.PHONY: run-e2e-test
+# Run an e2e playwright test. Use it via make run-e2e-test st_command_test.py
+run-e2e-test:
+	@if [[ ! "$(filter-out $@,$(MAKECMDGOALS))" == *"_test"* ]]; then \
+		echo "Error: Test script name must contain '_test' in the filename"; \
+		exit 1; \
+	fi
+	@echo "Running test: $(filter-out $@,$(MAKECMDGOALS))"
+	@TEST_SCRIPT=$$(echo $(filter-out $@,$(MAKECMDGOALS)) | sed 's|^e2e_playwright/||'); \
+	cd e2e_playwright && pytest $$TEST_SCRIPT --tracing retain-on-failure --reruns 0 || ( \
+		echo "If you implemented changes in the frontend, make sure to call \`make frontend-fast\` to use the up-to-date frontend build in the test."; \
+		echo "You can find test-results in ./e2e_playwright/test-results"; \
+		exit 1 \
+	)

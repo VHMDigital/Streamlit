@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 import React, {
+  memo,
   ReactElement,
   useContext,
   useEffect,
@@ -25,11 +26,12 @@ import React, {
 import { useTheme } from "@emotion/react"
 import { Tab as UITab, Tabs as UITabs } from "baseui/tabs-motion"
 
-import { AppNode, BlockNode } from "@streamlit/lib/src/AppNode"
-import { BlockPropsWithoutWidth } from "@streamlit/lib/src/components/core/Block"
-import { isElementStale } from "@streamlit/lib/src/components/core/Block/utils"
-import { LibContext } from "@streamlit/lib/src/components/core/LibContext"
-import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
+import { AppNode, BlockNode } from "~lib/AppNode"
+import { BlockPropsWithoutWidth } from "~lib/components/core/Block"
+import { isElementStale } from "~lib/components/core/Block/utils"
+import { LibContext } from "~lib/components/core/LibContext"
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
+import { STALE_STYLES } from "~lib/theme"
 
 import { StyledTabContainer } from "./styled-components"
 
@@ -132,12 +134,7 @@ function Tabs(props: Readonly<TabProps>): ReactElement {
               marginBottom: `-${TAB_BORDER_HEIGHT}`,
               paddingBottom: TAB_BORDER_HEIGHT,
               overflowY: "hidden",
-              ...(isStale
-                ? {
-                    opacity: 0.33,
-                    transition: "opacity 1s ease-in 0.5s",
-                  }
-                : {}),
+              ...(isStale && STALE_STYLES),
             }),
           },
           Root: {
@@ -232,21 +229,16 @@ function Tabs(props: Readonly<TabProps>): ReactElement {
                             : theme.colors.primary,
                         }
                       : {}),
+                    // Add minimal required padding to hide the overscroll gradient
+                    // This is calculated based on the width of the gradient (spacing.lg)
                     ...(isOverflowing && isLast
                       ? {
-                          // Add minimal required padding to hide the overscroll gradient
-                          // This is calculated based on the width of the gradient (spacing.lg)
                           paddingRight: `calc(${theme.spacing.lg} * 0.6)`,
                         }
                       : {}),
-                    ...(!isStale && isStaleTab
-                      ? {
-                          // Apply stale effect if only this specific
-                          // tab is stale but not the entire tab container.
-                          opacity: 0.33,
-                          transition: "opacity 1s ease-in 0.5s",
-                        }
-                      : {}),
+                    // Apply stale effect if only this specific
+                    // tab is stale but not the entire tab container.
+                    ...(!isStale && isStaleTab && STALE_STYLES),
                   }),
                 },
               }}
@@ -260,4 +252,4 @@ function Tabs(props: Readonly<TabProps>): ReactElement {
   )
 }
 
-export default Tabs
+export default memo(Tabs)

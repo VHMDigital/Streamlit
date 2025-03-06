@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,12 +38,15 @@ class ServerUtilTest(unittest.TestCase):
             self.assertTrue(server_util.is_url_from_allowed_origins("does not matter"))
 
     def test_is_url_from_allowed_origins_browser_serverAddress(self):
-        with patch(
-            "streamlit.web.server.server_util.config.is_manually_set",
-            side_effect=[True],
-        ), patch(
-            "streamlit.web.server.server_util.config.get_option",
-            side_effect=[True, "browser.server.address"],
+        with (
+            patch(
+                "streamlit.web.server.server_util.config.is_manually_set",
+                side_effect=[True],
+            ),
+            patch(
+                "streamlit.web.server.server_util.config.get_option",
+                side_effect=[True, "browser.server.address"],
+            ),
         ):
             self.assertTrue(
                 server_util.is_url_from_allowed_origins("browser.server.address")
@@ -51,22 +54,21 @@ class ServerUtilTest(unittest.TestCase):
 
     @parameterized.expand(
         [
-            (None, None, "http://the_ip_address:8501"),
+            (None, 8501, "http://the_ip_address:8501"),
             (None, 9988, "http://the_ip_address:9988"),
-            ("foo", None, "http://the_ip_address:8501/foo"),
-            ("foo/", None, "http://the_ip_address:8501/foo"),
-            ("/foo/bar/", None, "http://the_ip_address:8501/foo/bar"),
+            ("foo", 8501, "http://the_ip_address:8501/foo"),
+            ("foo/", 8501, "http://the_ip_address:8501/foo"),
+            ("/foo/bar/", 8501, "http://the_ip_address:8501/foo/bar"),
             ("/foo/bar/", 9988, "http://the_ip_address:9988/foo/bar"),
         ]
     )
-    def test_get_url(self, base_url: str | None, port: int | None, expected_url: str):
+    def test_get_url(self, base_url: str | None, port: int, expected_url: str):
         options = {"server.headless": False, "global.developmentMode": False}
 
         if base_url:
             options["server.baseUrlPath"] = base_url
 
-        if port:
-            options["server.port"] = port
+        options["server.port"] = port
 
         mock_get_option = testutil.build_mock_config_get_option(options)
 

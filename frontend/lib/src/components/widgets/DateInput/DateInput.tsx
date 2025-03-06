@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,23 +28,25 @@ import { useTheme } from "@emotion/react"
 import { DENSITY, Datepicker as UIDatePicker } from "baseui/datepicker"
 import { PLACEMENT } from "baseui/popover"
 
+import { DateInput as DateInputProto } from "@streamlit/protobuf"
+
 import {
   isNullOrUndefined,
   labelVisibilityProtoValueToEnum,
-} from "@streamlit/lib/src/util/utils"
-import { DateInput as DateInputProto } from "@streamlit/lib/src/proto"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+} from "~lib/util/utils"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
 import {
   useBasicWidgetState,
   ValueWithSource,
-} from "@streamlit/lib/src/hooks/useBasicWidgetState"
+} from "~lib/hooks/useBasicWidgetState"
 import {
   StyledWidgetLabelHelp,
   WidgetLabel,
-} from "@streamlit/lib/src/components/widgets/BaseWidget"
-import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
-import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
-import { LibContext } from "@streamlit/lib/src/components/core/LibContext"
+} from "~lib/components/widgets/BaseWidget"
+import TooltipIcon from "~lib/components/shared/TooltipIcon"
+import { Placement } from "~lib/components/shared/Tooltip"
+import { LibContext } from "~lib/components/core/LibContext"
+import { EmotionTheme } from "~lib/theme"
 
 import { useIntlLocale } from "./useIntlLocale"
 
@@ -52,7 +54,6 @@ export interface Props {
   disabled: boolean
   element: DateInputProto
   widgetMgr: WidgetStateManager
-  width: number
   fragmentId?: string
 }
 
@@ -76,9 +77,10 @@ function DateInput({
   disabled,
   element,
   widgetMgr,
-  width,
   fragmentId,
 }: Props): ReactElement {
+  const theme: EmotionTheme = useTheme()
+
   /**
    * An array with start and end date specified by the user via the UI. If the user
    * didn't touch this widget's UI, the default value is used. End date is optional.
@@ -103,7 +105,6 @@ function DateInput({
   const { locale } = useContext(LibContext)
   const loadedLocale = useIntlLocale(locale)
 
-  const style = { width }
   const minDate = moment(element.min, DATE_FORMAT).toDate()
   const maxDate = getMaxDate(element)
   const clearable = element.default.length === 0 && !disabled
@@ -167,7 +168,7 @@ function DateInput({
   }, [isEmpty, element, setValueWithSource])
 
   return (
-    <div className="stDateInput" data-testid="stDateInput" style={style}>
+    <div className="stDateInput" data-testid="stDateInput">
       <WidgetLabel
         label={element.label}
         disabled={disabled}
@@ -204,7 +205,7 @@ function DateInput({
               overrides: {
                 Body: {
                   style: {
-                    border: `${sizes.borderWidth} solid ${colors.borderColor}`,
+                    marginTop: theme.spacing.px,
                   },
                 },
               },

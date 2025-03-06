@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ import React from "react"
 
 import { CloudUpload } from "@emotion-icons/material-outlined"
 
-import Icon from "@streamlit/lib/src/components/shared/Icon"
-import { FileSize, getSizeDisplay } from "@streamlit/lib/src/util/FileHelper"
-import { Small } from "@streamlit/lib/src/components/shared/TextElements"
+import Icon from "~lib/components/shared/Icon"
+import { FileSize, getSizeDisplay } from "~lib/util/FileHelper"
+import { Small } from "~lib/components/shared/TextElements"
 
 import {
   StyledFileDropzoneInstructions,

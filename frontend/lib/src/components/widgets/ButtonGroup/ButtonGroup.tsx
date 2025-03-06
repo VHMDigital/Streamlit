@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,29 +26,29 @@ import React, {
 import { useTheme } from "@emotion/react"
 import { ButtonGroup as BasewebButtonGroup, MODE } from "baseui/button-group"
 
-import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown/StreamlitMarkdown"
-import BaseButton, {
-  BaseButtonKind,
-  BaseButtonSize,
-} from "@streamlit/lib/src/components/shared/BaseButton"
-import { DynamicIcon } from "@streamlit/lib/src/components/shared/Icon"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
 import {
   ButtonGroup as ButtonGroupProto,
   LabelVisibilityMessage,
-} from "@streamlit/lib/src/proto"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+} from "@streamlit/protobuf"
+
+import BaseButton, {
+  BaseButtonKind,
+  BaseButtonSize,
+  DynamicButtonLabel,
+} from "~lib/components/shared/BaseButton"
+import { EmotionTheme } from "~lib/theme"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
 import {
   StyledWidgetLabelHelpInline,
   WidgetLabel,
-} from "@streamlit/lib/src/components/widgets/BaseWidget"
-import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
-import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
-import { labelVisibilityProtoValueToEnum } from "@streamlit/lib/src/util/utils"
+} from "~lib/components/widgets/BaseWidget"
+import TooltipIcon from "~lib/components/shared/TooltipIcon"
+import { Placement } from "~lib/components/shared/Tooltip"
+import { labelVisibilityProtoValueToEnum } from "~lib/util/utils"
 import {
   useBasicWidgetState,
   ValueWithSource,
-} from "@streamlit/lib/src/hooks/useBasicWidgetState"
+} from "~lib/hooks/useBasicWidgetState"
 
 export interface Props {
   disabled: boolean
@@ -117,14 +117,20 @@ export function getContentElement(
       ? BaseButtonSize.XSMALL
       : BaseButtonSize.MEDIUM
 
+  // Use smaller font if kind is pills or segmented control
+  const useSmallerFont =
+    kind === BaseButtonKind.PILLS || kind === BaseButtonKind.SEGMENTED_CONTROL
+
   const iconSize = style === ButtonGroupProto.Style.BORDERLESS ? "lg" : "base"
 
   return {
     element: (
-      <>
-        {icon && <DynamicIcon size={iconSize} iconValue={icon} />}
-        {content && <StreamlitMarkdown source={content} allowHTML={false} />}
-      </>
+      <DynamicButtonLabel
+        icon={icon}
+        label={content}
+        iconSize={iconSize}
+        useSmallerFont={useSmallerFont}
+      />
     ),
     kind: kind,
     size: size,

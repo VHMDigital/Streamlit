@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,11 @@ import Dropzone, { FileRejection } from "react-dropzone"
 import BaseButton, {
   BaseButtonKind,
   BaseButtonSize,
-} from "@streamlit/lib/src/components/shared/BaseButton"
+} from "~lib/components/shared/BaseButton"
 
 import { StyledFileDropzoneSection } from "./styled-components"
 import FileDropzoneInstructions from "./FileDropzoneInstructions"
+import { getAccept } from "./utils"
 
 export interface Props {
   disabled: boolean
@@ -46,7 +47,7 @@ const FileDropzone = ({
   <Dropzone
     onDrop={onDrop}
     multiple={multiple}
-    accept={acceptedExtensions.length ? acceptedExtensions : undefined}
+    accept={getAccept(acceptedExtensions)}
     maxSize={maxSizeBytes}
     disabled={disabled}
     // react-dropzone v12+ uses the File System Access API by default,

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,14 +47,17 @@ IGNORE_PATTERN = re.compile(
     r"|yarn\.lock$"
     # Exclude pytest config files, because they don't have any degree of creativity.
     r"|pytest\.ini$"
+    r"|\.coveragerc$"
     # Exclude empty files, because they don't have any degree of creativity.
     r"|py\.typed$"
     # Exclude dev-tools configuration files, because they don't have any
     # degree of creativity.
     r"|^(\.dockerignore|\.editorconfig|\.gitignore|\.gitmodules)$"
     r"|^frontend/(\.dockerignore|\.eslintrc.js|\.prettierignore)$"
-    r"|^lib/(\.coveragerc|\.dockerignore|MANIFEST\.in|mypy\.ini)$"
-    r"|^lib/.*-requirements\.txt$"
+    r"|^frontend/\.yarn"  # Exclude everything in the .yarn folder
+    r"|^component-lib/\.yarn"
+    r"|^lib/(\.dockerignore|MANIFEST\.in|mypy\.ini)$"
+    r"|^.*-requirements\.txt$"
     r"|^lib/min-constraints-gen\.txt"
     r"|\.isort\.cfg$"
     r"|\.credentials/\.gitignore$"

@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -282,9 +282,12 @@ class ImageProtoTest(DeltaGeneratorTestCase):
         and not image_to_url - to throw an error.)
         """
         # Mock out save_image_data to avoid polluting the cache for later tests
-        with mock.patch(
-            "streamlit.runtime.media_file_manager.MediaFileManager.add"
-        ) as mock_mfm_add, mock.patch("streamlit.runtime.caching.save_media_data"):
+        with (
+            mock.patch(
+                "streamlit.runtime.media_file_manager.MediaFileManager.add"
+            ) as mock_mfm_add,
+            mock.patch("streamlit.runtime.caching.save_media_data"),
+        ):
             mock_mfm_add.return_value = "https://mockoutputurl.com"
 
             result = image_to_url(

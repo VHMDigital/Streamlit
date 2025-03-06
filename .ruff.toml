@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ include = [
   "e2e_playwright/**/*.py",
   "scripts/**/*.py",
 ]
-target-version = 'py38'
+target-version = 'py39'
 line-length = 88
 
 [format]
@@ -34,6 +34,7 @@ select = [
   "E",      # pycodestyle errors
   "FA",     # Verifies files use from __future__ import annotations if a type is used in the module that can be rewritten using PEP 563.
   "F",      # pyflakes
+  "G",      # Better usage of built-in logging
   "I",      # isort - Import sorting
   "ISC",    # Encourage correct string literal concatenation.
   "LOG",    # Checks for issues using the standard library logging module.
@@ -47,6 +48,8 @@ select = [
   "TID",    # Helps you write tidier imports.
   "UP",     # pyupgrade
   "W",      # pycodestyle warnings
+  "PD",     # Opinionated linting for pandas
+  "S324",   # Check usage of insecure hashlib functions
 ]
 ignore = [
   "B008",    # Checks for function calls in default function arguments.
@@ -59,6 +62,8 @@ ignore = [
   "PYI051",  # Checks for redundant unions between a Literal and a builtin supertype of that Literal.
   "UP031",   # Checks for printf-style string formatting, and offers to replace it with str.format calls.
   "PLC0208", # Checks for iterations over set literals.
+  "G004",    # Checks for usage of f-strings in logging messages.
+  "PD901",   # Checks for usage of `df` variable name.
 ]
 # Do not lint files in tests, scripts, and vendor directory:
 exclude = [
@@ -68,8 +73,9 @@ exclude = [
 ]
 
 [lint.per-file-ignores]
-"e2e_playwright/**" = ["T20", "B018"]
+"e2e_playwright/**" = ["T20", "B018", "PD"]
 "lib/streamlit/__init__.py" = ["E402", "PLC0414"]
+"lib/tests/**" = ["PD"]
 
 [lint.flake8-tidy-imports]
 # Disallow all relative imports.

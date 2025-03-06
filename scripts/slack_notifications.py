@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,6 +63,17 @@ def send_notification():
         else:
             payload = {
                 "text": f":blobonfire: Release failed - <https://github.com/streamlit/streamlit/actions/runs/{run_id}|Link to run>"
+            }
+
+    if workflow == "assets":
+        if message_key == "new_icons":
+            payload = {
+                "text": f":symbols: New Material Symbols available. Please run `make update-material-icons` to update the material icons."
+            }
+
+        if message_key == "new_emojis":
+            payload = {
+                "text": f":symbols: New emojis available. Please run `./scripts/update_emojis.py` to update the emojis."
             }
 
     if payload:

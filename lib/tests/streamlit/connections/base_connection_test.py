@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -122,11 +122,16 @@ class BaseConnectionDefaultMethodTests(unittest.TestCase):
     def test_on_secrets_changed(self):
         conn = MockConnection("my_mock_connection")
 
-        with patch(
-            "streamlit.connections.base_connection.BaseConnection.reset"
-        ) as patched_reset, patch(
-            "streamlit.connections.base_connection.BaseConnection._secrets",
-            PropertyMock(return_value=AttrDict({"mock_connection": {"new": "secret"}})),
+        with (
+            patch(
+                "streamlit.connections.base_connection.BaseConnection.reset"
+            ) as patched_reset,
+            patch(
+                "streamlit.connections.base_connection.BaseConnection._secrets",
+                PropertyMock(
+                    return_value=AttrDict({"mock_connection": {"new": "secret"}})
+                ),
+            ),
         ):
             conn._on_secrets_changed("unused_arg")
             patched_reset.assert_called_once()

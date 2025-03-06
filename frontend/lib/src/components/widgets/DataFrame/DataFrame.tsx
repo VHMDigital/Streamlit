@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useMemo } from "react"
+import React, { memo, ReactElement, useCallback, useEffect } from "react"
 
+import { createPortal } from "react-dom"
 import {
   CompactSelection,
   DataEditorRef,
   DataEditor as GlideDataEditor,
   GridCell,
   Item as GridCellPosition,
+  GridColumn,
   GridMouseEventArgs,
   GridSelection,
+  Rectangle,
 } from "@glideapps/glide-data-grid"
 import { Resizable } from "re-resizable"
 import {
@@ -32,45 +35,45 @@ import {
   Delete,
   FileDownload,
   Search,
+  Visibility,
 } from "@emotion-icons/material-outlined"
 
-import { useFormClearHelper } from "@streamlit/lib/src/components/widgets/Form"
-import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
-import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
-import { Arrow as ArrowProto } from "@streamlit/lib/src/proto"
-import {
-  WidgetInfo,
-  WidgetStateManager,
-} from "@streamlit/lib/src/WidgetStateManager"
-import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
-import Toolbar, {
-  ToolbarAction,
-} from "@streamlit/lib/src/components/shared/Toolbar"
-import { LibContext } from "@streamlit/lib/src/components/core/LibContext"
-import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
-import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
-import { useDebouncedCallback } from "@streamlit/lib/src/hooks/useDebouncedCallback"
+import { Arrow as ArrowProto } from "@streamlit/protobuf"
 
+import { useFormClearHelper } from "~lib/components/widgets/Form"
+import { withFullScreenWrapper } from "~lib/components/shared/FullScreenWrapper"
+import { Quiver } from "~lib/dataframes/Quiver"
+import { WidgetInfo, WidgetStateManager } from "~lib/WidgetStateManager"
+import { isNullOrUndefined } from "~lib/util/utils"
+import Toolbar, { ToolbarAction } from "~lib/components/shared/Toolbar"
+import { LibContext } from "~lib/components/core/LibContext"
+import { ElementFullscreenContext } from "~lib/components/shared/ElementFullscreen/ElementFullscreenContext"
+import { useRequiredContext } from "~lib/hooks/useRequiredContext"
+import { useDebouncedCallback } from "~lib/hooks/useDebouncedCallback"
+
+import ColumnMenu from "./menus/ColumnMenu"
+import ColumnVisibilityMenu from "./menus/ColumnVisibilityMenu"
 import EditingState, { getColumnName } from "./EditingState"
 import {
+  useColumnFormatting,
   useColumnLoader,
+  useColumnPinning,
+  useColumnReordering,
   useColumnSizer,
   useColumnSort,
+  useColumnVisibility,
+  useCustomEditors,
   useCustomRenderer,
   useCustomTheme,
   useDataEditor,
   useDataExporter,
   useDataLoader,
+  useRowHover,
   useSelectionHandler,
   useTableSizer,
   useTooltips,
 } from "./hooks"
-import {
-  BaseColumn,
-  getTextCell,
-  ImageCellEditor,
-  toGlideColumn,
-} from "./columns"
+import { getTextCell, ImageCellEditor, toGlideColumn } from "./columns"
 import Tooltip from "./Tooltip"
 import { StyledResizableContainer } from "./styled-components"
 
@@ -106,7 +109,6 @@ export interface DataFrameProps {
   widgetMgr: WidgetStateManager
   disableFullscreenMode?: boolean
   fragmentId?: string
-  width: number
   height?: number
 }
 
@@ -140,6 +142,9 @@ function DataFrame({
 
   const gridTheme = useCustomTheme()
 
+  const { getRowThemeOverride, onItemHovered: handleRowHover } =
+    useRowHover(gridTheme)
+
   const {
     libConfig: { enforceDownloadInNewTab = false }, // Default to false, if no libConfig, e.g. for tests
   } = React.useContext(LibContext)
@@ -150,6 +155,14 @@ function DataFrame({
     React.useState<boolean>(false)
   const [hasHorizontalScroll, setHasHorizontalScroll] =
     React.useState<boolean>(false)
+  const [showMenu, setShowMenu] = React.useState<{
+    // The index number of the column that the menu is shown for:
+    columnIdx: number
+    // The bounds of the column header:
+    headerBounds: Rectangle
+  }>()
+  const [showColumnVisibilityMenu, setShowColumnVisibilityMenu] =
+    React.useState(false)
 
   // Determine if the device is primary using touch as input:
   const isTouchDevice = React.useMemo<boolean>(
@@ -179,7 +192,7 @@ function DataFrame({
 
   // Number of rows of the table minus 1 for the header row:
   const dataDimensions = data.dimensions
-  const originalNumRows = Math.max(0, dataDimensions.dataRows)
+  const originalNumRows = Math.max(0, dataDimensions.numDataRows)
 
   // For empty tables, we show an extra row that
   // contains "empty" as a way to indicate that the table is empty.
@@ -187,10 +200,15 @@ function DataFrame({
     originalNumRows === 0 &&
     // We don't show empty state for dynamic mode with a table that has
     // data columns defined.
-    !(element.editingMode === DYNAMIC && dataDimensions.dataColumns > 0)
+    !(element.editingMode === DYNAMIC && dataDimensions.numDataColumns > 0)
 
   // For large tables, we apply some optimizations to handle large data
   const isLargeTable = originalNumRows > LARGE_TABLE_ROWS_THRESHOLD
+  const isSortingEnabled =
+    !isLargeTable && !isEmptyTable && element.editingMode !== DYNAMIC
+
+  const isDynamicAndEditable =
+    !isEmptyTable && element.editingMode === DYNAMIC && !disabled
 
   const editingState = React.useRef<EditingState>(
     new EditingState(originalNumRows)
@@ -210,7 +228,22 @@ function DataFrame({
     setNumRows(editingState.current.getNumRows())
   }, [originalNumRows])
 
-  const { columns: originalColumns } = useColumnLoader(element, data, disabled)
+  const [columnOrder, setColumnOrder] = React.useState(element.columnOrder)
+
+  // Update the column order if the element.columnOrder value changes
+  // e.g. if the user has applied changes to the column order in the code.
+  React.useEffect(() => {
+    setColumnOrder(element.columnOrder)
+
+    // eslint-disable-next-line react-compiler/react-compiler
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [element.columnOrder.join(",")])
+
+  const {
+    columns: originalColumns,
+    allColumns,
+    setColumnConfigMapping,
+  } = useColumnLoader(element, data, disabled, columnOrder)
 
   /**
    * On the first rendering, try to load initial widget state if
@@ -506,24 +539,44 @@ function DataFrame({
       clearSelection
     )
 
-  const { tooltip, clearTooltip, onItemHovered } = useTooltips(
+  const {
+    tooltip,
+    clearTooltip,
+    onItemHovered: handleTooltips,
+  } = useTooltips(
     columns,
-    getCellContent
+    getCellContent,
+    // If dynamic editing is enabled, we need to ignore the last row (trailing row)
+    // because it would result in some undesired errors in the tooltips.
+    // The index are 0-based -> therefore, numRows will point to the trailing row
+    // (which is not part of the actual data).
+    isDynamicAndEditable ? [numRows] : []
   )
 
   const { drawCell, customRenderers } = useCustomRenderer(columns)
+  const { provideEditor } = useCustomEditors()
+  // Callback that can be used to configure the column menu for the columns
+  const configureColumnMenu = useCallback(
+    (column: GridColumn): GridColumn => {
+      return {
+        ...column,
+        hasMenu: !isEmptyTable,
+      }
+    },
+    [isEmptyTable]
+  )
 
+  // Convert columns from our structure into the glide-data-grid compatible structure
   const transformedColumns = React.useMemo(
-    () => columns.map(column => toGlideColumn(column)),
-    [columns]
+    () => columns.map(column => configureColumnMenu(toGlideColumn(column))),
+    [columns, configureColumnMenu]
   )
   const { columns: glideColumns, onColumnResize } =
     useColumnSizer(transformedColumns)
 
-  // data.columns refers to the header rows, and
-  // not the data columns. Not sure why it is named this way.
-  // To activate the group row feature, we need at least two header rows.
-  const usesGroupRow = data.columns.length > 1
+  // To activate the group row feature (multi-level headers),
+  // we need more than one header row.
+  const usesGroupRow = data.dimensions.numHeaderRows > 1
   const {
     minHeight,
     maxHeight,
@@ -537,7 +590,7 @@ function DataFrame({
     gridTheme,
     numRows,
     usesGroupRow,
-    containerWidth,
+    containerWidth || 0,
     containerHeight,
     isFullScreen
   )
@@ -568,33 +621,26 @@ function DataFrame({
 
   useFormClearHelper({ element, widgetMgr, onFormCleared })
 
-  const isDynamicAndEditable =
-    !isEmptyTable && element.editingMode === DYNAMIC && !disabled
-
-  // This is a simple heuristic to prevent the pinned columns
-  // from taking up too much space and prevent horizontal scrolling.
-  // Since its not easy to determine the current width of auto-sized columns,
-  // we just use 2x of the min column width as a fallback.
-  // The combined width of all pinned columns should not exceed 60%
-  // of the container width.
-  const isPinnedColumnsWidthTooLarge = useMemo(() => {
-    return (
-      columns
-        .filter((col: BaseColumn) => col.isPinned)
-        .reduce(
-          (acc, col) => acc + (col.width ?? gridTheme.minColumnWidth * 2),
-          0
-        ) >
-      containerWidth * 0.6
-    )
-  }, [columns, containerWidth, gridTheme.minColumnWidth])
-
-  // All pinned columns are expected to be moved to the beginning
-  // in useColumnLoader. So we can just count all pinned columns here.
-  const freezeColumns =
-    isEmptyTable || isPinnedColumnsWidthTooLarge
-      ? 0
-      : columns.filter((col: BaseColumn) => col.isPinned).length
+  const { pinColumn, unpinColumn, freezeColumns } = useColumnPinning(
+    columns,
+    isEmptyTable,
+    containerWidth || 0,
+    gridTheme.minColumnWidth,
+    clearSelection,
+    setColumnConfigMapping
+  )
+  const { changeColumnFormat } = useColumnFormatting(setColumnConfigMapping)
+  const { hideColumn, showColumn } = useColumnVisibility(
+    clearSelection,
+    setColumnConfigMapping
+  )
+  const { onColumnMoved } = useColumnReordering(
+    columns,
+    freezeColumns,
+    pinColumn,
+    unpinColumn,
+    setColumnOrder
+  )
 
   // Determine if the table requires horizontal or vertical scrolling:
   React.useEffect(() => {
@@ -625,6 +671,13 @@ function DataFrame({
       }
     }, 1)
   }, [resizableSize, numRows, glideColumns])
+
+  // Hide the column visibility menu if all columns are visible:
+  useEffect(() => {
+    if (allColumns.length == columns.length) {
+      setShowColumnVisibilityMenu(false)
+    }
+  }, [allColumns.length, columns.length])
 
   return (
     <StyledResizableContainer
@@ -683,7 +736,8 @@ function DataFrame({
         locked={
           (isRowSelected && !isRowSelectionActivated) ||
           isCellSelected ||
-          (isTouchDevice && isFocused)
+          (isTouchDevice && isFocused) ||
+          showColumnVisibilityMenu
         }
         onExpand={expand}
         onCollapse={collapse}
@@ -725,9 +779,28 @@ function DataFrame({
                 setIsFocused(true)
                 onRowAppended()
                 clearTooltip()
+                // Automatically scroll to the new row on the vertical axis:
+                dataEditorRef.current?.scrollTo(0, numRows, "vertical")
               }
             }}
           />
+        )}
+        {!isEmptyTable && allColumns.length > columns.length && (
+          <ColumnVisibilityMenu
+            columns={allColumns}
+            columnOrder={columnOrder}
+            setColumnOrder={setColumnOrder}
+            hideColumn={hideColumn}
+            showColumn={showColumn}
+            isOpen={showColumnVisibilityMenu}
+            onClose={() => setShowColumnVisibilityMenu(false)}
+          >
+            <ToolbarAction
+              label="Show/hide columns"
+              icon={Visibility}
+              onClick={() => setShowColumnVisibilityMenu(true)}
+            />
+          </ColumnVisibilityMenu>
         )}
         {!isLargeTable && !isEmptyTable && (
           <ToolbarAction
@@ -823,8 +896,16 @@ function DataFrame({
           rangeSelect={isTouchDevice ? "cell" : "rect"}
           columnSelect={"none"}
           rowSelect={"none"}
-          // Enable tooltips on hover of a cell or column header:
-          onItemHovered={onItemHovered}
+          // Enable interactive column reordering:
+          onColumnMoved={
+            // Column selection is not compatible with column reordering.
+            isColumnSelectionActivated ? undefined : onColumnMoved
+          }
+          // Enable tooltips and row hovering theme on hover of a cell or column header:
+          onItemHovered={(args: GridMouseEventArgs) => {
+            handleRowHover?.(args)
+            handleTooltips?.(args)
+          }}
           // Activate keybindings:
           keybindings={{ downFill: true }}
           // Search needs to be activated manually, to support search
@@ -842,8 +923,8 @@ function DataFrame({
             clearTooltip()
           }}
           // Header click is used for column sorting:
-          onHeaderClicked={(colIndex: number, _event) => {
-            if (isEmptyTable || isLargeTable || isColumnSelectionActivated) {
+          onHeaderClicked={(columnIdx: number, _event) => {
+            if (!isSortingEnabled || isColumnSelectionActivated) {
               // Deactivate sorting for empty state, for large dataframes, or
               // when column selection is activated.
               return
@@ -856,8 +937,12 @@ function DataFrame({
               // the same row after sorting, hover that would require us to map the selection
               // to the new index of the selected row which adds complexity.
               clearSelection()
+            } else {
+              // Cell selection are kept on the old position,
+              // which can be confusing. So we clear all cell selections before sorting.
+              clearSelection(true, true)
             }
-            sortColumn(colIndex)
+            sortColumn(columnIdx, "auto")
           }}
           gridSelection={gridSelection}
           // We don't have to react to "onSelectionCleared" since
@@ -879,6 +964,7 @@ function DataFrame({
             }
           }}
           theme={gridTheme.glideTheme}
+          getRowThemeOverride={getRowThemeOverride}
           onMouseMove={(args: GridMouseEventArgs) => {
             // Determine if the dataframe is focused or not
             if (args.kind === "out-of-bounds" && isFocused) {
@@ -905,6 +991,7 @@ function DataFrame({
                 : undefined,
             }),
           }}
+          provideEditor={provideEditor}
           // Apply custom rendering (e.g. for missing or required cells):
           drawCell={drawCell}
           // Add support for additional cells:
@@ -915,6 +1002,13 @@ function DataFrame({
           headerIcons={gridTheme.headerIcons}
           // Add support for user input validation:
           validateCell={validateCell}
+          // Open column context menu:
+          onHeaderMenuClick={(columnIdx, screenPosition) => {
+            setShowMenu({
+              columnIdx,
+              headerBounds: screenPosition,
+            })
+          }}
           // The default setup is read only, and therefore we deactivate paste here:
           onPaste={false}
           // Activate features required for row selection:
@@ -1003,8 +1097,68 @@ function DataFrame({
           clearTooltip={clearTooltip}
         ></Tooltip>
       )}
+      {showMenu &&
+        createPortal(
+          // A context menu that provides interactive features (sorting, pinning, show/hide)
+          // for a grid column.
+          <ColumnMenu
+            top={showMenu.headerBounds.y + showMenu.headerBounds.height}
+            left={showMenu.headerBounds.x + showMenu.headerBounds.width}
+            columnKind={originalColumns[showMenu.columnIdx].kind}
+            onCloseMenu={() => setShowMenu(undefined)}
+            onSortColumn={
+              isSortingEnabled
+                ? (direction: "asc" | "desc" | undefined) => {
+                    // Cell selection are kept on the old position,
+                    // which can be confusing. So we clear all cell selections before sorting.
+                    clearSelection(true, true)
+                    sortColumn(showMenu.columnIdx, direction, true)
+                  }
+                : undefined
+            }
+            isColumnPinned={originalColumns[showMenu.columnIdx].isPinned}
+            onUnpinColumn={() => {
+              unpinColumn(originalColumns[showMenu.columnIdx].id)
+            }}
+            onPinColumn={() => {
+              pinColumn(originalColumns[showMenu.columnIdx].id)
+            }}
+            onHideColumn={() => {
+              hideColumn(originalColumns[showMenu.columnIdx].id)
+            }}
+            onChangeFormat={(format: string) => {
+              changeColumnFormat(
+                originalColumns[showMenu.columnIdx].id,
+                format
+              )
+              // After changing the format, remeasure the column to ensure that
+              // the column width is updated to the new format.
+              // We need to apply a short timeout here to ensure that
+              // the column format already has been fully applied to all cells
+              // before we remeasure the column.
+              setTimeout(() => {
+                dataEditorRef.current?.remeasureColumns(
+                  CompactSelection.fromSingleSelection(showMenu.columnIdx)
+                )
+              }, 100)
+            }}
+            onAutosize={() => {
+              dataEditorRef.current?.remeasureColumns(
+                CompactSelection.fromSingleSelection(showMenu.columnIdx)
+              )
+            }}
+          />,
+          // We put the column menu into the portal element which is also
+          // used for the cell overlays. This allows us to correctly position
+          // the column menu also when the grid is used in a dialog, popover,
+          // or anything else that apply a transform (position fixed is influenced
+          // by the transform property of the parent element).
+          // The portal element is expected to always exist (-> PortalProvider).
+          document.querySelector("#portal") as HTMLElement
+        )}
     </StyledResizableContainer>
   )
 }
 
-export default withFullScreenWrapper(DataFrame)
+const DataFrameWithFullscreen = withFullScreenWrapper(DataFrame)
+export default memo(DataFrameWithFullscreen)

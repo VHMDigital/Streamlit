@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -102,6 +102,15 @@ random_str = str(random())
 clicked = st.download_button(label="Download random text", data=random_str)
 
 st.write(f"value: {clicked}")
+
+download_button_ignore_rerun = st.download_button(
+    "Download Button ignore rerun",
+    key="download_button_ignore_rerun",
+    data="do not ignore the data, ignore rerun :)",
+    file_name="ignore_click.txt",
+    on_click="ignore",
+)
+st.write("Ignore rerun download button value:", download_button_ignore_rerun)
 
 # st.session_state can only be used in streamlit
 if runtime.exists():

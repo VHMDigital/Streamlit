@@ -1,5 +1,5 @@
 /**!
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,5 +54,6 @@ message WidgetState {
     // String value that resets itself to empty after the script has been run.
     // This is used for the chat_input widget.
     StringTriggerValue string_trigger_value = 14;
+    ChatInputValue chat_input_value = 15;
   }
 }

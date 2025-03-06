@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-import { logWarning, notNullOrUndefined } from "@streamlit/lib"
+import { getLogger } from "loglevel"
+
+import { notNullOrUndefined } from "@streamlit/utils"
 
 const BLOB_TYPE = "video/webm"
+const LOG = getLogger("ScreenCastRecorder")
 
 interface ScreenCastRecorderOptions {
   recordAudio: boolean
@@ -105,12 +108,12 @@ class ScreenCastRecorder {
    */
   public start(): boolean {
     if (!this.mediaRecorder) {
-      logWarning(`ScreenCastRecorder.start: mediaRecorder is null`)
+      LOG.warn(`ScreenCastRecorder.start: mediaRecorder is null`)
       return false
     }
 
     const logRecorderError = (e: any): void => {
-      logWarning(`mediaRecorder.start threw an error: ${e}`)
+      LOG.warn(`mediaRecorder.start threw an error: ${e}`)
     }
 
     this.mediaRecorder.onerror = (e: any): void => {

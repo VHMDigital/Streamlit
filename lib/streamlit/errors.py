@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -96,6 +96,10 @@ class DuplicateWidgetID(StreamlitAPIException):
     pass
 
 
+class StreamlitAuthError(StreamlitAPIException):
+    pass
+
+
 class StreamlitDuplicateElementId(DuplicateWidgetID):
     """An exception raised when the auto-generated ID of an element is not unique."""
 
@@ -150,8 +154,7 @@ class StreamlitModuleNotFoundError(StreamlitAPIWarning):
 
     def __init__(self, module_name, *args):
         message = (
-            f'This Streamlit command requires module "{module_name}" '
-            "to be installed."
+            f'This Streamlit command requires module "{module_name}" to be installed.'
         )
         super().__init__(message, *args)
 
@@ -373,21 +376,23 @@ class StreamlitMissingPageLabelError(LocalizableStreamlitException):
 class StreamlitPageNotFoundError(LocalizableStreamlitException):
     """Exception raised the linked page can not be found."""
 
-    def __init__(self, page: str, main_script_directory: str, is_mpa_v2: bool):
+    def __init__(
+        self, page: str, main_script_directory: str, uses_pages_directory: bool
+    ):
         directory = os.path.basename(main_script_directory)
 
         message = (
-            "Could not find page: `{page}`. You must provide a file path "
-            "relative to the entrypoint file (from the directory `{directory}`). "
-            "Only the entrypoint file and files in the `pages/` directory are supported."
+            "Could not find page: `{page}`. You must provide a `StreamlitPage` "
+            "object or file path relative to the entrypoint file. Only pages "
+            "previously defined by `st.Page` and passed to `st.navigation` are "
+            "allowed."
         )
 
-        if is_mpa_v2:
+        if uses_pages_directory:
             message = (
-                "Could not find page: `{page}`. You must provide a `StreamlitPage` "
-                "object or file path relative to the entrypoint file. Only pages "
-                "previously defined by `st.Page` and passed to `st.navigation` are "
-                "allowed."
+                "Could not find page: `{page}`. You must provide a file path "
+                "relative to the entrypoint file (from the directory `{directory}`). "
+                "Only the entrypoint file and files in the `pages/` directory are supported."
             )
 
         super().__init__(

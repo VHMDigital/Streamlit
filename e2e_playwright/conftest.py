@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ from io import BytesIO
 from pathlib import Path
 from random import randint
 from tempfile import TemporaryFile
-from typing import TYPE_CHECKING, Any, Callable, Generator, Literal, Protocol
+from typing import TYPE_CHECKING, Any, Callable, Literal, Protocol
 from urllib import parse
 
 import pytest
@@ -57,7 +57,13 @@ from e2e_playwright.shared.performance import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
     from types import ModuleType
+
+
+# Used for static app testing
+class StaticPage(Page):
+    pass
 
 
 def pytest_configure(config: pytest.Config):
@@ -228,9 +234,17 @@ def app_port(worker_id: str) -> int:
     return find_available_port()
 
 
+@pytest.fixture(scope="module")
+def app_server_extra_args() -> list[str]:
+    """Fixture that returns extra arguments to pass to the Streamlit app server."""
+    return []
+
+
 @pytest.fixture(scope="module", autouse=True)
 def app_server(
-    app_port: int, request: FixtureRequest
+    app_port: int,
+    app_server_extra_args: list[str],
+    request: FixtureRequest,
 ) -> Generator[AsyncSubprocess, None, None]:
     """Fixture that starts and stops the Streamlit app server."""
     streamlit_proc = AsyncSubprocess(
@@ -252,6 +266,7 @@ def app_server(
             "none",
             "--server.enableStaticServing",
             "true",
+            *app_server_extra_args,
         ],
         cwd=".",
     )
@@ -269,6 +284,21 @@ def app_server(
 def app(page: Page, app_port: int) -> Page:
     """Fixture that opens the app."""
     page.goto(f"http://localhost:{app_port}/")
+    start_capture_traces(page)
+    wait_for_app_loaded(page)
+    return page
+
+
+@pytest.fixture(scope="function")
+def static_app(page: Page, app_port: int, request) -> Page:
+    """Fixture that opens the app."""
+    query_param = request.node.get_closest_marker("query_param")
+    query_string = query_param.args[0] if query_param else ""
+
+    # Indicate this is a StaticPage
+    page.__class__ = StaticPage
+
+    page.goto(f"http://localhost:{app_port}/{query_string}")
     start_capture_traces(page)
     wait_for_app_loaded(page)
     return page
@@ -368,9 +398,11 @@ def iframed_app(page: Page, app_port: int) -> IframedPage:
                 <body style="height: 100%;">
                     <iframe
                         src={src}
-                        id={_iframe_element_attrs.element_id
-                            if _iframe_element_attrs.element_id
-                            else ""}
+                        id={
+                _iframe_element_attrs.element_id
+                if _iframe_element_attrs.element_id
+                else ""
+            }
                         title="Iframed Streamlit App"
                         allow="clipboard-write; microphone;"
                         sandbox="allow-popups allow-same-origin allow-scripts allow-downloads"
@@ -725,7 +757,7 @@ def assert_snapshot(
 
         test_failure_messages.append(
             f"Snapshot mismatch for {snapshot_file_name} ({mismatch} pixels difference;"
-            f" {mismatch/total_pixels * 100:.2f}%)"
+            f" {mismatch / total_pixels * 100:.2f}%)"
         )
 
     yield compare
@@ -753,7 +785,8 @@ def playwright_profiling(request, page: Page):
 
 
 def wait_for_app_run(
-    page_or_locator: Page | Locator | FrameLocator, wait_delay: int = 100
+    page_or_locator: Page | Locator | FrameLocator,
+    wait_delay: int = 100,
 ):
     """Wait for the given page to finish running."""
     # Add a little timeout to wait for eventual debounce timeouts used in some widgets.
@@ -768,13 +801,24 @@ def wait_for_app_run(
 
     # if isinstance(page, Page):
     page.wait_for_timeout(155)
-    # Make sure that the websocket connection is established.
-    page_or_locator.locator(
-        "[data-testid='stApp'][data-test-connection-state='CONNECTED']"
-    ).wait_for(
-        timeout=25000,
-        state="attached",
-    )
+
+    if isinstance(page_or_locator, StaticPage):
+        # Check that static connection established.
+        page_or_locator.locator(
+            "[data-testid='stApp'][data-test-connection-state='STATIC_CONNECTED']"
+        ).wait_for(
+            timeout=25000,
+            state="attached",
+        )
+    else:
+        # Make sure that the websocket connection is established.
+        page_or_locator.locator(
+            "[data-testid='stApp'][data-test-connection-state='CONNECTED']"
+        ).wait_for(
+            timeout=25000,
+            state="attached",
+        )
+
     # Wait until we know the script has started. We determine this by checking
     # whether the app is in notRunning state. (The data-test-connection-state attribute
     # goes through the sequence "initial" -> "running" -> "notRunning").
@@ -790,18 +834,12 @@ def wait_for_app_run(
         page.wait_for_timeout(wait_delay)
 
 
-def wait_for_app_loaded(page: Page, embedded: bool = False):
+def wait_for_app_loaded(page: Page):
     """Wait for the app to fully load."""
     # Wait for the app view container to appear:
     page.wait_for_selector(
         "[data-testid='stAppViewContainer']", timeout=30000, state="attached"
     )
-
-    # Wait for the main menu to appear:
-    if not embedded:
-        page.wait_for_selector(
-            "[data-testid='stMainMenu']", timeout=20000, state="attached"
-        )
 
     wait_for_app_run(page)
 

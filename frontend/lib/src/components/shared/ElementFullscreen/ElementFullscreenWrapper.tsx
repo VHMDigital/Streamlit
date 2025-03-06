@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,28 @@ import React, { FC, PropsWithChildren, useMemo } from "react"
 
 import { useTheme } from "@emotion/react"
 
-import { StyledFullScreenFrame } from "@streamlit/lib/src/components/shared/FullScreenWrapper/styled-components"
-import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+import { StyledFullScreenFrame } from "~lib/components/shared/FullScreenWrapper/styled-components"
+import { ElementFullscreenContext } from "~lib/components/shared/ElementFullscreen/ElementFullscreenContext"
+import { EmotionTheme } from "~lib/theme"
+import { useResizeObserver } from "~lib/hooks/useResizeObserver"
 
 import { useFullscreen } from "./useFullscreen"
 
 type ElementFullscreenWrapperProps = PropsWithChildren<{
   height?: number
-  width: number
+  width?: number
 }>
 
 const ElementFullscreenWrapper: FC<ElementFullscreenWrapperProps> = ({
   children,
   height,
-  width,
 }) => {
   const theme: EmotionTheme = useTheme()
   const { expanded, fullHeight, fullWidth, zoomIn, zoomOut } = useFullscreen()
+  const {
+    values: [width],
+    elementRef,
+  } = useResizeObserver(useMemo(() => ["width"], []))
 
   const fullscreenContextValue = useMemo(() => {
     return {
@@ -50,6 +54,7 @@ const ElementFullscreenWrapper: FC<ElementFullscreenWrapperProps> = ({
   return (
     <ElementFullscreenContext.Provider value={fullscreenContextValue}>
       <StyledFullScreenFrame
+        ref={elementRef}
         isExpanded={expanded}
         data-testid="stFullScreenFrame"
         theme={theme}

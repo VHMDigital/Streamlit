@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import { MouseEvent, ReactNode } from "react"
 import styled, { CSSObject } from "@emotion/styled"
 import { darken, transparentize } from "color2k"
 
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+import { EmotionTheme } from "~lib/theme"
 
 export enum BaseButtonKind {
   PRIMARY = "primary",
@@ -55,8 +55,8 @@ export interface BaseButtonProps {
   size?: BaseButtonSize
   onClick?: (event: MouseEvent<HTMLButtonElement>) => any
   disabled?: boolean
-  // If true or number, the button should take up container's full width
-  fluidWidth?: boolean | number
+  // If true, the button should take up container's full width
+  fluidWidth?: boolean
   children: ReactNode
   autoFocus?: boolean
   "data-testid"?: string
@@ -89,9 +89,6 @@ function getSizeStyle(size: BaseButtonSize, theme: EmotionTheme): CSSObject {
 
 export const StyledBaseButton = styled.button<RequiredBaseButtonProps>(
   ({ fluidWidth, size, theme }) => {
-    const buttonWidth =
-      typeof fluidWidth == "number" ? `${fluidWidth}px` : "100%"
-
     return {
       display: "inline-flex",
       alignItems: "center",
@@ -106,7 +103,7 @@ export const StyledBaseButton = styled.button<RequiredBaseButtonProps>(
       fontSize: "inherit",
       fontFamily: "inherit",
       color: "inherit",
-      width: fluidWidth ? buttonWidth : "auto",
+      width: fluidWidth ? "100%" : "auto",
       cursor: "pointer",
       userSelect: "none",
       "&:focus": {
@@ -345,7 +342,6 @@ const StyledButtonGroupBaseButton = styled(
       overflow: "hidden",
     },
     "& p": {
-      fontSize: theme.fontSizes.sm,
       textOverflow: "ellipsis",
       overflow: "hidden",
     },
@@ -358,7 +354,6 @@ export const StyledPillsButton = styled(
   return {
     borderRadius: theme.radii.full,
     padding: `${theme.spacing.twoXS} ${theme.spacing.md}`,
-    gap: theme.spacing.xs,
   }
 })
 
@@ -540,6 +535,7 @@ export const StyledElementToolbarButton = styled(
     minHeight: "unset",
     // line height should be the same as the icon size
     lineHeight: theme.iconSizes.md,
+    width: "auto",
 
     "&:focus": {
       outline: "none",

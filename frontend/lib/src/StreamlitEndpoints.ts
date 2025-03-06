@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 import { CancelToken } from "axios"
 
-import { IAppPage } from "./proto"
+import { IAppPage } from "@streamlit/protobuf"
 
 export type FileUploadClientConfig = {
   prefix: string
@@ -25,6 +25,13 @@ export type FileUploadClientConfig = {
 
 /** Exposes non-websocket endpoints used by the frontend. */
 export interface StreamlitEndpoints {
+  /**
+   * Set the static config url for static connection media assets.
+   *
+   * @param url The URL to set.
+   */
+  setStaticConfigUrl(url: string): void
+
   /**
    * Return a URL to fetch data for the given custom component.
    * @param componentName The registered name of the component.

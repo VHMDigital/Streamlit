@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import { useMemo } from "react"
 
 import type { Locale } from "date-fns"
-import enUS from "date-fns/locale/en-US"
+import { enUS } from "date-fns/locale/en-US"
 
 /**
  * 1 = Monday, 7 = Sunday

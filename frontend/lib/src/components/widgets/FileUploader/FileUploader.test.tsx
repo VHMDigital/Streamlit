@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import React from "react"
 import { fireEvent, screen, waitFor, within } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 
-import { render } from "@streamlit/lib/src/test_util"
 import {
   FileUploader as FileUploaderProto,
   FileUploaderState as FileUploaderStateProto,
@@ -27,8 +26,11 @@ import {
   IFileURLs,
   LabelVisibilityMessage as LabelVisibilityMessageProto,
   UploadedFileInfo as UploadedFileInfoProto,
-} from "@streamlit/lib/src/proto"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+} from "@streamlit/protobuf"
+
+import { render } from "~lib/test_util"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
+import * as UseResizeObserver from "~lib/hooks/useResizeObserver"
 
 import FileUploader, { Props } from "./FileUploader"
 
@@ -65,7 +67,7 @@ const getProps = (
       maxUploadSizeMb: 50,
       ...elementProps,
     }),
-    width: 0,
+    width: 250,
     disabled: false,
     widgetMgr: new WidgetStateManager({
       sendRerunBackMsg: vi.fn(),
@@ -94,6 +96,14 @@ const getProps = (
 }
 
 describe("FileUploader widget tests", () => {
+  beforeEach(() => {
+    vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
+      elementRef: React.createRef(),
+      forceRecalculate: vitest.fn(),
+      values: [250],
+    })
+  })
+
   it("renders without crashing", () => {
     const props = getProps()
     render(<FileUploader {...props} />)

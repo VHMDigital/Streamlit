@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -88,6 +88,35 @@ if (
     st.write(
         "Scatter chart with selection_interval:", str(st.session_state.scatter_interval)
     )
+
+st.subheader("Scatter chart with selection_interval & tooltip")
+base = (
+    alt.Chart(cars)
+    .mark_point()
+    .encode(
+        x="Horsepower:Q",
+        y="Miles_per_Gallon:Q",
+        color=alt.condition(interval, "Origin:N", alt.value("lightgray")),
+        tooltip=["Horsepower", "Miles_per_Gallon"],
+    )
+)
+chart_interval = base.add_params(interval)
+# Set use_container_width=True for all charts so that the width is not dependent on Vega-lib updates.
+st.altair_chart(
+    chart_interval,
+    on_select="rerun",
+    key="scatter_interval_tooltip",
+    use_container_width=True,
+)
+if (
+    "scatter_interval_tooltip" in st.session_state
+    and len(st.session_state.scatter_interval_tooltip.selection) > 0
+):
+    st.write(
+        "Scatter chart with selection_interval & tooltip:",
+        str(st.session_state.scatter_interval_tooltip),
+    )
+
 
 # BAR CHART
 st.subheader("Bar chart with selection_point")

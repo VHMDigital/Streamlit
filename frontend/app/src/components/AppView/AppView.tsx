@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,22 @@
 
 import React, { ReactElement } from "react"
 
+import { StreamlitEndpoints } from "@streamlit/connection"
 import {
   AppRoot,
   BlockNode,
   ComponentRegistry,
   FileUploadClient,
   FormsData,
-  IAppPage,
   IGuestToHostMessage,
   LibContext,
-  Logo,
   Profiler,
   ScriptRunState,
-  StreamlitEndpoints,
   VerticalBlock,
   WidgetStateManager,
 } from "@streamlit/lib"
-import { ThemedSidebar } from "@streamlit/app/src/components/Sidebar"
+import { IAppPage, Logo } from "@streamlit/protobuf"
+import ThemedSidebar from "@streamlit/app/src/components/Sidebar"
 import EventContainer from "@streamlit/app/src/components/EventContainer"
 import {
   StyledLogo,

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ import React, { ReactElement, ReactNode, useCallback, useContext } from "react"
 
 import { StyledAction, StyledBody } from "baseui/card"
 
-import { BaseButton, BaseButtonKind, GitInfo, IGitInfo } from "@streamlit/lib"
+import { BaseButton, BaseButtonKind } from "@streamlit/lib"
+import { GitInfo, IGitInfo } from "@streamlit/protobuf"
 import { MetricsManager } from "@streamlit/app/src/MetricsManager"
-import {
-  DialogType,
-  PlainEventHandler,
-} from "@streamlit/app/src/components/StreamlitDialog/StreamlitDialog"
+import { PlainEventHandler } from "@streamlit/app/src/components/StreamlitDialog/StreamlitDialog"
+import { DialogType } from "@streamlit/app/src/components/StreamlitDialog/constants"
 import { AppContext } from "@streamlit/app/src/components/AppContext"
 import StreamlitLogo from "@streamlit/app/src/assets/svg/logo.svg"
 import Rocket from "@streamlit/app/src/assets/svg/rocket.svg"

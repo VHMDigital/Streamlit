@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@ export const StyledNavLinkContainer = styled.div({
 export interface StyledNavLinkProps {
   disabled: boolean
   isCurrentPage: boolean
-  // If true or number, the button should take up container's full width
-  fluidWidth?: boolean | number
+  // If true, the button should take up container's full width
+  fluidWidth?: boolean
 }
 
 export const StyledNavLink = styled.a<StyledNavLinkProps>(
   ({ disabled, isCurrentPage, fluidWidth, theme }) => ({
     textDecoration: "none",
-    width: typeof fluidWidth == "number" ? `${fluidWidth}px` : "fit-content",
+    width: fluidWidth ? "100%" : "fit-content",
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
