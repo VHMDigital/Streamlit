@@ -39,6 +39,7 @@ def test_link_button_display(themed_app: Page, assert_snapshot: ImageCompareFunc
     assert_snapshot(
         link_elements.nth(10), name="st_link_button-tertiary_container_width"
     )
+    assert_snapshot(link_elements.nth(11), name="st_link_button-help")
 
 
 def test_link_button_hover(themed_app: Page, assert_snapshot: ImageCompareFunction):
