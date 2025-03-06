@@ -24,6 +24,7 @@ import {
 } from "@streamlit/protobuf"
 
 import { mockTheme } from "~lib/mocks/mockTheme"
+import { toExportedTheme } from "~lib/theme"
 import { WidgetStateManager } from "~lib/WidgetStateManager"
 
 import {
@@ -162,7 +163,10 @@ describe("test componentUtils", () => {
           args,
           dfs: dataframeArgs,
           disabled,
-          theme: expect.any(Object),
+          theme: {
+            ...toExportedTheme(mockTheme.emotion),
+            font: mockTheme.emotion.genericFonts.bodyFont,
+          },
         },
         "*"
       )
