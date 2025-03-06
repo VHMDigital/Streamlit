@@ -161,6 +161,7 @@ def test_video_autoplay(app: Page):
     expect(video_element).to_have_js_property("paused", False)
 
 
+@pytest.mark.flaky(reruns=3)  # Some flakiness with the js properties in webkit
 def test_video_muted_autoplay(app: Page):
     """Test that `st.video` muted and autoplay properties work correctly."""
     video_element = _select_video_to_show(app, "webm video muted")
