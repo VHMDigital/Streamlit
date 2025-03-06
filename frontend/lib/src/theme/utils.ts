@@ -283,11 +283,11 @@ export const createEmotionTheme = (
     conditionalOverrides.showSidebarSeparator = showSidebarSeparator
   }
 
-  // Fallback to use configured body font if heading font is not set
-  if (notNullOrUndefined(headingFont)) {
-    genericFonts.headingFont = parseFont(headingFont)
-  } else if (notNullOrUndefined(bodyFont)) {
-    genericFonts.headingFont = parseFont(bodyFont)
+  const fontOverrides: any = {}
+  if (headingFont) {
+    fontOverrides.headingFont = parseFont(headingFont)
+  } else if (bodyFont) {
+    fontOverrides.headingFont = parseFont(bodyFont)
   }
 
   return {
@@ -301,6 +301,7 @@ export const createEmotionTheme = (
       ...(codeFont && {
         codeFont: parseFont(codeFont),
       }),
+      ...fontOverrides,
     },
     ...conditionalOverrides,
   }

@@ -282,16 +282,12 @@ describe("createTheme", () => {
     const customThemeConfig = new CustomThemeConfig({
       primaryColor: "red",
       secondaryBackgroundColor: "blue",
-      headingFont: "serif",
       bodyFont: "serif",
     })
     const customTheme = createTheme(CUSTOM_THEME_NAME, customThemeConfig)
     expect(customTheme.name).toBe(CUSTOM_THEME_NAME)
     expect(customTheme.emotion.colors.primary).toBe("red")
     expect(customTheme.emotion.colors.secondaryBg).toBe("blue")
-    expect(customTheme.emotion.genericFonts.headingFont).toBe(
-      lightTheme.emotion.fonts.serif
-    )
     expect(customTheme.emotion.genericFonts.bodyFont).toBe(
       lightTheme.emotion.fonts.serif
     )
@@ -305,7 +301,6 @@ describe("createTheme", () => {
     const customThemeConfig = new CustomThemeConfig({
       primaryColor: "red",
       secondaryBackgroundColor: "blue",
-      headingFont: "serif",
       bodyFont: "serif",
     })
     const customTheme = createTheme(
@@ -318,9 +313,6 @@ describe("createTheme", () => {
     expect(customTheme.name).toBe(CUSTOM_THEME_NAME)
     expect(customTheme.emotion.colors.primary).toBe("red")
     expect(customTheme.emotion.colors.secondaryBg).toBe("blue")
-    expect(customTheme.emotion.genericFonts.headingFont).toBe(
-      darkTheme.emotion.fonts.serif
-    )
     expect(customTheme.emotion.genericFonts.bodyFont).toBe(
       darkTheme.emotion.fonts.serif
     )
@@ -336,7 +328,6 @@ describe("createTheme", () => {
     const customThemeConfig = new CustomThemeConfig({
       primaryColor: "eee",
       secondaryBackgroundColor: "fc9231",
-      headingFont: "serif",
       bodyFont: "serif",
     })
     const customTheme = createTheme(
@@ -347,9 +338,6 @@ describe("createTheme", () => {
     expect(customTheme.name).toBe(CUSTOM_THEME_NAME)
     expect(customTheme.emotion.colors.primary).toBe("#eee")
     expect(customTheme.emotion.colors.secondaryBg).toBe("#fc9231")
-    expect(customTheme.emotion.genericFonts.headingFont).toBe(
-      customTheme.emotion.fonts.serif
-    )
     expect(customTheme.emotion.genericFonts.bodyFont).toBe(
       customTheme.emotion.fonts.serif
     )
@@ -585,7 +573,7 @@ describe("isColor", () => {
 describe("createEmotionTheme", () => {
   it("sets to light when matchMedia does not match dark", () => {
     const themeInput: Partial<CustomThemeConfig> = {
-      headingFont: "monospace",
+      headingFont: "serif",
       bodyFont: "monospace",
       codeFont: "monospace",
       primaryColor: "red",
@@ -600,7 +588,7 @@ describe("createEmotionTheme", () => {
     expect(theme.colors.bgColor).toBe("pink")
     expect(theme.colors.secondaryBg).toBe("blue")
     expect(theme.colors.bodyText).toBe("orange")
-    expect(theme.genericFonts.headingFont).toBe(theme.fonts.monospace)
+    expect(theme.genericFonts.headingFont).toBe(theme.fonts.serif)
     expect(theme.genericFonts.bodyFont).toBe(theme.fonts.monospace)
     expect(theme.genericFonts.codeFont).toBe(theme.fonts.monospace)
   })
@@ -625,6 +613,18 @@ describe("createEmotionTheme", () => {
     expect(theme.genericFonts.codeFont).toBe(
       baseTheme.emotion.genericFonts.codeFont
     )
+  })
+
+  it("uses bodyFont for headingFont when headingFont is not configured", () => {
+    const themeInput: Partial<CustomThemeConfig> = {
+      bodyFont: "monospace",
+      // headingFont is intentionally not set
+    }
+
+    const theme = createEmotionTheme(themeInput)
+
+    expect(theme.genericFonts.bodyFont).toBe(theme.fonts.monospace)
+    expect(theme.genericFonts.headingFont).toBe(theme.fonts.monospace)
   })
 
   it("adapts the radii theme props if baseRadius is provided", () => {
