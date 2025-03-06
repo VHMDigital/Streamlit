@@ -305,6 +305,7 @@ export const toThemeInput = (
     backgroundColor: colors.bgColor,
     secondaryBackgroundColor: colors.secondaryBg,
     textColor: colors.bodyText,
+    bodyFont: theme.genericFonts.bodyFont,
   }
 }
 
@@ -314,6 +315,7 @@ export type ExportedTheme = {
   backgroundColor: string
   secondaryBackgroundColor: string
   textColor: string
+  bodyFont: string
 } & DerivedColors
 
 export const toExportedTheme = (theme: EmotionTheme): ExportedTheme => {
@@ -328,7 +330,7 @@ export const toExportedTheme = (theme: EmotionTheme): ExportedTheme => {
     backgroundColor: themeInput.backgroundColor as string,
     secondaryBackgroundColor: themeInput.secondaryBackgroundColor as string,
     textColor: themeInput.textColor as string,
-
+    bodyFont: themeInput.bodyFont as string,
     base: bgColorToBaseString(themeInput.backgroundColor),
 
     ...computeDerivedColors(colors),
