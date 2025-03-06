@@ -24,7 +24,6 @@ import BaseButton, {
   BaseButtonTooltip,
   DynamicButtonLabel,
 } from "~lib/components/shared/BaseButton"
-import { Placement } from "~lib/components/shared/Tooltip"
 import { WidgetStateManager } from "~lib/WidgetStateManager"
 import { Box } from "~lib/components/shared/Base/styled-components"
 

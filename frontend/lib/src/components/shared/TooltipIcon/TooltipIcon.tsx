@@ -37,6 +37,7 @@ export interface TooltipIconProps {
   children?: ReactNode
   markdownProps?: Partial<StreamlitMarkdownProps>
   onMouseEnterDelay?: number
+  containerWidth?: boolean
 }
 
 function TooltipIcon({
@@ -47,8 +48,7 @@ function TooltipIcon({
   markdownProps,
   onMouseEnterDelay,
   containerWidth = false,
-}: // inline = true,
-TooltipIconProps): ReactElement {
+}: TooltipIconProps): ReactElement {
   const theme: EmotionTheme = useTheme()
   return (
     <StyledTooltipIconWrapper
@@ -67,7 +67,6 @@ TooltipIconProps): ReactElement {
         }
         placement={placement}
         onMouseEnterDelay={onMouseEnterDelay}
-        // inline={inline}
         inline
         containerWidth={containerWidth}
       >

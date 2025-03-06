@@ -22,7 +22,6 @@ import { PageLink as PageLinkProto } from "@streamlit/protobuf"
 
 import { DynamicIcon } from "~lib/components/shared/Icon"
 import { Placement } from "~lib/components/shared/Tooltip"
-import { Box } from "~lib/components/shared/Base/styled-components"
 import { BaseButtonTooltip } from "~lib/components/shared/BaseButton"
 import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
 import { EmotionTheme } from "~lib/theme"
