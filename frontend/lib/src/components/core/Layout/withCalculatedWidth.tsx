@@ -26,8 +26,7 @@ import { useResizeObserver } from "~lib/hooks/useResizeObserver"
  * used in legacy components that require the width prop.
  */
 export const withCalculatedWidth = <P extends { width?: number }>(
-  WrappedComponent: ComponentType<React.PropsWithChildren<P>>,
-  onlyRenderWhenObserved = false
+  WrappedComponent: ComponentType<React.PropsWithChildren<P>>
 ): ComponentType<Omit<P, "width">> => {
   const EnhancedComponent = (props: Omit<P, "width">): ReactElement => {
     const {
@@ -35,19 +34,9 @@ export const withCalculatedWidth = <P extends { width?: number }>(
       elementRef,
     } = useResizeObserver(useMemo(() => ["width"], []))
 
-    if (onlyRenderWhenObserved) {
-      return (
-        <Box ref={elementRef}>
-          {width ? (
-            <WrappedComponent {...(props as P)} width={width || -1} />
-          ) : null}
-        </Box>
-      )
-    }
-
     return (
       <Box ref={elementRef}>
-        <WrappedComponent {...(props as P)} width={width || -1} />
+        {width ? <WrappedComponent {...(props as P)} width={width} /> : null}
       </Box>
     )
   }
