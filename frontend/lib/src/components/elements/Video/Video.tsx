@@ -25,7 +25,6 @@ import { StyledVideoIframe } from "./styled-components"
 
 export interface VideoProps {
   endpoints: StreamlitEndpoints
-  width: number
   element: VideoProto
   elementMgr: ElementStateManager
 }
