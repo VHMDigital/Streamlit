@@ -1804,7 +1804,7 @@ export class App extends PureComponent<Props, State> {
   }
 
   getUrl = (): string => {
-    return document.location.href
+    return isInChildFrame() ? document.referrer : document.location.href
   }
 
   getQueryString = (): string => {
