@@ -165,6 +165,7 @@ describe("test componentUtils", () => {
           disabled,
           theme: {
             ...toExportedTheme(mockTheme.emotion),
+            // Should fill in the deprecated font property for backwards compatibility
             font: mockTheme.emotion.genericFonts.bodyFont,
           },
         },
