@@ -58,7 +58,7 @@ export function FormSubmitButton(props: Props): ReactElement {
         <BaseButton
           kind={kind}
           size={BaseButtonSize.SMALL}
-          fluidWidth={element.useContainerWidth || !!element.help}
+          containerWidth={element.useContainerWidth}
           disabled={disabled || hasInProgressUpload}
           onClick={() => {
             widgetMgr.submitForm(element.formId, fragmentId, element)

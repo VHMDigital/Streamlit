@@ -22,6 +22,7 @@ import { PageLink as PageLinkProto } from "@streamlit/protobuf"
 
 import { DynamicIcon } from "~lib/components/shared/Icon"
 import { Placement } from "~lib/components/shared/Tooltip"
+import { Box } from "~lib/components/shared/Base/styled-components"
 import { BaseButtonTooltip } from "~lib/components/shared/BaseButton"
 import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
 import { EmotionTheme } from "~lib/theme"
@@ -83,13 +84,17 @@ function PageLink(props: Readonly<Props>): ReactElement {
 
   return (
     <div className="stPageLink" data-testid="stPageLink">
-      <BaseButtonTooltip help={element.help} placement={Placement.TOP_RIGHT}>
+      <BaseButtonTooltip
+        help={element.help}
+        placement={Placement.TOP_RIGHT}
+        containerWidth={useContainerWidth}
+      >
         <StyledNavLinkContainer>
           <StyledNavLink
             data-testid="stPageLink-NavLink"
             disabled={disabled}
             isCurrentPage={isCurrentPage}
-            fluidWidth={useContainerWidth || !!element.help}
+            containerWidth={useContainerWidth}
             href={element.page}
             target={element.external ? "_blank" : ""}
             rel="noreferrer"

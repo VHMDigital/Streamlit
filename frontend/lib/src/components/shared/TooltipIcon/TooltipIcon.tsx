@@ -46,7 +46,9 @@ function TooltipIcon({
   children,
   markdownProps,
   onMouseEnterDelay,
-}: TooltipIconProps): ReactElement {
+  containerWidth = false,
+}: // inline = true,
+TooltipIconProps): ReactElement {
   const theme: EmotionTheme = useTheme()
   return (
     <StyledTooltipIconWrapper
@@ -65,7 +67,9 @@ function TooltipIcon({
         }
         placement={placement}
         onMouseEnterDelay={onMouseEnterDelay}
+        // inline={inline}
         inline
+        containerWidth={containerWidth}
       >
         {children || (
           <HelpCircleIcon
