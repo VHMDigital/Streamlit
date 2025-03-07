@@ -18,6 +18,7 @@ import unittest
 from unittest.mock import patch
 
 import numpy as np
+import pytest
 
 import streamlit as st
 from streamlit.errors import StreamlitAPIException
@@ -25,6 +26,7 @@ from streamlit.type_util import is_version_less_than
 from tests.delta_generator_test_case import DeltaGeneratorTestCase
 
 
+@pytest.mark.require_integration
 class BokehTest(DeltaGeneratorTestCase):
     """Test ability to marshall bokeh_chart protos."""
 

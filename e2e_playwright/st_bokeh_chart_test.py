@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.shared.app_utils import check_top_level_class
 
 
+@pytest.mark.skip(reason="Skipping bokeh since it enforces old dependencies.")
 def test_bokeh_chart(app: Page):
     """Test that st.bokeh_chart renders correctly."""
     bokeh_chart_elements = app.get_by_test_id("stBokehChart")
@@ -30,6 +32,7 @@ def test_bokeh_chart(app: Page):
     expect(bokeh_chart_elements.nth(3).locator("canvas").nth(0)).to_be_visible()
 
 
+@pytest.mark.skip(reason="Skipping bokeh since it enforces old dependencies.")
 def test_check_top_level_class(app: Page):
     """Check that the top level class is correctly set."""
     check_top_level_class(app, "stBokehChart")
