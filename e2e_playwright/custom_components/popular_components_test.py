@@ -141,3 +141,10 @@ def test_url_fragment(app: Page):
     _select_component(app, "urlFragment")
     _expect_no_exception(app)
     _expect_iframe_attached(app)
+
+
+def test_bokeh(app: Page):
+    """Test that the bokeh component renders"""
+    _select_component(app, "bokeh")
+    _expect_no_exception(app)
+    _expect_iframe_attached(app)

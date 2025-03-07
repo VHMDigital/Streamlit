@@ -191,6 +191,29 @@ def use_url_fragment():
     st.write(f"Current value: {current_value!r}")
 
 
+def use_bokeh():
+    from bokeh.plotting import figure
+    from streamlit_bokeh import streamlit_bokeh
+
+    # Data
+    x = [1, 2, 3, 4, 5]
+    y = [6, 7, 2, 4, 5]
+
+    # Create Bokeh figure
+    YOUR_BOKEH_FIGURE = figure(
+        title="Simple Line Example", x_axis_label="x", y_axis_label="y"
+    )
+    YOUR_BOKEH_FIGURE.line(x, y, legend_label="Trend", line_width=2)
+
+    # Render in Streamlit
+    streamlit_bokeh(
+        YOUR_BOKEH_FIGURE,
+        use_container_width=True,
+        theme="streamlit",
+        key="my_unique_key",
+    )
+
+
 # ---
 
 options: dict[str, Callable] = {
@@ -207,6 +230,7 @@ options: dict[str, Callable] = {
     "folium": use_folium,
     "optionMenu": use_option_menu,
     "urlFragment": use_url_fragment,
+    "bokeh": use_bokeh,
 }
 component_selection = st.selectbox("ComponentSelections", options=options.keys())
 if component_selection:
