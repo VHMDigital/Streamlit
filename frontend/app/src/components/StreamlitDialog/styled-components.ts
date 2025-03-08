@@ -15,7 +15,6 @@
  */
 
 import styled from "@emotion/styled"
-import { darken } from "color2k"
 import { ChevronLeft } from "react-feather"
 
 export const StyledShortcutLabel = styled.span({
