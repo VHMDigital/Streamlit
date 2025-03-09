@@ -277,7 +277,7 @@ jobs:
             const deployUrl = `https://share.streamlit.io/deploy?repository=streamlit/core-previews&branch=${previewBranch}&mainModule=E2E_Tester_🧪.py`;
 
             // Define the ready template once
-            const readyTemplate = "### ✅ PR preview is ready!\n\n" +
+            const readyTemplate = "### ✅ PR preview is ready! \n\n" +
                                  "| Name | Link |\n" +
                                  "| ---- | ---- |\n" +
                                  "| 📦 Wheel file | " + s3Url + " |\n" +
