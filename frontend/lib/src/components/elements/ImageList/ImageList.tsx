@@ -137,17 +137,22 @@ function ImageList({
           }
           return (
             <StyledImageContainer data-testid="stImageContainer" key={idx}>
-              {image.clickUrl ? (
-                <a
-                  href={image.clickUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+              {/* This div ensures consistent layout for images regardless of
+                whether they have click_url. Without it, images with and without anchor
+                tags may have different heights and/or styles. */}
+              <div>
+                {image.clickUrl ? (
+                  <a
+                    href={image.clickUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img {...imgProps} />
+                  </a>
+                ) : (
                   <img {...imgProps} />
-                </a>
-              ) : (
-                <img {...imgProps} />
-              )}
+                )}
+              </div>
               {image.caption && (
                 <StyledCaption data-testid="stImageCaption" style={imgStyle}>
                   <StreamlitMarkdown
