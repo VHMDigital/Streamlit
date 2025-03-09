@@ -41,10 +41,18 @@ class NumberInputTest(DeltaGeneratorTestCase):
         st.number_input("Label", value=0)
         c = self.get_delta_from_queue().new_element.number_input
         self.assertEqual(NumberInput.INT, c.data_type)
+        self.assertEqual(c.has_min, True)
+        self.assertEqual(c.min, JSNumber.MIN_SAFE_INTEGER)
+        self.assertEqual(c.has_max, True)
+        self.assertEqual(c.max, JSNumber.MAX_SAFE_INTEGER)
 
         st.number_input("Label", value=0.5)
         c = self.get_delta_from_queue().new_element.number_input
         self.assertEqual(NumberInput.FLOAT, c.data_type)
+        self.assertEqual(c.has_min, True)
+        self.assertEqual(c.min, JSNumber.MIN_NEGATIVE_VALUE)
+        self.assertEqual(c.has_max, True)
+        self.assertEqual(c.max, JSNumber.MAX_VALUE)
 
     def test_min_value_zero_sets_default_value(self):
         st.number_input("Label", 0, 10)
@@ -63,8 +71,6 @@ class NumberInputTest(DeltaGeneratorTestCase):
         )
         self.assertEqual(c.default, 0.0)
         self.assertEqual(c.HasField("default"), True)
-        self.assertEqual(c.has_min, False)
-        self.assertEqual(c.has_max, False)
         self.assertEqual(c.disabled, False)
         self.assertEqual(c.placeholder, "")
 
