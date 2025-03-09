@@ -591,3 +591,30 @@ class ImageProtoTest(DeltaGeneratorTestCase):
         el = self.get_delta_from_queue().new_element
         self.assertEqual(len(el.imgs.imgs), 1)
         self.assertEqual(el.imgs.imgs[0].url, img_url)
+
+    def test_image_with_invalid_click_url(self):
+        """Test st.image with an invalid click_url."""
+        img_url = "http://server/fake0.jpg"
+        click_url = "not_a_valid_url"
+
+        with self.assertRaises(StreamlitAPIException) as e:
+            st.image(img_url, click_url=click_url)
+
+        self.assertTrue(
+            "The click_url parameter must be a valid URL" in str(e.exception)
+        )
+
+    def test_image_with_atleast_one_invalid_click_url(self):
+        """Test st.image with at least one invalid click_url."""
+        img_urls = [
+            "http://server/fake0.jpg",
+            "http://server/fake1.jpg",
+        ]
+        click_urls = ["https://streamlit.io/", "not_a_valid_url"]
+
+        with self.assertRaises(StreamlitAPIException) as e:
+            st.image(img_urls, click_url=click_urls)
+
+        self.assertTrue(
+            "The click_url parameter must be a valid URL" in str(e.exception)
+        )
