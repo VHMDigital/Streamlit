@@ -347,6 +347,13 @@ def _4d_to_list_3d(array: npt.NDArray[Any]) -> list[npt.NDArray[Any]]:
     return [array[i, :, :, :] for i in range(array.shape[0])]
 
 
+def _validate_click_url(url: str | None) -> None:
+    if url is not None and not url_util.is_url(url):
+        raise StreamlitAPIException(
+            f"The click_url parameter must be a valid URL (got: {url})"
+        )
+
+
 def marshall_images(
     coordinates: str,
     image: ImageOrImageList,
@@ -445,6 +452,9 @@ def marshall_images(
             len(images),
         )
     )
+
+    for url in click_urls:
+        _validate_click_url(url)
 
     proto_imgs.width = int(width)
     # Each image in an image list needs to be kept track of at its own coordinates.
