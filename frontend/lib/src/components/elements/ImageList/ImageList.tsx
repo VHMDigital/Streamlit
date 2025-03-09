@@ -130,13 +130,24 @@ function ImageList({
       <StyledImageList className="stImage" data-testid="stImage">
         {element.imgs.map((iimage, idx): ReactElement => {
           const image = iimage as ImageProto
+          const imgProps = {
+            style: imgStyle,
+            src: endpoints.buildMediaURL(image.url),
+            alt: idx.toString(),
+          }
           return (
             <StyledImageContainer data-testid="stImageContainer" key={idx}>
-              <img
-                style={imgStyle}
-                src={endpoints.buildMediaURL(image.url)}
-                alt={idx.toString()}
-              />
+              {image.clickUrl ? (
+                <a
+                  href={image.clickUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img {...imgProps} />
+                </a>
+              ) : (
+                <img {...imgProps} />
+              )}
               {image.caption && (
                 <StyledCaption data-testid="stImageCaption" style={imgStyle}>
                   <StreamlitMarkdown
