@@ -363,7 +363,7 @@ def marshall_images(
     clamp: bool,
     channels: Channels = "RGB",
     output_format: ImageFormatOrAuto = "auto",
-    click_url: str | list[str] | None = None,
+    click_url: str | list[str | None] | None = None,
 ) -> None:
     """Fill an ImageListProto with a list of images and their captions.
     The images will be resized and reformatted as necessary.

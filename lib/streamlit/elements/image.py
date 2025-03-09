@@ -58,7 +58,7 @@ class ImageMixin:
         output_format: ImageFormatOrAuto = "auto",
         *,
         use_container_width: bool = False,
-        click_url: str | list[str] | None = None,
+        click_url: str | list[str | None] | None = None,
     ) -> DeltaGenerator:
         """Display an image or list of images.
 
