@@ -20,61 +20,44 @@ jobs:
     permissions:
       pull-requests: write
 
-    outputs:
-      comment-id: ${{ steps.initial-comment.outputs.comment-id }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      - name: Find existing comment
-        id: find-comment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number
-            });
-
-            const botComment = comments.find(comment =>
-              comment.user.login === 'github-actions[bot]' &&
-              (comment.body.includes('PR preview is building') ||
-               comment.body.includes('PR preview is ready'))
-            );
-
-            if (botComment) {
-              return { id: botComment.id, exists: true };
-            }
-
-            return { id: null, exists: false };
-
       - name: Create or update comment (Building)
         id: initial-comment
         uses: actions/github-script@v7
         with:
           script: |
-            // Define the building template once
+            // Define the building template
             const buildingTemplate = "### 🚧 PR preview is building...\n\n" +
                                     "| Name | Link |\n" +
                                     "| ---- | ---- |\n" +
                                     "| 📦 Wheel file | *Building...* |\n" +
                                     "| 🕹️ Deploy preview app | *Building...* |";
 
-            let commentBody;
-            let commentId;
-            const findResult = ${{ toJSON(steps.find-comment.outputs.result) }};
-            const findResultObj = JSON.parse(findResult || '{"exists": false, "id": null}');
+            // Find an existing comment; if it exists, we will udpate it
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            const botComment = comments.find(comment =>
+              comment.user.login === 'github-actions[bot]' &&
+              (comment.body.includes('PR preview is building') ||
+               comment.body.includes('PR preview is ready'))
+            );
 
-            if (findResultObj.exists && findResultObj.id) {
-              // Get the current comment content
+            let commentBody;
+
+            if (botComment) {
+              // Get the current comment content to check if it has links
               const { data: currentComment } = await github.rest.issues.getComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                comment_id: findResultObj.id
+                comment_id: botComment.id
               });
 
               // Check if the comment already has links (not just "Building...")
@@ -87,13 +70,13 @@ jobs:
               }
 
               // Update existing comment
-              const { data: updatedComment } = await github.rest.issues.updateComment({
+              await github.rest.issues.updateComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                comment_id: findResultObj.id,
+                comment_id: botComment.id,
                 body: commentBody
               });
-              commentId = updatedComment.id;
+              console.log('Updated existing comment with ID:', botComment.id);
             } else {
               // Create new comment with building template
               commentBody = buildingTemplate;
@@ -104,11 +87,8 @@ jobs:
                 issue_number: context.issue.number,
                 body: commentBody
               });
-              commentId = newComment.id;
+              console.log('Created new comment with ID:', newComment.id);
             }
-
-            // Explicitly set the output with the comment ID
-            return { 'comment-id': commentId.toString() };
 
   upload-whl:
     runs-on: ubuntu-latest
@@ -256,7 +236,7 @@ jobs:
 
   update-pr-comment:
     runs-on: ubuntu-latest
-    needs: [upload-whl, setup-preview, initial-pr-comment]
+    needs: [upload-whl, setup-preview]
     if: needs.upload-whl.outputs.enable-setup == 'true' && github.event_name == 'pull_request'
 
     permissions:
@@ -272,16 +252,25 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const commentId = '${{ needs.initial-pr-comment.outputs.comment-id }}';
+            // Find the existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
 
-            // Debug output to see what we're getting
-            console.log('Comment ID:', commentId);
+            const botComment = comments.find(comment =>
+              comment.user.login === 'github-actions[bot]' &&
+              (comment.body.includes('PR preview is building') ||
+               comment.body.includes('PR preview is ready'))
+            );
 
-            // Check if we have a valid comment ID
-            if (!commentId || commentId === 'undefined' || commentId === '') {
-              console.error('No valid comment ID found. Cannot update comment.');
-              return;
+            if (!botComment) {
+              throw new Error('No PR preview comment found. The initial comment job may have failed.');
             }
+
+            const commentId = botComment.id;
+            console.log('Found comment with ID:', commentId);
 
             const s3Url = '${{ needs.upload-whl.outputs.s3-url }}';
             const previewBranch = '${{ needs.upload-whl.outputs.preview-branch }}';
@@ -294,15 +283,10 @@ jobs:
                                  "| 📦 Wheel file | " + s3Url + " |\n" +
                                  "| 🕹️ Deploy preview app | [Deploy](" + deployUrl + ") |";
 
-            try {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: parseInt(commentId),
-                body: readyTemplate
-              });
-              console.log('Successfully updated comment with ID:', commentId);
-            } catch (error) {
-              console.error('Error updating comment:', error);
-              throw new Error(`Failed to update comment: ${error.message}`);
-            }
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: commentId,
+              body: readyTemplate
+            });
+            console.log('Successfully updated comment with ID:', commentId);
