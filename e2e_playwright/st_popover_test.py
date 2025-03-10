@@ -99,7 +99,11 @@ def test_popover_with_use_container_width(app: Page):
     # Check that the min width is stretched to the full container width:
     expect(popover_container).to_have_css("min-width", "704px")
 
-    # Check that this works when help is provided as well
+
+def test_popover_with_use_container_width_and_help(app: Page):
+    """Test that the popover container is correctly stretched to the button width
+    if `use_container_width=True` and `help` is provided."""
+    # Get the stretched popover container:
     popover_container = open_popover(app, "popover 9 (use_container_width) with help")
 
     expect(popover_container.get_by_test_id("stMarkdown")).to_have_text("Hello")
