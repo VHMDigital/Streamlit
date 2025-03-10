@@ -318,6 +318,11 @@ const NumberInput: React.FC<Props> = ({
   // Material icons need to be larger to render similar size of emojis, emojis need addtl margin
   const dynamicIconSize = isMaterialIcon ? "lg" : "base"
 
+  // TODO: Verify adjustment to breakpoint for icon
+  const numberInputControlBreakpoint = icon
+    ? theme.breakpoints.hideNumberInputControls + 32
+    : theme.breakpoints.hideNumberInputControls
+
   return (
     <div
       className="stNumberInput"
@@ -440,8 +445,7 @@ const NumberInput: React.FC<Props> = ({
           }}
         />
         {/* We only want to show the increment/decrement controls when there is sufficient room to display the value and these controls. */}
-        {/* TODO: Readjust breakpoint for icon */}
-        {width > theme.breakpoints.hideNumberInputControls && (
+        {width > numberInputControlBreakpoint && (
           <StyledInputControls>
             <StyledInputControl
               data-testid="stNumberInputStepDown"
