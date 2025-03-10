@@ -205,3 +205,46 @@ def test_pills_with_labels(app: Page):
     expect(markdown_el).not_to_be_visible()
     expect(markdown_el).to_have_css("display", "flex")
     expect(markdown_el).to_have_css("visibility", "hidden")
+
+
+def test_required_single_pills(app: Page):
+    """Test required single pills behavior."""
+    pills = get_button_group(app, "pills_required_single")
+    expect_markdown(app, "pills-required-single: Joy")
+
+    # Here, we switch between options in single select mode.
+    # We click a different option to validate the single select functionality.
+    # The new option should become selected, replacing the previous one.
+    get_pill_button(pills, "Anger").click()
+    wait_for_app_run(app)
+    expect_markdown(app, "pills-required-single: Anger")
+
+    # We then attempt to deselect the currently selected option,
+    # which should have no effect. The selection should remain unchanged.
+    get_pill_button(pills, "Anger").click()
+    wait_for_app_run(app)
+    expect_markdown(app, "pills-required-single: Anger")
+
+
+def test_required_multi_pills(app: Page):
+    """Test required multi pills behavior."""
+    pills = get_button_group(app, "pills_required_multi")
+    expect_markdown(app, "pills-required-multi: ['Joy']")
+
+    # Here, we select another option to validate the multi select functionality.
+    # The new option should be added to the selection (a total of 2).
+    get_pill_button(pills, "Anger").click()
+    wait_for_app_run(app)
+    expect_markdown(app, "pills-required-multi: ['Joy', 'Anger']")
+
+    # Let's now try to deselect one option.
+    # This should work since there are multiple selected
+    get_pill_button(pills, "Joy").click()
+    wait_for_app_run(app)
+    expect_markdown(app, "pills-required-multi: ['Anger']")
+
+    # But if we try to deselect the only selected option, this should
+    # have no effect since at least one selection is always required
+    get_pill_button(pills, "Anger").click()
+    wait_for_app_run(app)
+    expect_markdown(app, "pills-required-multi: ['Anger']")
