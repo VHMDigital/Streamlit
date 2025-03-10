@@ -85,9 +85,9 @@ const NumberInput: React.FC<Props> = ({
     formId: elementFormId,
     default: elementDefault,
     format: elementFormat,
+    min,
+    max,
   } = element
-  const min = element.hasMin ? element.min : -Infinity
-  const max = element.hasMax ? element.max : +Infinity
 
   const {
     values: [width],
@@ -202,6 +202,17 @@ const NumberInput: React.FC<Props> = ({
       updateFromProtobuf()
     } else {
       commitValue({ value, source: { fromUi: false } })
+    }
+
+    const numberInput = inputRef.current
+    if (numberInput) {
+      // Issue #8867: Disable wheel events on the input to avoid accidental changes
+      // caused by scrolling.
+      numberInput.addEventListener("wheel", e => e.preventDefault())
+
+      return () => {
+        numberInput.removeEventListener("wheel", e => e.preventDefault())
+      }
     }
 
     // I don't want to run this effect on every render, only on mount.
