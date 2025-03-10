@@ -276,7 +276,7 @@ jobs:
             const s3Url = '${{ needs.upload-whl.outputs.s3-url }}';
             const previewBranch = '${{ needs.upload-whl.outputs.preview-branch }}';
             const deployUrl = `https://share.streamlit.io/deploy?repository=streamlit/core-previews&branch=${previewBranch}&mainModule=E2E_Tester_🧪.py&subdomain=${previewBranch}`;
-            const viewUrl = `https://${previewBranch}.streamlit.app`
+            const viewUrl = `${previewBranch}.streamlit.app`;
 
             // Define the ready template once
             const readyTemplate = "### ✅ PR preview is ready!\n\n" +
@@ -284,7 +284,7 @@ jobs:
                                  "| :----: | ---- |\n" +
                                  "| 📦 Wheel file | " + s3Url + " |\n" +
                                  "| ☁️ Deploy app | [Deploy on Community Cloud](" + deployUrl + ") |\n" +
-                                 "| 🕹️ View app | " + viewUrl + " |";
+                                 "| 🕹️ View app | [" + viewUrl + "](https://" + viewUrl + ") |";
 
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
