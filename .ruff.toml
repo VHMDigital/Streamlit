@@ -76,8 +76,6 @@ ignore = [
 exclude = [
   # pympler is a vendored dependency that doesn't conform to our linting rules:
   "lib/streamlit/vendor/**",
-  # This is causing some issues
-
 ]
 
 [lint.per-file-ignores]
