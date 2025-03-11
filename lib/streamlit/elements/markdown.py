@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, cast
+from typing import TYPE_CHECKING, Final, Literal, cast
 
 from streamlit.proto.Markdown_pb2 import Markdown as MarkdownProto
 from streamlit.runtime.metrics_util import gather_metrics
@@ -312,59 +312,65 @@ class MarkdownMixin:
     @gather_metrics("badge")
     def badge(
         self,
-        label: str | list[str],
-        icon: str | list[str],
-        color: str | list[str],
+        label: str,
+        *,  # keyword-only arguments:
+        icon: str | None = None,
+        color: Literal[
+            "blue",
+            "green",
+            "orange",
+            "red",
+            "violet",
+            "gray",
+            "grey",
+            "rainbow",
+            "primary",
+        ] = "blue",
     ) -> DeltaGenerator:
-        """Display one or multiple colored badges with an icon and label.
+        """Display a colored badge with an icon and label.
+
+        This is a convenience wrapper around
+        `st.markdown(f":small[:{color}-background[:{color}[{icon} {label}]]]")`.
 
         Parameters
         ----------
-        label : str or list of str
-            The text to display in the badge(s).
-        icon : str or list of str
-            The icon name(s) to display, in the format ":material/icon_name:".
-        color : str or list of str
-            The color(s) to use for the badge(s). Supported colors are: blue, green,
+        label : str
+            The text to display in the badge.
+
+        icon : str or None
+            An optional emoji or icon to display next to the badge label. If
+            ``icon`` is ``None`` (default), no icon is displayed. If ``icon``
+            is a string, the following options are valid:
+
+            - A single-character emoji. For example, you can set ``icon="🚨"``
+              or ``icon="🔥"``. Emoji short codes are not supported.
+
+            - An icon from the Material Symbols library (rounded style) in the
+              format ``":material/icon_name:"`` where "icon_name" is the name
+              of the icon in snake case.
+
+              For example, ``icon=":material/thumb_up:"`` will display the
+              Thumb Up icon. Find additional icons in the `Material Symbols \
+              <https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Rounded>`_
+              font library.
+
+        color : str
+            The color to use for the badge. Supported colors are: blue, green,
             orange, red, violet, gray/grey, rainbow, primary.
 
         Examples
         --------
         >>> import streamlit as st
         >>>
-        >>> # Single badge
-        >>> st.badge("Home", ":material/home:", "blue")
+        >>> # Simple badge
+        >>> st.badge("Home")
         >>>
-        >>> # Multiple badges
-        >>> st.badge(
-        ...     ["Home", "Success", "Warning"],
-        ...     [":material/home:", ":material/check:", ":material/warning:"],
-        ...     ["blue", "green", "red"],
-        ... )
+        >>> # Badge with icon and color
+        >>> st.badge("Success", icon=":material/check:", color="green")
         """
         badge_proto = MarkdownProto()
-
-        # Convert inputs to lists if they're single values
-        labels = [label] if isinstance(label, str) else label
-        icons = [icon] if isinstance(icon, str) else icon
-        colors = (
-            [color]
-            if isinstance(color, str)
-            else [color] * len(labels)
-            if isinstance(color, str)
-            else list(color)
-        )
-
-        # Validate inputs
-        if not (len(labels) == len(icons) == len(colors)):
-            raise ValueError("All inputs must have the same length")
-
-        # Generate badge markdown
-        badges = [
-            f":small[:{c}-background[:{c}[{i} {l}]]]"
-            for l, i, c in zip(labels, icons, colors)
-        ]
-        badge_proto.body = " &nbsp; ".join(badges)
+        icon_str = icon + " " if icon else ""
+        badge_proto.body = f":small[:{color}-background[:{color}[{icon_str}{label}]]]"
         badge_proto.element_type = MarkdownProto.Type.NATIVE
         return self.dg._enqueue("markdown", badge_proto)
 
