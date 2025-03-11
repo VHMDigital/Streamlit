@@ -18,14 +18,13 @@ from __future__ import annotations
 import os
 import signal
 import subprocess
-from typing import Optional
 
 import pytest
 
 CONFIG_FILE_PATH: str
 CREDENTIALS_FILE_PATH: str
 REPO_ROOT: str
-STREAMLIT_RELEASE_VERSION: Optional[str]
+STREAMLIT_RELEASE_VERSION: str | None
 
 
 class TestCLIRegressions:
@@ -151,11 +150,11 @@ class TestCLIRegressions:
         return output_one, output_two
 
     @pytest.mark.skipif(
-        bool(os.environ.get("SKIP_VERSION_CHECK", False)) == True,
+        bool(os.environ.get("SKIP_VERSION_CHECK", False)) is True,
         reason="Skip version verification when `SKIP_VERSION_CHECK` env var is set",
     )
     def test_streamlit_version(self):
-        assert STREAMLIT_RELEASE_VERSION != None and STREAMLIT_RELEASE_VERSION != "", (
+        assert STREAMLIT_RELEASE_VERSION is not None and STREAMLIT_RELEASE_VERSION != "", (
             "You must set the $STREAMLIT_RELEASE_VERSION env variable"
         )
         assert STREAMLIT_RELEASE_VERSION in self.run_command("streamlit version"), (
