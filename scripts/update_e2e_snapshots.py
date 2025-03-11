@@ -15,17 +15,19 @@
 
 """Update e2e snapshots."""
 
-import os
-import sys
-import subprocess
-import requests
-import tempfile
-import shutil
-import zipfile
-import argparse
-from typing import Any, Dict, List
-import time
+from __future__ import annotations
 
+import argparse
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+import zipfile
+from typing import Any, Dict, List
+
+import requests
 
 SNAPSHOT_UPDATE_FOLDER = "snapshot-updates"
 GITHUB_OWNER = "streamlit"

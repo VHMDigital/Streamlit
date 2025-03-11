@@ -19,6 +19,8 @@ out and exit with an error code. If all dependencies have acceptable licenses,
 exit normally.
 """
 
+from __future__ import annotations
+
 import json
 import subprocess
 import sys

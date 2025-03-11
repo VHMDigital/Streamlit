@@ -19,6 +19,8 @@
 The streamlit-nightly CI job uses this to set the project name to "streamlit-nightly".
 """
 
+from __future__ import annotations
+
 import fileinput
 import os
 import re

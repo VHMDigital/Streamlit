@@ -22,6 +22,8 @@ If any script exits with a non-zero status, this will also exit
 with a non-zero status.
 """
 
+from __future__ import annotations
+
 import multiprocessing
 import os
 import subprocess

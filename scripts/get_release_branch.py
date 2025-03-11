@@ -15,6 +15,8 @@
 
 """Retrieve the branch name from the release PR"""
 
+from __future__ import annotations
+
 import requests
 
 
