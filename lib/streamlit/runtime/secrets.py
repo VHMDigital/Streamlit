@@ -292,7 +292,7 @@ class Secrets(Mapping[str, Any]):
                 error_msg = secret_error_messages_singleton.get_subfolder_path_is_not_a_folder_message(
                     sub_folder_path
                 )
-                raise ValueError(error_msg)
+                raise StreamlitSecretNotFoundError(error_msg)
             sub_secrets = {}
 
             for filename in os.listdir(sub_folder_path):
