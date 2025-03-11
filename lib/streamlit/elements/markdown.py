@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Final, Literal, cast
 
 from streamlit.proto.Markdown_pb2 import Markdown as MarkdownProto
 from streamlit.runtime.metrics_util import gather_metrics
-from streamlit.string_util import clean_text
+from streamlit.string_util import clean_text, validate_icon_or_emoji
 from streamlit.type_util import SupportsStr, is_sympy_expression
 
 if TYPE_CHECKING:
@@ -368,8 +368,12 @@ class MarkdownMixin:
         >>> # Badge with icon and color
         >>> st.badge("Success", icon=":material/check:", color="green")
         """
+        if icon is not None:
+            icon_str = validate_icon_or_emoji(icon) + " "
+        else:
+            icon_str = ""
+
         badge_proto = MarkdownProto()
-        icon_str = icon + " " if icon else ""
         badge_proto.body = f":small[:{color}-background[:{color}[{icon_str}{label}]]]"
         badge_proto.element_type = MarkdownProto.Type.NATIVE
         return self.dg._enqueue("markdown", badge_proto)
