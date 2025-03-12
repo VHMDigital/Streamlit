@@ -389,6 +389,9 @@ def main_init(directory: str | None = None):
     (project_dir / "streamlit_app.py").write_text("""import streamlit as st
 
 st.title("🎈 My new app")
+st.write(
+    "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
+)
 """)
 
     rel_path_str = str(directory) if directory else "."
