@@ -80,7 +80,13 @@ class MarkdownMixin:
               primary accent color unless you set the ``theme.primaryColor``
               configuration option.
 
+            - Colored badges, using the syntax ``:color-badge[text in the badge]``.
+              Supported colors are: blue, green, orange, red, violet, gray/grey,
+              or primary. For example, you can use ``:orange-badge[your text here]``
+              or ``:blue-badge[your text here]``.
+
             - Small text, using the syntax ``:small[text to show small]``.
+
 
         unsafe_allow_html : bool
             Whether to render HTML within ``body``. If this is ``False``
@@ -320,7 +326,10 @@ class MarkdownMixin:
 
         color : str
             The color to use for the badge. Supported colors are: blue, green,
-            orange, red, violet, gray/grey, rainbow, primary.
+            orange, red, violet, gray/grey, primary.
+            If you use "primary" for color, Streamlit will use the default
+            primary accent color unless you set the ``theme.primaryColor``
+            configuration option.
 
         Examples
         --------
@@ -334,7 +343,7 @@ class MarkdownMixin:
         >>>
         >>> # Multiple badges side by side in Markdown
         >>> st.markdown(
-        ...     "Here are some badges: :yellow-badge[⭐️ Favorite] :blue-badge[🏠 Home] :green-badge[✅ Success]"
+        ...     "Here are some badges: :orange-badge[⭐️ Favorite] :blue-badge[🏠 Home] :green-badge[✅ Success]"
         ... )
         """
         if icon is not None:

@@ -420,6 +420,18 @@ export function RenderedMarkdown({
         const badgeMatch = nodeName.match(/^(.+)-badge$/)
         if (badgeMatch && colorMapping.has(badgeMatch[1])) {
           const color = badgeMatch[1]
+
+          // rainbow-badge is not supported because the rainbow text effect uses
+          // background-clip: text with a transparent color, which conflicts with
+          // having a background color for the badge.
+          // We *could* support it by using a nested span structure, but that breaks
+          // the material icon handling below.
+          // We can support that in the future if we want to, but I think a
+          // rainbow-colored badge shouldn't be a common use case anyway.
+          if (color === "rainbow") {
+            return
+          }
+
           const textColor = colorMapping.get(color)
           const bgColor = colorMapping.get(`${color}-background`)
 
@@ -428,22 +440,7 @@ export function RenderedMarkdown({
             data.hName = "span"
             data.hProperties = data.hProperties || {}
             data.hProperties.className = "has-background-color"
-            data.hProperties.style = `${bgColor}`
-
-            // We use a nested structure here to ensure that the rainbow text and
-            // background are visible simultaneously (since the rainbow text
-            // uses a background image, which conflicts with the background color).
-            data.hChildren = [
-              {
-                type: "element",
-                tagName: "span",
-                properties: {
-                  style: `${textColor}; font-size: ${theme.fontSizes.sm}; white-space: nowrap;`,
-                },
-                children: node.children,
-              },
-            ]
-            node.children = []
+            data.hProperties.style = `${bgColor}; ${textColor}; font-size: ${theme.fontSizes.sm}; white-space: nowrap;`
             return
           }
         }
@@ -502,7 +499,6 @@ export function RenderedMarkdown({
                 userSelect: "none",
                 verticalAlign: "bottom",
                 whiteSpace: "nowrap",
-                wordWrap: "normal",
               },
             },
             hChildren: [{ type: "text", value: iconName }],
