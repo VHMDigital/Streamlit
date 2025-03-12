@@ -439,8 +439,8 @@ export function RenderedMarkdown({
             const data = node.data || (node.data = {})
             data.hName = "span"
             data.hProperties = data.hProperties || {}
-            data.hProperties.className = "has-background-color"
-            data.hProperties.style = `${bgColor}; ${textColor}; font-size: ${theme.fontSizes.sm}; white-space: nowrap;`
+            data.hProperties.className = "is-badge"
+            data.hProperties.style = `${bgColor}; ${textColor}; font-size: ${theme.fontSizes.sm};`
             return
           }
         }
@@ -457,8 +457,7 @@ export function RenderedMarkdown({
             style &&
             (/background-color:/.test(style) || /background:/.test(style))
           ) {
-            data.hProperties.className =
-              (data.hProperties.className || "") + " has-background-color"
+            data.hProperties.className = "has-background-color"
           }
           return
         }
