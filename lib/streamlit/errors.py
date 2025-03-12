@@ -338,7 +338,7 @@ class StreamlitValueAboveMaxError(LocalizableStreamlitException):
 
     def __init__(self, value: int | float, max_value: int | float):
         super().__init__(
-            "The `value` {value} is greater than than the `max_value` {max_value}.",
+            "The `value` {value} is greater than the `max_value` {max_value}.",
             value=value,
             max_value=max_value,
         )
@@ -450,3 +450,10 @@ class StreamlitBadTimeStringError(LocalizableStreamlitException):
             "`'1d2h34m'` or `2 days`, for example. Got: {time_string}",
             time_string=time_string,
         )
+
+
+class StreamlitSecretNotFoundError(LocalizableStreamlitException, FileNotFoundError):
+    """Exception raised when a secret cannot be found or parsed in the secrets.toml file."""
+
+    def __init__(self, message: str):
+        super().__init__(message)
