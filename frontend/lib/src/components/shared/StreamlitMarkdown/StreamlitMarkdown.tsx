@@ -428,7 +428,7 @@ export function RenderedMarkdown({
             data.hName = "span"
             data.hProperties = data.hProperties || {}
             data.hProperties.className = "has-background-color"
-            data.hProperties.style = `${bgColor}; font-size: ${theme.fontSizes.sm}; white-space: nowrap;`
+            data.hProperties.style = `${bgColor}`
 
             // We use a nested structure here to ensure that the rainbow text and
             // background are visible simultaneously (since the rainbow text
@@ -438,7 +438,7 @@ export function RenderedMarkdown({
                 type: "element",
                 tagName: "span",
                 properties: {
-                  style: `${textColor}`,
+                  style: `${textColor}; font-size: ${theme.fontSizes.sm}; white-space: nowrap;`,
                 },
                 children: node.children,
               },
