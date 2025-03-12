@@ -179,10 +179,7 @@ with st.container(key="latex_elements"):
 
     st.latex(out)
 
-
-st.markdown(
-    "Images in markdown should stay inside the container width:\n\n![image](./app/static/streamlit-logo.png)"
-)
+"---"
 
 with st.container(key="badge_elements"):
     st.badge("Simple badge")
@@ -194,6 +191,14 @@ with st.container(key="badge_elements"):
     st.markdown(
         ":blue-badge[Blue markdown badge] :green-badge[🌱 Green markdown badge]"
     )
+
+"---"
+
+st.markdown(
+    "Images in markdown should stay inside the container width:\n\n![image](./app/static/streamlit-logo.png)"
+)
+
+"---"
 
 st.container(key="mixed_markdown").markdown(
     r"""
