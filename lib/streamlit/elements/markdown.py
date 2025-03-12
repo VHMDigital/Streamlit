@@ -351,8 +351,11 @@ class MarkdownMixin:
         else:
             icon_str = ""
 
+        # Escape [ and ] characters in the label to prevent breaking the directive syntax
+        escaped_label = label.replace("[", "\\[").replace("]", "\\]")
+
         badge_proto = MarkdownProto()
-        badge_proto.body = f":{color}-badge[{icon_str}{label}]"
+        badge_proto.body = f":{color}-badge[{icon_str}{escaped_label}]"
         badge_proto.element_type = MarkdownProto.Type.NATIVE
         return self.dg._enqueue("markdown", badge_proto)
 
