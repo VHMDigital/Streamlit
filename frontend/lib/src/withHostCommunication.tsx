@@ -1,4 +1,4 @@
-/**!
+/**
  * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-syntax = "proto3";
-
-option java_package = "com.snowflake.apps.streamlit";
-option java_outer_classname = "BokehChartProto";
-
-message BokehChart {
-  // A JSON-formatted string from the Bokeh chart figure.
-  string figure = 1;
-
-  // If True, will overwrite the chart width spec to fit to container.
-  bool use_container_width = 2;
-
-  // A unique ID of this element.
-  string element_id = 3;
-
-  // Alternative text for screen readers.
-  string alt_text = 4;
-}
+  case "arrowTable": {
+    const quiver = new Quiver(element.arrowTable)
+    return (
+      <ArrowTable
+        element={quiver}
+        altText={element.arrowTable.alt_text}
+      />
+    )
+  }

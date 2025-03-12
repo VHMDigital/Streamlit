@@ -116,6 +116,7 @@ const ArrowVegaLiteChart: FC<Props> = ({
         useContainerWidth={element.useContainerWidth}
         isFullScreen={isFullScreen}
         ref={containerRef}
+        aria-label={element.altText || "Vega-Lite chart"}
       />
     </StyledToolbarElementContainer>
   )
