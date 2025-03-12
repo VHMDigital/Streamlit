@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,22 +21,24 @@ import { screen, within } from "@testing-library/react"
 import {
   AppRoot,
   BlockNode,
-  Block as BlockProto,
   ComponentRegistry,
   createFormsData,
-  Element,
   ElementNode,
   FileUploadClient,
-  ForwardMsgMetadata,
-  Logo as LogoProto,
   makeElementWithInfoText,
   mockEndpoints,
   mockSessionInfo,
-  PageConfig,
   render,
   ScriptRunState,
   WidgetStateManager,
 } from "@streamlit/lib"
+import {
+  Block as BlockProto,
+  Element,
+  ForwardMsgMetadata,
+  Logo as LogoProto,
+  PageConfig,
+} from "@streamlit/protobuf"
 import {
   AppContext,
   Props as AppContextProps,
@@ -67,6 +69,8 @@ function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
     showColoredLine: false,
     pageLinkBaseUrl: "",
     sidebarChevronDownshift: 0,
+    gitInfo: null,
+    appConfig: {},
     ...context,
   }
 }

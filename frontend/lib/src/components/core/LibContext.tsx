@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 import React from "react"
 
-import { baseTheme, ThemeConfig } from "@streamlit/lib/src/theme"
+import { baseTheme, ThemeConfig } from "~lib/theme"
 
 /**
  * The lib config contains various configurations that the host platform can

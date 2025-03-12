@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 # limitations under the License.
 
 """Retrieve the branch name from the release PR"""
+
+from __future__ import annotations
 
 import requests
 
@@ -35,7 +37,7 @@ def get_release_branch():
     # Response is in an array, must map over each pull (dict)
     for pull in response:
         ref = check_for_release_pr(pull)
-        if ref != None:
+        if ref is not None:
             return ref
 
 

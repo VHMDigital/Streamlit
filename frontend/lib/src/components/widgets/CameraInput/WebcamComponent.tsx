@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ import { useTheme } from "@emotion/react"
 import { isMobile } from "react-device-detect"
 import Webcam from "react-webcam"
 
-import { debounce } from "@streamlit/lib/src/util/utils"
-import Icon from "@streamlit/lib/src/components/shared/Icon"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
-import themeColors from "@streamlit/lib/src/theme/emotionBaseTheme/themeColors"
-import { CAMERA_PERMISSION_URL } from "@streamlit/lib/src/urls"
+import { debounce } from "~lib/util/utils"
+import Icon from "~lib/components/shared/Icon"
+import { EmotionTheme } from "~lib/theme"
+import themeColors from "~lib/theme/emotionBaseTheme/themeColors"
+import { CAMERA_PERMISSION_URL } from "~lib/urls"
 
 import CameraInputButton from "./CameraInputButton"
 import SwitchFacingModeButton, { FacingMode } from "./SwitchFacingModeButton"

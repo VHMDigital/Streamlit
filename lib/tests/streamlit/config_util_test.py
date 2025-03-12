@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -210,15 +210,15 @@ class ConfigUtilTest(unittest.TestCase):
             "# This option's description starts from third line."
         )
 
-        assert (
-            description_index > 1
-        ), "Description should not be at the start of the output"
-        assert (
-            lines[description_index - 1].strip() == ""
-        ), "Preceding line should be empty (this line separates config options)"
-        assert (
-            lines[description_index - 2].strip() != ""
-        ), "The line before the preceding line should not be empty (this is the section header)"
+        assert description_index > 1, (
+            "Description should not be at the start of the output"
+        )
+        assert lines[description_index - 1].strip() == "", (
+            "Preceding line should be empty (this line separates config options)"
+        )
+        assert lines[description_index - 2].strip() != "", (
+            "The line before the preceding line should not be empty (this is the section header)"
+        )
 
     @patch("click.secho")
     def test_description_appears_before_option(self, patched_echo):

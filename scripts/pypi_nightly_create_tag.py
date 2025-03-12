@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 
 Increment the version number, add a dev suffix and add todays date
 """
+
+from __future__ import annotations
 
 from datetime import datetime
 

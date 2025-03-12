@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,14 @@ import {
   within,
 } from "@testing-library/react"
 
-import {
-  emotionLightTheme,
-  Logo,
-  mockEndpoints,
-  PageConfig,
-  render,
-} from "@streamlit/lib"
+import { mockEndpoints, render } from "@streamlit/lib"
+import { Logo, PageConfig } from "@streamlit/protobuf"
 
 import Sidebar, { SidebarProps } from "./Sidebar"
 
-vi.mock("@streamlit/lib/src/util/Hooks", async () => ({
+vi.mock("~lib/util/Hooks", async () => ({
   __esModule: true,
-  ...(await vi.importActual("@streamlit/lib/src/util/Hooks")),
+  ...(await vi.importActual("~lib/util/Hooks")),
   useIsOverflowing: vi.fn(),
 }))
 
@@ -46,7 +41,6 @@ function renderSidebar(props: Partial<SidebarProps> = {}): RenderResult {
     <Sidebar
       endpoints={mockEndpointProp}
       chevronDownshift={0}
-      theme={emotionLightTheme}
       appLogo={null}
       appPages={[]}
       navSections={[]}

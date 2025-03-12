@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -224,7 +224,7 @@ def test_latex_elements(themed_app: Page, assert_snapshot: ImageCompareFunction)
     expect(latex_elements).to_have_count(3)
 
     assert_snapshot(latex_elements.nth(0), name="st_latex-latex")
-    expect(latex_elements.nth(0)).to_contain_text("LATE​X")
+    expect(latex_elements.nth(0)).to_contain_text("LATEX")
 
     assert_snapshot(latex_elements.nth(1), name="st_latex-formula")
 

@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ random.seed(0)
 
 st.header("Pandas Styler: Value formatting")
 df = pd.DataFrame({"test": [3.1423424, 3.1]})
-st.dataframe(df.style.format({"test": "{:.2f}"}))
+st.dataframe(df.style.format({"test": "{:.2f}"}), use_container_width=False)
 
 st.header("Pandas Styler: Background color")
 

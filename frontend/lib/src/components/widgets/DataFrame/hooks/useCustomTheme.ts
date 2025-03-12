@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ import React from "react"
 
 import { useTheme } from "@emotion/react"
 import { Theme as GlideTheme, SpriteMap } from "@glideapps/glide-data-grid"
-import { transparentize } from "color2k"
+import { mix, transparentize } from "color2k"
 
-import { convertRemToPx, EmotionTheme } from "@streamlit/lib/src/theme"
+import { convertRemToPx, EmotionTheme } from "~lib/theme"
 
 export type CustomGridTheme = {
   // The theme configuration for the glide-data-grid
@@ -32,6 +32,8 @@ export type CustomGridTheme = {
   defaultTableHeight: number
   // Configure custom SVG icons used in the column header:
   headerIcons: SpriteMap
+  // The background color of the row when it is hovered:
+  bgRowHovered: string
   // Min column width in pixels used for manual and automatic resizing
   minColumnWidth: number
   // Max column width in pixels used for manual resizing
@@ -80,9 +82,9 @@ function useCustomTheme(): Readonly<CustomGridTheme> {
       textHeader: theme.colors.fadedText60,
       textHeaderSelected: theme.colors.white,
       textGroupHeader: theme.colors.fadedText60,
-      headerFontStyle: `${theme.fontSizes.sm}`,
+      headerFontStyle: `${convertRemToPx(theme.fontSizes.sm)}px`,
       // Cell styling:
-      baseFontStyle: theme.fontSizes.sm,
+      baseFontStyle: `${convertRemToPx(theme.fontSizes.sm)}px`,
       editorFontSize: theme.fontSizes.sm,
       textDark: theme.colors.bodyText,
       textMedium: transparentize(theme.colors.bodyText, 0.2),
@@ -96,7 +98,7 @@ function useCustomTheme(): Readonly<CustomGridTheme> {
       // Special cells:
       bgBubble: theme.colors.secondaryBg,
       bgBubbleSelected: theme.colors.secondaryBg,
-      linkColor: theme.colors.linkText,
+      linkColor: theme.colors.link,
       drilldownBorder: theme.colors.darkenedBgMix25,
       // Unused settings:
       // lineHeight
@@ -117,6 +119,7 @@ function useCustomTheme(): Readonly<CustomGridTheme> {
       maxColumnAutoWidth: Math.round(convertRemToPx("31.25rem")),
       defaultRowHeight: Math.round(convertRemToPx("2.1875rem")),
       defaultHeaderHeight: Math.round(convertRemToPx("2.1875rem")),
+      bgRowHovered: mix(theme.colors.bgColor, theme.colors.secondaryBg, 0.3),
       headerIcons,
     }
   }, [theme])

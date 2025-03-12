@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import { MouseEvent, ReactNode } from "react"
 import styled, { CSSObject } from "@emotion/styled"
 import { transparentize } from "color2k"
 
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+import { EmotionTheme } from "~lib/theme"
 
 export interface CameraInputButtonProps {
   onClick?: (event: MouseEvent<HTMLButtonElement>) => any

@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ from __future__ import annotations
 import os
 import tempfile
 import unittest
+from collections.abc import Mapping, MutableMapping
 from collections.abc import Mapping as MappingABC
 from collections.abc import MutableMapping as MutableMappingABC
-from typing import Mapping, MutableMapping
 from unittest.mock import MagicMock, mock_open, patch
 
 from parameterized import parameterized

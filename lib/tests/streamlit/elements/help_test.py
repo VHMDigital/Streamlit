@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -260,7 +260,7 @@ class StHelpTest(DeltaGeneratorTestCase):
                 return 5
 
             @staticmethod
-            def staticmethod1(self, x=10):
+            def staticmethod1(x=10):
                 "Static method 1"
 
             @classmethod
@@ -302,7 +302,7 @@ class StHelpTest(DeltaGeneratorTestCase):
                 return 5
 
             @staticmethod
-            def staticmethod1(self, x=10):
+            def staticmethod1(x=10):
                 "Static method 1"
 
             @classmethod

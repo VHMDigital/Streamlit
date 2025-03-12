@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_run
@@ -22,6 +23,7 @@ from e2e_playwright.shared.app_utils import (
 )
 
 
+@pytest.mark.performance
 def test_form_input_performance(app: Page):
     """
     Tests the re-render performance when typing in an input that is in a form.
@@ -264,3 +266,6 @@ def test_check_form_submit_button_types(
 
     form_10 = app.get_by_test_id("stForm").nth(9)
     assert_snapshot(form_10, name="st_form-tertiary_submit_button")
+
+    form_11 = app.get_by_test_id("stForm").nth(10)
+    assert_snapshot(form_11, name="st_form-submit_button_just_help")

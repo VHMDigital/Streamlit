@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,29 +27,29 @@ import without from "lodash/without"
 import { isMobile } from "react-device-detect"
 import { useTheme } from "@emotion/react"
 
-import { VirtualDropdown } from "@streamlit/lib/src/components/shared/Dropdown"
-import { fuzzyFilterSelectOptions } from "@streamlit/lib/src/components/shared/Dropdown/Selectbox"
-import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
-import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
+import { MultiSelect as MultiSelectProto } from "@streamlit/protobuf"
+
+import { VirtualDropdown } from "~lib/components/shared/Dropdown"
+import { fuzzyFilterSelectOptions } from "~lib/components/shared/Dropdown/Selectbox"
+import { Placement } from "~lib/components/shared/Tooltip"
+import TooltipIcon from "~lib/components/shared/TooltipIcon"
 import {
   StyledWidgetLabelHelp,
   WidgetLabel,
-} from "@streamlit/lib/src/components/widgets/BaseWidget"
-import { StyledUISelect } from "@streamlit/lib/src/components/widgets/Multiselect/styled-components"
-import { MultiSelect as MultiSelectProto } from "@streamlit/lib/src/proto"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
-import { labelVisibilityProtoValueToEnum } from "@streamlit/lib/src/util/utils"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+} from "~lib/components/widgets/BaseWidget"
+import { StyledUISelect } from "~lib/components/widgets/Multiselect/styled-components"
+import { EmotionTheme } from "~lib/theme"
+import { labelVisibilityProtoValueToEnum } from "~lib/util/utils"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
 import {
   useBasicWidgetState,
   ValueWithSource,
-} from "@streamlit/lib/src/hooks/useBasicWidgetState"
+} from "~lib/hooks/useBasicWidgetState"
 
 export interface Props {
   disabled: boolean
   element: MultiSelectProto
   widgetMgr: WidgetStateManager
-  width: number
   fragmentId?: string
 }
 
@@ -94,7 +94,7 @@ const updateWidgetMgrState = (
 }
 
 const Multiselect: FC<Props> = props => {
-  const { element, widgetMgr, width, fragmentId } = props
+  const { element, widgetMgr, fragmentId } = props
 
   const theme: EmotionTheme = useTheme()
   const [value, setValueWithSource] = useBasicWidgetState<
@@ -190,7 +190,6 @@ const Multiselect: FC<Props> = props => {
     [overMaxSelections, value]
   )
 
-  const style = { width }
   const { options } = element
   const disabled = options.length === 0 ? true : props.disabled
   const placeholder =
@@ -209,7 +208,7 @@ const Multiselect: FC<Props> = props => {
   const showKeyboardOnMobile = options.length > 10
 
   return (
-    <div className="stMultiSelect" data-testid="stMultiSelect" style={style}>
+    <div className="stMultiSelect" data-testid="stMultiSelect">
       <WidgetLabel
         label={element.label}
         disabled={disabled}
@@ -243,6 +242,17 @@ const Multiselect: FC<Props> = props => {
           filterOptions={filterOptions}
           closeOnSelect={false}
           overrides={{
+            Popover: {
+              props: {
+                overrides: {
+                  Body: {
+                    style: () => ({
+                      marginTop: theme.spacing.px,
+                    }),
+                  },
+                },
+              },
+            },
             SelectArrow: {
               component: ChevronDown,
               props: {
@@ -296,6 +306,7 @@ const Multiselect: FC<Props> = props => {
                       padding: theme.spacing.threeXS,
                       height: theme.sizes.clearIconSize,
                       width: theme.sizes.clearIconSize,
+                      cursor: "pointer",
                       ":hover": {
                         fill: theme.colors.bodyText,
                       },
@@ -327,6 +338,11 @@ const Multiselect: FC<Props> = props => {
                       // to nicely fit into the input field.
                       height: `calc(${theme.sizes.minElementHeight} - 2 * ${theme.spacing.xs})`,
                       maxWidth: `calc(100% - ${theme.spacing.lg})`,
+                      // Using !important because the alternative would be
+                      // uglier: we'd have to put it under a selector like
+                      // "&[role="button"]:not(:disabled)" in order to win in
+                      // the order of the precendence.
+                      cursor: "default !important",
                     },
                   },
                   Action: {

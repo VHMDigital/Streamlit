@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ import React from "react"
 import { act, fireEvent, screen, within } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 
-import { customRenderLibContext, render } from "@streamlit/lib/src/test_util"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import {
   DateInput as DateInputProto,
   LabelVisibilityMessage as LabelVisibilityMessageProto,
-} from "@streamlit/lib/src/proto"
+} from "@streamlit/protobuf"
+
+import { customRenderLibContext, render } from "~lib/test_util"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
 
 import DateInput, { Props } from "./DateInput"
 
@@ -44,7 +45,6 @@ const getProps = (
     format: "YYYY/MM/DD",
     ...elementProps,
   }),
-  width: 0,
   disabled: false,
   widgetMgr: new WidgetStateManager({
     sendRerunBackMsg: vi.fn(),
@@ -127,13 +127,12 @@ describe("DateInput widget", () => {
     )
   })
 
-  it("has correct className and style", () => {
+  it("has correct className", () => {
     const props = getProps()
     render(<DateInput {...props} />)
 
     const dateInput = screen.getByTestId("stDateInput")
     expect(dateInput).toHaveAttribute("class", "stDateInput")
-    expect(dateInput).toHaveStyle("width: 0px;")
   })
 
   it("renders a default value", () => {

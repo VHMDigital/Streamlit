@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,11 @@ import {
   InsertDriveFile,
 } from "@emotion-icons/material-outlined"
 
-import BaseButton, {
-  BaseButtonKind,
-} from "@streamlit/lib/src/components/shared/BaseButton"
-import Icon from "@streamlit/lib/src/components/shared/Icon"
-import ProgressBar, {
-  Size,
-} from "@streamlit/lib/src/components/shared/ProgressBar"
-import { Small } from "@streamlit/lib/src/components/shared/TextElements"
-import { FileSize, getSizeDisplay } from "@streamlit/lib/src/util/FileHelper"
+import BaseButton, { BaseButtonKind } from "~lib/components/shared/BaseButton"
+import Icon from "~lib/components/shared/Icon"
+import ProgressBar, { Size } from "~lib/components/shared/ProgressBar"
+import { Small } from "~lib/components/shared/TextElements"
+import { FileSize, getSizeDisplay } from "~lib/util/FileHelper"
 
 import {
   StyledErrorMessage,

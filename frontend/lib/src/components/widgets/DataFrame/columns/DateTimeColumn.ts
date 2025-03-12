@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,8 @@ import { GridCell, GridCellKind } from "@glideapps/glide-data-grid"
 import { DatePickerType } from "@glideapps/glide-data-grid-cells"
 import moment, { Moment } from "moment-timezone"
 
-import {
-  isNullOrUndefined,
-  notNullOrUndefined,
-} from "@streamlit/lib/src/util/utils"
+import { getTimezone } from "~lib/dataframes/arrowTypeUtils"
+import { isNullOrUndefined, notNullOrUndefined } from "~lib/util/utils"
 
 import {
   BaseColumn,
@@ -82,7 +80,7 @@ export interface DateTimeColumnParams {
  * @returns A BaseColumn object
  */
 function BaseDateTimeColumn(
-  kind: string,
+  kind: "date" | "time" | "datetime",
   props: BaseColumnProps,
   defaultFormat: string, // used for rendering and copy data
   defaultStep: number,
@@ -240,7 +238,8 @@ function BaseDateTimeColumn(
         try {
           displayDate = formatMoment(
             momentDate,
-            parameters.format || defaultFormat
+            parameters.format || defaultFormat,
+            kind
           )
         } catch (error) {
           return getErrorCell(
@@ -249,7 +248,7 @@ function BaseDateTimeColumn(
           )
         }
         // Copy data should always use the default format
-        copyData = formatMoment(momentDate, defaultFormat)
+        copyData = formatMoment(momentDate, defaultFormat, kind)
       }
 
       return {
@@ -288,7 +287,7 @@ export default function DateTimeColumn(props: BaseColumnProps): BaseColumn {
     defaultFormat = "YYYY-MM-DD HH:mm:ss.SSS"
   }
 
-  const timezone: string | undefined = props.arrowType?.meta?.timezone
+  const timezone = getTimezone(props.arrowType)
   const hasTimezone: boolean =
     notNullOrUndefined(timezone) ||
     // Timezone can also be configure by the user:

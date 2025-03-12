@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,7 @@
 
 import { GridCell, GridCellKind, TextCell } from "@glideapps/glide-data-grid"
 
-import {
-  isNullOrUndefined,
-  notNullOrUndefined,
-} from "@streamlit/lib/src/util/utils"
+import { isNullOrUndefined, notNullOrUndefined } from "~lib/util/utils"
 
 import {
   BaseColumn,
@@ -62,6 +59,7 @@ function TextColumn(props: BaseColumnProps): BaseColumn {
     displayData: "",
     allowOverlay: true,
     contentAlignment: props.contentAlignment,
+    allowWrapping: props.isWrappingAllowed,
     readonly: !props.isEditable,
     // The text in pinned columns should be faded.
     style: props.isPinned ? "faded" : "normal",

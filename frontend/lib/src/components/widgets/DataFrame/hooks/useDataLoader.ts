@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,15 @@ import React from "react"
 
 import { DataEditorProps, GridCell } from "@glideapps/glide-data-grid"
 
-import { getCellFromArrow } from "@streamlit/lib/src/components/widgets/DataFrame/arrowUtils"
+import { getCellFromArrow } from "~lib/components/widgets/DataFrame/arrowUtils"
 import {
   BaseColumn,
   getErrorCell,
-} from "@streamlit/lib/src/components/widgets/DataFrame/columns"
-import EditingState from "@streamlit/lib/src/components/widgets/DataFrame/EditingState"
-import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
-import { notNullOrUndefined } from "@streamlit/lib/src/util/utils"
+} from "~lib/components/widgets/DataFrame/columns"
+import EditingState from "~lib/components/widgets/DataFrame/EditingState"
+import { getStyledCell } from "~lib/dataframes/pandasStylerUtils"
+import { Quiver } from "~lib/dataframes/Quiver"
+import { notNullOrUndefined } from "~lib/util/utils"
 
 type DataLoaderReturn = Pick<DataEditorProps, "getCellContent">
 
@@ -45,8 +46,6 @@ function useDataLoader(
   numRows: number,
   editingState: React.MutableRefObject<EditingState>
 ): DataLoaderReturn {
-  // data.columns refers to the header rows (not sure about why it is named this way)
-  const numHeaderRows = data.columns.length
   const getCellContent = React.useCallback(
     ([col, row]: readonly [number, number]): GridCell => {
       if (col > columns.length - 1) {
@@ -74,7 +73,16 @@ function useDataLoader(
           originalRow
         )
         if (notNullOrUndefined(editedCell)) {
-          return editedCell
+          // Create a new representation of the edited cell to apply
+          // changes that might have been applied to the column (e.g. change of format from UI).
+          // TODO(lukasmasuch): We should refactor this at some point to avoid storing
+          // cells in the editing state. It would be enough to store the value and the
+          // last updated timestamp.
+          return {
+            ...column.getCell(column.getCellValue(editedCell), false),
+            // Apply the last updated timestamp stored in the edited cell:
+            lastUpdated: editedCell.lastUpdated,
+          }
         } else if (isAddedRow) {
           // This is not expected to happen. All cells to added rows should
           // be defined. If not, we return a specific error cell.
@@ -89,11 +97,15 @@ function useDataLoader(
       try {
         // We skip all header rows to get to to the actual data rows.
         // in th Arrow data.
-        const arrowCell = data.getCell(
-          originalRow + numHeaderRows,
-          originalCol
+        const arrowCell = data.getCell(originalRow, originalCol)
+        const styledCell = getStyledCell(data, originalRow, originalCol)
+
+        return getCellFromArrow(
+          column,
+          arrowCell,
+          styledCell,
+          data.styler?.cssStyles
         )
-        return getCellFromArrow(column, arrowCell, data.cssStyles)
       } catch (error) {
         return getErrorCell(
           "Error during cell creation",
@@ -101,7 +113,7 @@ function useDataLoader(
         )
       }
     },
-    [columns, numRows, data, editingState, numHeaderRows]
+    [columns, numRows, data, editingState]
   )
 
   return {

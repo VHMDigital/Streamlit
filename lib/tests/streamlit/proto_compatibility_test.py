@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -101,11 +101,18 @@ FD = FieldDescriptor
                 ("widget_background_color", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
                 ("widget_border_color", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
                 ("radii", FD.LABEL_OPTIONAL, FD.TYPE_MESSAGE),
+                ("heading_font", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
                 ("body_font", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
                 ("code_font", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
                 ("font_faces", FD.LABEL_REPEATED, FD.TYPE_MESSAGE),
                 ("font_sizes", FD.LABEL_OPTIONAL, FD.TYPE_MESSAGE),
                 ("skeleton_background_color", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
+                ("base_radius", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
+                ("border_color", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
+                ("show_border_around_inputs", FD.LABEL_OPTIONAL, FD.TYPE_BOOL),
+                ("link_color", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
+                ("base_font_size", FD.LABEL_OPTIONAL, FD.TYPE_INT32),
+                ("show_sidebar_separator", FD.LABEL_OPTIONAL, FD.TYPE_BOOL),
             },
         ),
         (

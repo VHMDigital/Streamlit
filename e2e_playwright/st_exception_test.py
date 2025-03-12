@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ from e2e_playwright.shared.app_utils import check_top_level_class
 def test_st_exception_displays_correctly(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
-    expect(themed_app.get_by_test_id("stException").nth(0)).to_have_text(
+    expect(themed_app.get_by_test_id("stException").nth(0)).to_contain_text(
         "RuntimeError: This exception message is awesome!"
     )
 

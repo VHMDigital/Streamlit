@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import datetime
 import json
 import unittest
 from decimal import Decimal
-from typing import Any, Mapping
+from typing import TYPE_CHECKING, Any
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -52,6 +52,9 @@ from streamlit.errors import StreamlitAPIException
 from streamlit.proto.Arrow_pb2 import Arrow as ArrowProto
 from tests.delta_generator_test_case import DeltaGeneratorTestCase
 from tests.streamlit.data_test_cases import SHARED_TEST_CASES, CaseMetadata
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 def _get_arrow_schema(df: pd.DataFrame) -> pa.Schema:
@@ -303,6 +306,29 @@ class DataEditorUtilTest(unittest.TestCase):
 
 
 class DataEditorTest(DeltaGeneratorTestCase):
+    def test_default_params(self):
+        """Test that it can be called with a dataframe."""
+        df = pd.DataFrame({"a": [1, 2, 3]})
+        st.data_editor(df)
+
+        proto = self.get_delta_from_queue().new_element.arrow_data_frame
+        pd.testing.assert_frame_equal(convert_arrow_bytes_to_pandas_df(proto.data), df)
+
+        self.assertEqual(proto.use_container_width, True)
+        self.assertEqual(proto.width, 0)
+        self.assertEqual(proto.height, 0)
+        self.assertEqual(proto.editing_mode, ArrowProto.EditingMode.FIXED)
+        self.assertEqual(proto.selection_mode, [])
+        self.assertEqual(proto.disabled, False)
+        self.assertEqual(proto.column_order, [])
+        self.assertEqual(proto.row_height, 0)
+        self.assertEqual(proto.form_id, "")
+        self.assertEqual(proto.columns, "{}")
+        # ID should be set
+        self.assertNotEqual(proto.id, "")
+        # Row height should not be set if not specified
+        self.assertEqual(proto.HasField("row_height"), False)
+
     def test_just_disabled_true(self):
         """Test that it can be called with disabled=True param."""
         st.data_editor(pd.DataFrame(), disabled=True)
@@ -324,6 +350,8 @@ class DataEditorTest(DeltaGeneratorTestCase):
         proto = self.get_delta_from_queue().new_element.arrow_data_frame
         self.assertEqual(proto.width, 300)
         self.assertEqual(proto.height, 400)
+        # Uses false as default for use_container_width in this case
+        self.assertEqual(proto.use_container_width, False)
 
     def test_num_rows_fixed(self):
         """Test that it can be called with num_rows fixed."""
@@ -346,12 +374,19 @@ class DataEditorTest(DeltaGeneratorTestCase):
         proto = self.get_delta_from_queue().new_element.arrow_data_frame
         self.assertEqual(proto.column_order, ["a", "b"])
 
-    def test_just_use_container_width(self):
-        """Test that it can be called with use_container_width."""
-        st.data_editor(pd.DataFrame(), use_container_width=True)
+    def test_row_height_parameter(self):
+        """Test that it can be called with row_height."""
+        st.data_editor(pd.DataFrame(), row_height=100)
 
         proto = self.get_delta_from_queue().new_element.arrow_data_frame
-        self.assertEqual(proto.use_container_width, True)
+        self.assertEqual(proto.row_height, 100)
+
+    def test_just_use_container_width(self):
+        """Test that it can be called with use_container_width."""
+        st.data_editor(pd.DataFrame(), use_container_width=False)
+
+        proto = self.get_delta_from_queue().new_element.arrow_data_frame
+        self.assertEqual(proto.use_container_width, False)
 
     def test_disable_individual_columns(self):
         """Test that disable can be used to disable individual columns."""
@@ -516,7 +551,6 @@ class DataEditorTest(DeltaGeneratorTestCase):
 
     @parameterized.expand(
         [
-            (pd.CategoricalIndex(["a", "b", "c"]),),
             (pd.PeriodIndex(["2020-01-01", "2020-01-02", "2020-01-03"], freq="D"),),
             (pd.TimedeltaIndex(["1 day", "2 days", "3 days"]),),
             (pd.MultiIndex.from_tuples([("a", "b"), ("c", "d"), ("e", "f")]),),
@@ -544,6 +578,7 @@ class DataEditorTest(DeltaGeneratorTestCase):
             (pd.Index([1.0, 2.0, 3.0], dtype="float"),),
             (pd.Index(["a", "b", "c"]),),
             (pd.DatetimeIndex(["2020-01-01", "2020-01-02", "2020-01-03"]),),
+            (pd.CategoricalIndex(["a", "b", "c"], categories=["a", "b", "c"]),),
         ]
     )
     def test_with_supported_index(self, index: pd.Index):
@@ -657,7 +692,7 @@ class DataEditorTest(DeltaGeneratorTestCase):
 
         proto = self.get_delta_from_queue().new_element.arrow_data_frame
         self.assertEqual(
-            proto.styler.styles, "#T_29028a0632row1_col2 { background-color: yellow }"
+            proto.styler.styles, "#T_29028a0632_row1_col2 { background-color: yellow }"
         )
 
         # Check that different delta paths lead to different element ids
@@ -665,14 +700,14 @@ class DataEditorTest(DeltaGeneratorTestCase):
         # delta path is: [0, 1, 0]
         proto = self.get_delta_from_queue().new_element.arrow_data_frame
         self.assertEqual(
-            proto.styler.styles, "#T_e94cd2b42erow1_col2 { background-color: yellow }"
+            proto.styler.styles, "#T_e94cd2b42e_row1_col2 { background-color: yellow }"
         )
 
         st.container().container().data_editor(styler, width=100)
         # delta path is: [0, 2, 0, 0]
         proto = self.get_delta_from_queue().new_element.arrow_data_frame
         self.assertEqual(
-            proto.styler.styles, "#T_9e33af1e69row1_col2 { background-color: yellow }"
+            proto.styler.styles, "#T_9e33af1e69_row1_col2 { background-color: yellow }"
         )
 
     def test_duplicate_column_names_raise_exception(self):

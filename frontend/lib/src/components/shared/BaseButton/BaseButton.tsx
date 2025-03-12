@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,15 @@ import {
 } from "./styled-components"
 
 function BaseButton(props: Readonly<BaseButtonPropsT>): ReactElement {
-  const { kind, size, disabled, onClick, fluidWidth, children, autoFocus } =
-    props
+  const {
+    kind,
+    size,
+    disabled,
+    onClick,
+    containerWidth,
+    children,
+    autoFocus,
+  } = props
 
   let ComponentType = StyledPrimaryButton
 
@@ -89,7 +96,7 @@ function BaseButton(props: Readonly<BaseButtonPropsT>): ReactElement {
     <ComponentType
       kind={kind}
       size={size ?? BaseButtonSize.MEDIUM}
-      fluidWidth={fluidWidth || false}
+      containerWidth={containerWidth || false}
       disabled={disabled || false}
       onClick={onClick || (() => {})}
       autoFocus={autoFocus || false}

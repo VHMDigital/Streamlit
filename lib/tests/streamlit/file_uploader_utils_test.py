@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,14 @@
 from __future__ import annotations
 
 import unittest
-from typing import Sequence
+from typing import TYPE_CHECKING
 
 from parameterized import parameterized
 
 from streamlit.elements.lib.file_uploader_utils import normalize_upload_file_type
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class FileUploaderUtilsTest(unittest.TestCase):

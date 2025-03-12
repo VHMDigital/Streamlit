@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -147,4 +147,14 @@ with st.form("form_10"):
         use_container_width=True,
     )
     if submitted_10:
+        st.write("Form submitted")
+
+with st.form("form_11"):
+    st.write("Inside form 11")
+    text_input = st.text_input("Form 11 - Text Input")
+    submitted_11 = st.form_submit_button(
+        "Form 11 - Submit",
+        help="Submit by clicking",
+    )
+    if submitted_11:
         st.write("Form submitted")

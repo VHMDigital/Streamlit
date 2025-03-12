@@ -1,4 +1,4 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,15 +15,22 @@
 # This script should be invoked using `make gen-min-dep-constraints`.
 # It has the precondition that you must have installed streamlit locally since
 # you last updated its dependencies, which the make command takes care of.
+from __future__ import annotations
 
 # based on https://stackoverflow.com/a/59711270
 import pkg_resources
 
 package = pkg_resources.working_set.find(pkg_resources.Requirement.parse("streamlit"))
+if package is None:
+    package = pkg_resources.working_set.find(
+        pkg_resources.Requirement.parse("streamlit-nightly")
+    )
+if package is None:
+    raise ValueError("streamlit/streamlit-nightly packages not found")
 
 oldest_dependencies = []
 
-for requirement in package.requires():  # type: ignore
+for requirement in package.requires():
     dependency = requirement.project_name
     if requirement.extras:
         dependency += "[" + ",".join(requirement.extras) + "]"

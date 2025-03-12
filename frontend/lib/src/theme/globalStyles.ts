@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import { css, SerializedStyles } from "@emotion/react"
 import { transparentize } from "color2k"
 
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+import { EmotionTheme } from "~lib/theme"
 
 /**
  * Contains various styles that are applied globally to the app.
@@ -28,7 +28,7 @@ import { EmotionTheme } from "@streamlit/lib/src/theme"
 export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
   // Override the base font-size value here.
   html {
-    font-size: ${theme.fontSizes.mdPx}px;
+    font-size: ${theme.fontSizes.baseFontSize}px;
   }
 
   // Set height to 100% for printing, otherwise the page on Safari might be blank

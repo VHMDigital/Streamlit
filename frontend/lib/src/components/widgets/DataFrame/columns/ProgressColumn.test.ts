@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 import { GridCellKind } from "@glideapps/glide-data-grid"
 import { RangeCellType } from "@glideapps/glide-data-grid-cells"
+import { Field, Float64, Int64 } from "apache-arrow"
+
+import { DataFrameCellType } from "~lib/dataframes/arrowTypeUtils"
 
 import ProgressColumn, { ProgressColumnParams } from "./ProgressColumn"
 import { BaseColumnProps, ErrorCell, isErrorCell } from "./utils"
@@ -31,10 +34,15 @@ const PROGRESS_COLUMN_TEMPLATE = {
   isPinned: false,
   isStretched: false,
   arrowType: {
-    // The arrow type of the underlying data is
-    // not used for anything inside the column.
-    pandas_type: "float64",
-    numpy_type: "float64",
+    type: DataFrameCellType.DATA,
+    arrowField: new Field("progress_column", new Float64(), true),
+    pandasType: {
+      field_name: "progress_column",
+      name: "progress_column",
+      pandas_type: "float64",
+      numpy_type: "float64",
+      metadata: null,
+    },
   },
 } as BaseColumnProps
 
@@ -61,7 +69,7 @@ describe("ProgressColumn", () => {
     const mockCell = mockColumn.getCell(0.5)
     expect(mockCell.kind).toEqual(GridCellKind.Custom)
     expect((mockCell as RangeCellType).data?.value).toEqual(0.5)
-    expect((mockCell as RangeCellType).data?.label).toEqual("50.00%")
+    expect((mockCell as RangeCellType).data?.label).toEqual("50%")
   })
 
   it("supports configuring min/max scale", () => {
@@ -146,8 +154,15 @@ describe("ProgressColumn", () => {
     [1234567898765432, "%d ⭐", "1234567898765432 ⭐"],
     [72.3, "%.1f%%", "72.3%"],
     [-5.678, "%.1f", "-5.7"],
-    [0.12, "percent", "12.00%"],
+    [0.12, "percent", "12%"],
     [1100, "compact", "1.1K"],
+    [-1234.567, "accounting", "(1,234.57)"],
+    [-1234.567, "dollar", "-$1,234.57"],
+    [-1234.567, "euro", "-€1,234.57"],
+    [-1234.567, "localized", "-1,234.567"],
+    [-1234.567, "plain", "-1234.567"],
+    [-1234.567, "scientific", "-1.235E3"],
+    [-1234.567, "engineering", "-1.235E3"],
   ])(
     "formats %p with sprintf format %p to %p",
     (input: number, format: string, displayValue: string) => {
@@ -209,8 +224,15 @@ describe("ProgressColumn", () => {
     const mockColumn = ProgressColumn({
       ...PROGRESS_COLUMN_TEMPLATE,
       arrowType: {
-        pandas_type: "int64",
-        numpy_type: "int64",
+        type: DataFrameCellType.DATA,
+        arrowField: new Field("progress_column", new Int64(), true),
+        pandasType: {
+          field_name: "progress_column",
+          name: "progress_column",
+          pandas_type: "int64",
+          numpy_type: "int64",
+          metadata: null,
+        },
       },
     } as BaseColumnProps)
     const mockCell = mockColumn.getCell(52)

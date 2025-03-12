@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,51 @@
 /* eslint-disable  @typescript-eslint/no-non-null-assertion */
 
 import { GridCellKind, NumberCell } from "@glideapps/glide-data-grid"
+import { Field, Float64, Int64, Uint64 } from "apache-arrow"
 
 import {
-  Type as ArrowType,
+  ArrowType,
+  DataFrameCellType,
   DataType,
-} from "@streamlit/lib/src/dataframes/arrowTypeUtils"
+} from "~lib/dataframes/arrowTypeUtils"
 
 import NumberColumn, { NumberColumnParams } from "./NumberColumn"
 import { BaseColumnProps, ErrorCell, isErrorCell } from "./utils"
 
 const MOCK_FLOAT_ARROW_TYPE: ArrowType = {
-  pandas_type: "float64",
-  numpy_type: "float64",
+  type: DataFrameCellType.DATA,
+  arrowField: new Field("float_column", new Float64(), true),
+  pandasType: {
+    field_name: "float_column",
+    name: "float_column",
+    pandas_type: "float64",
+    numpy_type: "float64",
+    metadata: null,
+  },
 }
 
 const MOCK_INT_ARROW_TYPE: ArrowType = {
-  pandas_type: "int64",
-  numpy_type: "int64",
+  type: DataFrameCellType.DATA,
+  arrowField: new Field("int_column", new Int64(), true),
+  pandasType: {
+    field_name: "int_column",
+    name: "int_column",
+    pandas_type: "int64",
+    numpy_type: "int64",
+    metadata: null,
+  },
 }
 
 const MOCK_UINT_ARROW_TYPE: ArrowType = {
-  pandas_type: "uint64",
-  numpy_type: "uint64",
+  type: DataFrameCellType.DATA,
+  arrowField: new Field("uint_column", new Uint64(), true),
+  pandasType: {
+    field_name: "uint_column",
+    name: "uint_column",
+    pandas_type: "uint64",
+    numpy_type: "uint64",
+    metadata: null,
+  },
 }
 
 const NUMBER_COLUMN_TEMPLATE: Partial<BaseColumnProps> = {
@@ -266,8 +289,15 @@ describe("NumberColumn", () => {
     [1234567898765432, "%d ⭐", "1234567898765432 ⭐"],
     [72.3, "%.1f%%", "72.3%"],
     [-5.678, "%.1f", "-5.7"],
-    [0.12, "percent", "12.00%"],
+    [0.12, "percent", "12%"],
     [1100, "compact", "1.1K"],
+    [-1234.567, "accounting", "(1,234.57)"],
+    [-1234.567, "dollar", "-$1,234.57"],
+    [-1234.567, "euro", "-€1,234.57"],
+    [-1234.567, "localized", "-1,234.567"],
+    [-1234.567, "plain", "-1234.567"],
+    [-1234.567, "scientific", "-1.235E3"],
+    [-1234.567, "engineering", "-1.235E3"],
   ])(
     "formats %p with sprintf format %p to %p",
     (input: number, format: string, displayValue: string) => {

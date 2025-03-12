@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2024)
+ * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ describe("FileUploadClient Upload", () => {
     uploader = new FileUploadClient({
       sessionInfo: mockSessionInfo(),
       endpoints: {
+        setStaticConfigUrl: vi.fn(),
         buildComponentURL: vi.fn(),
         buildMediaURL: vi.fn(),
         buildFileUploadURL: vi.fn(),
@@ -137,7 +138,7 @@ describe("FileUploadClient Upload", () => {
     const pendingReqs = uploader.pendingFileURLsRequests
     expect(pendingReqs.size).toBe(1)
 
-    const reqId = pendingReqs.keys().next().value
+    const reqId = pendingReqs.keys().next().value as string
 
     expect(pendingReqs.get(reqId)?.promise).toBe(fileURLsPromise)
   })
@@ -147,7 +148,7 @@ describe("FileUploadClient Upload", () => {
 
     // @ts-expect-error
     const pendingReqs = uploader.pendingFileURLsRequests
-    const reqId = pendingReqs.keys().next().value
+    const reqId = pendingReqs.keys().next().value as string
     const promise = pendingReqs.get(reqId)?.promise
 
     uploader.onFileURLsResponse({
@@ -163,7 +164,7 @@ describe("FileUploadClient Upload", () => {
 
     // @ts-expect-error
     const pendingReqs = uploader.pendingFileURLsRequests
-    const reqId = pendingReqs.keys().next().value
+    const reqId = pendingReqs.keys().next().value as string
     const promise = pendingReqs.get(reqId)?.promise
 
     uploader.onFileURLsResponse({
