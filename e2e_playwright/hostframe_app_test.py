@@ -27,6 +27,7 @@ from e2e_playwright.conftest import (
     wait_until,
 )
 from e2e_playwright.shared.app_utils import (
+    expect_prefixed_markdown,
     get_observed_connection_statuses,
     register_connection_status_observer,
 )
@@ -142,6 +143,11 @@ def test_handles_host_rerun_script_message(iframed_app: IframedPage):
     expect(frame_locator.get_by_test_id("stApp")).to_have_attribute(
         "data-test-script-state", "running"
     )
+
+
+def test_context_url_is_correct_when_hosted_in_iframe(iframed_app: IframedPage):
+    frame_locator, _ = _load_html_and_get_locators(iframed_app)
+    expect_prefixed_markdown(frame_locator, "Full url:", "http://localhost:1345/")
 
 
 def test_handles_host_stop_script_message(iframed_app: IframedPage):
