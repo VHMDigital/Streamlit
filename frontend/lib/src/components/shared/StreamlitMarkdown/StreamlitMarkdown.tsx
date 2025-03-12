@@ -499,6 +499,7 @@ export function RenderedMarkdown({
                 userSelect: "none",
                 verticalAlign: "bottom",
                 whiteSpace: "nowrap",
+                wordWrap: "normal",
               },
             },
             hChildren: [{ type: "text", value: iconName }],
