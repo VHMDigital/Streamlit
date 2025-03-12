@@ -291,8 +291,10 @@ class MarkdownMixin:
     ) -> DeltaGenerator:
         """Display a colored badge with an icon and label.
 
-        This is a convenience wrapper around
-        `st.markdown(f":small[:{color}-background[:{color}[{icon} {label}]]]")`.
+        You can also insert badges directly in Markdown, e.g. via
+        `st.markdown(":blue-badge[Home]")`. This works in all places where Streamlit
+        supports Markdown, e.g. widget labels or `st.table` cells. See `st.markdown`
+        for more information.
 
         Parameters
         ----------
@@ -329,6 +331,11 @@ class MarkdownMixin:
         >>>
         >>> # Badge with icon and color
         >>> st.badge("Success", icon=":material/check:", color="green")
+        >>>
+        >>> # Multiple badges side by side in Markdown
+        >>> st.markdown(
+        ...     "Here are some badges: :yellow-badge[⭐️ Favorite] :blue-badge[🏠 Home] :green-badge[✅ Success]"
+        ... )
         """
         if icon is not None:
             icon_str = validate_icon_or_emoji(icon) + " "
@@ -336,7 +343,7 @@ class MarkdownMixin:
             icon_str = ""
 
         badge_proto = MarkdownProto()
-        badge_proto.body = f":small[:{color}-background[:{color}[{icon_str}{label}]]]"
+        badge_proto.body = f":{color}-badge[{icon_str}{label}]"
         badge_proto.element_type = MarkdownProto.Type.NATIVE
         return self.dg._enqueue("markdown", badge_proto)
 

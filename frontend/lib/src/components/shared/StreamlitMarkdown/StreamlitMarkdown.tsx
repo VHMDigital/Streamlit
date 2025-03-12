@@ -407,7 +407,7 @@ export function RenderedMarkdown({
       visit(tree, "textDirective", (node, _index, _parent) => {
         const nodeName = String(node.name)
 
-        // Handle small text directive
+        // Handle small text directive (:small[])
         if (nodeName === "small") {
           const data = node.data || (node.data = {})
           data.hName = "span"
@@ -416,7 +416,39 @@ export function RenderedMarkdown({
           return
         }
 
-        // Handle color directives
+        // Handle badge directives (:color-badge[])
+        const badgeMatch = nodeName.match(/^(.+)-badge$/)
+        if (badgeMatch && colorMapping.has(badgeMatch[1])) {
+          const color = badgeMatch[1]
+          const textColor = colorMapping.get(color)
+          const bgColor = colorMapping.get(`${color}-background`)
+
+          if (textColor && bgColor) {
+            const data = node.data || (node.data = {})
+            data.hName = "span"
+            data.hProperties = data.hProperties || {}
+            data.hProperties.className = "has-background-color"
+            data.hProperties.style = `${bgColor}; font-size: ${theme.fontSizes.sm}; white-space: nowrap;`
+
+            // We use a nested structure here to ensure that the rainbow text and
+            // background are visible simultaneously (since the rainbow text
+            // uses a background image, which conflicts with the background color).
+            data.hChildren = [
+              {
+                type: "element",
+                tagName: "span",
+                properties: {
+                  style: `${textColor}`,
+                },
+                children: node.children,
+              },
+            ]
+            node.children = []
+            return
+          }
+        }
+
+        // Handle color directives (:color[] or :color-background[])
         if (colorMapping.has(nodeName)) {
           const data = node.data || (node.data = {})
           const style = colorMapping.get(nodeName)
