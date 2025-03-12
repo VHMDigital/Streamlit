@@ -189,7 +189,7 @@ with st.container(key="badge_elements"):
     st.badge("Green badge", icon="🚀", color="green")
     st.badge("Red badge", icon=":material/warning:", color="red")
     st.markdown(
-        """:blue-badge[Blue markdown badge] :green-badge[🌱 Green markdown badge]"""
+        ":blue-badge[Blue markdown badge] :green-badge[🌱 Green markdown badge]"
     )
 
 st.container(key="mixed_markdown").markdown(
