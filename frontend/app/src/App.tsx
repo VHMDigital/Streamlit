@@ -1804,22 +1804,12 @@ export class App extends PureComponent<Props, State> {
   }
 
   getUrl = (): string => {
-    if (isInChildFrame()) {
-      try {
-        return document.referrer
-      } catch (e) {
-        // If we can't access the parent's location, it's likely a CORS error.
-        // Just return the current iframe location.
-        return document.location.href
-      }
-    } else {
-      return document.location.href
+    let url = document.location.href
+    if (this.isInCloudEnvironment()) {
+      // This function returns the current URL, with "/~/+" removed
+      url = document.location.href.replace(/\/~\/\+\/?/g, "/")
     }
-
-    return isInChildFrame()
-      ? window.parent.location.href
-      : document.location.href
-    // return document.location.href
+    return url
   }
 
   getQueryString = (): string => {

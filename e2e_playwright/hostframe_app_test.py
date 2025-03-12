@@ -145,9 +145,13 @@ def test_handles_host_rerun_script_message(iframed_app: IframedPage):
     )
 
 
-def test_context_url_is_correct_when_hosted_in_iframe(iframed_app: IframedPage):
+def test_context_url_is_correct_when_hosted_in_iframe(
+    iframed_app: IframedPage, app_port: int
+):
     frame_locator, _ = _load_html_and_get_locators(iframed_app)
-    expect_prefixed_markdown(frame_locator, "Full url:", "http://localhost:1345/")
+    expect_prefixed_markdown(
+        frame_locator, "Full url:", f"http://localhost:{app_port}/"
+    )
 
 
 def test_handles_host_stop_script_message(iframed_app: IframedPage):
