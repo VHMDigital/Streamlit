@@ -238,9 +238,10 @@ def test_badge_elements(themed_app: Page, assert_snapshot: ImageCompareFunction)
 
     # Check that the badge texts are displayed correctly
     expect(badge_container).to_contain_text("Simple badge")
-    expect(badge_container).to_contain_text("Green badge")
-    expect(badge_container).to_contain_text("Red badge")
+    expect(badge_container).to_contain_text("Green badge with emoji")
+    expect(badge_container).to_contain_text("Red badge with material icon")
     expect(badge_container).to_contain_text("🚀")
+    expect(badge_container).to_contain_text("This is a very long badge")
     expect(badge_container).to_contain_text("Blue markdown badge")
     expect(badge_container).to_contain_text("🌱 Green markdown badge")
 

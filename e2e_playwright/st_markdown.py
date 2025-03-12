@@ -186,8 +186,11 @@ st.markdown(
 
 with st.container(key="badge_elements"):
     st.badge("Simple badge")
-    st.badge("Green badge", icon="🚀", color="green")
-    st.badge("Red badge", icon=":material/warning:", color="red")
+    st.badge("Green badge with emoji", icon="🚀", color="green")
+    st.badge("Red badge with material icon", icon=":material/warning:", color="red")
+    st.badge(
+        "This is a very long badge that should be ellipsized when it exceeds the container width. It contains enough text to demonstrate how badges handle overflow and text wrapping in the Streamlit interface.",
+    )
     st.markdown(
         ":blue-badge[Blue markdown badge] :green-badge[🌱 Green markdown badge]"
     )
