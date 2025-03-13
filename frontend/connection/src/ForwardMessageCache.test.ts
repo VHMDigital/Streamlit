@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import { Mock } from "vitest"
-
 import { ForwardMsg } from "@streamlit/protobuf"
 
 import { ForwardMsgCache } from "./ForwardMessageCache"
@@ -23,19 +21,16 @@ import { ForwardMsgCache } from "./ForwardMessageCache"
 interface MockCache {
   cache: ForwardMsgCache
   getCachedMessage: (hash: string) => ForwardMsg | undefined
-  mockFetchCachedForwardMsg: Mock
 }
 
 function createCache(): MockCache {
-  const mockFetchCachedForwardMsg = vi.fn()
-
   const cache = new ForwardMsgCache()
 
   const getCachedMessage = (hash: string): ForwardMsg | undefined =>
     // @ts-expect-error (accessing internals for testing)
     cache.getCachedMessage(hash, false)
 
-  return { cache, getCachedMessage, mockFetchCachedForwardMsg }
+  return { cache, getCachedMessage }
 }
 
 /**
@@ -120,34 +115,12 @@ test("caches messages as a deep copy", async () => {
   expect(getCachedMessage("Cacheable")).not.toEqual(msg)
 })
 
-test("fetches uncached messages from server", async () => {
+test("errors when message is not cached", async () => {
   const msg = createForwardMsg("Cacheable", true)
   const refMsg = createRefMsg(msg)
   const encodedRefMsg = ForwardMsg.encode(refMsg).finish()
 
-  const { cache, getCachedMessage, mockFetchCachedForwardMsg } = createCache()
-  mockFetchCachedForwardMsg.mockResolvedValue(
-    new Uint8Array(ForwardMsg.encode(msg).finish())
-  )
-
-  // processMessagePayload on a reference message whose
-  // original version does *not* exist in our local cache. We
-  // should hit the server's /message endpoint to fetch it.
-  await expect(
-    cache.processMessagePayload(refMsg, encodedRefMsg)
-  ).resolves.toEqual(msg)
-
-  // The fetched message should now be cached
-  expect(getCachedMessage("Cacheable")).toEqual(msg)
-})
-
-test("errors when uncached message is not on server", async () => {
-  const msg = createForwardMsg("Cacheable", true)
-  const refMsg = createRefMsg(msg)
-  const encodedRefMsg = ForwardMsg.encode(refMsg).finish()
-
-  const { cache, mockFetchCachedForwardMsg } = createCache()
-  mockFetchCachedForwardMsg.mockRejectedValue(new Error("404"))
+  const { cache } = createCache()
 
   await expect(
     cache.processMessagePayload(refMsg, encodedRefMsg)
