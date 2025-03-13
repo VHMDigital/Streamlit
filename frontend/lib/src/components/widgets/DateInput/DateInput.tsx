@@ -23,6 +23,8 @@ import React, {
   useState,
 } from "react"
 
+import { ErrorOutline } from "@emotion-icons/material-outlined"
+import { format } from "date-fns"
 import moment from "moment"
 import { useTheme } from "@emotion/react"
 import { DENSITY, Datepicker as UIDatePicker } from "baseui/datepicker"
@@ -43,10 +45,15 @@ import {
   StyledWidgetLabelHelp,
   WidgetLabel,
 } from "~lib/components/widgets/BaseWidget"
+import Icon from "~lib/components/shared/Icon"
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
 import TooltipIcon from "~lib/components/shared/TooltipIcon"
-import { Placement } from "~lib/components/shared/Tooltip"
+import Tooltip, {
+  generateDefaultTooltipOverrides,
+  Placement,
+} from "~lib/components/shared/Tooltip"
 import { LibContext } from "~lib/components/core/LibContext"
-import { EmotionTheme } from "~lib/theme"
+import { EmotionTheme, hasLightBackgroundColor } from "~lib/theme"
 
 import { useIntlLocale } from "./useIntlLocale"
 
@@ -99,6 +106,7 @@ function DateInput({
   })
 
   const [isEmpty, setIsEmpty] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const { colors, fontSizes, lineHeights, spacing, sizes } = useTheme()
 
@@ -130,33 +138,71 @@ function DateInput({
     [element.format]
   )
 
+  // Dates can be entered outside of min/max in UI, we check for this and set an error state if date invalid
+  // Issue #8475
+  const checkDateInRange = (date: Date): void => {
+    const minDateString = format(minDate, dateFormat, {
+      locale: loadedLocale,
+    })
+    const maxDateString = maxDate
+      ? format(maxDate, dateFormat, { locale: loadedLocale })
+      : ""
+
+    let dateError = ""
+    if (maxDate && date > maxDate) {
+      dateError = "Max"
+    } else if (date < minDate) {
+      dateError = "Min"
+    }
+
+    if (element.isRange && dateError) {
+      const messageEnding =
+        dateError === "Max"
+          ? `before ${maxDateString}`
+          : `after ${minDateString}`
+      setError(
+        `**Error**: ${dateError} date set outside allowed range. Please select a date ${messageEnding}.`
+      )
+    } else if (!element.isRange && dateError) {
+      setError(
+        `**Error**: Date set outside allowed range. Please select a date between ${minDateString} and ${maxDateString}.`
+      )
+    }
+  }
+
   const handleChange = useCallback(
     ({
       date,
     }: {
       date: Date | (Date | null | undefined)[] | null | undefined
     }): void => {
+      setError("")
+
       if (isNullOrUndefined(date)) {
         setValueWithSource({ value: [], fromUi: true })
         setIsEmpty(true)
         return
       }
 
+      // TODO (mayagbarnes): Refactor checkDateInRange to handle iteration over multiple dates
+      // Handle scenario where start after end date etc.
       const newValue: Date[] = []
       if (Array.isArray(date)) {
         date.forEach((dt: Date | null | undefined) => {
           if (dt) {
+            checkDateInRange(dt)
             newValue.push(dt)
           }
         })
       } else {
+        checkDateInRange(date)
         newValue.push(date)
       }
 
       setValueWithSource({ value: newValue, fromUi: true })
       setIsEmpty(!newValue)
     },
-    [setValueWithSource]
+    [setValueWithSource, checkDateInRange]
   )
 
   const handleClose = useCallback((): void => {
@@ -166,6 +212,24 @@ function DateInput({
     setValueWithSource({ value: newValue, fromUi: true })
     setIsEmpty(!newValue)
   }, [isEmpty, element, setValueWithSource])
+
+  const errorTooltipBody = { style: { backgroundColor: colors.bgColor } }
+  const errorTooltipInner = {
+    style: {
+      // backgroundColor: colors.dangerBg,
+      backgroundColor: "transparent",
+      color: hasLightBackgroundColor(theme) ? colors.red100 : colors.red20,
+      paddingLeft: "0",
+      paddingRight: "0",
+      paddingTop: "0",
+      paddingBottom: "0",
+    },
+  }
+  const errorTooltipOverrides = generateDefaultTooltipOverrides(
+    theme,
+    errorTooltipBody,
+    errorTooltipInner
+  )
 
   return (
     <div className="stDateInput" data-testid="stDateInput">
@@ -185,166 +249,186 @@ function DateInput({
           </StyledWidgetLabelHelp>
         )}
       </WidgetLabel>
-      <UIDatePicker
-        locale={loadedLocale}
-        density={DENSITY.high}
-        formatString={dateFormat}
-        mask={element.isRange ? `${dateMask} – ${dateMask}` : dateMask}
-        placeholder={
-          element.isRange
-            ? `${element.format} – ${element.format}`
-            : element.format
+      <Tooltip
+        content={
+          error ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: theme.spacing.twoXS,
+              }}
+            >
+              <Icon content={ErrorOutline} size="base" />
+              <StreamlitMarkdown source={error} allowHTML={false} />
+            </div>
+          ) : null
         }
-        disabled={disabled}
-        onChange={handleChange}
-        onClose={handleClose}
-        overrides={{
-          Popover: {
-            props: {
-              placement: PLACEMENT.bottomLeft,
-              overrides: {
-                Body: {
-                  style: {
-                    marginTop: theme.spacing.px,
+        placement={Placement.TOP}
+        overrides={errorTooltipOverrides}
+      >
+        <UIDatePicker
+          error={!!error}
+          locale={loadedLocale}
+          density={DENSITY.high}
+          formatString={dateFormat}
+          mask={element.isRange ? `${dateMask} – ${dateMask}` : dateMask}
+          placeholder={
+            element.isRange
+              ? `${element.format} – ${element.format}`
+              : element.format
+          }
+          disabled={disabled}
+          onChange={handleChange}
+          onClose={handleClose}
+          overrides={{
+            Popover: {
+              props: {
+                placement: PLACEMENT.bottomLeft,
+                overrides: {
+                  Body: {
+                    style: {
+                      marginTop: theme.spacing.px,
+                    },
                   },
                 },
               },
             },
-          },
-          CalendarContainer: {
-            style: {
-              fontSize: fontSizes.sm,
-              paddingRight: spacing.sm,
-              paddingLeft: spacing.sm,
-              paddingBottom: spacing.sm,
-              paddingTop: spacing.sm,
-            },
-          },
-          Week: {
-            style: {
-              fontSize: fontSizes.sm,
-            },
-          },
-          Day: {
-            style: ({
-              // Due to a bug in BaseWeb, where the range selection defaults to mono300 and can't be changed, we need to override the background colors for all these shared props:
-              // $pseudoHighlighted: Styles the range selection when you click an initial date, and hover over the end one, but NOT click it.
-              // $pseudoSelected: Styles when a range was selected, click outide, and click the calendar again.
-              // $selected: Styles the background below the red circle from the start and end dates.
-              // $isHovered: Styles the background below the end date when hovered.
-              $pseudoHighlighted,
-              $pseudoSelected,
-              $selected,
-              $isHovered,
-            }) => ({
-              fontSize: fontSizes.sm,
-              lineHeight: lineHeights.base,
-
-              "::before": {
-                backgroundColor:
-                  $selected ||
-                  $pseudoSelected ||
-                  $pseudoHighlighted ||
-                  $isHovered
-                    ? `${colors.secondaryBg} !important`
-                    : colors.transparent,
-              },
-
-              "::after": {
-                borderColor: colors.transparent,
-              },
-            }),
-          },
-          PrevButton: {
-            style: () => ({
-              // Align icon to the center of the button.
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              // Remove primary-color click effect.
-              ":active": {
-                backgroundColor: colors.transparent,
-              },
-              ":focus": {
-                backgroundColor: colors.transparent,
-                outline: 0,
-              },
-            }),
-          },
-          NextButton: {
-            style: {
-              // Align icon to the center of the button.
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              // Remove primary-color click effect.
-              ":active": {
-                backgroundColor: colors.transparent,
-              },
-              ":focus": {
-                backgroundColor: colors.transparent,
-                outline: 0,
+            CalendarContainer: {
+              style: {
+                fontSize: fontSizes.sm,
+                paddingRight: spacing.sm,
+                paddingLeft: spacing.sm,
+                paddingBottom: spacing.sm,
+                paddingTop: spacing.sm,
               },
             },
-          },
-          Input: {
-            props: {
-              // The default maskChar ` ` causes empty dates to display as ` / / `
-              // Clearing the maskChar so empty dates will not display
-              maskChar: null,
+            Week: {
+              style: {
+                fontSize: fontSizes.sm,
+              },
+            },
+            Day: {
+              style: ({
+                // Due to a bug in BaseWeb, where the range selection defaults to mono300 and can't be changed, we need to override the background colors for all these shared props:
+                // $pseudoHighlighted: Styles the range selection when you click an initial date, and hover over the end one, but NOT click it.
+                // $pseudoSelected: Styles when a range was selected, click outide, and click the calendar again.
+                // $selected: Styles the background below the red circle from the start and end dates.
+                // $isHovered: Styles the background below the end date when hovered.
+                $pseudoHighlighted,
+                $pseudoSelected,
+                $selected,
+                $isHovered,
+              }) => ({
+                fontSize: fontSizes.sm,
+                lineHeight: lineHeights.base,
 
-              overrides: {
-                Root: {
-                  style: {
-                    // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
-                    borderLeftWidth: sizes.borderWidth,
-                    borderRightWidth: sizes.borderWidth,
-                    borderTopWidth: sizes.borderWidth,
-                    borderBottomWidth: sizes.borderWidth,
-                    paddingRight: spacing.twoXS,
-                  },
+                "::before": {
+                  backgroundColor:
+                    $selected ||
+                    $pseudoSelected ||
+                    $pseudoHighlighted ||
+                    $isHovered
+                      ? `${colors.secondaryBg} !important`
+                      : colors.transparent,
                 },
-                ClearIcon: {
-                  props: {
-                    overrides: {
-                      Svg: {
-                        style: {
-                          color: colors.darkGray,
-                          // setting this width and height makes the clear-icon align with dropdown arrows of other input fields
-                          padding: spacing.threeXS,
-                          height: sizes.clearIconSize,
-                          width: sizes.clearIconSize,
-                          ":hover": {
-                            fill: colors.bodyText,
+
+                "::after": {
+                  borderColor: colors.transparent,
+                },
+              }),
+            },
+            PrevButton: {
+              style: () => ({
+                // Align icon to the center of the button.
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                // Remove primary-color click effect.
+                ":active": {
+                  backgroundColor: colors.transparent,
+                },
+                ":focus": {
+                  backgroundColor: colors.transparent,
+                  outline: 0,
+                },
+              }),
+            },
+            NextButton: {
+              style: {
+                // Align icon to the center of the button.
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                // Remove primary-color click effect.
+                ":active": {
+                  backgroundColor: colors.transparent,
+                },
+                ":focus": {
+                  backgroundColor: colors.transparent,
+                  outline: 0,
+                },
+              },
+            },
+            Input: {
+              props: {
+                // The default maskChar ` ` causes empty dates to display as ` / / `
+                // Clearing the maskChar so empty dates will not display
+                maskChar: null,
+
+                overrides: {
+                  Root: {
+                    style: {
+                      // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
+                      borderLeftWidth: sizes.borderWidth,
+                      borderRightWidth: sizes.borderWidth,
+                      borderTopWidth: sizes.borderWidth,
+                      borderBottomWidth: sizes.borderWidth,
+                      paddingRight: spacing.twoXS,
+                    },
+                  },
+                  ClearIcon: {
+                    props: {
+                      overrides: {
+                        Svg: {
+                          style: {
+                            color: colors.darkGray,
+                            // setting this width and height makes the clear-icon align with dropdown arrows of other input fields
+                            padding: spacing.threeXS,
+                            height: sizes.clearIconSize,
+                            width: sizes.clearIconSize,
+                            ":hover": {
+                              fill: colors.bodyText,
+                            },
                           },
                         },
                       },
                     },
                   },
-                },
-                Input: {
-                  style: {
-                    // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
-                    paddingRight: spacing.sm,
-                    paddingLeft: spacing.sm,
-                    paddingBottom: spacing.sm,
-                    paddingTop: spacing.sm,
-                    lineHeight: lineHeights.inputWidget,
-                  },
-                  props: {
-                    "data-testid": "stDateInputField",
+                  Input: {
+                    style: {
+                      // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
+                      paddingRight: spacing.sm,
+                      paddingLeft: spacing.sm,
+                      paddingBottom: spacing.sm,
+                      paddingTop: spacing.sm,
+                      lineHeight: lineHeights.inputWidget,
+                    },
+                    props: {
+                      "data-testid": "stDateInputField",
+                    },
                   },
                 },
               },
             },
-          },
-        }}
-        value={value}
-        minDate={minDate}
-        maxDate={maxDate}
-        range={element.isRange}
-        clearable={clearable}
-      />
+          }}
+          value={value}
+          minDate={minDate}
+          maxDate={maxDate}
+          range={element.isRange}
+          clearable={clearable}
+        />
+      </Tooltip>
     </div>
   )
 }
@@ -376,12 +460,26 @@ function updateWidgetMgrState(
   vws: ValueWithSource<Date[]>,
   fragmentId?: string
 ): void {
-  widgetMgr.setStringArrayValue(
-    element,
-    datesToStrings(vws.value),
-    { fromUi: vws.fromUi },
-    fragmentId
-  )
+  const minDate = moment(element.min, DATE_FORMAT).toDate()
+  const maxDate = getMaxDate(element)
+  let isValid = true
+
+  // Check if date(s) outside of allowed min/max
+  vws.value.forEach((dt: Date | null | undefined) => {
+    if (dt && ((maxDate && dt > maxDate) || dt < minDate)) {
+      isValid = false
+    }
+  })
+
+  // Only update widget state if date(s) valid
+  if (isValid) {
+    widgetMgr.setStringArrayValue(
+      element,
+      datesToStrings(vws.value),
+      { fromUi: vws.fromUi },
+      fragmentId
+    )
+  }
 }
 
 function getMaxDate(element: DateInputProto): Date | undefined {
