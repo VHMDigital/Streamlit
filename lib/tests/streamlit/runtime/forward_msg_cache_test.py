@@ -56,7 +56,9 @@ class ForwardMsgCacheTest(unittest.TestCase):
         """Test creation of 'reference' ForwardMsgs"""
         msg = create_dataframe_msg([1, 2, 3], 34)
         ref_msg = create_reference_msg(msg)
-        self.assertEqual(populate_hash_if_needed(msg), ref_msg.ref_hash)
+        populate_hash_if_needed(msg)
+
+        self.assertEqual(msg.hash, ref_msg.ref_hash)
         self.assertEqual(msg.metadata, ref_msg.metadata)
 
     def test_add_message(self):
@@ -75,7 +77,8 @@ class ForwardMsgCacheTest(unittest.TestCase):
         session = _create_mock_session()
         msg = create_dataframe_msg([1, 2, 3])
 
-        msg_hash = populate_hash_if_needed(msg)
+        populate_hash_if_needed(msg)
+        msg_hash = msg.hash
 
         cache.add_message(msg, session, 0)
         self.assertEqual(msg, cache.get_message(msg_hash))
@@ -86,7 +89,8 @@ class ForwardMsgCacheTest(unittest.TestCase):
         session = _create_mock_session()
 
         msg = create_dataframe_msg([1, 2, 3])
-        msg_hash = populate_hash_if_needed(msg)
+        populate_hash_if_needed(msg)
+        msg_hash = msg.hash
 
         cache.add_message(msg, session, 0)
         self.assertEqual(msg, cache.get_message(msg_hash))
@@ -139,7 +143,7 @@ class ForwardMsgCacheTest(unittest.TestCase):
         runcount1 = 0
 
         msg = create_dataframe_msg([1, 2, 3])
-        msg_hash = populate_hash_if_needed(msg)
+        populate_hash_if_needed(msg)
 
         cache.add_message(msg, session1, runcount1)
 
@@ -151,7 +155,7 @@ class ForwardMsgCacheTest(unittest.TestCase):
         # though it won't have actually been removed yet.
         runcount1 += 1
         self.assertFalse(cache.has_message_reference(msg, session1, runcount1))
-        self.assertIsNotNone(cache.get_message(msg_hash))
+        self.assertIsNotNone(cache.get_message(msg.hash))
 
         # Add another reference to the message
         session2 = _create_mock_session()
@@ -168,7 +172,7 @@ class ForwardMsgCacheTest(unittest.TestCase):
         # in the cache at all.
         runcount2 += 2
         cache.remove_expired_entries_for_session(session2, runcount2)
-        self.assertIsNone(cache.get_message(msg_hash))
+        self.assertIsNone(cache.get_message(msg.hash))
 
     def test_cache_stats_provider(self):
         """Test ForwardMsgCache's CacheStatsProvider implementation."""

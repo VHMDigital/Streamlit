@@ -20,7 +20,6 @@ from typing import TYPE_CHECKING, Any
 
 from streamlit import config
 from streamlit.errors import MarkdownFormattedException, StreamlitAPIException
-from streamlit.runtime.forward_msg_cache import populate_hash_if_needed
 
 if TYPE_CHECKING:
     from streamlit.proto.ForwardMsg_pb2 import ForwardMsg
@@ -60,23 +59,16 @@ class BadDurationStringError(StreamlitAPIException):
         )
 
 
-def is_cacheable_msg(msg: ForwardMsg) -> bool:
-    """True if the given message qualifies for caching."""
-    if msg.WhichOneof("type") in {"ref_hash", "initialize"}:
-        # Some message types never get cached
-        return False
-    return msg.ByteSize() >= int(config.get_option("global.minCachedMessageSize"))
-
-
 def serialize_forward_msg(msg: ForwardMsg) -> bytes:
     """Serialize a ForwardMsg to send to a client.
 
     If the message is too large, it will be converted to an exception message
     instead.
     """
-    # TODO(lukasmasuch): Do we need to do this here?
-    populate_hash_if_needed(msg)
+
     msg_str = msg.SerializeToString()
+
+    print("runtime_util", msg.metadata.cacheable, msg.hash, len(msg_str))
 
     if len(msg_str) > get_max_message_size_bytes():
         import streamlit.elements.exception as exception

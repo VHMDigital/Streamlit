@@ -40,7 +40,6 @@ from streamlit.runtime.forward_msg_cache import (
     create_reference_msg,
     populate_hash_if_needed,
 )
-from streamlit.runtime.runtime_util import is_cacheable_msg
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -201,14 +200,11 @@ class ScriptRunContext:
 
         msg.metadata.active_script_hash = self.active_script_hash
 
-        msg.metadata.cacheable = is_cacheable_msg(msg)
+        populate_hash_if_needed(msg)
         msg_to_send = msg
-        if msg.metadata.cacheable:
-            message_hash = populate_hash_if_needed(msg)
-
-            if message_hash in self.cached_messages:
-                _LOGGER.debug("Sending cached message ref (hash=%s)", msg.hash)
-                msg_to_send = create_reference_msg(msg, message_hash)
+        if msg.metadata.cacheable and msg.hash and msg.hash in self.cached_messages:
+            _LOGGER.debug("Sending cached message ref (hash=%s)", msg.hash)
+            msg_to_send = create_reference_msg(msg)
 
         # Pass the message up to our associated ScriptRunner.
         self._enqueue(msg_to_send)

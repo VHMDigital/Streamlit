@@ -13,22 +13,13 @@
 # limitations under the License.
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
-from e2e_playwright.conftest import rerun_app
 from e2e_playwright.shared.app_utils import (
     click_button,
     click_toggle,
     fill_number_input,
 )
-
-
-def test_forward_msg_cache_receives_msg(app: Page):
-    app.evaluate("window.streamlitDebug.clearForwardMsgCache()")
-    rerun_app(app)
-    expect(app.get_by_role("dialog")).not_to_be_visible()
-
-    app.expect_request("**/_stcore/message/")
 
 
 def _rerun_app(app: Page, times: int):

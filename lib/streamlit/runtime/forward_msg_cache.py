@@ -14,11 +14,11 @@
 
 from __future__ import annotations
 
-from streamlit import util
+from streamlit import config, util
 from streamlit.proto.ForwardMsg_pb2 import ForwardMsg
 
 
-def populate_hash_if_needed(msg: ForwardMsg) -> str:
+def populate_hash_if_needed(msg: ForwardMsg) -> None:
     """Computes and assigns the unique hash for a ForwardMsg.
 
     If the ForwardMsg already has a hash, this is a no-op.
@@ -27,30 +27,34 @@ def populate_hash_if_needed(msg: ForwardMsg) -> str:
     ----------
     msg : ForwardMsg
 
-    Returns
-    -------
-    string
-        The message's hash, returned here for convenience. (The hash
-        will also be assigned to the ForwardMsg; callers do not need
-        to do this.)
-
     """
-    if msg.hash == "":
+    if msg.hash == "" and msg.WhichOneof("type") not in {"ref_hash", "initialize"}:
         # Move the message's metadata aside. It's not part of the
         # hash calculation.
         metadata = msg.metadata
         msg.ClearField("metadata")
 
+        serialized_msg = msg.SerializeToString(deterministic=True)
+
         # MD5 is good enough for what we need, which is uniqueness.
-        msg.hash = util.calc_md5(msg.SerializeToString())
+        msg.hash = util.calc_md5(serialized_msg)
 
         # Restore metadata.
         msg.metadata.CopyFrom(metadata)
 
-    return msg.hash
+        # Set cacheable flag:
+        msg.metadata.cacheable = len(serialized_msg) >= int(
+            config.get_option("global.minCachedMessageSize")
+        )
+        print(
+            "populate_hash_if_needed",
+            msg.metadata.cacheable,
+            len(serialized_msg),
+            msg.hash,
+        )
 
 
-def create_reference_msg(msg: ForwardMsg, hash: str) -> ForwardMsg:
+def create_reference_msg(msg: ForwardMsg) -> ForwardMsg:
     """Create a ForwardMsg that refers to the given message via its hash.
 
     The reference message will also get a copy of the source message's
@@ -61,9 +65,6 @@ def create_reference_msg(msg: ForwardMsg, hash: str) -> ForwardMsg:
     msg : ForwardMsg
         The ForwardMsg to create the reference to.
 
-    hash : str
-        The hash of the message to create the reference to.
-
     Returns
     -------
     ForwardMsg
@@ -71,7 +72,8 @@ def create_reference_msg(msg: ForwardMsg, hash: str) -> ForwardMsg:
         ref_hash field.
 
     """
+    # TODO(lukasmasuch): Log error if msg.hash is not set
     ref_msg = ForwardMsg()
-    ref_msg.ref_hash = hash
+    ref_msg.ref_hash = msg.hash
     ref_msg.metadata.CopyFrom(msg.metadata)
     return ref_msg
