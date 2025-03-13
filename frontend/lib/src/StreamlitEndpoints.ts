@@ -91,8 +91,8 @@ export interface StreamlitEndpoints {
   deleteFileAtURL?(fileUrl: string, sessionId: string): Promise<void>
 
   /**
-   * Set JWT Header.
-   * @param jwtHeader the object that contains jwtHeaderName and jwtHeaderValue
+   * setFileUploadClientConfig.
+   * @param config the object that contains prefix and headers object
    */
   setFileUploadClientConfig?(config: FileUploadClientConfig): void
 }
