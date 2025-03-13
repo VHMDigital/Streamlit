@@ -35,6 +35,7 @@ import {
   StyledWidgetLabelHelp,
   WidgetLabel,
 } from "~lib/components/widgets/BaseWidget"
+import { DynamicIcon } from "~lib/components/shared/Icon"
 import TooltipIcon from "~lib/components/shared/TooltipIcon"
 import { Placement } from "~lib/components/shared/Tooltip"
 import { isInForm, labelVisibilityProtoValueToEnum } from "~lib/util/utils"
@@ -141,6 +142,10 @@ function TextInput({
     fragmentId
   )
 
+  const isMaterialIcon = element.icon?.startsWith(":material")
+  // Material icons need to be larger to render similar size of emojis, emojis need addtl margin
+  const dynamicIconSize = isMaterialIcon ? "lg" : "base"
+
   return (
     <StyledTextInput
       className="stTextInput"
@@ -176,6 +181,11 @@ function TextInput({
         id={id}
         type={getTypeString(element)}
         autoComplete={element.autocomplete}
+        startEnhancer={
+          element.icon && (
+            <DynamicIcon iconValue={element.icon} size={dynamicIconSize} />
+          )
+        }
         overrides={{
           Input: {
             style: {
@@ -206,6 +216,13 @@ function TextInput({
               borderRightWidth: theme.sizes.borderWidth,
               borderTopWidth: theme.sizes.borderWidth,
               borderBottomWidth: theme.sizes.borderWidth,
+              paddingLeft: element.icon ? theme.spacing.sm : 0,
+            },
+          },
+          StartEnhancer: {
+            style: {
+              paddingLeft: 0,
+              paddingRight: 0,
             },
           },
         }}
