@@ -83,7 +83,7 @@ def test_st_rerun_is_fragment_scoped_rerun_flag_false(patched_get_script_run_ctx
     MagicMock(return_value=["some_fragment_ids"]),
 )
 @patch("streamlit.commands.execution_control.get_script_run_ctx")
-def test_st_rerun_is_fragment_scoped_rerun_flag_True(patched_get_script_run_ctx):
+def test_st_rerun_is_fragment_scoped_rerun_flag_true(patched_get_script_run_ctx):
     ctx = MagicMock()
     patched_get_script_run_ctx.return_value = ctx
 
