@@ -130,7 +130,7 @@ def main(log_level="info"):
 
         $ streamlit hello
 
-    Or use the line below to run your own script:å
+    Or use the line below to run your own script:
 
         $ streamlit run your_script.py
     """  # noqa: D400
