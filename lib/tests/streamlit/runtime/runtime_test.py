@@ -339,9 +339,9 @@ class RuntimeTest(RuntimeTestCase):
         app_sessions = []
         for _ in range(3):
             session_id = self.runtime.connect_session(MockSessionClient(), MagicMock())
-            app_session = self.runtime._session_mgr.get_active_session_info(
-                session_id
-            ).session
+            session_info = self.runtime._session_mgr.get_active_session_info(session_id)
+            assert session_info is not None
+            app_session = session_info.session
             app_sessions.append(app_session)
 
         with patch.object(
@@ -367,9 +367,9 @@ class RuntimeTest(RuntimeTestCase):
         back_msg = MagicMock()
         self.runtime.handle_backmsg(session_id, back_msg)
 
-        app_session = self.runtime._session_mgr.get_active_session_info(
-            session_id
-        ).session
+        session_info = self.runtime._session_mgr.get_active_session_info(session_id)
+        assert session_info is not None
+        app_session = session_info.session
         app_session.handle_backmsg.assert_called_once_with(back_msg)
 
     async def test_handle_backmsg_invalid_session(self):
@@ -393,9 +393,9 @@ class RuntimeTest(RuntimeTestCase):
         exception = MagicMock()
         self.runtime.handle_backmsg_deserialization_exception(session_id, exception)
 
-        app_session = self.runtime._session_mgr.get_active_session_info(
-            session_id
-        ).session
+        session_info = self.runtime._session_mgr.get_active_session_info(session_id)
+        assert session_info is not None
+        app_session = session_info.session
         app_session.handle_backmsg_exception.assert_called_once_with(exception)
 
     async def test_handle_backmsg_exception_invalid_session(self):
