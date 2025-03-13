@@ -22,6 +22,7 @@ from parameterized import parameterized
 
 from streamlit.errors import NoSessionContext, StreamlitAPIException
 from streamlit.proto.ForwardMsg_pb2 import ForwardMsg
+from streamlit.runtime.forward_msg_cache import populate_hash_if_needed
 from streamlit.runtime.fragment import MemoryFragmentStorage
 from streamlit.runtime.memory_uploaded_file_manager import MemoryUploadedFileManager
 from streamlit.runtime.pages_manager import PagesManager
@@ -40,6 +41,7 @@ def _create_script_run_context(
     fake_enqueue: Callable[[ForwardMsg], None],
     current_fragment_id: str | None = None,
     pages_manager: PagesManager | None = None,
+    cached_messages: list[str] | None = None,
 ):
     return ScriptRunContext(
         session_id="TestSessionID",
@@ -52,6 +54,7 @@ def _create_script_run_context(
         fragment_storage=MemoryFragmentStorage(),
         pages_manager=pages_manager or PagesManager(""),
         current_fragment_id=current_fragment_id,
+        cached_messages=cached_messages or [],
     )
 
 
@@ -145,7 +148,7 @@ class ScriptRunContextTest(unittest.TestCase):
         def fake_enqueue(msg):
             return None
 
-        ctx = _create_script_run_context(fake_enqueue)
+        ctx = _create_script_run_context(fake_enqueue, pages_manager=pg_mgr)
         ctx.reset(page_script_hash="main_script_hash")
 
         ctx.on_script_start()
@@ -250,6 +253,25 @@ class ScriptRunContextTest(unittest.TestCase):
             enqueue_message(cacheable_msg)
             self.assertIsNotNone(fake_enqueue_result)
             self.assertEqual(fake_enqueue_result["msg"].metadata.cacheable, False)
+
+    def test_enqueue_reference_message_if_cached(self):
+        """Test that a reference message is enqueued if the original message is cached."""
+        fake_enqueue_result: dict[str, ForwardMsg] = {}
+
+        def fake_enqueue(msg: ForwardMsg):
+            fake_enqueue_result["msg"] = msg
+
+        with patch_config_options({"global.minCachedMessageSize": 0}):
+            cacheable_msg = create_dataframe_msg([1, 2, 3])
+            populate_hash_if_needed(cacheable_msg)
+            assert bool(cacheable_msg.hash)
+            ctx = _create_script_run_context(
+                fake_enqueue, cached_messages=[cacheable_msg.hash]
+            )
+            add_script_run_ctx(ctx=ctx)
+            enqueue_message(cacheable_msg)
+            self.assertIsNotNone(fake_enqueue_result)
+            self.assertEqual(fake_enqueue_result["msg"].WhichOneof("type"), "ref_hash")
 
     def test_enqueue_message_with_fragment_id(self):
         fake_enqueue_result = {}
