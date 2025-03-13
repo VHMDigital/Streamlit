@@ -96,6 +96,7 @@ vi.mock("@streamlit/connection", async () => {
       disconnect: vi.fn(),
       sendMessage: vi.fn(),
       incrementMessageCacheRunCount: vi.fn(),
+      getCachedMessageHashes: vi.fn(),
       getBaseUriParts() {
         return {
           pathname: "/",
