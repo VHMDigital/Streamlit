@@ -621,17 +621,11 @@ def assert_snapshot(
 
     # Check if reruns are enabled for this test run
     configured_reruns = pytestconfig.getoption("reruns", 0)
-    # Get the current execution count (0 for first run, 1 for first rerun, etc.)
-    execution_count = getattr(request.node, "execution_count", 0)
+    # Get the current execution count:
+    execution_count = getattr(request.node, "execution_count", 1)
     # True if this is the last rerun (or the only test run)
-    is_last_rerun = execution_count == configured_reruns
+    is_last_rerun = execution_count - 1 == configured_reruns
 
-    print(
-        "RERUNS: ",
-        configured_reruns,
-        execution_count,
-        is_last_rerun,
-    )
     root_path = get_git_root()
 
     platform = str(sys.platform)
@@ -755,8 +749,8 @@ def assert_snapshot(
             pixel_diff = abs(expected_pixels - actual_pixels)
 
             error_msg = (
-                f"Snapshot matching for {snapshot_file_name} failed. "
-                f"Expected size: {img_b.size}, actual size: {img_a.size} "
+                f"Snapshot mismatch for {snapshot_file_name}. "
+                f"Wrong size: expected={img_b.size}, actual={img_a.size} "
                 f"({pixel_diff} pixels difference; "
                 f"{pixel_diff / expected_pixels * 100:.2f}%). "
                 f"Error: {ex}"
