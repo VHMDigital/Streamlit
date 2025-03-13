@@ -733,6 +733,8 @@ def assert_snapshot(
         img_a = Image.open(BytesIO(img_bytes))
         img_b = Image.open(snapshot_file_path)
         img_diff = Image.new("RGBA", img_a.size)
+        error_msg: str = "Unknown error"
+
         try:
             mismatch = pixelmatch(
                 img_a,
@@ -741,6 +743,29 @@ def assert_snapshot(
                 threshold=pixel_threshold,
                 fail_fast=fail_fast,
                 alpha=0,
+            )
+
+            total_pixels = img_a.size[0] * img_a.size[1]
+            max_diff_pixels = int(image_threshold * total_pixels)
+
+            if mismatch < max_diff_pixels:
+                return
+
+            error_msg = (
+                f"Snapshot mismatch for {snapshot_file_name} ({mismatch} pixels difference;"
+                f" {mismatch / total_pixels * 100:.2f}%)"
+            )
+
+            # Create new failures folder for this test:
+            test_failures_dir.mkdir(parents=True, exist_ok=True)
+            img_diff.save(
+                f"{test_failures_dir}/diff_{snapshot_file_name}{file_extension}"
+            )
+            img_a.save(
+                f"{test_failures_dir}/actual_{snapshot_file_name}{file_extension}"
+            )
+            img_b.save(
+                f"{test_failures_dir}/expected_{snapshot_file_name}{file_extension}"
             )
         except ValueError as ex:
             # Create new failures folder for this test:
@@ -764,37 +789,7 @@ def assert_snapshot(
                 f"{pixel_diff / expected_pixels * 100:.2f}%). "
                 f"Error: {ex}"
             )
-            if is_last_rerun:
-                # If its the last rerun (or the only test run), update snapshots
-                # and fail after all the other snapshots have been updated in the given
-                # test.
-                snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
-                snapshot_updates_file_path.write_bytes(img_bytes)
-                # Add error to the list of test failures:
-                test_failure_messages.append(error_msg)
-            else:
-                # If there are other test reruns that will follow, fail immediately
-                # and avoid updating the snapshot. Failing here will correctly show a
-                # test error in the Github UI, which enables our flaky test tracking
-                # tool to work correctly.
-                pytest.fail(error_msg)
-            return
-        total_pixels = img_a.size[0] * img_a.size[1]
-        max_diff_pixels = int(image_threshold * total_pixels)
 
-        if mismatch < max_diff_pixels:
-            return
-
-        error_msg = (
-            f"Snapshot mismatch for {snapshot_file_name} ({mismatch} pixels difference;"
-            f" {mismatch / total_pixels * 100:.2f}%)"
-        )
-
-        # Create new failures folder for this test:
-        test_failures_dir.mkdir(parents=True, exist_ok=True)
-        img_diff.save(f"{test_failures_dir}/diff_{snapshot_file_name}{file_extension}")
-        img_a.save(f"{test_failures_dir}/actual_{snapshot_file_name}{file_extension}")
-        img_b.save(f"{test_failures_dir}/expected_{snapshot_file_name}{file_extension}")
         if is_last_rerun:
             # If its the last rerun (or the only test run), update snapshots
             # and fail after all the other snapshots have been updated in the given
