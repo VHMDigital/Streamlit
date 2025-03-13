@@ -365,6 +365,7 @@ class ConfigTest(unittest.TestCase):
                 "browser",
                 "client",
                 "theme",
+                "theme.sidebar",
                 "global",
                 "logger",
                 "magic",
@@ -402,6 +403,20 @@ class ConfigTest(unittest.TestCase):
                 "theme.showBorderAroundInputs",
                 "theme.linkColor",
                 "theme.showSidebarSeparator",
+                "theme.sidebar.base",
+                "theme.sidebar.primaryColor",
+                "theme.sidebar.backgroundColor",
+                "theme.sidebar.secondaryBackgroundColor",
+                "theme.sidebar.textColor",
+                "theme.sidebar.baseFontSize",
+                "theme.sidebar.baseRadius",
+                "theme.sidebar.font",
+                "theme.sidebar.headingFont",
+                "theme.sidebar.codeFont",
+                "theme.sidebar.fontFaces",
+                "theme.sidebar.borderColor",
+                "theme.sidebar.showBorderAroundInputs",
+                "theme.sidebar.linkColor",
                 "global.appTest",
                 "global.developmentMode",
                 "global.disableWidgetStateDuplicationWarning",
@@ -625,6 +640,72 @@ class ConfigTest(unittest.TestCase):
             "showSidebarSeparator": True,
         }
         self.assertEqual(config.get_options_for_section("theme"), expected)
+
+    def test_with_sidebar_theme_options(self):
+        """Test that the sidebar theme options are correctly set."""
+
+        config._set_option("theme.sidebar.primaryColor", "#FFF000", "test")
+
+        config._set_option("theme.sidebar.base", "dark", "test")
+        config._set_option("theme.sidebar.textColor", "#DFFDE0", "test")
+        config._set_option("theme.sidebar.baseRadius", "1.2rem", "test")
+        config._set_option("theme.sidebar.secondaryBackgroundColor", "#021A09", "test")
+        config._set_option("theme.sidebar.backgroundColor", "#001200", "test")
+        config._set_option("theme.sidebar.borderColor", "#0B4C0B", "test")
+        config._set_option("theme.sidebar.showBorderAroundInputs", True, "test")
+        config._set_option("theme.sidebar.linkColor", "#2EC163", "test")
+        config._set_option("theme.sidebar.font", "Inter", "test")
+        config._set_option("theme.sidebar.headingFont", "Inter", "test")
+        config._set_option(
+            "theme.sidebar.fontFaces",
+            [
+                {
+                    "family": "Inter",
+                    "url": "https://raw.githubusercontent.com/rsms/inter/refs/heads/master/docs/font-files/Inter-Regular.woff2",
+                    "weight": 400,
+                },
+            ],
+            "test",
+        )
+        config._set_option("theme.sidebar.codeFont", "Monaspace Argon", "test")
+        config._set_option("theme.sidebar.baseFontSize", 14, "test")
+
+        expected = {
+            "base": "dark",
+            "primaryColor": "#FFF000",
+            "baseRadius": "1.2rem",
+            "secondaryBackgroundColor": "#021A09",
+            "backgroundColor": "#001200",
+            "textColor": "#DFFDE0",
+            "borderColor": "#0B4C0B",
+            "showBorderAroundInputs": True,
+            "linkColor": "#2EC163",
+            "font": "Inter",
+            "headingFont": "Inter",
+            "codeFont": "Monaspace Argon",
+            "fontFaces": [
+                {
+                    "family": "Inter",
+                    "url": "https://raw.githubusercontent.com/rsms/inter/refs/heads/master/docs/font-files/Inter-Regular.woff2",
+                    "weight": 400,
+                },
+            ],
+            "baseFontSize": 14,
+        }
+        self.assertEqual(config.get_options_for_section("theme.sidebar"), expected)
+
+    def test_with_sidebar_theme_unsupported_options(self):
+        """Test that the sidebar theme cannot set unsupported options."""
+        unsupported_options = ["showSidebarSeparator"]
+
+        for option in unsupported_options:
+            with self.assertLogs(logger="streamlit.config", level="WARNING") as cm:
+                config._set_option(f"theme.sidebar.{option}", True, "test")
+            # cm.output is a list of messages and there shouldn't be any other messages besides one created by this test
+            self.assertIn(
+                f'"theme.sidebar.{option}" is not a valid config option. If you previously had this config option set, it may have been removed.',
+                cm.output[0],
+            )
 
     def test_browser_server_port(self):
         # developmentMode must be False for server.port to be modified
