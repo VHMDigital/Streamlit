@@ -140,7 +140,7 @@ class _SpecialRequestHandler(tornado.web.RequestHandler):
 
 class HealthHandler(_SpecialRequestHandler):
     def initialize(self, callback):
-        """Initialize the handler
+        """Initialize the handler.
 
         Parameters
         ----------
