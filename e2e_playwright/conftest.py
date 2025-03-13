@@ -769,10 +769,13 @@ def assert_snapshot(
                 # test.
                 snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
                 snapshot_updates_file_path.write_bytes(img_bytes)
+                # Add error to the list of test failures:
                 test_failure_messages.append(error_msg)
             else:
                 # If there are other test reruns that will follow, fail immediately
-                # to avoid updating the snapshot.
+                # and avoid updating the snapshot. Failing here will correctly show a
+                # test error in the Github UI, which enables our flaky test tracking
+                # tool to work correctly.
                 pytest.fail(error_msg)
             return
         total_pixels = img_a.size[0] * img_a.size[1]
@@ -797,10 +800,13 @@ def assert_snapshot(
             # test.
             snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
             snapshot_updates_file_path.write_bytes(img_bytes)
+            # Add error to the list of test failures:
             test_failure_messages.append(error_msg)
         else:
             # If there are other test reruns that will follow, fail immediately
-            # to avoid updating the snapshot.
+            # and avoid updating the snapshot. Failing here will correctly show a
+            # test error in the Github UI, which enables our flaky test tracking
+            # tool to work correctly.
             pytest.fail(error_msg)
 
     yield compare
