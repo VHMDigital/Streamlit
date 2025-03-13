@@ -90,10 +90,9 @@ message ForwardMsg {
     // Platform - message to host
     ParentMessage parent_message = 20;
 
-    // A reference to a ForwardMsg that has already been delivered.
-    // The client should substitute the message with the given hash
-    // for this one. If the client does not have the referenced message
-    // in its cache, it can retrieve it from the server.
+    // A reference to a ForwardMsg that has already been delivered
+    // and cached in the frontend. The client should substitute the message
+    // with the given hash for this one.
     string ref_hash = 11;
   }
 
