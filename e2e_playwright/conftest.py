@@ -67,6 +67,8 @@ class StaticPage(Page):
 
 
 def pytest_configure(config: pytest.Config):
+    """Register custom markers."""
+    config.addinivalue_line("markers", "early: mark fixture to be executed early")
     config.addinivalue_line(
         "markers", "no_perf: mark test to not use performance profiling"
     )
@@ -90,6 +92,20 @@ def reorder_early_fixtures(metafunc: pytest.Metafunc):
 
 def pytest_generate_tests(metafunc: pytest.Metafunc):
     reorder_early_fixtures(metafunc)
+
+
+# Add this to suppress the deprecation warnings
+@pytest.hookimpl(hookwrapper=True)
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    """Suppress deprecation warnings about marks on fixtures."""
+    yield
+    # Filter out the specific deprecation warnings about marks on fixtures
+    if hasattr(terminalreporter, "_warnings"):
+        terminalreporter._warnings = [
+            w
+            for w in terminalreporter._warnings
+            if "Marks applied to fixtures have no effect" not in str(w.message)
+        ]
 
 
 class AsyncSubprocess:
