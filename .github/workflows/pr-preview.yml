@@ -41,8 +41,7 @@ jobs:
                                     "| Name | Link |\n" +
                                     "| :----: | ---- |\n" +
                                     "| 📦 Wheel file | *Building...* |\n" +
-                                    "| ☁️ Deploy app | *Building...* |\n" +
-                                    "| 🕹️ View app | *Building...* |";
+                                    "| 🕹️ Preview app | *Building...* |";
 
             // Find an existing comment; if it exists, we will update it
             const { data: comments } = await github.rest.issues.listComments({
@@ -468,8 +467,7 @@ jobs:
                                  "| Name | Link |\n" +
                                  "| :----: | ---- |\n" +
                                  "| 📦 Wheel file | " + s3Url + " |\n" +
-                                 "| ☁️ Deploy app | [Deploy on Community Cloud](" + deployUrl + ") |\n" +
-                                 "| 🕹️ View app | [" + viewUrl + "](https://" + viewUrl + ") | ";
+                                 "| 🕹️ Preview app | [" + viewUrl + "](https://" + viewUrl + ") (☁️ Deploy [here](" + deployUrl + ") if not accessible)| ";
 
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
