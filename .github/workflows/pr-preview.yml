@@ -28,6 +28,7 @@ jobs:
           fetch-depth: 1
 
       # Only create a comment if the AWS_ACCESS_KEY_ID is set
+      # The API key is not set if this is from a fork PR or from dependabot.
       - if: ${{ env.AWS_ACCESS_KEY_ID != '' }}
         name: Create or update comment (Building)
         id: initial-comment
