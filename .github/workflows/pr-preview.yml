@@ -459,8 +459,9 @@ jobs:
             console.log('Found comment with ID:', commentId);
 
             const s3Url = '${{ needs.upload-whl.outputs.s3-url }}';
-            const previewBranch = '${{ needs.upload-whl.outputs.preview-branch }}';
             const deployUrl = '${{ needs.setup-preview.outputs.deploy-url }}';
+
+            const previewBranch = '${{ needs.upload-whl.outputs.preview-branch }}';
             const viewUrl = `${previewBranch}.streamlit.app`;
 
             // Define the ready template once
