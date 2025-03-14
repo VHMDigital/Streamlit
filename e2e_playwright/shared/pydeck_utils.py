@@ -66,7 +66,7 @@ def wait_for_chart(app: Page):
     # The pydeck chart takes a while to load so check that
     # it gets attached with an increased timeout.
     pydeck_charts = app.get_by_test_id("stDeckGlJsonChart")
-    expect(pydeck_charts).to_have_count(1, timeout=15000)
+    expect(pydeck_charts).to_have_count(1, timeout=10000)
 
     # The map assets can take more time to load and render especially in CI due
     # to the underlying hardware. Add an extra timeout to naively prevent

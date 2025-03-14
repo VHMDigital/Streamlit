@@ -68,7 +68,6 @@ def _select_chart_type(app: Page, chart_type: str):
 
     button_text = button_text_map.get(chart_type, "Basic Chart")
     click_button(app, button_text)
-    wait_for_app_run(app, wait_delay=STANDARD_WAIT_DELAY)
 
 
 def _set_selection_mode(app: Page, mode: Literal["single-object", "multi-object"]):
