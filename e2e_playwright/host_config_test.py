@@ -14,13 +14,17 @@
 
 from playwright.sync_api import Page, Route, expect
 
-from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_loaded
+from e2e_playwright.conftest import (
+    ImageCompareFunction,
+    wait_for_app_loaded,
+)
 
 
-def handle_route_hostconfig_disable_fullscreen(route: Route) -> None:
+def handle_route_hostconfig_disable_fullscreen_and_error_dialogs(route: Route) -> None:
     response = route.fetch()
     body = response.json()
     body["disableFullscreenMode"] = True
+    body["blockErrorDialogs"] = True
     route.fulfill(
         # Pass all fields from the response.
         response=response,
@@ -33,7 +37,10 @@ def test_disable_fullscreen(
     page: Page, app_port: int, assert_snapshot: ImageCompareFunction
 ):
     """Test that fullscreen mode is disabled for elements when set via host-config."""
-    page.route("**/_stcore/host-config", handle_route_hostconfig_disable_fullscreen)
+    page.route(
+        "**/_stcore/host-config",
+        handle_route_hostconfig_disable_fullscreen_and_error_dialogs,
+    )
     page.goto(f"http://localhost:{app_port}")
     wait_for_app_loaded(page)
 
@@ -52,3 +59,34 @@ def test_disable_fullscreen(
     assert_snapshot(
         dataframe_toolbar, name="host_config-dataframe_disabled_fullscreen_mode"
     )
+
+
+def test_block_error_dialogs(page: Page, app_port: int):
+    """Test that error dialogs are blocked and sent to host when set via host-config."""
+    # Need to be more specific about the route to allow for successful redirect
+    page.route(
+        f"http://localhost:{app_port}/_stcore/host-config",
+        handle_route_hostconfig_disable_fullscreen_and_error_dialogs,
+    )
+
+    # Initial load of page
+    page.goto(f"http://localhost:{app_port}")
+    wait_for_app_loaded(page)
+
+    # Capture console messages
+    messages = []
+    page.on("console", lambda msg: messages.append(msg))
+
+    # Navigate to a non-existent page to trigger page not found error
+    page.goto(f"http://localhost:{app_port}/nonexistent_page")
+    page.wait_for_timeout(1000)
+
+    # Console includes 2 404 errors (health & host-config) + 1 error from page not found (last message)
+    last_message = messages.pop()
+    assert (
+        "The page that you have requested does not seem to exist. Running the app's main page."
+        in last_message.text
+    )
+
+    # # Verify no error dialog is shown
+    expect(page.get_by_role("dialog")).not_to_be_attached()
