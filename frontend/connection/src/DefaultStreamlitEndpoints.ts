@@ -94,30 +94,30 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
     source: string,
     componentName: string
   ): Promise<void> {
-    fetch(source)
-      .then(response => {
-        if (!response.ok) {
-          // Send response info if unsuccessful
-          this.sendClientErrorToHost(
-            "Custom Component",
-            componentName,
-            response.status,
-            response.statusText,
-            source
-          )
-        }
-        // Don't send error info on success
-      })
-      .catch(error => {
-        // Send fetch error info on failure
+    try {
+      const response = await fetch(source)
+      if (!response.ok) {
+        // Send response info if unsuccessful
         this.sendClientErrorToHost(
           "Custom Component",
           componentName,
-          "Error fetching source",
-          error.message,
+          response.status,
+          response.statusText,
           source
         )
-      })
+      }
+      // Don't send error info on success
+    } catch (error: any) {
+      const message = error instanceof Error ? error.message : "Unknown Error"
+      // Send fetch error info on failure
+      this.sendClientErrorToHost(
+        "Custom Component",
+        componentName,
+        "Error fetching source",
+        message,
+        source
+      )
+    }
   }
 
   public buildComponentURL(componentName: string, path: string): string {

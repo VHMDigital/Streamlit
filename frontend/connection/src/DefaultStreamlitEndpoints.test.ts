@@ -505,4 +505,67 @@ describe("DefaultStreamlitEndpoints", () => {
       })
     })
   })
+
+  describe("checkSourceResponse", () => {
+    it("calls the passed source - sends error to host if error on response", async () => {
+      // Mock fetch for checkSourceResponse - response is not ok
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 404,
+          statusText: "Not Found",
+        } as Response)
+      )
+      const endpoints = new DefaultStreamlitEndpoints({
+        getServerUri: () => MOCK_SERVER_URI,
+        csrfEnabled: false,
+        sendClientError: vi.fn(),
+      })
+
+      const url = buildHttpUri(MOCK_SERVER_URI, "mockUrl")
+      const sendClientErrorToHostSpy = vi.spyOn(
+        endpoints,
+        "sendClientErrorToHost"
+      )
+      await endpoints.checkSourceResponse(url, "mockComponent")
+
+      expect(fetch).toHaveBeenCalledWith(url)
+
+      expect(sendClientErrorToHostSpy).toHaveBeenCalledWith(
+        "Custom Component",
+        "mockComponent",
+        404,
+        "Not Found",
+        url
+      )
+    })
+
+    it("calls the passed source - sends error to host if fetch fails", async () => {
+      const endpoints = new DefaultStreamlitEndpoints({
+        getServerUri: () => MOCK_SERVER_URI,
+        csrfEnabled: false,
+        sendClientError: vi.fn(),
+      })
+
+      // Mock fetch for checkSourceResponse - fetch fails
+      global.fetch = vi.fn(() => Promise.reject(new Error("mockError")))
+
+      const sendClientErrorToHostSpy = vi.spyOn(
+        endpoints,
+        "sendClientErrorToHost"
+      )
+      const url = buildHttpUri(MOCK_SERVER_URI, "mockUrl")
+      await endpoints.checkSourceResponse(url, "mockComponent")
+
+      expect(fetch).toHaveBeenCalledWith(url)
+
+      expect(sendClientErrorToHostSpy).toHaveBeenCalledWith(
+        "Custom Component",
+        "mockComponent",
+        "Error fetching source",
+        "mockError",
+        url
+      )
+    })
+  })
 })

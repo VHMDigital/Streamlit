@@ -540,6 +540,64 @@ describe("ComponentInstance", () => {
     })
   })
 
+  describe("Error handling", () => {
+    it("triggers component registry's checkSourceResponse when component is mounted", () => {
+      const componentRegistry = getComponentRegistry()
+      const checkSourceResponseSpy = vi.spyOn(
+        componentRegistry,
+        "checkSourceResponse"
+      )
+      render(
+        <ComponentInstance
+          element={createElementProp()}
+          registry={componentRegistry}
+          disabled={false}
+          widgetMgr={
+            new WidgetStateManager({
+              sendRerunBackMsg: vi.fn(),
+              formsDataChanged: vi.fn(),
+            })
+          }
+        />
+      )
+
+      expect(checkSourceResponseSpy).toHaveBeenCalledWith(
+        "http://a.mock.url?streamlitUrl=http%3A%2F%2Flocalhost%3A3000%2F",
+        MOCK_COMPONENT_NAME
+      )
+    })
+
+    it("triggers component registry's sendTimeoutError when component has timed out waiting for READY message", () => {
+      const componentRegistry = getComponentRegistry()
+      // spy on Component Registry's sendTimeoutError method
+      const sendTimeoutErrorSpy = vi.spyOn(
+        componentRegistry,
+        "sendTimeoutError"
+      )
+
+      render(
+        <ComponentInstance
+          element={createElementProp()}
+          registry={componentRegistry}
+          disabled={false}
+          widgetMgr={
+            new WidgetStateManager({
+              sendRerunBackMsg: vi.fn(),
+              formsDataChanged: vi.fn(),
+            })
+          }
+        />
+      )
+      // Advance past our warning timeout, and force a re-render.
+      act(() => vi.advanceTimersByTime(COMPONENT_READY_WARNING_TIME_MS))
+
+      expect(sendTimeoutErrorSpy).toHaveBeenCalledWith(
+        "http://a.mock.url?streamlitUrl=http%3A%2F%2Flocalhost%3A3000%2F",
+        MOCK_COMPONENT_NAME
+      )
+    })
+  })
+
   describe("SET_COMPONENT_VALUE handler", () => {
     it("handles JSON values", () => {
       const jsonValue = {
