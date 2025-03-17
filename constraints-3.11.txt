@@ -3,7 +3,6 @@ attrs==25.3.0
 Authlib==1.5.1
 backports.tarfile==1.2.0
 blinker==1.9.0
-bokeh==2.4.3
 cachetools==5.5.2
 certifi==2025.1.31
 cffi==1.17.1
@@ -47,10 +46,10 @@ more-itertools==10.6.0
 mypy==1.10.1
 mypy-extensions==1.0.0
 mypy-protobuf==3.6.0
-narwhals==1.30.0
+narwhals==1.31.0
 nh3==0.2.21
 nodeenv==1.9.1
-numpy==1.26.4
+numpy==2.2.4
 packaging==24.2
 pandas==2.2.3
 parameterized==0.9.0
@@ -58,7 +57,7 @@ pillow==11.1.0
 pixelmatch==0.3.0
 platformdirs==4.3.6
 playwright==1.50.0
-plotly==6.0.0
+plotly==6.0.1
 pluggy==1.5.0
 pre_commit==4.1.0
 protobuf==5.29.3
