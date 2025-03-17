@@ -174,7 +174,7 @@ message CustomThemeConfig {
   optional int32 base_font_size = 22;
   optional bool show_sidebar_separator = 23;
 
-  CustomThemeConfig sidebar = 600;
+  CustomThemeConfig sidebar = 24;
 }
 
 message FontFace {
