@@ -3392,8 +3392,7 @@ describe("App", () => {
         sendForwardMessage("sessionEvent", sessionEvent)
 
         expect(hostCommunicationMgr.sendMessageToHost).toBeCalledWith({
-          type: "CLIENT_ERROR",
-          dialog: true,
+          type: "CLIENT_ERROR_DIALOG",
           error: "scriptCompileError",
           message: "random string",
         })
@@ -3408,8 +3407,7 @@ describe("App", () => {
         sendForwardMessage("randomMessage", {})
 
         expect(hostCommunicationMgr.sendMessageToHost).toBeCalledWith({
-          type: "CLIENT_ERROR",
-          dialog: true,
+          type: "CLIENT_ERROR_DIALOG",
           error: "Bad message format",
           message: 'Cannot handle type "undefined".',
         })
@@ -3424,8 +3422,7 @@ describe("App", () => {
         sendForwardMessage("pageNotFound", { pageName: "random page" })
 
         expect(hostCommunicationMgr.sendMessageToHost).toBeCalledWith({
-          type: "CLIENT_ERROR",
-          dialog: true,
+          type: "CLIENT_ERROR_DIALOG",
           error: "Page not found",
           message:
             "You have requested page /random page, but no corresponding file was found in the app's pages/ directory. Running the app's main page.",
@@ -3445,8 +3442,7 @@ describe("App", () => {
         })
 
         expect(hostCommunicationMgr.sendMessageToHost).toBeCalledWith({
-          type: "CLIENT_ERROR",
-          dialog: true,
+          type: "CLIENT_ERROR_DIALOG",
           error: "Connection error",
           message: "Connection error message.",
         })

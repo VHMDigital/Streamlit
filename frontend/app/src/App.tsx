@@ -563,29 +563,23 @@ export class App extends PureComponent<Props, State> {
     newDialog: WarningProps | DeployErrorProps | ScriptCompileErrorProps,
     errorMsg: string
   ): void {
+    // Show dialog only if blockErrorDialogs host config is false
     const { blockErrorDialogs } = this.state.appConfig
-
     if (!blockErrorDialogs) {
-      // Show dialog as normal
       this.openDialog(newDialog)
-    } else {
-      const {
-        // @ts-expect-error - script compile error has exception instead of title
-        title: dialogTitle,
-        type: dialogType,
-      } = newDialog
-      const isScriptCompileError =
-        dialogType === DialogType.SCRIPT_COMPILE_ERROR
-      const error = isScriptCompileError ? dialogType : dialogTitle
-
-      // Send error info to host via postMessage instead
-      this.hostCommunicationMgr.sendMessageToHost({
-        type: "CLIENT_ERROR",
-        dialog: true,
-        error,
-        message: errorMsg,
-      })
     }
+
+    const isScriptCompileError =
+      newDialog.type === DialogType.SCRIPT_COMPILE_ERROR
+    // script compile error has no title
+    const error = isScriptCompileError ? newDialog.type : newDialog.title
+
+    // Send error info to host via postMessage
+    this.hostCommunicationMgr.sendMessageToHost({
+      type: "CLIENT_ERROR_DIALOG",
+      error,
+      message: errorMsg,
+    })
   }
 
   showError(title: string, errorMarkdown: string): void {
@@ -998,7 +992,7 @@ export class App extends PureComponent<Props, State> {
       }
       this.maybeShowErrorDialog(
         newDialog,
-        sessionEvent.scriptCompilationException?.message ?? ""
+        sessionEvent.scriptCompilationException?.message ?? "No message"
       )
     }
   }

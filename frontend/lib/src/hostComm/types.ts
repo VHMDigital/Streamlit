@@ -235,8 +235,7 @@ export type IGuestToHostMessage =
       data: MetricsEvent
     }
   | {
-      type: "CLIENT_ERROR"
-      dialog: boolean
+      type: "CLIENT_ERROR_DIALOG"
       error: string
       message?: string
     }

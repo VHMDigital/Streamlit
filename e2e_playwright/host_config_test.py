@@ -88,5 +88,5 @@ def test_block_error_dialogs(page: Page, app_port: int):
         in last_message.text
     )
 
-    # # Verify no error dialog is shown
+    # Verify no error dialog is shown
     expect(page.get_by_role("dialog")).not_to_be_attached()
