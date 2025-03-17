@@ -293,7 +293,7 @@ protobuf: check-protoc
 .PHONY: react-init
 # React init.
 react-init:
-	cd frontend/ ; yarn install --immutable
+	cd frontend/ ; corepack enable ; corepack install ; yarn install --immutable
 
 .PHONY: react-build
 # React build.
