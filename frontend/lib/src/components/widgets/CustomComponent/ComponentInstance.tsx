@@ -242,17 +242,21 @@ function ComponentInstance(props: Props): ReactElement {
       getSrc(componentName, registry, url),
       componentName
     )
+    // Array must be empty to run as mount/cleanup
+    // TODO: Update to match React best practices
+    // eslint-disable-next-line react-compiler/react-compiler
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
-    if (isReadyTimeout) {
-      // Send timeout error if custom component register fails
+    if (isReadyTimeout && !isReadyRef.current) {
+      // Send timeout error if we've timed out waiting for the READY message from the component
       registry.sendTimeoutError(
         getSrc(componentName, registry, url),
         componentName
       )
     }
-  }, [isReadyTimeout])
+  }, [isReadyTimeout, componentName, registry, url])
 
   // Send a render message to the custom component everytime relevant props change, such as the
   // input args or the theme / width

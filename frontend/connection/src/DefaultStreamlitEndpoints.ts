@@ -24,16 +24,18 @@ import {
   notNullOrUndefined,
 } from "@streamlit/utils"
 
-import {
-  FileUploadClientConfig,
-  IClientErrorMessage,
-  StreamlitEndpoints,
-} from "./types"
+import { FileUploadClientConfig, StreamlitEndpoints } from "./types"
 
 interface Props {
   getServerUri: () => URL | undefined
   csrfEnabled: boolean
-  sendMessageToHost: (message: IClientErrorMessage) => void
+  sendClientError: (
+    component: string,
+    customComponentName: string,
+    error: string | number,
+    message: string,
+    source: string
+  ) => void
 }
 
 const MEDIA_ENDPOINT = "/media"
@@ -45,7 +47,13 @@ const FORWARD_MSG_CACHE_ENDPOINT = "/_stcore/message"
 export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
   private readonly getServerUri: () => URL | undefined
 
-  private readonly sendMessageToHost: (message: IClientErrorMessage) => void
+  private readonly sendClientError: (
+    component: string,
+    customComponentName: string,
+    error: string | number,
+    message: string,
+    source: string
+  ) => void
 
   private readonly csrfEnabled: boolean
 
@@ -58,7 +66,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
   public constructor(props: Props) {
     this.getServerUri = props.getServerUri
     this.csrfEnabled = props.csrfEnabled
-    this.sendMessageToHost = props.sendMessageToHost
+    this.sendClientError = props.sendClientError
     this.staticConfigUrl = null
   }
 
@@ -66,22 +74,20 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
     this.staticConfigUrl = url
   }
 
-  public sendClientError(
-    error: string | number,
-    source: string,
+  public sendClientErrorToHost(
     component: string,
     customComponentName: string,
-    message?: string
+    error: string | number,
+    message: string,
+    source: string
   ): void {
-    this.sendMessageToHost({
-      type: "CLIENT_ERROR",
-      dialog: false,
-      error,
-      message,
+    this.sendClientError(
       component,
       customComponentName,
-      url: source,
-    })
+      error,
+      message,
+      source
+    )
   }
 
   public async checkSourceResponse(
@@ -92,23 +98,24 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
       .then(response => {
         if (!response.ok) {
           // Send response info if unsuccessful
-          this.sendClientError(
-            response.status,
-            source,
+          this.sendClientErrorToHost(
             "Custom Component",
             componentName,
-            response.statusText
+            response.status,
+            response.statusText,
+            source
           )
         }
         // Don't send error info on success
       })
       .catch(error => {
         // Send fetch error info on failure
-        this.sendClientError(
-          error.message,
-          source,
+        this.sendClientErrorToHost(
           "Custom Component",
-          componentName
+          componentName,
+          "Error fetching source",
+          error.message,
+          source
         )
       })
   }

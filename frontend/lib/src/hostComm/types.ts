@@ -231,12 +231,11 @@ export type IGuestToHostMessage =
     }
   | {
       type: "CLIENT_ERROR"
-      dialog: boolean
-      error: string
-      message?: string
-      component?: string
-      customComponentName?: string
-      url?: string
+      component: string
+      customComponentName: string
+      error: string | number
+      message: string
+      source: string
     }
 
 export type VersionedMessage<Message> = {

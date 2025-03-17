@@ -34,18 +34,18 @@ export interface StreamlitEndpoints {
 
   /**
    * Send postMessage to host with client errors
-   * @param error error status code or message
-   * @param source component src (url)
    * @param component component causing the error
-   * @param message additional error info
    * @param customComponentName if custom component, component's name
+   * @param error error status code or message
+   * @param message additional error info
+   * @param source component src (url)
    */
-  sendClientError(
-    error: string | number,
-    source: string,
+  sendClientErrorToHost(
     component: string,
-    customComponentName?: string,
-    message?: string
+    customComponentName: string,
+    error: string | number,
+    message: string,
+    source: string
   ): void
 
   /**

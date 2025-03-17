@@ -31,7 +31,7 @@ function createCache(): MockCache {
 
   const cache = new ForwardMsgCache({
     setStaticConfigUrl: vi.fn(),
-    sendClientError: vi.fn(),
+    sendClientErrorToHost: vi.fn(),
     checkSourceResponse: vi.fn(),
     buildComponentURL: vi.fn(),
     buildMediaURL: vi.fn(),
