@@ -260,7 +260,7 @@ function warningDialog(props: WarningProps): ReactElement {
   )
 }
 
-export interface DeployErrorProps {
+interface DeployErrorProps {
   type: DialogType.DEPLOY_ERROR
   title: string
   msg: ReactNode

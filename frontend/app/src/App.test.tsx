@@ -3447,9 +3447,6 @@ describe("App", () => {
           message: "Connection error message.",
         })
       })
-
-      // TODO (mayagbarnes): First verify that the deploy button exists in SIS
-      // If so, add test for deploy error dialog
     })
   })
 

@@ -108,7 +108,6 @@ import ToolbarActions from "@streamlit/app/src/components/ToolbarActions"
 import DeployButton from "@streamlit/app/src/components/DeployButton"
 import Header from "@streamlit/app/src/components/Header"
 import {
-  DeployErrorProps,
   DialogProps,
   ScriptCompileErrorProps,
   StreamlitDialog,
@@ -560,7 +559,7 @@ export class App extends PureComponent<Props, State> {
    * to be handled by the host.
    */
   maybeShowErrorDialog(
-    newDialog: WarningProps | DeployErrorProps | ScriptCompileErrorProps,
+    newDialog: WarningProps | ScriptCompileErrorProps,
     errorMsg: string
   ): void {
     // Show dialog only if blockErrorDialogs host config is false
@@ -596,7 +595,6 @@ export class App extends PureComponent<Props, State> {
   showDeployError = (
     title: string,
     errorNode: ReactNode,
-    errorMsg: string,
     onContinue?: () => void
   ): void => {
     const newDialog: DialogProps = {
@@ -607,7 +605,7 @@ export class App extends PureComponent<Props, State> {
       onClose: () => {},
       onTryAgain: this.sendLoadGitInfoBackMsg,
     }
-    this.maybeShowErrorDialog(newDialog, errorMsg)
+    this.openDialog(newDialog)
   }
 
   /**

@@ -19,5 +19,4 @@ export type {
   PlainEventHandler,
   ScriptCompileErrorProps,
   WarningProps,
-  DeployErrorProps,
 } from "./StreamlitDialog"
