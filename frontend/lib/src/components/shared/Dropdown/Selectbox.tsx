@@ -138,8 +138,6 @@ const Selectbox: React.FC<Props> = ({
   const opts = propOptions
 
   let selectValue: Option[] = []
-  // eslint-disable-next-line no-console
-  console.log(`Selectbox value:`, label, value, opts, opts.length)
   if (!isNullOrUndefined(value)) {
     selectValue = [{ label: value, value }]
   }
@@ -153,8 +151,6 @@ const Selectbox: React.FC<Props> = ({
     label: option,
     value: option,
   }))
-  // eslint-disable-next-line no-console
-  console.log(`Selectbox options:`, selectOptions, opts)
 
   // Check if we have more than 10 options in the selectbox.
   // If that's true, we show the keyboard on mobile. If not, we hide it.

@@ -29,7 +29,7 @@ import Selectbox, { fuzzyFilterSelectOptions, Props } from "./Selectbox"
 vi.mock("~lib/WidgetStateManager")
 
 const getProps = (props: Partial<Props> = {}): Props => ({
-  value: "someValue",
+  value: "a",
   label: "Label",
   options: ["a", "b", "c"],
   disabled: false,
@@ -137,7 +137,7 @@ describe("Selectbox widget", () => {
     // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.click(options[2])
 
-    expect(props.onChange).toHaveBeenCalledWith(2)
+    expect(props.onChange).toHaveBeenCalledWith("c")
     expect(screen.getByText(props.options[2])).toBeInTheDocument()
   })
 
@@ -205,7 +205,7 @@ describe("Selectbox widget", () => {
     // Original value passed is 0
     expect(screen.getByText(props.options[0])).toBeInTheDocument()
 
-    props = getProps({ value: "someOtherValue" })
+    props = getProps({ value: "b" })
     rerender(<Selectbox {...props} />)
     expect(screen.getByText(props.options[1])).toBeInTheDocument()
   })
