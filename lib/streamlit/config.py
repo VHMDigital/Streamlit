@@ -1332,11 +1332,11 @@ def _update_config_with_toml(raw_toml: str, where_defined: str) -> None:
 
     parsed_config_file = toml.loads(raw_toml)
 
-    def process_section(section_path, section_data):
+    def process_section(section_path: str, section_data: dict[str, Any]) -> None:
         for name, value in section_data.items():
             option_name = f"{section_path}.{name}"
-            # If value is a dict, it's a nested table (e.g. theme.sidebar)
-            if isinstance(value, dict):
+            # Process it as a nested config section if it's a custom theme sub-category
+            if name in [CustomThemeCategories.SIDEBAR.value]:
                 process_section(option_name, value)
             else:
                 # It's a regular config option, set it
