@@ -50,11 +50,10 @@ const getStateFromWidgetMgr = (
 }
 
 const getDefaultStateFromProto = (element: SelectboxProto): SelectboxValue => {
-  const defaultIndex = element.default
-  if (!defaultIndex) {
+  if (element.options.length === 0 || isNullOrUndefined(element.default)) {
     return null
   }
-  return element.options[defaultIndex]
+  return element.options[element.default]
 }
 
 const getCurrStateFromProto = (element: SelectboxProto): SelectboxValue => {

@@ -101,7 +101,6 @@ const Selectbox: React.FC<Props> = ({
   // This ref is used to store the value before the user starts removing characters so that we can restore
   // the value in case the user dismisses the changes by clicking away.
   const valueBeforeRemoval = useRef<string | number | null>(value)
-  const [options] = useState<string[]>(propOptions)
 
   // Update the value whenever the value provided by the props changes
   // TODO: Find a better way to handle this to prevent unneeded re-renders
@@ -145,19 +144,17 @@ const Selectbox: React.FC<Props> = ({
   )
 
   let selectDisabled = disabled
+  const opts = propOptions
 
   let selectValue: Option[] = []
+  // eslint-disable-next-line no-console
+  console.log(`Selectbox value:`, label, value, opts, opts.length)
   if (!isNullOrUndefined(value)) {
-    if (options.length === 0) {
-      selectValue = [{ label: NO_OPTIONS_MSG, value: null }]
-    } else {
-      selectValue = [{ label: value, value: null }]
-    }
+    selectValue = [{ label: value, value }]
   }
 
-  let opts = options
   if (opts.length === 0) {
-    opts = [NO_OPTIONS_MSG]
+    selectValue = [{ label: NO_OPTIONS_MSG }]
     selectDisabled = true
   }
 
@@ -165,6 +162,8 @@ const Selectbox: React.FC<Props> = ({
     label: option,
     value: option,
   }))
+  // eslint-disable-next-line no-console
+  console.log(`Selectbox options:`, selectOptions, opts)
 
   // Check if we have more than 10 options in the selectbox.
   // If that's true, we show the keyboard on mobile. If not, we hide it.
