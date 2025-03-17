@@ -280,7 +280,7 @@ class ConfigTest(unittest.TestCase):
         sidebar_key = f"theme.{CustomThemeCategories.SIDEBAR.value}.testConfig"
         self.assertEqual(options[sidebar_key].name, "testConfig")
         self.assertEqual(
-            options[sidebar_key].section, f"{CustomThemeCategories.SIDEBAR.value}"
+            options[sidebar_key].section, f"theme.{CustomThemeCategories.SIDEBAR.value}"
         )
         self.assertEqual(options[sidebar_key].description, "This is a test config")
         self.assertEqual(options[sidebar_key].value, "TEST")

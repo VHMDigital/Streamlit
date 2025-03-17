@@ -726,6 +726,12 @@ class AppSession:
         )
         _populate_config_msg(msg.new_session.config)
         _populate_theme_msg(msg.new_session.custom_theme)
+        _populate_theme_msg(
+            getattr(
+                msg.new_session.custom_theme, config.CustomThemeCategories.SIDEBAR.value
+            ),
+            f"theme.{config.CustomThemeCategories.SIDEBAR.value}",
+        )
 
         # Immutable session data. We send this every time a new session is
         # started, to avoid having to track whether the client has already
@@ -933,7 +939,7 @@ def _populate_theme_msg(msg: CustomThemeConfig, section: str = "theme") -> None:
         "light": msg.BaseTheme.LIGHT,
         "dark": msg.BaseTheme.DARK,
     }
-    base = theme_opts["base"]
+    base = theme_opts.get("base", None)
     if base is not None:
         if base not in base_map:
             _LOGGER.warning(
@@ -946,11 +952,11 @@ def _populate_theme_msg(msg: CustomThemeConfig, section: str = "theme") -> None:
 
     # Since the font field uses the deprecated enum, we need to put the font
     # config into the body_font field instead:
-    body_font = theme_opts["font"]
+    body_font = theme_opts.get("font", None)
     if body_font:
         msg.body_font = body_font
 
-    font_faces = theme_opts["fontFaces"]
+    font_faces = theme_opts.get("fontFaces", None)
     # If fontFaces was configured via config.toml, it's already a parsed list of
     # dictionaries. However, if it was provided via env variable or via CLI arg,
     # it's a json string that still needs to be parsed.
@@ -974,11 +980,6 @@ def _populate_theme_msg(msg: CustomThemeConfig, section: str = "theme") -> None:
                     f"Failed to parse the theme.fontFaces config option: {font_face}.",
                     exc_info=e,
                 )
-
-    msg_sidebar = getattr(msg, config.CustomThemeCategories.SIDEBAR.value)
-    _populate_theme_msg(
-        msg_sidebar, f"theme.{config.CustomThemeCategories.SIDEBAR.value}"
-    )
 
 
 def _populate_user_info_msg(msg: UserInfo) -> None:
