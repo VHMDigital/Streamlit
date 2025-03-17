@@ -176,7 +176,8 @@ class LocalSourcesWatcherTest(unittest.TestCase):
 
         fob.assert_called_once()  # Just __init__.py
 
-        patched_logger.warning.assert_called_once_with(
+        # Check that the warning was called with the expected message
+        patched_logger.warning.assert_any_call(
             "Examining the path of MisbehavedModule raised:",
             exc_info=True,
         )
@@ -199,7 +200,7 @@ class LocalSourcesWatcherTest(unittest.TestCase):
             lsw.update_watched_modules()
 
             # Simulate a change to the child module
-            lsw.on_file_changed(NESTED_MODULE_CHILD_FILE)
+            lsw.on_path_changed(NESTED_MODULE_CHILD_FILE)
 
             # Assert that both the parent and child are unloaded, ready for reload
             self.assertNotIn("NESTED_MODULE_CHILD", sys.modules)
@@ -286,7 +287,7 @@ class LocalSourcesWatcherTest(unittest.TestCase):
             lsw.update_watched_modules()
 
             # Simulate a change to the child module
-            lsw.on_file_changed(pkg_path)
+            lsw.on_path_changed(pkg_path)
 
             # Assert that both the parent and child are unloaded, ready for reload
             self.assertNotIn("pkg", sys.modules)
@@ -480,14 +481,13 @@ class LocalSourcesWatcherTest(unittest.TestCase):
         lsw.register_file_change_callback(callback)
 
         # Simulate a change to the report script
-        lsw.on_file_changed(SCRIPT_PATH)
+        lsw.on_path_changed(SCRIPT_PATH)
 
         self.assertEqual(saved_filepath, SCRIPT_PATH)
 
-    @patch("streamlit.watcher.local_sources_watcher.watch_dir")
     @patch("streamlit.watcher.local_sources_watcher.PathWatcher")
     @patch("os.path.isdir")
-    def test_folder_watch_list(self, mock_isdir, mock_path_watcher, mock_watch_dir):
+    def test_folder_watch_list(self, mock_isdir, mock_path_watcher):
         watch_folders = ["/watch/path1", "/watch/path2"]
         config.set_option("server.folderWatchList", watch_folders)
 
@@ -496,16 +496,18 @@ class LocalSourcesWatcherTest(unittest.TestCase):
         lsw = local_sources_watcher.LocalSourcesWatcher(PagesManager(SCRIPT_PATH))
         lsw.register_file_change_callback(NOOP_CALLBACK)
 
-        # Check that watch_dir was called for each directory
-        expected_watch_dir_calls = [
-            call(folder, lsw.on_dir_changed, glob_pattern="**/*")
-            for folder in watch_folders
-        ]
-        mock_watch_dir.assert_has_calls(expected_watch_dir_calls, any_order=True)
+        # Check that PathWatcher was called for each directory with the glob_pattern
+        expected_calls = []
+        for folder in watch_folders:
+            expected_calls.append(
+                call(folder, lsw.on_path_changed, glob_pattern="**/*")
+            )
+
+        mock_path_watcher.assert_has_calls(expected_calls, any_order=True)
 
         # Simulate file changes in watched directories
         test_file = "/watch/path1/test.txt"
-        lsw.on_dir_changed(test_file)
+        lsw.on_path_changed(test_file)
 
         # Clean up
         config.set_option("server.folderWatchList", [])

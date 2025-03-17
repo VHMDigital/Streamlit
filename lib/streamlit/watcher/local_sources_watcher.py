@@ -25,7 +25,6 @@ from streamlit.watcher.folder_black_list import FolderBlackList
 from streamlit.watcher.path_watcher import (
     NoOpPathWatcher,
     get_default_path_watcher_class,
-    watch_dir,
 )
 
 if TYPE_CHECKING:
@@ -52,7 +51,7 @@ class LocalSourcesWatcher:
         self._main_script_path = os.path.abspath(self._pages_manager.main_script_path)
         self._watch_folders = config.get_option("server.folderWatchList")
         self._script_folder = os.path.dirname(self._main_script_path)
-        self._on_file_changed: list[Callable[[str], None]] = []
+        self._on_path_changed: list[Callable[[str], None]] = []
         self._is_closed = False
         self._cached_sys_modules: set[str] = set()
 
@@ -107,27 +106,22 @@ class LocalSourcesWatcher:
         self._watched_pages = self._watched_pages.union(new_pages_paths)
 
     def register_file_change_callback(self, cb: Callable[[str], None]) -> None:
-        self._on_file_changed.append(cb)
+        self._on_path_changed.append(cb)
 
-    def on_dir_changed(self, filepath: str):
-        """
-        Callback for directory-level changes. Handles file changes within watched directories.
-        """
-        for watched_dir in self._watched_modules:
-            if (
-                os.path.isdir(watched_dir)
-                and os.path.commonpath([watched_dir, filepath]) == watched_dir
-            ):
-                _LOGGER.info("File changed in watched directory: %s", filepath)
-                for cb in self._on_file_changed:
-                    cb(filepath)
-                return
-        _LOGGER.debug("File not in any watched directory: %s", filepath)
-
-    def on_file_changed(self, filepath):
-        _LOGGER.debug("File changed: %s", filepath)
+    def on_path_changed(self, filepath):
+        _LOGGER.debug("Path changed: %s", filepath)
         if filepath not in self._watched_modules:
-            _LOGGER.error("Received event for non-watched file: %s", filepath)
+            # Check if this is a file in a watched directory
+            for watched_dir in self._watched_modules:
+                if (
+                    os.path.isdir(watched_dir)
+                    and os.path.commonpath([watched_dir, filepath]) == watched_dir
+                ):
+                    _LOGGER.info("File changed in watched directory: %s", filepath)
+                    for cb in self._on_path_changed:
+                        cb(filepath)
+                    return
+            _LOGGER.error("Received event for non-watched path: %s", filepath)
             return
 
         # Workaround:
@@ -146,7 +140,7 @@ class LocalSourcesWatcher:
             if wm.module_name is not None and wm.module_name in sys.modules:
                 del sys.modules[wm.module_name]
 
-        for cb in self._on_file_changed:
+        for cb in self._on_path_changed:
             cb(filepath)
 
     def close(self):
@@ -165,20 +159,15 @@ class LocalSourcesWatcher:
             return
 
         try:
+            kwargs = {}
             if is_directory:
-                # Watch the directory instead of individual files
-                watch_dir(filepath, self.on_dir_changed, glob_pattern="**/*")
-                wm = WatchedModule(
-                    watcher=None,
-                    module_name=module_name,
-                )
-                self._watched_modules[filepath] = wm
-            else:
-                wm = WatchedModule(
-                    watcher=PathWatcher(filepath, self.on_file_changed),
-                    module_name=module_name,
-                )
-                self._watched_modules[filepath] = wm
+                kwargs["glob_pattern"] = "**/*"
+
+            wm = WatchedModule(
+                watcher=PathWatcher(filepath, self.on_path_changed, **kwargs),
+                module_name=module_name,
+            )
+            self._watched_modules[filepath] = wm
         except PermissionError:
             # If you don't have permission to read this file, don't even add it
             # to watchers.
