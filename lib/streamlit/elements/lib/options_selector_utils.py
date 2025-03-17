@@ -211,10 +211,10 @@ def maybe_coerce_enum(register_widget_result, options, opt_sequence):
 # (https://github.com/python/typing/issues/548)
 @overload
 def maybe_coerce_enum_sequence(
-    register_widget_result: RegisterWidgetResult[list[T]],
+    register_widget_result: RegisterWidgetResult[list[T] | list[T | str]],
     options: OptionSequence[T],
     opt_sequence: Sequence[T],
-) -> RegisterWidgetResult[list[T]]: ...
+) -> RegisterWidgetResult[list[T] | list[T | str]]: ...
 
 
 @overload
@@ -227,8 +227,8 @@ def maybe_coerce_enum_sequence(
 
 def maybe_coerce_enum_sequence(register_widget_result, options, opt_sequence):
     """Maybe Coerce a RegisterWidgetResult with a sequence of Enum members as value
-    to RegisterWidgetResult[Sequence[option]] if option is an EnumType, otherwise just return
-    the original RegisterWidgetResult.
+    to RegisterWidgetResult[Sequence[option]] if option is an EnumType, otherwise just
+    return the original RegisterWidgetResult.
     """
 
     # If not all widget values are Enums, return early

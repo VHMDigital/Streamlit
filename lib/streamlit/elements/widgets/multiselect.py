@@ -71,24 +71,24 @@ if TYPE_CHECKING:
 
 class MultiSelectSerde(Generic[T]):
     options: Sequence[T]
-    default_options: list[int]
+    default_options_indices: list[int]
     accept_new_options: bool
     formatted_option_to_option_mapping: dict[str, T]
-    format_func: Callable[[Any], Any]
+    format_func: Callable[[Any], str]
 
     def __init__(
         self,
         options: Sequence[T],
         formatted_option_to_option_mapping: dict[str, T],
-        default_options: list[int] | None = None,
+        default_options_indices: list[int] | None = None,
         accept_new_options: bool = False,
-        format_func: Callable[[Any], Any] = str,
+        format_func: Callable[[Any], str] = str,
     ):
         self.options = options
-        self.default_options = default_options or []
+        self.formatted_option_to_option_mapping = formatted_option_to_option_mapping
+        self.default_options_indices = default_options_indices or []
         self.accept_new_options = accept_new_options
         self.format_func = format_func
-        self.formatted_option_to_option_mapping = formatted_option_to_option_mapping
 
     def serialize(self, value: list[T | str] | list[T]) -> list[str]:
         return [self.format_func(v) for v in value] if value is not None else []
@@ -108,7 +108,7 @@ class MultiSelectSerde(Generic[T]):
                 for selected_option in ui_value
             ]
             if ui_value is not None
-            else [self.options[i] for i in self.default_options]
+            else [self.options[i] for i in self.default_options_indices]
         )
 
 
@@ -140,7 +140,7 @@ class MultiSelectMixin:
         label: str,
         options: OptionSequence[T],
         default: Any | None = None,
-        format_func: Callable[[Any], Any] = str,
+        format_func: Callable[[Any], str] = str,
         key: Key | None = None,
         help: str | None = None,
         on_change: WidgetCallback | None = None,
@@ -160,7 +160,7 @@ class MultiSelectMixin:
         label: str,
         options: OptionSequence[T],
         default: Any | None = None,
-        format_func: Callable[[Any], Any] = str,
+        format_func: Callable[[Any], str] = str,
         key: Key | None = None,
         help: str | None = None,
         on_change: WidgetCallback | None = None,
@@ -180,7 +180,7 @@ class MultiSelectMixin:
         label: str,
         options: OptionSequence[T],
         default: Any | None = None,
-        format_func: Callable[[Any], Any] = str,
+        format_func: Callable[[Any], str] = str,
         key: Key | None = None,
         help: str | None = None,
         on_change: WidgetCallback | None = None,
@@ -393,6 +393,7 @@ class MultiSelectMixin:
             formatted_option_to_option_mapping,
             default_values,
             accept_new_options,
+            format_func,
         )
 
         widget_state = register_widget(
@@ -408,14 +409,9 @@ class MultiSelectMixin:
 
         _check_max_selections(widget_state.value, max_selections)
 
-        # Ignore type to make mypy happy.
-        # mypy complains because widget_state is a
-        # RegisterWidgetResult[list[T] | list[T | str]]. If widget_state is
-        # `list[T | str]` and one of the options is a string, then
-        # `maybe_coerce_enum_sequence` returns early and does nothing.
         widget_state = maybe_coerce_enum_sequence(
             widget_state, options, indexable_options
-        )  # type: ignore
+        )
 
         if widget_state.value_changed:
             proto.raw_values[:] = serde.serialize(widget_state.value)

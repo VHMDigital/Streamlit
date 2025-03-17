@@ -35,11 +35,8 @@ import { EmotionTheme } from "~lib/theme"
 
 const NO_OPTIONS_MSG = "No options to select."
 
-export interface Props {
+interface BaseProps {
   disabled: boolean
-  value: string | null
-
-  onChange: (value: string | null) => void
   options: any[]
   label?: string | null
   labelVisibility?: LabelVisibilityOptions
@@ -48,6 +45,17 @@ export interface Props {
   clearable?: boolean
   acceptNewOptions?: boolean | null
 }
+interface NumberValueProps extends BaseProps {
+  value: number | null
+  onChange: (value: number | null) => void
+}
+
+interface StringValueProps extends BaseProps {
+  value: string | null
+  onChange: (value: string | null) => void
+}
+
+export type Props = NumberValueProps | StringValueProps
 
 interface SelectOption {
   label: string
@@ -88,10 +96,11 @@ const Selectbox: React.FC<Props> = ({
   acceptNewOptions,
 }) => {
   const theme: EmotionTheme = useTheme()
-  const [value, setValue] = useState<string | null>(propValue)
+
+  const [value, setValue] = useState<string | number | null>(propValue)
   // This ref is used to store the value before the user starts removing characters so that we can restore
   // the value in case the user dismisses the changes by clicking away.
-  const valueBeforeRemoval = useRef<string | null>(value)
+  const valueBeforeRemoval = useRef<string | number | null>(value)
   const [options] = useState<string[]>(propOptions)
 
   // Update the value whenever the value provided by the props changes
