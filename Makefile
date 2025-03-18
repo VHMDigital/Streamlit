@@ -25,7 +25,7 @@ CONSTRAINTS_BRANCH ?= constraints-develop
 CONSTRAINTS_URL ?= https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${CONSTRAINTS_BRANCH}/constraints-${PYTHON_VERSION}.txt
 
 # Black magic to get module directories
-PYTHON_MODULES := $(foreach initpy, $(foreach dir, $(wildcard lib/*), $(wildcard $(dir)/__init__.py)), $(realpath $(dir $(initpy))))
+PYTHON_MODULES := $(foreach initpy, $(foreach dir, $(wildcard lib/*), $(wildcard $(dir)/__init__.py)), "$(realpath $(dir $(initpy)))")
 
 # Check if Python is installed and can be executed, otherwise show an error message in red (but continue)
 ifeq ($(PYTHON_VERSION),)
