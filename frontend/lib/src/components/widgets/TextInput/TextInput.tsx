@@ -48,6 +48,7 @@ import { useResizeObserver } from "~lib/hooks/useResizeObserver"
 
 import { StyledTextInput } from "./styled-components"
 import MaskedTextInput from "../MaskedTextInput"
+import { isValidMaskedValue } from "~lib/util/validateMaskValue"
 
 export interface Props {
   disabled: boolean
@@ -111,6 +112,10 @@ function TextInput({
   const { placeholder, formId } = element
 
   const commitWidgetValue = useCallback((): void => {
+    if (element.mask && !isValidMaskedValue(uiValue ?? "", element.mask)) {
+      return
+    }
+
     setDirty(false)
     setValueWithSource({ value: uiValue, fromUi: true })
   }, [uiValue, setValueWithSource])
