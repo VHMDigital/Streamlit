@@ -24,7 +24,8 @@ GITHUB_REPOSITORY ?= streamlit/streamlit
 CONSTRAINTS_BRANCH ?= constraints-develop
 CONSTRAINTS_URL ?= https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${CONSTRAINTS_BRANCH}/constraints-${PYTHON_VERSION}.txt
 
-# Black magic to get module directories
+# Black magic to get module directories.
+# (Should the quoting use bash ${parameter@Q} instead? (https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html) In what way, exactly?)
 PYTHON_MODULES := $(foreach initpy, $(foreach dir, $(wildcard lib/*), $(wildcard $(dir)/__init__.py)), "$(realpath $(dir $(initpy)))")
 
 # Check if Python is installed and can be executed, otherwise show an error message in red (but continue)
