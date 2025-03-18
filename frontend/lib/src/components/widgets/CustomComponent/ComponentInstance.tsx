@@ -251,6 +251,7 @@ function ComponentInstance(props: Props): ReactElement {
   useEffect(() => {
     if (isReadyTimeout && !isReadyRef.current) {
       // Send timeout error if we've timed out waiting for the READY message from the component
+      LOG.error("Custom component timeout error:", componentName)
       registry.sendTimeoutError(
         getSrc(componentName, registry, url),
         componentName

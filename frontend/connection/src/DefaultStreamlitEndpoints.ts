@@ -15,6 +15,7 @@
  */
 
 import axios, { AxiosRequestConfig, AxiosResponse, CancelToken } from "axios"
+import { getLogger } from "loglevel"
 
 import { IAppPage } from "@streamlit/protobuf"
 import {
@@ -25,6 +26,8 @@ import {
 } from "@streamlit/utils"
 
 import { FileUploadClientConfig, StreamlitEndpoints } from "./types"
+
+const LOG = getLogger("DefaultStreamlitEndpoints")
 
 interface Props {
   getServerUri: () => URL | undefined
@@ -98,6 +101,11 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
       const response = await fetch(source)
       if (!response.ok) {
         // Send response info if unsuccessful
+        LOG.error(
+          "Custom component source error:",
+          componentName,
+          response.status
+        )
         this.sendClientErrorToHost(
           "Custom Component",
           componentName,
@@ -110,6 +118,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
     } catch (error: any) {
       const message = error instanceof Error ? error.message : "Unknown Error"
       // Send fetch error info on failure
+      LOG.error("Custom component fetch error:", componentName, message)
       this.sendClientErrorToHost(
         "Custom Component",
         componentName,
