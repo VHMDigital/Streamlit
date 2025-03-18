@@ -727,9 +727,7 @@ class AppSession:
         _populate_config_msg(msg.new_session.config)
         _populate_theme_msg(msg.new_session.custom_theme)
         _populate_theme_msg(
-            getattr(
-                msg.new_session.custom_theme, config.CustomThemeCategories.SIDEBAR.value
-            ),
+            msg.new_session.custom_theme.sidebar,
             f"theme.{config.CustomThemeCategories.SIDEBAR.value}",
         )
 

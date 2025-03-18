@@ -1202,9 +1202,11 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
 
         # Default values for unsupported fields in sidebar
         assert new_session_msg.custom_theme.sidebar.base == 0
-        assert new_session_msg.custom_theme.sidebar.base_font_size == 0
         assert not new_session_msg.custom_theme.sidebar.font_faces
-        assert new_session_msg.custom_theme.sidebar.show_sidebar_separator is False
+        assert not new_session_msg.custom_theme.sidebar.HasField("base_font_size")
+        assert not new_session_msg.custom_theme.sidebar.HasField(
+            "show_sidebar_separator"
+        )
 
     @patch("streamlit.runtime.app_session._LOGGER")
     @patch("streamlit.runtime.app_session.config")

@@ -316,16 +316,16 @@ def _create_theme_options(
 
         _create_option(
             f"{section}.{name}",
-            description,
-            default_val,
-            False,  # scriptable
-            visibility,
-            False,  # deprecated
-            None,  # deprecation_text
-            None,  # expiration_date
-            None,  # replaced_by
-            type_,
-            False,  # sensitive
+            description=description,
+            default_val=default_val,
+            scriptable=False,
+            visibility=visibility,
+            deprecated=False,
+            deprecation_text=None,
+            expiration_date=None,
+            replaced_by=None,
+            type_=type_,
+            sensitive=False,
         )
 
 
@@ -1333,6 +1333,39 @@ def _update_config_with_toml(raw_toml: str, where_defined: str) -> None:
     parsed_config_file = toml.loads(raw_toml)
 
     def process_section(section_path: str, section_data: dict[str, Any]) -> None:
+        """Recursively process nested sections of the config file.
+
+        Parameters
+        ----------
+        section_path : str
+            The dot-separated path to the current section (e.g., "server" or "theme")
+        section_data : dict[str, Any]
+            The dictionary containing configuration values for this section
+
+        Notes
+        -----
+        TOML's hierarchical structure gets parsed into nested dictionaries.
+        For example:
+            [main]
+            option = "value"
+
+            [main.subsection]
+            another = "value2"
+
+        Will be loaded by the TOML parser as:
+            {
+                "main": {
+                    "option": "value",
+                    "subsection": {
+                        "another": "value2"
+                    }
+                }
+            }
+
+        This function traverses these nested dictionaries and converts them
+        to dot-notation config options.
+        """
+
         for name, value in section_data.items():
             option_name = f"{section_path}.{name}"
             # Process it as a nested config section if it's a custom theme sub-category
