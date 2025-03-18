@@ -29,7 +29,7 @@ const outputJsFile = "proto.js"
 const outputDtsFile = "proto.d.ts"
 
 // Commands to run
-const pbjsCommand = `yarn run --silent pbjs ${protoGlob} --path ${protoDir} -t static-module --wrap es6`
+const pbjsCommand = `yarn run --silent pbjs "${protoGlob}" --path "${protoDir}" -t static-module --wrap es6`
 const pbtsCommand = `yarn run --silent pbts proto.js`
 const TEMPLATE = "/* eslint-disable */\n\n"
 
