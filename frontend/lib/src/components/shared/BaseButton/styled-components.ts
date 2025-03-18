@@ -106,6 +106,12 @@ export const StyledBaseButton = styled.button<RequiredBaseButtonProps>(
       width: containerWidth ? "100%" : "auto",
       cursor: "pointer",
       userSelect: "none",
+      "&:hover": {
+        color: theme.colors.primary,
+        "*": {
+          color: `${theme.colors.primary} !important`,
+        },
+      },
       "&:focus": {
         outline: "none",
       },
