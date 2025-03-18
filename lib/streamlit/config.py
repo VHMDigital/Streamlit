@@ -1148,7 +1148,6 @@ _create_theme_options(
         file_uploader, etc).
     """,
     type_=bool,
-    visibility="hidden",
 )
 
 _create_theme_options(
@@ -1168,7 +1167,6 @@ _create_theme_options(
         Whether to show a vertical separator between the sidebar and the main content.
     """,
     type_=bool,
-    visibility="hidden",
 )
 
 # Config Section: Secrets #
