@@ -242,7 +242,7 @@ export type IGuestToHostMessage =
   | {
       type: "CLIENT_ERROR"
       component: string
-      customComponentName: string
+      customComponentName?: string
       error: string | number
       message: string
       source: string

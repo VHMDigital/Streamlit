@@ -54,6 +54,7 @@ function createMockArgs(overrides?: Partial<Args>): Args {
     onRetry: vi.fn(),
     claimHostAuthToken: () => Promise.resolve(undefined),
     resetHostAuthToken: vi.fn(),
+    sendClientError: vi.fn(),
     onHostConfigResp: vi.fn(),
     ...overrides,
   }
@@ -68,6 +69,7 @@ describe("doInitPings", () => {
     timeoutMs: 10,
     maxTimeoutMs: 100,
     retryCallback: vi.fn(),
+    sendClientError: vi.fn(),
     setAllowedOrigins: vi.fn(),
   }
 
@@ -94,6 +96,7 @@ describe("doInitPings", () => {
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       MOCK_PING_DATA.retryCallback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
     expect(uriIndex).toEqual(0)
@@ -113,6 +116,7 @@ describe("doInitPings", () => {
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       MOCK_PING_DATA.retryCallback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
     expect(uriIndex).toEqual(0)
@@ -136,6 +140,7 @@ describe("doInitPings", () => {
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       MOCK_PING_DATA.retryCallback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
     expect(uriIndex).toEqual(1)
@@ -161,6 +166,7 @@ describe("doInitPings", () => {
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       MOCK_PING_DATA.retryCallback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
@@ -188,6 +194,7 @@ describe("doInitPings", () => {
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       MOCK_PING_DATA.retryCallback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
@@ -219,6 +226,7 @@ describe("doInitPings", () => {
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       MOCK_PING_DATA.retryCallback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
@@ -248,6 +256,7 @@ describe("doInitPings", () => {
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       MOCK_PING_DATA.retryCallback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
@@ -287,6 +296,7 @@ describe("doInitPings", () => {
       MOCK_PING_DATA_LOCALHOST.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       MOCK_PING_DATA_LOCALHOST.retryCallback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
@@ -322,6 +332,7 @@ If you are trying to access a Streamlit app running on another server, this coul
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       MOCK_PING_DATA.retryCallback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
@@ -354,6 +365,7 @@ If you are trying to access a Streamlit app running on another server, this coul
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       MOCK_PING_DATA.retryCallback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
@@ -393,6 +405,7 @@ If you are trying to access a Streamlit app running on another server, this coul
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       MOCK_PING_DATA.retryCallback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
@@ -443,6 +456,7 @@ If you are trying to access a Streamlit app running on another server, this coul
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       callback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
@@ -496,6 +510,7 @@ If you are trying to access a Streamlit app running on another server, this coul
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       callback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
@@ -550,6 +565,7 @@ If you are trying to access a Streamlit app running on another server, this coul
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       callback,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
@@ -573,6 +589,7 @@ If you are trying to access a Streamlit app running on another server, this coul
       MOCK_PING_DATA.timeoutMs,
       MOCK_PING_DATA.maxTimeoutMs,
       callback2,
+      MOCK_PING_DATA.sendClientError,
       MOCK_PING_DATA.setAllowedOrigins
     )
 
