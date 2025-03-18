@@ -69,12 +69,28 @@ function Html({ element, width }: Readonly<HtmlProps>): ReactElement {
   const sanitizedHtml = useMemo(() => sanitizeString(body), [body])
 
   useEffect(() => {
+    // Side-effect to hide the element if it has no rendered content.
+    // This is a hack to avoid rendering empty children in the
+    // `StyledElementContainerLayoutWrapper`.
+    // If the DOM structure changes, this will break.
+
+    /**
+     * Parent element is the `Box` rendered by the `withCalculatedWidth` HOC
+     */
+    const parent = htmlRef.current?.parentElement
+    /**
+     * Grandparent element is the `StyledElementContainer` rendered by the
+     * `StyledElementContainerLayoutWrapper`
+     */
+    const grandparent = parent?.parentElement
+
     if (
       htmlRef.current?.clientHeight === 0 &&
-      htmlRef.current.parentElement?.childElementCount === 1
+      parent?.childElementCount === 1 &&
+      grandparent?.childElementCount === 1
     ) {
       // div has no rendered content - hide to avoid unnecessary spacing
-      htmlRef.current.parentElement.classList.add("stHtml-empty")
+      grandparent.classList.add("stHtml-empty")
     }
   })
 
