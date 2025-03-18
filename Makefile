@@ -106,10 +106,8 @@ conditional-ubuntu-init:
 		curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash ; \
 		#: "Avoid pyenv 'Restart your shell for the changes to take effect.' error by re-sourcing." ; \
 		#source ~/.bashrc ; \
-		: 'Install some other deps (python3-distutils has been removed from this list).' ; \
-		sudo apt install -y graphviz pre-commit ; \
-		: 'Install pip, Protobuf, npm (libgconf-2-4 is no longer on this list as Cypress (which we use for our e2e tests) no longer requires it; cf https://github.com/cypress-io/cypress/issues/27972).' ; \
-		sudo apt install -y python3-pip protobuf-compiler  ; \
+		: 'Install some other deps, incl. Pip, Protobuf.' ; \
+		sudo apt install -y graphviz pre-commit python3-pip protobuf-compiler  ; \
 	else \
 		echo "Apparently not on Ubuntu." 1>&2 ; \
 	fi ; \
