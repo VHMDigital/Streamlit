@@ -64,11 +64,15 @@ export class ComponentRegistry {
     }
   }
 
+  /**
+   * Check the source of a custom component for successful response
+   * If the response is not ok, or fetch otherwise fails, send an error to the host.
+   */
   public checkSourceResponse = (
     source: string,
     componentName?: string
-  ): void => {
-    this.endpoints.checkSourceResponse(source, componentName)
+  ): Promise<void> => {
+    return this.endpoints.checkSourceResponse(source, componentName)
   }
 
   public sendTimeoutError = (source: string, componentName: string): void => {

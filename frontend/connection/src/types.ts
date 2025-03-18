@@ -79,7 +79,7 @@ export interface StreamlitEndpoints {
   ): void
 
   /**
-   * Checks if the custom component src has successful response.
+   * Checks if the component src has successful response.
    * If not, sends CLIENT_ERROR message with error info.
    * @param source The source to check.
    * @param componentName The component for which the source is being checked.

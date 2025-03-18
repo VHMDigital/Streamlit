@@ -93,6 +93,10 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
     )
   }
 
+  /**
+   * Check the source of a component for successful response (for those without onerror event)
+   * If the response is not ok, or fetch otherwise fails, send an error to the host.
+   */
   public async checkSourceResponse(
     source: string,
     componentName: string
@@ -102,9 +106,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
       if (!response.ok) {
         // Send response info if unsuccessful
         LOG.error(
-          "Custom component source error:",
-          componentName,
-          response.status
+          `Client Error: Custom component ${componentName} source error - ${response.status}`
         )
         this.sendClientErrorToHost(
           "Custom Component",
@@ -115,10 +117,12 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
         )
       }
       // Don't send error info on success
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Unknown Error"
       // Send fetch error info on failure
-      LOG.error("Custom component fetch error:", componentName, message)
+      LOG.error(
+        `Client Error: Custom component ${componentName} fetch error - ${message}`
+      )
       this.sendClientErrorToHost(
         "Custom Component",
         componentName,

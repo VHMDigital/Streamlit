@@ -235,23 +235,20 @@ function ComponentInstance(props: Props): ReactElement {
     })
   }, COMPONENT_READY_WARNING_TIME_MS)
 
+  const componentSourceUrl = getSrc(componentName, registry, url)
+
   useEffect(() => {
-    // Iframe has no onerror event - so check custom component
+    // Iframe onerror event unreliable - check custom component
     // src on mount to catch iframe load errors
-    registry.checkSourceResponse(
-      getSrc(componentName, registry, url),
-      componentName
-    )
-    // Array must be empty to run as mount/cleanup
-    // TODO: Update to match React best practices
-    // eslint-disable-next-line react-compiler/react-compiler
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    registry.checkSourceResponse(componentSourceUrl, componentName)
+  }, [componentSourceUrl, componentName, registry])
 
   useEffect(() => {
     if (isReadyTimeout && !isReadyRef.current) {
       // Send timeout error if we've timed out waiting for the READY message from the component
-      LOG.error("Custom component timeout error:", componentName)
+      LOG.error(
+        `Client Error: Custom component ${componentName} timeout error`
+      )
       registry.sendTimeoutError(
         getSrc(componentName, registry, url),
         componentName

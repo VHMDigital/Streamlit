@@ -52,7 +52,8 @@ def test_component_source_failure(page: Page, app_port: int):
     wait_until(
         page,
         lambda: any(
-            "Custom component source error: streamlit_ace.streamlit_ace 404" in message
+            "Client Error: Custom component streamlit_ace.streamlit_ace source error"
+            in message
             for message in messages
         ),
     )
@@ -75,10 +76,12 @@ def test_component_timeout_failure(page: Page, app_port: int):
     # Expect the iframe to be attached
     expect(page.get_by_test_id("stCustomComponentV1")).to_be_attached()
 
+    # Fetch error should be logged
     wait_until(
         page,
         lambda: any(
-            "Custom component fetch error: streamlit_ace.streamlit_ace" in message
+            "Client Error: Custom component streamlit_ace.streamlit_ace fetch error"
+            in message
             for message in messages
         ),
     )
@@ -89,7 +92,8 @@ def test_component_timeout_failure(page: Page, app_port: int):
     wait_until(
         page,
         lambda: any(
-            "Custom component timeout error: streamlit_ace.streamlit_ace" in message
+            "Client Error: Custom component streamlit_ace.streamlit_ace timeout error"
+            in message
             for message in messages
         ),
     )
