@@ -329,6 +329,11 @@ describe("DefaultStreamlitEndpoints", () => {
         .onPut("http://streamlit.mock:80/mock/base/path/_stcore/upload_file")
         .reply(() => [400])
 
+      const sendClientErrorToHostSpy = vi.spyOn(
+        endpoints,
+        "sendClientErrorToHost"
+      )
+
       await expect(
         endpoints.uploadFileUploaderFile(
           "/_stcore/upload_file",
@@ -336,6 +341,14 @@ describe("DefaultStreamlitEndpoints", () => {
           "mockSessionId"
         )
       ).rejects.toThrow("Request failed with status code 400")
+
+      expect(sendClientErrorToHostSpy).toHaveBeenCalledWith(
+        "File Uploader",
+        "",
+        "Error uploading file",
+        "Request failed with status code 400",
+        "http://streamlit.mock:80/mock/base/path/_stcore/upload_file"
+      )
     })
   })
 
@@ -406,6 +419,34 @@ describe("DefaultStreamlitEndpoints", () => {
         data: { sessionId: "mockSessionId" },
       })
     })
+
+    it("errors on bad status", async () => {
+      axiosMock
+        .onDelete(
+          "http://streamlit.mock:80/mock/base/path/_stcore/upload_file/file_1"
+        )
+        .reply(() => [400])
+
+      const sendClientErrorToHostSpy = vi.spyOn(
+        endpoints,
+        "sendClientErrorToHost"
+      )
+
+      await expect(
+        endpoints.deleteFileAtURL(
+          "/_stcore/upload_file/file_1",
+          "mockSessionId"
+        )
+      ).rejects.toThrow("Request failed with status code 400")
+
+      expect(sendClientErrorToHostSpy).toHaveBeenCalledWith(
+        "File Uploader",
+        "",
+        "Error deleting file",
+        "Request failed with status code 400",
+        "http://streamlit.mock:80/mock/base/path/_stcore/upload_file/file_1"
+      )
+    })
   })
 
   describe("fetchCachedForwardMsg()", () => {
@@ -450,9 +491,22 @@ describe("DefaultStreamlitEndpoints", () => {
         )
         .reply(() => [400])
 
+      const sendClientErrorToHostSpy = vi.spyOn(
+        endpoints,
+        "sendClientErrorToHost"
+      )
+
       await expect(
         endpoints.fetchCachedForwardMsg("mockHash")
       ).rejects.toThrow("Request failed with status code 400")
+
+      expect(sendClientErrorToHostSpy).toHaveBeenCalledWith(
+        "Forward Message Cache",
+        "",
+        "Error fetching cached forward message",
+        "Request failed with status code 400",
+        "http://streamlit.mock:80/mock/base/path/_stcore/message?hash=mockHash"
+      )
     })
   })
 
