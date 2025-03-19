@@ -20,6 +20,7 @@ from e2e_playwright.conftest import (
     ImageCompareFunction,
     wait_for_app_loaded,
     wait_for_app_run,
+    wait_until,
 )
 from e2e_playwright.shared.app_utils import (
     click_button,
@@ -72,6 +73,22 @@ def get_page_link(
     return (
         app.get_by_test_id("stSidebarNav").locator("a").nth(page_order.index(page_name))
     )
+
+
+def check_logo_source_errors(messages: list[str]):
+    """Check that both logo source error messages are logged."""
+    main_logo_error_count = 0
+    sidebar_logo_error_count = 0
+
+    # iterate over messages and check if both error messages are present
+    for message in messages:
+        if "Client Error: Logo source error" in message:
+            main_logo_error_count += 1
+        if "Client Error: Sidebar Logo source error" in message:
+            sidebar_logo_error_count += 1
+
+    assert main_logo_error_count == 1
+    assert sidebar_logo_error_count == 1
 
 
 def expect_page_order(app: Page, page_order: list[str] = expected_page_order):
@@ -539,3 +556,27 @@ def test_sidebar_interaction_performance(app: Page):
     options = sidebar.locator("li")
     for option in options.all():
         option.hover()
+
+
+def test_logo_source_errors(app: Page, app_port: int):
+    """Test that logo source errors are logged."""
+    app.route(
+        f"http://localhost:{app_port}/media/**",
+        lambda route: route.fulfill(
+            status=404, headers={"Content-Type": "text/plain"}, body="Not Found"
+        ),
+    )
+
+    # Capture console messages
+    messages = []
+    app.on("console", lambda msg: messages.append(msg.text))
+
+    # Navigate to the app
+    app.goto(f"http://localhost:{app_port}")
+
+    # Wait until the expected error is logged, indicating CLIENT_ERROR was sent
+    # for the logo in the main app area and the sidebar
+    wait_until(
+        app,
+        lambda: check_logo_source_errors(messages),
+    )
