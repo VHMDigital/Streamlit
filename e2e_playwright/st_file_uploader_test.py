@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from playwright.sync_api import FilePayload, ImageCompareFunction, Page, Route, expect
+from playwright.sync_api import FilePayload, Page, Route, expect
 
 from e2e_playwright.conftest import (
-    check_top_level_class,
-    get_element_by_key,
+    ImageCompareFunction,
     rerun_app,
     wait_for_app_run,
     wait_until,
 )
+from e2e_playwright.shared.app_utils import check_top_level_class, get_element_by_key
 
 
 def test_file_uploader_render_correctly(
