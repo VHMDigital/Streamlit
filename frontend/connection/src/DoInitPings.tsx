@@ -212,7 +212,7 @@ If you are trying to access a Streamlit app running on another server, this coul
             )
             sendClientError(
               "No response received from server",
-              error.request,
+              error.request.status,
               source
             )
           }
@@ -225,7 +225,7 @@ If you are trying to access a Streamlit app running on another server, this coul
           )
           sendClientError(
             "Error setting up request to server",
-            error.message,
+            error.message ?? "",
             source
           )
         }
