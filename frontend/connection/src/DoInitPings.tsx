@@ -107,6 +107,21 @@ If you are trying to access a Streamlit app running on another server, this coul
     retry(forbiddenMessage)
   }
 
+  // Handle retrieving the source URL, otherwise fallback to "DoInitPings"
+  const determineUrlSource = (url: string | undefined): string => {
+    let source = "DoInitPings"
+
+    if (url) {
+      try {
+        source = new URL(url).pathname
+      } catch (e) {
+        LOG.error(`unrecognized url: ${url}`)
+      }
+    }
+
+    return source
+  }
+
   connect = () => {
     const uriParts = uriPartsList[uriNumber]
     const healthzUri = buildHttpUri(uriParts, SERVER_PING_PATH)
@@ -142,9 +157,7 @@ If you are trying to access a Streamlit app running on another server, this coul
         if (error.code === "ECONNABORTED") {
           if (shouldSendClientError) {
             // Handle retrieving the source URL from the error (health or host-config endpoint)
-            const source = error.config?.url
-              ? new URL(error.config.url).pathname
-              : "DoInitPings"
+            const source = determineUrlSource(error.config?.url)
             LOG.error("Client error: DoInitPings timed out")
             sendClientError(
               "DoInitPings timed out",
@@ -161,9 +174,7 @@ If you are trying to access a Streamlit app running on another server, this coul
 
           const { data, status, statusText } = error.response
           // Handle retrieving the source URL from the error (health or host-config endpoint)
-          const source = error.response.config?.url
-            ? new URL(error.response.config.url).pathname
-            : "DoInitPings"
+          const source = determineUrlSource(error.response.config?.url)
 
           if (status === /* NO RESPONSE */ 0) {
             if (shouldSendClientError) {
@@ -207,9 +218,7 @@ If you are trying to access a Streamlit app running on another server, this coul
 
           if (shouldSendClientError) {
             // Handle retrieving the source URL from the error (health or host-config endpoint)
-            const source = error.request.path
-              ? new URL(error.request.path).pathname
-              : "DoInitPings"
+            const source = determineUrlSource(error.request.path)
             LOG.error(
               `Client Error in reaching server endpoint - No response received when attempting to reach ${source}`
             )
@@ -224,9 +233,7 @@ If you are trying to access a Streamlit app running on another server, this coul
         // Something happened in setting up the request that triggered an Error
         if (shouldSendClientError) {
           // Handle retrieving the source URL from the error (health or host-config endpoint)
-          const source = error.config?.url
-            ? new URL(error.config.url).pathname
-            : "DoInitPings"
+          const source = determineUrlSource(error.config?.url)
           LOG.error(
             `Client Error in reaching server endpoint - error in setting up request when attempting to reach ${source}`
           )
