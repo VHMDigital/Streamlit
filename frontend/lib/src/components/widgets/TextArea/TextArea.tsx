@@ -171,8 +171,6 @@ const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
   const shouldShowInstructions =
     focused && width > theme.breakpoints.hideWidgetDetails
 
-  console.log("text area", theme.inSidebar, theme)
-
   return (
     <div className="stTextArea" data-testid="stTextArea" ref={elementRef}>
       <WidgetLabel

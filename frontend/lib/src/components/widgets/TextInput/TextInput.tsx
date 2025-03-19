@@ -141,8 +141,6 @@ function TextInput({
     fragmentId
   )
 
-  console.log("text input", theme.inSidebar, theme)
-
   return (
     <StyledTextInput
       className="stTextInput"
