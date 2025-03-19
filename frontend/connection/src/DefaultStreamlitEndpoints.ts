@@ -236,33 +236,29 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
 
     const uploadUrl = this.buildFileUploadURL(fileUploadUrl)
 
-    const response = await this.csrfRequest<number>(uploadUrl, {
-      cancelToken,
-      method: "PUT",
-      data: form,
-      responseType: "text",
-      headers,
-      onUploadProgress,
-    })
-      .then(() => undefined) // If the request succeeds, we don't care about the response body
-      .catch(error => {
-        // Send error info on failure
-        LOG.error(
-          `Client Error: File uploader error on file upload - ${error}`
-        )
-        const message =
-          error instanceof Error ? error.message : "Unknown Error"
-        this.sendClientErrorToHost(
-          "File Uploader",
-          "Error uploading file",
-          message,
-          uploadUrl
-        )
-        // Reject the promise with the error after sending the error to the host
-        throw error
+    try {
+      await this.csrfRequest<number>(uploadUrl, {
+        cancelToken,
+        method: "PUT",
+        data: form,
+        responseType: "text",
+        headers,
+        onUploadProgress,
       })
-
-    return response
+      // If the request succeeds, we don't care about the response body
+    } catch (error: unknown) {
+      // Send error info on failure
+      LOG.error(`Client Error: File uploader error on file upload - ${error}`)
+      const message = error instanceof Error ? error.message : "Unknown Error"
+      this.sendClientErrorToHost(
+        "File Uploader",
+        "Error uploading file",
+        message,
+        uploadUrl
+      )
+      // Reject the promise with the error after sending the error to the host
+      throw error
+    }
   }
 
   private getAdditionalHeaders(): Record<string, string> {
@@ -286,30 +282,27 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
   ): Promise<void> {
     const headers: Record<string, string> = this.getAdditionalHeaders()
     const deleteUrl = this.buildFileUploadURL(fileUrl)
-    const response = await this.csrfRequest<number>(deleteUrl, {
-      method: "DELETE",
-      data: { sessionId },
-      headers,
-    })
-      .then(() => undefined) // If the request succeeds, we don't care about the response body
-      .catch(error => {
-        // Send error info on failure
-        LOG.error(
-          `Client Error: File uploader error on file delete - ${error}`
-        )
-        const message =
-          error instanceof Error ? error.message : "Unknown Error"
-        this.sendClientErrorToHost(
-          "File Uploader",
-          "Error deleting file",
-          message,
-          deleteUrl
-        )
-        // Reject the promise with the error after sending the error to the host
-        throw error
-      })
 
-    return response
+    try {
+      await this.csrfRequest<number>(deleteUrl, {
+        method: "DELETE",
+        data: { sessionId },
+        headers,
+      })
+      // If the request succeeds, we don't care about the response body
+    } catch (error: unknown) {
+      // Send error info on failure
+      LOG.error(`Client Error: File uploader error on file delete - ${error}`)
+      const message = error instanceof Error ? error.message : "Unknown Error"
+      this.sendClientErrorToHost(
+        "File Uploader",
+        "Error deleting file",
+        message,
+        deleteUrl
+      )
+      // Reject the promise with the error after sending the error to the host
+      throw error
+    }
   }
 
   public async fetchCachedForwardMsg(hash: string): Promise<Uint8Array> {
