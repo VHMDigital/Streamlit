@@ -29,7 +29,6 @@ import Video, { VideoProps } from "./Video"
 
 describe("Video Element", () => {
   let buildMediaURL = vi.fn().mockReturnValue("https://mock.media.url")
-  // const buildMediaURL = vi.fn((url: string) => url)
   const sendClientErrorToHost = vi.fn()
 
   const mockSetElementState = vi.fn()

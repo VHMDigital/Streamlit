@@ -236,7 +236,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
 
     const uploadUrl = this.buildFileUploadURL(fileUploadUrl)
 
-    return this.csrfRequest<number>(uploadUrl, {
+    const response = await this.csrfRequest<number>(uploadUrl, {
       cancelToken,
       method: "PUT",
       data: form,
@@ -259,8 +259,10 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
           uploadUrl
         )
         // Reject the promise with the error after sending the error to the host
-        return Promise.reject(error)
+        throw error
       })
+
+    return response
   }
 
   private getAdditionalHeaders(): Record<string, string> {
@@ -284,7 +286,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
   ): Promise<void> {
     const headers: Record<string, string> = this.getAdditionalHeaders()
     const deleteUrl = this.buildFileUploadURL(fileUrl)
-    return this.csrfRequest<number>(deleteUrl, {
+    const response = await this.csrfRequest<number>(deleteUrl, {
       method: "DELETE",
       data: { sessionId },
       headers,
@@ -304,8 +306,10 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
           deleteUrl
         )
         // Reject the promise with the error after sending the error to the host
-        return Promise.reject(error)
+        throw error
       })
+
+    return response
   }
 
   public async fetchCachedForwardMsg(hash: string): Promise<Uint8Array> {

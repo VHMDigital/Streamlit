@@ -71,17 +71,28 @@ function Video({
     return preventAutoplay ?? false
   }, [element.id, elementMgr])
 
+  // Create a stable dependency for checking subtitle source urls
+  const subtitleSrcArrString = useMemo(() => {
+    if (!subtitles) {
+      return JSON.stringify([])
+    }
+
+    return JSON.stringify(
+      subtitles.map(subtitle => endpoints.buildMediaURL(`${subtitle.url}`))
+    )
+  }, [subtitles, endpoints])
+
   // Check the video's subtitles for load errors
   useEffect(() => {
+    const subtitleSrcArr: string[] = JSON.parse(subtitleSrcArrString)
+    if (subtitleSrcArr.length === 0) return
+
     // Since there is no onerror event for track elements, we can't use the onerror event
     // to catch src url load errors. Catch with direct check instead.
-    if (subtitles) {
-      subtitles.forEach(subtitle => {
-        const subtitleSrc = endpoints.buildMediaURL(`${subtitle.url}`)
-        endpoints.checkSourceUrlResponse(subtitleSrc, "Video Subtitle")
-      })
-    }
-  }, [subtitles, endpoints])
+    subtitleSrcArr.forEach(subtitleSrc => {
+      endpoints.checkSourceUrlResponse(subtitleSrc, "Video Subtitle")
+    })
+  }, [subtitleSrcArrString, endpoints])
 
   // Handle startTime changes
   useEffect(() => {

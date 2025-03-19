@@ -181,10 +181,7 @@ function AppView(props: AppViewProps): ReactElement {
     removeScriptFinishedHandler,
   ])
 
-  const handleLogoError = (
-    _: React.SyntheticEvent<HTMLImageElement>,
-    logoUrl: string
-  ): void => {
+  const handleLogoError = (logoUrl: string): void => {
     // StyledLogo does not retain the e.currentEvent.src like other onerror cases
     // store and read from ref instead
     LOG.error(`Client Error: Logo source error - ${logoUrl}`)
@@ -208,7 +205,7 @@ function AppView(props: AppViewProps): ReactElement {
         className="stLogo"
         data-testid="stLogo"
         // Save to logo's src to send on load error
-        onError={e => handleLogoError(e, source)}
+        onError={_ => handleLogoError(source)}
       />
     )
 

@@ -223,11 +223,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     setCollapsedSidebar(!collapsedSidebar)
   }, [collapsedSidebar])
 
-  const handleLogoError = (
-    _: React.SyntheticEvent<HTMLImageElement>,
-    logoUrl: string,
-    collapsed: boolean
-  ): void => {
+  const handleLogoError = (logoUrl: string, collapsed: boolean): void => {
     // StyledLogo does not retain the e.currentEvent.src like other onerror cases
     // store and read from ref instead
     const component = collapsed ? "Logo" : "Sidebar Logo"
@@ -258,7 +254,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         className="stLogo"
         data-testid="stLogo"
         // Save to logo's src to send on load error
-        onError={e => handleLogoError(e, source, collapsed)}
+        onError={_ => handleLogoError(source, collapsed)}
       />
     )
 
