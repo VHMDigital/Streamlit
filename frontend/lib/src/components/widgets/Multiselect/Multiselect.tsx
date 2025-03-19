@@ -150,6 +150,19 @@ const Multiselect: FC<Props> = props => {
     [value]
   )
 
+  /**
+   * This is the onChange handler for the baseweb Select component.
+   * It is called whenever the user selects an option or removes an option.
+   * When the user starts to modify an option by typing in the input field and
+   * pressing backspace, a single `type="remove"` event is fired with the value set
+   * to the option that is being removed. The same type of event is fired when the
+   * user removes an option by clicking the X icon.
+   *
+   * If we wanted to prevent an immediate rerun when starting to delete characters,
+   * we would need to introduce two new states, e.g. `localValue` and `aboutToDelete`,
+   * and commit that state to the backend upon an onBlur event.
+   * To keep it simple, we just accept the rerun happening for now.
+   */
   const onChange = useCallback(
     (params: OnChangeParams) => {
       if (
