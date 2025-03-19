@@ -318,13 +318,13 @@ def _create_theme_options(
             f"{section}.{name}",
             description=description,
             default_val=default_val,
-            scriptable=False,
             visibility=visibility,
+            type_=type_,
+            scriptable=False,
             deprecated=False,
             deprecation_text=None,
             expiration_date=None,
             replaced_by=None,
-            type_=type_,
             sensitive=False,
         )
 
@@ -1084,7 +1084,6 @@ _create_theme_options(
     "linkColor",
     categories=["theme", CustomThemeCategories.SIDEBAR],
     description="Color used for all links.",
-    visibility="hidden",
 )
 
 _create_theme_options(
@@ -1110,7 +1109,6 @@ _create_theme_options(
         The font family to use for code (monospace) in the app.
         To use a custom font, it needs to be added via [theme.fontFaces].
     """,
-    visibility="hidden",
 )
 
 _create_theme_options(
@@ -1120,7 +1118,6 @@ _create_theme_options(
         The font family to use for headings in the app.
         To use a custom font, it needs to be added via [theme.fontFaces].
     """,
-    visibility="hidden",
 )
 
 _create_theme_options(
@@ -1129,7 +1126,6 @@ _create_theme_options(
     description="""
     Configure a list of font faces that you can use for the app & code fonts.
 """,
-    visibility="hidden",
 )
 
 _create_theme_options(
@@ -1140,7 +1136,6 @@ _create_theme_options(
         "none", "small", "medium", "large", "full", or the number in pixel or rem.
         For example: "10px", "0.5rem", "1.2rem", "2rem".
     """,
-    visibility="hidden",
 )
 
 _create_theme_options(
@@ -1149,7 +1144,6 @@ _create_theme_options(
     description="""
         The color of the border around elements.
     """,
-    visibility="hidden",
 )
 
 _create_theme_options(
@@ -1160,7 +1154,6 @@ _create_theme_options(
         file_uploader, etc).
     """,
     type_=bool,
-    visibility="hidden",
 )
 
 _create_theme_options(
@@ -1171,7 +1164,6 @@ _create_theme_options(
         scale of text and UI elements. The default base font size is 16.
     """,
     type_=int,
-    visibility="hidden",
 )
 
 _create_theme_options(
@@ -1181,7 +1173,6 @@ _create_theme_options(
         Whether to show a vertical separator between the sidebar and the main content.
     """,
     type_=bool,
-    visibility="hidden",
 )
 
 # Config Section: Secrets #
