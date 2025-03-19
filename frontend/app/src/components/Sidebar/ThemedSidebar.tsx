@@ -36,7 +36,7 @@ const createSidebarTheme = (theme: ThemeConfig): ThemeConfig => {
     sidebarOverride = theme.themeInput.sidebar
   }
 
-  // Eeither use the configured background color or secondary background from main theme:
+  // Either use the configured background color or secondary background from main theme:
   const sidebarBackground =
     theme.themeInput?.sidebar?.backgroundColor ??
     theme.emotion.colors.secondaryBg
