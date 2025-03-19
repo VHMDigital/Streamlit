@@ -103,7 +103,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
     customComponentName?: string
   ): Promise<void> {
     const componentForError = customComponentName
-      ? `${componentName} ${customComponentName})`
+      ? `${componentName} ${customComponentName}`
       : componentName
 
     try {
