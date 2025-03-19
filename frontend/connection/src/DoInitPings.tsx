@@ -35,6 +35,7 @@ import {
 import { IHostConfigResponse, OnRetry } from "./types"
 
 const LOG = getLogger("DoInitPings")
+export const THRESHOLD_FOR_CONNECTION_ERROR_DIALOG = 6
 
 export function doInitPings(
   uriPartsList: URL[],
@@ -135,21 +136,15 @@ If you are trying to access a Streamlit app running on another server, this coul
       .catch(error => {
         // If its our 6th try (retry count at which we show connection error dialog), send a client error
         // to inform the host of connection error
-        const shouldSendClientError = totalTries === 6
-
-        // Handle retrieving the source URL from the error (health or host-config endpoint)
-        // Fallback to "DoInitPings" if we can't retrieve the source url from the error
-        let source = "DoInitPings"
-        if (error.config?.url) {
-          source = new URL(error.config.url).pathname
-        } else if (error.response?.config?.url) {
-          source = new URL(error.response.config.url).pathname
-        } else if (error.request?.path) {
-          source = new URL(error.request.path).pathname
-        }
+        const shouldSendClientError =
+          totalTries === THRESHOLD_FOR_CONNECTION_ERROR_DIALOG
 
         if (error.code === "ECONNABORTED") {
           if (shouldSendClientError) {
+            // Handle retrieving the source URL from the error (health or host-config endpoint)
+            const source = error.config?.url
+              ? new URL(error.config.url).pathname
+              : "DoInitPings"
             LOG.error("Client error: DoInitPings timed out")
             sendClientError(
               "DoInitPings timed out",
@@ -165,6 +160,10 @@ If you are trying to access a Streamlit app running on another server, this coul
           // that falls out of the range of 2xx
 
           const { data, status, statusText } = error.response
+          // Handle retrieving the source URL from the error (health or host-config endpoint)
+          const source = error.response.config?.url
+            ? new URL(error.response.config.url).pathname
+            : "DoInitPings"
 
           if (status === /* NO RESPONSE */ 0) {
             if (shouldSendClientError) {
@@ -207,6 +206,10 @@ If you are trying to access a Streamlit app running on another server, this coul
           // http.ClientRequest in node.js
 
           if (shouldSendClientError) {
+            // Handle retrieving the source URL from the error (health or host-config endpoint)
+            const source = error.request.path
+              ? new URL(error.request.path).pathname
+              : "DoInitPings"
             LOG.error(
               `Client Error in reaching server endpoint - No response received when attempting to reach ${source}`
             )
@@ -220,6 +223,10 @@ If you are trying to access a Streamlit app running on another server, this coul
         }
         // Something happened in setting up the request that triggered an Error
         if (shouldSendClientError) {
+          // Handle retrieving the source URL from the error (health or host-config endpoint)
+          const source = error.config?.url
+            ? new URL(error.config.url).pathname
+            : "DoInitPings"
           LOG.error(
             `Client Error in reaching server endpoint - error in setting up request when attempting to reach ${source}`
           )
