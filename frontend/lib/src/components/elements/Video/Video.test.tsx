@@ -16,7 +16,7 @@
 
 import React from "react"
 
-import { screen } from "@testing-library/react"
+import { fireEvent, screen } from "@testing-library/react"
 
 import { Video as VideoProto } from "@streamlit/protobuf"
 
@@ -29,6 +29,7 @@ import Video, { VideoProps } from "./Video"
 
 describe("Video Element", () => {
   const buildMediaURL = vi.fn().mockReturnValue("https://mock.media.url")
+  const sendClientErrorToHost = vi.fn()
 
   const mockSetElementState = vi.fn()
   const mockGetElementState = vi.fn()
@@ -46,7 +47,10 @@ describe("Video Element", () => {
       startTime: 0,
       ...elementProps,
     }),
-    endpoints: mockEndpoints({ buildMediaURL: buildMediaURL }),
+    endpoints: mockEndpoints({
+      buildMediaURL: buildMediaURL,
+      sendClientErrorToHost: sendClientErrorToHost,
+    }),
     elementMgr: elementMgrMock as unknown as ElementStateManager,
   })
 
@@ -82,6 +86,23 @@ describe("Video Element", () => {
     expect(await screen.findByTestId("stVideo")).toHaveAttribute(
       "src",
       "https://mock.media.url"
+    )
+  })
+
+  it("sends an CLIENT_ERROR message when the video source fails to load", () => {
+    const props = getProps()
+    render(<Video {...props} />)
+    const videoElement = screen.getByTestId("stVideo")
+    expect(videoElement).toBeInTheDocument()
+
+    fireEvent.error(videoElement)
+
+    expect(sendClientErrorToHost).toHaveBeenCalledWith(
+      "Video",
+      "",
+      "Video source failed to load",
+      "onerror triggered",
+      "https://mock.media.url/"
     )
   })
 

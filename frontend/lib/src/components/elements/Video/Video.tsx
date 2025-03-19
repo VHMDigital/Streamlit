@@ -16,6 +16,8 @@
 
 import React, { memo, ReactElement, useEffect, useMemo, useRef } from "react"
 
+import { getLogger } from "loglevel"
+
 import { ISubtitleTrack, Video as VideoProto } from "@streamlit/protobuf"
 
 import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
@@ -23,6 +25,7 @@ import { WidgetStateManager as ElementStateManager } from "~lib/WidgetStateManag
 
 import { StyledVideoIframe } from "./styled-components"
 
+const LOG = getLogger("Video")
 export interface VideoProps {
   endpoints: StreamlitEndpoints
   element: VideoProto
@@ -201,6 +204,20 @@ function Video({
     )
   }
 
+  const handleVideoError = (
+    e: React.SyntheticEvent<HTMLVideoElement>
+  ): void => {
+    const videoUrl = e.currentTarget.src
+    LOG.error(`Client Error: Video source error - ${videoUrl}`)
+    endpoints.sendClientErrorToHost(
+      "Video",
+      "",
+      "Video source failed to load",
+      "onerror triggered",
+      videoUrl
+    )
+  }
+
   // Only in dev mode we set crossOrigin to "anonymous" to avoid CORS issues
   // when streamlit frontend and backend are running on different ports
   return (
@@ -218,6 +235,7 @@ function Video({
           ? "anonymous"
           : undefined
       }
+      onError={handleVideoError}
     >
       {subtitles &&
         subtitles.map((subtitle: ISubtitleTrack, idx: number) => (
