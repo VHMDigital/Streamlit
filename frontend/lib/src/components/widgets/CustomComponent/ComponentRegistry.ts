@@ -70,18 +70,25 @@ export class ComponentRegistry {
    */
   public checkSourceUrlResponse = (
     sourceUrl: string,
-    componentName?: string
+    customComponentName: string
   ): Promise<void> => {
-    return this.endpoints.checkSourceUrlResponse(sourceUrl, componentName)
+    return this.endpoints.checkSourceUrlResponse(
+      sourceUrl,
+      "Custom Component",
+      customComponentName
+    )
   }
 
-  public sendTimeoutError = (source: string, componentName: string): void => {
+  public sendTimeoutError = (
+    source: string,
+    customComponentName: string
+  ): void => {
     this.endpoints.sendClientErrorToHost(
       "Custom Component",
-      componentName,
       "Request Timeout",
       "Your app is having trouble loading the component.",
-      source
+      source,
+      customComponentName
     )
   }
 
