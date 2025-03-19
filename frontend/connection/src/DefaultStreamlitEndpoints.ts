@@ -34,10 +34,10 @@ interface Props {
   csrfEnabled: boolean
   sendClientError: (
     component: string,
-    customComponentName: string,
     error: string | number,
     message: string,
-    source: string
+    source: string,
+    customComponentName?: string
   ) => void
 }
 
@@ -52,10 +52,10 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
 
   private readonly sendClientError: (
     component: string,
-    customComponentName: string,
     error: string | number,
     message: string,
-    source: string
+    source: string,
+    customComponentName?: string
   ) => void
 
   private readonly csrfEnabled: boolean
@@ -79,17 +79,17 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
 
   public sendClientErrorToHost(
     component: string,
-    customComponentName: string,
     error: string | number,
     message: string,
-    source: string
+    source: string,
+    customComponentName?: string
   ): void {
     this.sendClientError(
       component,
-      customComponentName,
       error,
       message,
-      source
+      source,
+      customComponentName
     )
   }
 
@@ -99,36 +99,39 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
    */
   public async checkSourceUrlResponse(
     sourceUrl: string,
-    componentName: string
+    componentName: string,
+    customComponentName?: string
   ): Promise<void> {
+    const componentForError = customComponentName
+      ? `${componentName} ${customComponentName}`
+      : componentName
+
     try {
       const response = await fetch(sourceUrl)
       if (!response.ok) {
         // Send response info if unsuccessful
         LOG.error(
-          `Client Error: Custom component ${componentName} source error - ${response.status}`
+          `Client Error: ${componentForError} source error - ${response.status}`
         )
         this.sendClientErrorToHost(
-          "Custom Component",
           componentName,
           response.status,
           response.statusText,
-          sourceUrl
+          sourceUrl,
+          customComponentName
         )
       }
       // Don't send error info on success
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Unknown Error"
       // Send fetch error info on failure
-      LOG.error(
-        `Client Error: Custom component ${componentName} fetch error - ${message}`
-      )
+      LOG.error(`Client Error: ${componentForError} fetch error - ${message}`)
       this.sendClientErrorToHost(
-        "Custom Component",
         componentName,
         "Error fetching source",
         message,
-        sourceUrl
+        sourceUrl,
+        customComponentName
       )
     }
   }
@@ -231,14 +234,31 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
 
     const headers: Record<string, string> = this.getAdditionalHeaders()
 
-    return this.csrfRequest<number>(this.buildFileUploadURL(fileUploadUrl), {
-      cancelToken,
-      method: "PUT",
-      data: form,
-      responseType: "text",
-      headers,
-      onUploadProgress,
-    }).then(() => undefined) // If the request succeeds, we don't care about the response body
+    const uploadUrl = this.buildFileUploadURL(fileUploadUrl)
+
+    try {
+      await this.csrfRequest<number>(uploadUrl, {
+        cancelToken,
+        method: "PUT",
+        data: form,
+        responseType: "text",
+        headers,
+        onUploadProgress,
+      })
+      // If the request succeeds, we don't care about the response body
+    } catch (error: unknown) {
+      // Send error info on failure
+      LOG.error(`Client Error: File uploader error on file upload - ${error}`)
+      const message = error instanceof Error ? error.message : "Unknown Error"
+      this.sendClientErrorToHost(
+        "File Uploader",
+        "Error uploading file",
+        message,
+        uploadUrl
+      )
+      // Reject the promise with the error after sending the error to the host
+      throw error
+    }
   }
 
   private getAdditionalHeaders(): Record<string, string> {
@@ -261,25 +281,55 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
     sessionId: string
   ): Promise<void> {
     const headers: Record<string, string> = this.getAdditionalHeaders()
-    return this.csrfRequest<number>(this.buildFileUploadURL(fileUrl), {
-      method: "DELETE",
-      data: { sessionId },
-      headers,
-    }).then(() => undefined) // If the request succeeds, we don't care about the response body
+    const deleteUrl = this.buildFileUploadURL(fileUrl)
+
+    try {
+      await this.csrfRequest<number>(deleteUrl, {
+        method: "DELETE",
+        data: { sessionId },
+        headers,
+      })
+      // If the request succeeds, we don't care about the response body
+    } catch (error: unknown) {
+      // Send error info on failure
+      LOG.error(`Client Error: File uploader error on file delete - ${error}`)
+      const message = error instanceof Error ? error.message : "Unknown Error"
+      this.sendClientErrorToHost(
+        "File Uploader",
+        "Error deleting file",
+        message,
+        deleteUrl
+      )
+      // Reject the promise with the error after sending the error to the host
+      throw error
+    }
   }
 
   public async fetchCachedForwardMsg(hash: string): Promise<Uint8Array> {
     const serverURI = this.requireServerUri()
-    const rsp = await axios.request({
-      url: buildHttpUri(
-        serverURI,
-        `${FORWARD_MSG_CACHE_ENDPOINT}?hash=${hash}`
-      ),
-      method: "GET",
-      responseType: "arraybuffer",
-    })
+    const fetchUrl = buildHttpUri(
+      serverURI,
+      `${FORWARD_MSG_CACHE_ENDPOINT}?hash=${hash}`
+    )
 
-    return new Uint8Array(rsp.data)
+    try {
+      const rsp = await axios.get(fetchUrl, { responseType: "arraybuffer" })
+      return new Uint8Array(rsp.data)
+    } catch (error) {
+      // Send error info on failure
+      LOG.error(
+        `Client Error: Cached forward message error on fetch - ${error}`
+      )
+      const message = error instanceof Error ? error.message : "Unknown Error"
+      this.sendClientErrorToHost(
+        "Forward Message Cache",
+        "Error fetching cached forward message",
+        message,
+        fetchUrl
+      )
+      // Reject the promise with the error after sending the error to the host
+      return Promise.reject(error)
+    }
   }
 
   /**

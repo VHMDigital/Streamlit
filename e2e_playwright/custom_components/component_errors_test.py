@@ -52,7 +52,7 @@ def test_component_source_failure(page: Page, app_port: int):
     wait_until(
         page,
         lambda: any(
-            "Client Error: Custom component streamlit_ace.streamlit_ace source error"
+            "Client Error: Custom Component streamlit_ace.streamlit_ace source error"
             in message
             for message in messages
         ),
@@ -80,7 +80,7 @@ def test_component_timeout_failure(page: Page, app_port: int):
     wait_until(
         page,
         lambda: any(
-            "Client Error: Custom component streamlit_ace.streamlit_ace fetch error"
+            "Client Error: Custom Component streamlit_ace.streamlit_ace fetch error"
             in message
             for message in messages
         ),
@@ -92,7 +92,7 @@ def test_component_timeout_failure(page: Page, app_port: int):
     wait_until(
         page,
         lambda: any(
-            "Client Error: Custom component streamlit_ace.streamlit_ace timeout error"
+            "Client Error: Custom Component streamlit_ace.streamlit_ace timeout error"
             in message
             for message in messages
         ),
