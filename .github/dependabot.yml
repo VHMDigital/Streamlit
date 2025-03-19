@@ -109,13 +109,13 @@ updates:
           - "deck.gl"
           - "@loaders.gl/*"
           - "mapbox-gl"
-      glide-data-grid:
-        patterns:
-          - "@glideapps/glide-data-grid*"
       vega:
         patterns:
           - "vega"
           - "vega-*"
+      glide-data-grid:
+        patterns:
+          - "@glideapps/glide-data-grid*"
       markdown-processing:
         patterns:
           - "remark-*"
