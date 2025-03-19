@@ -398,6 +398,9 @@ export const createTheme = (
   )
 
   const emotion = createEmotionTheme(completedThemeInput, startingTheme)
+
+  // Creates a deep copy of the Base Web UI theme to ensure that modifications to
+  // this theme object won't affect the original theme.
   const basewebTheme = cloneDeep(
     createBaseUiTheme(emotion, startingTheme.primitives)
   )
@@ -406,7 +409,7 @@ export const createTheme = (
     ...startingTheme,
     name: themeName,
     emotion,
-    basewebTheme: basewebTheme,
+    basewebTheme,
     themeInput,
   }
 }
