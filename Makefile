@@ -75,13 +75,12 @@ mini-init: conditional-ubuntu-init python-init-dev-only react-init protobuf
 .PHONY: conditional-ubuntu-init
 # If we detect we're on an Ubuntu system, install most of the Ubuntu pre-requisites (otherwise do nothing).
 conditional-ubuntu-init:
-	@# : is used to comment code in the below because it is difficult to combine comments and multi-line strings otherwise.
+	@# : is used to comment code in the below because it is difficult to combine comments and line-continuation otherwise.
 	@if grep "ubuntu" /etc/os-release --quiet ; then \
 		echo "Apparently an Ubuntu system, therefore I will install Ubuntu requirements..." 1>&2 ; \
 		: There are ways to run this script as root without having sudo installed, but most people won't, so let's ignore the nigh-inevitable error. ; \
 		apt-get install -y sudo 2>/dev/null ; \
-		: Install some essentials. ; \
-		: Again, including make, even though you need it to run this make script itself, so this is probably pointless. ; \
+		: 'Install some essentials (including make, even though you need it to run this make script itself, so this is probably pointless).' ; \
 		sudo apt-get install -y make curl git unzip ; \
 		: Set up the Yarn repo ; \
 		node_version_major=`node -v | tr -d 'v' | cut -d'.' -f1` ; \
