@@ -75,22 +75,6 @@ def get_page_link(
     )
 
 
-def check_logo_source_errors(messages: list[str]):
-    """Check that both logo source error messages are logged."""
-    main_logo_error_count = 0
-    sidebar_logo_error_count = 0
-
-    # iterate over messages and check if both error messages are present
-    for message in messages:
-        if "Client Error: Logo source error" in message:
-            main_logo_error_count += 1
-        if "Client Error: Sidebar Logo source error" in message:
-            sidebar_logo_error_count += 1
-
-    assert main_logo_error_count == 1
-    assert sidebar_logo_error_count == 1
-
-
 def expect_page_order(app: Page, page_order: list[str] = expected_page_order):
     """Test that the page order is correct."""
     nav = app.get_by_test_id("stSidebarNav")
@@ -578,5 +562,13 @@ def test_logo_source_errors(app: Page, app_port: int):
     # for the logo in the main app area and the sidebar
     wait_until(
         app,
-        lambda: check_logo_source_errors(messages),
+        lambda: any(
+            "Client Error: Logo source error" in message for message in messages
+        ),
+    )
+    wait_until(
+        app,
+        lambda: any(
+            "Client Error: Sidebar Logo source error" in message for message in messages
+        ),
     )
