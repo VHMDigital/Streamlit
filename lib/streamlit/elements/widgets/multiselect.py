@@ -174,7 +174,7 @@ class MultiSelectMixin:
         accept_new_options: Literal[True] = True,
     ) -> list[T | str]: ...
 
-    @gather_metrics("multiselect")
+    @overload
     def multiselect(
         self,
         label: str,
@@ -192,6 +192,26 @@ class MultiSelectMixin:
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: bool = False,
+    ) -> list[T] | list[T | str]: ...
+
+    @gather_metrics("multiselect")
+    def multiselect(
+        self,
+        label: str,
+        options: OptionSequence[T],
+        default: Any | None = None,
+        format_func: Callable[[Any], str] = str,
+        key: Key | None = None,
+        help: str | None = None,
+        on_change: WidgetCallback | None = None,
+        args: WidgetArgs | None = None,
+        kwargs: WidgetKwargs | None = None,
+        *,  # keyword-only arguments:
+        max_selections: int | None = None,
+        placeholder: str = "Choose an option",
+        disabled: bool = False,
+        label_visibility: LabelVisibility = "visible",
+        accept_new_options: Literal[False, True] | bool = False,
     ) -> list[T] | list[T | str]:
         r"""Display a multiselect widget.
         The multiselect widget starts as empty.

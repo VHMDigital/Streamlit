@@ -179,7 +179,7 @@ class SelectboxMixin:
         accept_new_options: Literal[True] = True,
     ) -> T | str | None: ...
 
-    @gather_metrics("selectbox")
+    @overload
     def selectbox(
         self,
         label: str,
@@ -196,6 +196,25 @@ class SelectboxMixin:
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: bool = False,
+    ) -> T | str | None: ...
+
+    @gather_metrics("selectbox")
+    def selectbox(
+        self,
+        label: str,
+        options: OptionSequence[T],
+        index: int | None = 0,
+        format_func: Callable[[Any], str] = str,
+        key: Key | None = None,
+        help: str | None = None,
+        on_change: WidgetCallback | None = None,
+        args: WidgetArgs | None = None,
+        kwargs: WidgetKwargs | None = None,
+        *,  # keyword-only arguments:
+        placeholder: str = "Choose an option",
+        disabled: bool = False,
+        label_visibility: LabelVisibility = "visible",
+        accept_new_options: Literal[False, True] | bool = False,
     ) -> T | str | None:
         r"""Display a select widget.
 
