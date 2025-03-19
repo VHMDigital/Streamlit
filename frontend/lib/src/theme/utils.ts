@@ -216,14 +216,16 @@ export const createEmotionTheme = (
     )
   }
 
-  if (!showBorderAroundInputs) {
-    conditionalOverrides.colors.widgetBorderColor = undefined
-  } else if (showBorderAroundInputs || widgetBorderColor) {
+  if (widgetBorderColor) {
     // widgetBorderColor from the themeInput is deprecated. For compatibility
     // with older SiS theming, we still apply it here if provided, but we should
     // consider full removing it at some point.
+    conditionalOverrides.colors.widgetBorderColor = widgetBorderColor
+  } else if (showBorderAroundInputs) {
     conditionalOverrides.colors.widgetBorderColor =
-      widgetBorderColor || conditionalOverrides.colors.borderColor
+      conditionalOverrides.colors.borderColor
+  } else {
+    conditionalOverrides.colors.widgetBorderColor = undefined
   }
 
   if (notNullOrUndefined(baseRadius)) {
