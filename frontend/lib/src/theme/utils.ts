@@ -252,6 +252,10 @@ export const createEmotionTheme = (
     } else if (processedBaseRadius.endsWith("px")) {
       radiusValue = parseFloat(processedBaseRadius)
       cssUnit = "px"
+    } else if (!isNaN(parseFloat(processedBaseRadius))) {
+      // Fallback: if the value can be parsed as a number, treat it as pixels
+      radiusValue = parseFloat(processedBaseRadius)
+      cssUnit = "px"
     }
 
     if (notNullOrUndefined(radiusValue) && !isNaN(radiusValue)) {
