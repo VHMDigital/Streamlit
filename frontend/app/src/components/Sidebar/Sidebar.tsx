@@ -273,7 +273,14 @@ const Sidebar: React.FC<SidebarProps> = ({
         data-testid="stSidebarCollapsedControl"
       >
         {renderLogo(true)}
-        <StyledOpenSidebarButton theme={activeTheme.emotion}>
+        <StyledOpenSidebarButton
+          theme={
+            // Use the active theme from the LibContext to use the main theme
+            // for styling the open button since otherwise it would use the colors
+            // of the sidebar theme (which is not what we want here).
+            activeTheme.emotion
+          }
+        >
           <BaseButton
             kind={BaseButtonKind.HEADER_NO_PADDING}
             onClick={toggleCollapse}
