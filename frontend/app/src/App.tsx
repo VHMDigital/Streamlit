@@ -1153,7 +1153,10 @@ export class App extends PureComponent<Props, State> {
       return "hash_for_undefined_custom_theme"
     }
 
-    return hashString(JSON.stringify(themeInput))
+    // Hash the sorted representation of the theme input:
+    return hashString(
+      JSON.stringify(themeInput, Object.keys(themeInput).sort())
+    )
   }
 
   processThemeInput(themeInput: CustomThemeConfig): void {
