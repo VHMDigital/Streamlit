@@ -1153,10 +1153,10 @@ _create_theme_options(
 )
 
 _create_theme_options(
-    "showBorderAroundInputs",
+    "showWidgetBorder",
     categories=["theme", CustomThemeCategories.SIDEBAR],
     description="""
-        Whether to show a border around input elements (e.g. text_input, number_input,
+        Whether to show a border around input widgets (e.g. text_input, number_input,
         file_uploader, etc).
     """,
     type_=bool,
@@ -1175,7 +1175,7 @@ _create_theme_options(
 )
 
 _create_theme_options(
-    "showSidebarSeparator",
+    "showSidebarBorder",
     categories=["theme"],
     description="""
         Whether to show a vertical separator between the sidebar and the main content.

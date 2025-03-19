@@ -641,7 +641,7 @@ def _mock_get_options_for_section(overrides=None) -> Callable[..., Any]:
         "linkColor": "#2EC163",
         "primaryColor": "red",
         "secondaryBackgroundColor": "blue",
-        "showBorderAroundInputs": True,
+        "showWidgetBorder": True,
         "textColor": "black",
         "codeBackgroundColor": "blue",
     }
@@ -678,8 +678,8 @@ def _mock_get_options_for_section(overrides=None) -> Callable[..., Any]:
         "linkColor": "#2EC163",
         "primaryColor": "coral",
         "secondaryBackgroundColor": "blue",
-        "showBorderAroundInputs": True,
-        "showSidebarSeparator": True,
+        "showWidgetBorder": True,
+        "showSidebarBorder": True,
         "textColor": "black",
         "codeBackgroundColor": "blue",
     }
@@ -1046,8 +1046,8 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
                     "linkColor": None,
                     "primaryColor": None,
                     "secondaryBackgroundColor": None,
-                    "showBorderAroundInputs": None,
-                    "showSidebarSeparator": None,
+                    "showWidgetBorder": None,
+                    "showSidebarBorder": None,
                     "textColor": None,
                     "sidebar": None,
                     "codeBackgroundColor": None,
@@ -1078,8 +1078,8 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
                     "linkColor": None,
                     "primaryColor": None,
                     "secondaryBackgroundColor": None,
-                    "showBorderAroundInputs": False,
-                    "showSidebarSeparator": None,
+                    "showWidgetBorder": False,
+                    "showSidebarBorder": None,
                     "textColor": None,
                     "sidebar": None,
                     "codeBackgroundColor": None,
@@ -1092,7 +1092,7 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
         app_session._populate_theme_msg(new_session_msg.custom_theme)
 
         assert new_session_msg.HasField("custom_theme")
-        assert new_session_msg.custom_theme.show_border_around_inputs is False
+        assert new_session_msg.custom_theme.show_widget_border is False
 
     @patch("streamlit.runtime.app_session.config")
     def test_can_specify_some_options(self, patched_config):
@@ -1111,8 +1111,8 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
                     "headingFont": None,
                     "linkColor": None,
                     "secondaryBackgroundColor": None,
-                    "showBorderAroundInputs": None,
-                    "showSidebarSeparator": None,
+                    "showWidgetBorder": None,
+                    "showSidebarBorder": None,
                     "textColor": None,
                     "codeBackgroundColor": None,
                     "sidebar": {
@@ -1125,7 +1125,7 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
                         "headingFont": None,
                         "linkColor": None,
                         "secondaryBackgroundColor": None,
-                        "showBorderAroundInputs": None,
+                        "showWidgetBorder": None,
                         "textColor": None,
                         "codeBackgroundColor": None,
                     },
@@ -1152,11 +1152,11 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
         # Fields that are marked as optional in proto:
         assert not new_session_msg.custom_theme.HasField("base_radius")
         assert not new_session_msg.custom_theme.HasField("border_color")
-        assert not new_session_msg.custom_theme.HasField("show_border_around_inputs")
+        assert not new_session_msg.custom_theme.HasField("show_widget_border")
         assert not new_session_msg.custom_theme.HasField("link_color")
         assert not new_session_msg.custom_theme.HasField("base_font_size")
-        assert not new_session_msg.custom_theme.HasField("show_sidebar_separator")
         assert not new_session_msg.custom_theme.HasField("code_background_color")
+        assert not new_session_msg.custom_theme.HasField("show_sidebar_border")
 
         app_session._populate_theme_msg(
             new_session_msg.custom_theme.sidebar,
@@ -1173,9 +1173,7 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
         # Fields that are marked as optional in proto:
         assert not new_session_msg.custom_theme.sidebar.HasField("base_radius")
         assert not new_session_msg.custom_theme.sidebar.HasField("border_color")
-        assert not new_session_msg.custom_theme.sidebar.HasField(
-            "show_border_around_inputs"
-        )
+        assert not new_session_msg.custom_theme.sidebar.HasField("show_widget_border")
         assert not new_session_msg.custom_theme.sidebar.HasField("link_color")
         assert not new_session_msg.custom_theme.sidebar.HasField(
             "code_background_color"
@@ -1199,11 +1197,11 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
         assert new_session_msg.custom_theme.secondary_background_color == "blue"
         assert new_session_msg.custom_theme.base_radius == "1.2rem"
         assert new_session_msg.custom_theme.border_color == "#ff0000"
-        assert new_session_msg.custom_theme.show_border_around_inputs is True
+        assert new_session_msg.custom_theme.show_widget_border is True
         assert new_session_msg.custom_theme.link_color == "#2EC163"
         assert new_session_msg.custom_theme.base_font_size == 14
-        assert new_session_msg.custom_theme.show_sidebar_separator is True
         assert new_session_msg.custom_theme.code_background_color == "blue"
+        assert new_session_msg.custom_theme.show_sidebar_border is True
         # The value from `theme.font` will be placed in body_font since
         # font uses a deprecated enum:
         assert new_session_msg.custom_theme.heading_font == "Inter Bold"
@@ -1237,7 +1235,7 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
         assert new_session_msg.custom_theme.sidebar.secondary_background_color == "blue"
         assert new_session_msg.custom_theme.sidebar.base_radius == "1.2rem"
         assert new_session_msg.custom_theme.sidebar.border_color == "#ff0000"
-        assert new_session_msg.custom_theme.sidebar.show_border_around_inputs is True
+        assert new_session_msg.custom_theme.sidebar.show_widget_border is True
         assert new_session_msg.custom_theme.sidebar.link_color == "#2EC163"
         assert new_session_msg.custom_theme.sidebar.heading_font == "Inter Bold"
         assert new_session_msg.custom_theme.sidebar.body_font == "Inter"
@@ -1248,9 +1246,7 @@ class PopulateCustomThemeMsgTest(unittest.TestCase):
         assert new_session_msg.custom_theme.sidebar.base == 0
         assert not new_session_msg.custom_theme.sidebar.font_faces
         assert not new_session_msg.custom_theme.sidebar.HasField("base_font_size")
-        assert not new_session_msg.custom_theme.sidebar.HasField(
-            "show_sidebar_separator"
-        )
+        assert not new_session_msg.custom_theme.sidebar.HasField("show_sidebar_border")
 
     @patch("streamlit.runtime.app_session._LOGGER")
     @patch("streamlit.runtime.app_session.config")
