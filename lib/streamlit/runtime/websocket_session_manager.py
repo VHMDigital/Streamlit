@@ -88,7 +88,9 @@ class WebsocketSessionManager(SessionManager):
             existing_session.register_file_watchers()
 
             self._active_session_info_by_id[existing_session.id] = ActiveSessionInfo(
-                client, existing_session, session_info.script_run_count
+                client,
+                existing_session,
+                session_info.script_run_count,
             )
             self._session_storage.delete(existing_session.id)
 
@@ -122,7 +124,13 @@ class WebsocketSessionManager(SessionManager):
             session.request_script_stop()
             session.disconnect_file_watchers()
 
-            self._session_storage.save(SessionInfo(client=None, session=session))
+            self._session_storage.save(
+                SessionInfo(
+                    client=None,
+                    session=session,
+                    script_run_count=active_session_info.script_run_count,
+                )
+            )
             del self._active_session_info_by_id[session_id]
 
     def get_active_session_info(self, session_id: str) -> ActiveSessionInfo | None:
