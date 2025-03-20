@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Final, NamedTuple
 
 from streamlit.components.lib.local_component_registry import LocalComponentRegistry
 from streamlit.logger import get_logger
+from streamlit.proto.ForwardMsg_pb2 import ForwardMsg
 from streamlit.runtime.app_session import AppSession
 from streamlit.runtime.caching import (
     get_data_cache_stats_provider,
@@ -36,6 +37,7 @@ from streamlit.runtime.memory_session_storage import MemorySessionStorage
 from streamlit.runtime.script_data import ScriptData
 from streamlit.runtime.scriptrunner.script_cache import ScriptCache
 from streamlit.runtime.session_manager import (
+    ActiveSessionInfo,
     SessionClient,
     SessionClientDisconnectedError,
     SessionManager,
@@ -623,7 +625,7 @@ class Runtime:
                         msg_list = active_session_info.session.flush_browser_queue()
                         for msg in msg_list:
                             try:
-                                active_session_info.client.write_forward_msg(msg)
+                                self._send_message(active_session_info, msg)
                             except SessionClientDisconnectedError:
                                 self._session_mgr.disconnect_session(
                                     active_session_info.session.id
@@ -672,6 +674,34 @@ class Runtime:
 Please report this bug at https://github.com/streamlit/streamlit/issues.
 """
             )
+
+    def _send_message(self, session_info: ActiveSessionInfo, msg: ForwardMsg) -> None:
+        """Send a message to a client.
+        If the client is likely to have already cached the message, we may
+        instead send a "reference" message that contains only the hash of the
+        message.
+
+        Parameters
+        ----------
+        session_info : ActiveSessionInfo
+            The ActiveSessionInfo associated with websocket
+        msg : ForwardMsg
+            The message to send to the client
+
+        Notes
+        -----
+        Threading: UNSAFE. Must be called on the eventloop thread.
+        """
+
+        # If this was a `script_finished` message, we increment the
+        # script_run_count for this session, and update the cache
+        if msg.WhichOneof("type") == "script_finished" and (
+            msg.script_finished == ForwardMsg.FINISHED_SUCCESSFULLY
+        ):
+            session_info.script_run_count += 1
+
+        # Ship it off!
+        session_info.client.write_forward_msg(msg)
 
     def _enqueued_some_message(self) -> None:
         """Callback called by AppSession after the AppSession has enqueued a
