@@ -29,25 +29,17 @@ import { Box } from "~lib/components/shared/Base/styled-components"
 import BaseLinkButton from "./BaseLinkButton"
 
 export interface Props {
-  disabled: boolean
   element: LinkButtonProto
 }
 
 function LinkButton(props: Readonly<Props>): ReactElement {
-  const { disabled, element } = props
+  const { element } = props
 
   let kind = BaseButtonKind.SECONDARY
   if (element.type === "primary") {
     kind = BaseButtonKind.PRIMARY
   } else if (element.type === "tertiary") {
     kind = BaseButtonKind.TERTIARY
-  }
-
-  const handleClick = (e: MouseEvent<HTMLAnchorElement>): void => {
-    // Prevent the link from being followed if the button is disabled.
-    if (props.disabled) {
-      e.preventDefault()
-    }
   }
 
   return (
@@ -61,13 +53,10 @@ function LinkButton(props: Readonly<Props>): ReactElement {
         <BaseLinkButton
           kind={kind}
           size={BaseButtonSize.SMALL}
-          disabled={disabled}
-          onClick={handleClick}
           containerWidth={element.useContainerWidth}
           href={element.url}
           target="_blank"
           rel="noreferrer"
-          aria-disabled={disabled}
         >
           <DynamicButtonLabel icon={element.icon} label={element.label} />
         </BaseLinkButton>
