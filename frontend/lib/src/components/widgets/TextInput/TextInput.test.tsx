@@ -512,4 +512,24 @@ describe("TextInput widget", () => {
 
     expect(forId2).toBe(forId1)
   })
+
+  it("handles an emoji icon", () => {
+    const props = getProps({ icon: "👓" })
+    render(<TextInput {...props} />)
+    // Icon parent element
+    expect(screen.getByTestId("stTextInputIcon")).toBeInTheDocument()
+    // Element rendering emoji icon
+    const emojiIcon = screen.getByTestId("stIconEmoji")
+    expect(emojiIcon).toHaveTextContent("👓")
+  })
+
+  it("handles a material icon", () => {
+    const props = getProps({ icon: ":material/search:" })
+    render(<TextInput {...props} />)
+    // Icon parent element
+    expect(screen.getByTestId("stTextInputIcon")).toBeInTheDocument()
+    // Element rendering material icon
+    const materialIcon = screen.getByTestId("stIconMaterial")
+    expect(materialIcon).toHaveTextContent("search")
+  })
 })

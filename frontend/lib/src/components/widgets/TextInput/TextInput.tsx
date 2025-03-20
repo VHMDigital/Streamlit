@@ -183,7 +183,11 @@ function TextInput({
         autoComplete={element.autocomplete}
         startEnhancer={
           element.icon && (
-            <DynamicIcon iconValue={element.icon} size={dynamicIconSize} />
+            <DynamicIcon
+              data-testid="stTextInputIcon"
+              iconValue={element.icon}
+              size={dynamicIconSize}
+            />
           )
         }
         overrides={{
