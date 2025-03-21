@@ -315,7 +315,7 @@ const NumberInput: React.FC<Props> = ({
   )
 
   const isMaterialIcon = icon?.startsWith(":material")
-  // Material icons need to be larger to render similar size of emojis, emojis need addtl margin
+  // Material icons need to be larger to render similar size of emojis
   const dynamicIconSize = isMaterialIcon ? "lg" : "base"
 
   // TODO: Verify adjustment to breakpoint for icon
@@ -366,7 +366,11 @@ const NumberInput: React.FC<Props> = ({
           aria-label={element.label}
           startEnhancer={
             element.icon && (
-              <DynamicIcon iconValue={element.icon} size={dynamicIconSize} />
+              <DynamicIcon
+                data-testid="stNumberInputIcon"
+                iconValue={element.icon}
+                size={dynamicIconSize}
+              />
             )
           }
           id={id.current}
@@ -440,6 +444,8 @@ const NumberInput: React.FC<Props> = ({
               style: {
                 paddingLeft: 0,
                 paddingRight: 0,
+                // Keeps emoji icons from being cut off on the right
+                minWidth: theme.iconSizes.lg,
               },
             },
           }}
