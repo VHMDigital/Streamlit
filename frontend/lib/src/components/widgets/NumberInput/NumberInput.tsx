@@ -314,8 +314,9 @@ const NumberInput: React.FC<Props> = ({
     [dirty, value, commitValue, widgetMgr, elementFormId, fragmentId]
   )
 
+  // Material icons need to be larger to render similar size of emojis,
+  // and we change their text color
   const isMaterialIcon = icon?.startsWith(":material")
-  // Material icons need to be larger to render similar size of emojis
   const dynamicIconSize = isMaterialIcon ? "lg" : "base"
 
   // Adjust breakpoint for icon so the total width of the input element
@@ -447,6 +448,8 @@ const NumberInput: React.FC<Props> = ({
                 paddingRight: 0,
                 // Keeps emoji icons from being cut off on the right
                 minWidth: theme.iconSizes.lg,
+                // Material icons color changed as inactionable
+                color: isMaterialIcon ? theme.colors.fadedText60 : "inherit",
               },
             },
           }}
