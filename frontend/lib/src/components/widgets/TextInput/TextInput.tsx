@@ -142,8 +142,9 @@ function TextInput({
     fragmentId
   )
 
+  // Material icons need to be larger to render similar size of emojis,
+  // and we change their text color
   const isMaterialIcon = element.icon?.startsWith(":material")
-  // Material icons need to be larger to render similar size of emojis
   const dynamicIconSize = isMaterialIcon ? "lg" : "base"
 
   return (
@@ -229,6 +230,8 @@ function TextInput({
               paddingRight: 0,
               // Keeps emoji icons from being cut off on the right
               minWidth: theme.iconSizes.lg,
+              // Material icons color changed as inactionable
+              color: isMaterialIcon ? theme.colors.fadedText60 : "inherit",
             },
           },
         }}
