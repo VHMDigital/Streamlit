@@ -143,7 +143,7 @@ function TextInput({
   )
 
   const isMaterialIcon = element.icon?.startsWith(":material")
-  // Material icons need to be larger to render similar size of emojis, emojis need addtl margin
+  // Material icons need to be larger to render similar size of emojis
   const dynamicIconSize = isMaterialIcon ? "lg" : "base"
 
   return (
