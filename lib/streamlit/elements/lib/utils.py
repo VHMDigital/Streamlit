@@ -31,6 +31,7 @@ from streamlit import config
 from streamlit.errors import StreamlitDuplicateElementId, StreamlitDuplicateElementKey
 from streamlit.proto.ChatInput_pb2 import ChatInput
 from streamlit.proto.LabelVisibilityMessage_pb2 import LabelVisibilityMessage
+from streamlit.proto.RootContainer_pb2 import RootContainer
 from streamlit.runtime.scriptrunner_utils.script_run_context import (
     ScriptRunContext,
     get_script_run_ctx,
@@ -184,6 +185,7 @@ def compute_and_register_element_id(
     *,
     user_key: str | None,
     form_id: str | None,
+    active_dg_root_container: int | None = None,
     **kwargs: SAFE_VALUES | Iterable[SAFE_VALUES],
 ) -> str:
     """Compute and register the ID for the given element.
@@ -214,6 +216,11 @@ def compute_and_register_element_id(
         The ID of the form that the element belongs to. `None` or empty string
         if the element doesn't belong to a form or doesn't support forms.
 
+    active_dg_root_container : int | None
+        The root container of the DeltaGenerator that's currently 'active'. `None` if the element
+        is not a widget or hybrid-widget since the key won't be re-evaluated to allow the same
+        widget or hybrid-widget both in the main and sidebar area.
+
     kwargs : SAFE_VALUES | Iterable[SAFE_VALUES]
         The arguments to use to compute the element ID.
         The arguments must be stable, deterministic values.
@@ -230,6 +237,13 @@ def compute_and_register_element_id(
         # Add the active script hash to give elements on different
         # pages unique IDs.
         kwargs_to_use["active_script_hash"] = ctx.active_script_hash
+
+    if active_dg_root_container:
+        # If no key is provided and the widget element is inside the sidebar area
+        # create a new key
+        # allows the same widget to be both in main area and sidebar
+        if active_dg_root_container == RootContainer.SIDEBAR and user_key is None:
+            user_key = f"sidebar-{element_type}-{kwargs.get('label', element_type)}"
 
     element_id = _compute_element_id(
         element_type,
