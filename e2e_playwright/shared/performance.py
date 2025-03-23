@@ -117,7 +117,6 @@ def measure_performance(
         client.send("Network.enable")
 
         # Track network requests
-        total_asset_size = 0
         total_playwright_bytes = 0
         total_encoded_bytes = 0
         total_cdp_encoded_bytes = 0  # Compressed bytes on the wire
@@ -139,13 +138,6 @@ def measure_performance(
                 pass
 
         page.on("response", handle_playwright_response)
-
-        def handle_response(response):
-            nonlocal total_asset_size
-            if response.get("response"):
-                total_asset_size += response["response"].get("encodedDataLength", 0)
-
-        client.on("Network.responseReceived", handle_response)
 
         # Handler for the Network.loadingFinished event
         def on_loading_finished(params):
@@ -179,10 +171,6 @@ def measure_performance(
         # Add custom metrics
         custom_metrics = [
             {"name": "TestExecutionTime", "value": execution_time},
-            {
-                "name": "TotalAssetSize",
-                "value": total_asset_size,  # bytes
-            },
             {
                 "name": "TotalPlaywrightBytes",
                 "value": total_playwright_bytes,  # bytes
