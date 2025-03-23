@@ -239,7 +239,7 @@ def compute_and_register_element_id(
     if active_dg_root_container:
         # If no key is provided and the widget element is inside the sidebar area
         # create a new key
-        # allows the same widget to be both in main area and sidebar
+        # allowing the same widget to be both in main area and sidebar.
         if active_dg_root_container == RootContainer.SIDEBAR and user_key is None:
             user_key = f"sidebar-{element_type}"
             user_key += "-".join(f"{k}:{v}" for k, v in kwargs_to_use.items())

@@ -428,7 +428,7 @@ class ComputeElementIdTests(DeltaGeneratorTestCase):
     def test_not_triggers_duplicate_id_error(self, _element_name: str, widget_func):
         """
         Test that duplicate ID error is not raised if the same widget is
-        both in the main and sidebar area
+        both in the main and sidebar area.
         """
         try:
             with st.container():
