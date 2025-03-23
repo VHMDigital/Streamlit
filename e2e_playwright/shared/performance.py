@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING
 from e2e_playwright.shared.git_utils import get_git_root
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Page
+    from playwright.sync_api import Page, Response
 
 
 # Observe long tasks, measure, marks, and paints with PerformanceObserver
@@ -118,6 +118,24 @@ def measure_performance(
 
         # Track network requests
         total_asset_size = 0
+        total_playwright_bytes = 0
+
+        def handle_playwright_response(response: Response):
+            nonlocal total_playwright_bytes
+            try:
+                # First try content-length header
+                content_length = response.headers.get("content-length")
+                if content_length:
+                    total_playwright_bytes += int(content_length)
+                else:
+                    # If that fails, read the body (expensive for large files)
+                    body = response.body()
+                    total_playwright_bytes += len(body)
+            except Exception:
+                # Catch any errors when fetching headers/body
+                pass
+
+        page.on("response", handle_playwright_response)
 
         def handle_response(response):
             nonlocal total_asset_size
@@ -141,6 +159,10 @@ def measure_performance(
             {
                 "name": "TotalAssetSize",
                 "value": total_asset_size,  # bytes
+            },
+            {
+                "name": "TotalPlaywrightBytes",
+                "value": total_playwright_bytes,  # bytes
             },
         ]
 
