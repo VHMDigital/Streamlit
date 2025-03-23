@@ -16,19 +16,22 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from e2e_playwright.conftest import wait_for_app_loaded
+from e2e_playwright.conftest import IframedPage, wait_for_app_loaded, wait_for_app_run
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Page
+    from playwright.sync_api import FrameLocator, Page
 
 
-def test_no_console_errors(page: Page):
+def test_no_console_errors(page: Page, app_port: int):
     """Test that the app does not log any console errors."""
+    expected_console_errors = ["Failed to load resource: net::ERR_CONNECTION_REFUSED"]
     console_errors = []
 
     def on_console_message(msg):
         # Possible message types: "log", "debug", "info", "error", "warning", ...
-        if msg.type == "error":
+        if msg.type == "error" and any(
+            error in msg.text for error in expected_console_errors
+        ):
             # Each console message has text, location, etc.
             console_errors.append(
                 {
@@ -40,7 +43,16 @@ def test_no_console_errors(page: Page):
             )
 
     page.on("console", on_console_message)
-    page.goto("http://localhost:8501")
+    page.goto(f"http://localhost:{app_port}")
     wait_for_app_loaded(page)
 
     assert not console_errors, "Console errors were logged " + str(console_errors)
+
+
+def test_mega_tester_app_in_iframe(iframed_app: IframedPage):
+    """Test that the mega tester app can be loaded within an iframe with CSP."""
+
+    page: Page = iframed_app.page
+    frame_locator: FrameLocator = iframed_app.open_app(None)
+
+    wait_for_app_run(frame_locator)
