@@ -216,8 +216,8 @@ def compute_and_register_element_id(
 
     active_dg_root_container : int | None
         The root container of the DeltaGenerator that's currently 'active'. `None` if the element
-        is not a widget or hybrid-widget since the key won't be re-evaluated to allow the same
-        widget or hybrid-widget both in the main and sidebar area.
+        is not a widget since the key won't be re-evaluated to allow the same
+        widget to be both in main and sidebar area.
 
     kwargs : SAFE_VALUES | Iterable[SAFE_VALUES]
         The arguments to use to compute the element ID.
@@ -241,12 +241,8 @@ def compute_and_register_element_id(
         # create a new key
         # allows the same widget to be both in main area and sidebar
         if active_dg_root_container == RootContainer.SIDEBAR and user_key is None:
-            label = kwargs.get("label")
-            user_key = (
-                f"sidebar-{element_type}-{label}"
-                if label
-                else f"sidebar-{element_type}"
-            )
+            user_key = f"sidebar-{element_type}"
+            user_key += "-".join(f"{k}:{v}" for k, v in kwargs_to_use.items())
 
     element_id = _compute_element_id(
         element_type,
