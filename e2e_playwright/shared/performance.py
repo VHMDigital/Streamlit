@@ -120,6 +120,8 @@ def measure_performance(
         total_asset_size = 0
         total_playwright_bytes = 0
         total_encoded_bytes = 0
+        total_cdp_encoded_bytes = 0  # Compressed bytes on the wire
+        total_cdp_decoded_bytes = 0  # Uncompressed data bytes
 
         def handle_playwright_response(response: Response):
             nonlocal total_playwright_bytes
@@ -154,6 +156,17 @@ def measure_performance(
 
         client.on("Network.loadingFinished", on_loading_finished)
 
+        def on_data_received(params):
+            nonlocal total_cdp_encoded_bytes, total_cdp_decoded_bytes
+            # Each chunk of data:
+            chunk_decoded = params.get("dataLength", 0)
+            chunk_encoded = params.get("encodedDataLength", 0)
+
+            total_cdp_decoded_bytes += chunk_decoded
+            total_cdp_encoded_bytes += chunk_encoded
+
+        client.on("Network.dataReceived", on_data_received)
+
         # Start timing
         start_time = time.time()
 
@@ -177,6 +190,14 @@ def measure_performance(
             {
                 "name": "TotalEncodedBytes",
                 "value": total_encoded_bytes,  # bytes
+            },
+            {
+                "name": "TotalCDPDecodedBytes",
+                "value": total_cdp_decoded_bytes,  # bytes
+            },
+            {
+                "name": "TotalCDPEncodedBytes",
+                "value": total_cdp_encoded_bytes,  # bytes
             },
         ]
 
