@@ -30,9 +30,10 @@ TEST_ASSETS_DIR = Path(__file__).parent / "test_assets"
 MP4_VIDEO_PATH = TEST_ASSETS_DIR / "sintel-short.mp4"
 CAT_AUDIO_PATH = TEST_ASSETS_DIR / "cat-purr.mp3"
 STREAMLIT_LOGO_PATH = TEST_ASSETS_DIR / "streamlit-logo.png"
+STREAMLIT_LOGO_SMALL_PATH = TEST_ASSETS_DIR / "streamlit-logo-small.png"
 
 st.set_page_config("Mega tester app", "🎈")
-st.logo(STREAMLIT_LOGO_PATH, size="large")
+st.logo(STREAMLIT_LOGO_PATH, icon_image=STREAMLIT_LOGO_SMALL_PATH, size="large")
 st.title("🎈 Mega tester app")
 
 
