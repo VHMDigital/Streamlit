@@ -24,15 +24,22 @@ const LOG = getLogger("ForwardMessageCache")
 class CacheEntry {
   public readonly encodedMsg: Uint8Array
 
+  public readonly fragmentId?: string
+
   public scriptRunCount = 0
 
   public getAge(curScriptRunCount: number): number {
     return curScriptRunCount - this.scriptRunCount
   }
 
-  constructor(encodedMsg: Uint8Array, scriptRunCount: number) {
+  constructor(
+    encodedMsg: Uint8Array,
+    scriptRunCount: number,
+    fragmentId?: string
+  ) {
     this.encodedMsg = encodedMsg
     this.scriptRunCount = scriptRunCount
+    this.fragmentId = fragmentId
   }
 }
 
@@ -57,16 +64,35 @@ export class ForwardMsgCache {
    * The "age" of a message is defined by how many times the underlying script
    * has finished running (without a compile error) since the message was
    * last accessed.
+   *
+   * @param fragmentIdsThisRun The fragment IDs being run in this rerun.
    */
-  public incrementRunCount(maxMessageAge: number): void {
-    // TODO(lukasmasuch): Do we need to check for fragmentID here?
+  public incrementRunCount(
+    maxMessageAge: number,
+    fragmentIdsThisRun: string[]
+  ): void {
+    // We only have a single `scriptRunCount` regardless of if its a fragment or full rerun.
+    // Thereby, if we have a couple of subsequent fragment runs, the `scriptRunCount`
+    // will increase, but we only remove cached messages if they are part of the provided
+    // fragment IDs. However, for messages not related to the fragment the
+    // maxMessageAge will not work as expected anymore. If they are not part of the
+    // next full rerun after a couple of fragment runs, they will be deleted.
+    // We could improve this by having a different `scriptRunCount` for each cache message.
+    // But the technical overhead might not be worth it for what we can gain.
     this.scriptRunCount += 1
 
     // It is safe to delete from a map during forEach iteration:
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach#Description
     this.messages.forEach((entry, hash) => {
+      if (
+        fragmentIdsThisRun.length > 0 &&
+        (!entry.fragmentId || !fragmentIdsThisRun.includes(entry.fragmentId))
+      ) {
+        // We only want to delete messages related to the current fragment ID.
+        return
+      }
+
       if (entry.getAge(this.scriptRunCount) > maxMessageAge) {
-        // TODO(lukasmasuch): Only delete messages connected to this fragment run
         LOG.info(`Removing expired ForwardMsg [hash=${hash}]`)
         this.messages.delete(hash)
       }
@@ -156,10 +182,15 @@ export class ForwardMsgCache {
     }
 
     LOG.info(`Caching ForwardMsg [hash=${msg.hash}]`, msg)
-    // TODO(lukasmasuch): Cache with fragmentID as well
     this.messages.set(
       msg.hash,
-      new CacheEntry(encodedMsg, this.scriptRunCount)
+
+      new CacheEntry(
+        encodedMsg,
+        this.scriptRunCount,
+        // Only delta messages have an associated fragment ID:
+        msg.delta?.fragmentId ?? undefined
+      )
     )
   }
 
