@@ -461,9 +461,8 @@ class DataframeUtilTest(unittest.TestCase):
         """Verify that sqlite3 cursor can be used as a data source."""
         import sqlite3
 
-        con = sqlite3.connect("file::memory:")
+        con = sqlite3.connect("file::memory:", uri=True)
         cur = con.cursor()
-        cur.execute("DROP TABLE IF EXISTS movie")
         cur.execute("CREATE TABLE movie(title, year, score)")
         cur.execute("""
             INSERT INTO movie VALUES
