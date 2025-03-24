@@ -44,18 +44,18 @@ def test_total_loaded_assets_size_under_threshold(page: Page, app_port: int):
                 # If that fails, read the body (expensive for large files)
                 body = response.body()
                 total_size_bytes += len(body)
-        except Exception:
-            # Catch any errors when fetching headers/body
-            pass
+        except Exception as ex:
+            print(f"Error calculating size of web assets: {ex}")
 
     # Register the response handler
     page.on("response", handle_response)
 
     page.goto(f"http://localhost:{app_port}/")
     wait_for_app_loaded(page)
-
-    # Wait for the page to load completely
-    page.wait_for_load_state("networkidle")
+    # Wait until all dependent resources are loaded:
+    page.wait_for_load_state()
+    # Additional wait for lazy-loaded resources to load:
+    page.wait_for_timeout(1000)
 
     # Convert to MB and assert it's under threshold
     total_size_mb = total_size_bytes / (1024 * 1024)
@@ -70,4 +70,5 @@ def test_total_loaded_assets_size_under_threshold(page: Page, app_port: int):
 @pytest.mark.performance
 def test_blank_app_performance(app: Page):
     """Collect performance metrics for a blank app."""
-    app.wait_for_load_state("networkidle")
+    # Wait until all dependent resources are loaded:
+    app.wait_for_load_state()
