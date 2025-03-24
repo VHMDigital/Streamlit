@@ -16,6 +16,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from playwright.sync_api import expect
+
 from e2e_playwright.conftest import IframedPage, wait_for_app_loaded, wait_for_app_run
 
 if TYPE_CHECKING:
@@ -50,15 +52,30 @@ def test_no_console_errors(page: Page, app_port: int):
     page.on("console", on_console_message)
     page.goto(f"http://localhost:{app_port}")
     wait_for_app_loaded(page)
+    page.wait_for_load_state()
 
+    # Make sure that all elements are rendered and no skeletons are shown:
+    expect(page.get_by_test_id("stSkeleton")).to_have_count(0, timeout=25000)
+
+    # There should be only one exception in the app:
+    expect(page.get_by_test_id("stException")).to_have_count(1)
+
+    # There should be no unexpected console errors:
     assert not console_errors, "Console errors were logged " + str(console_errors)
 
 
 def test_mega_tester_app_in_iframe(iframed_app: IframedPage):
     """Test that the mega tester app can be loaded within an iframe with CSP."""
 
-    # page: Page = iframed_app.page
+    page: Page = iframed_app.page
     frame_locator: FrameLocator = iframed_app.open_app(None)
 
     wait_for_app_run(frame_locator)
+    page.wait_for_load_state()
+
+    # Make sure that all elements are rendered and no skeletons are shown:
+    expect(frame_locator.get_by_test_id("stSkeleton")).to_have_count(0, timeout=25000)
+
+    # There should be only one exception in the app:
+    expect(frame_locator.get_by_test_id("stException")).to_have_count(1)
     # TODO(lukasmasuch): Add test case
