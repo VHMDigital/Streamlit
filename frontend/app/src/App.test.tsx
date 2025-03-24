@@ -2326,6 +2326,10 @@ describe("App", () => {
             timezone: "UTC",
             timezoneOffset: 0,
             url: "http://localhost:3000/",
+            theme: {
+              backgroundColor: "#ffffff",
+              primaryColor: "Light",
+            },
           },
         },
       })
@@ -2896,6 +2900,10 @@ describe("App", () => {
             timezone: "UTC",
             timezoneOffset: 0,
             url: "http://localhost:3000/",
+            theme: {
+              backgroundColor: "#ffffff",
+              primaryColor: "Light",
+            },
           },
         },
       })
@@ -3109,6 +3117,10 @@ describe("App", () => {
             timezone: "UTC",
             timezoneOffset: 0,
             url: "http://localhost:3000/",
+            theme: {
+              backgroundColor: "#ffffff",
+              primaryColor: "Light",
+            },
           },
         },
       })
