@@ -57,6 +57,8 @@ def populate_hash_if_needed(msg: ForwardMsg) -> None:
         # delta. We only cache new_element and add_block deltas since container's
         # are not expected to be larger than a few KB and have other side-effects
         # to consider if cached. But `add_block` deltas should still get a hash.
+        # In case we ever allow other delta types to be cached, we should
+        # also need to adapt the composable logic in forward_msg_queue.
         msg.metadata.cacheable = (
             len(serialized_msg) >= int(config.get_option("global.minCachedMessageSize"))
             and msg.WhichOneof("type") == "delta"
