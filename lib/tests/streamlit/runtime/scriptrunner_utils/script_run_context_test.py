@@ -41,7 +41,7 @@ def _create_script_run_context(
     fake_enqueue: Callable[[ForwardMsg], None],
     current_fragment_id: str | None = None,
     pages_manager: PagesManager | None = None,
-    cached_messages: list[str] | None = None,
+    cached_messages: set[str] | None = None,
 ):
     return ScriptRunContext(
         session_id="TestSessionID",
@@ -54,7 +54,7 @@ def _create_script_run_context(
         fragment_storage=MemoryFragmentStorage(),
         pages_manager=pages_manager or PagesManager(""),
         current_fragment_id=current_fragment_id,
-        cached_messages=cached_messages or [],
+        cached_messages=cached_messages or set(),
     )
 
 
@@ -266,7 +266,7 @@ class ScriptRunContextTest(unittest.TestCase):
             populate_hash_if_needed(cacheable_msg)
             assert bool(cacheable_msg.hash)
             ctx = _create_script_run_context(
-                fake_enqueue, cached_messages=[cacheable_msg.hash]
+                fake_enqueue, cached_messages={cacheable_msg.hash}
             )
             add_script_run_ctx(ctx=ctx)
             enqueue_message(cacheable_msg)

@@ -22,21 +22,57 @@ from streamlit.runtime.forward_msg_cache import (
     create_reference_msg,
     populate_hash_if_needed,
 )
-from tests.streamlit.message_mocks import create_dataframe_msg
+from streamlit.testing.v1.util import patch_config_options
+from tests.streamlit.message_mocks import (
+    create_container_msg,
+    create_dataframe_msg,
+)
 
 
 class ForwardMsgCacheTest(unittest.TestCase):
     def test_msg_hash(self):
         """Test that ForwardMsg hash generation works as expected"""
-        msg1 = create_dataframe_msg([1, 2, 3])
-        msg2 = create_dataframe_msg([1, 2, 3])
-        populate_hash_if_needed(msg1)
-        populate_hash_if_needed(msg2)
-        self.assertEqual(msg1.hash, msg2.hash)
+        with patch_config_options({"global.minCachedMessageSize": 0}):
+            msg1 = create_dataframe_msg([1, 2, 3])
+            msg2 = create_dataframe_msg([1, 2, 3])
+            populate_hash_if_needed(msg1)
+            populate_hash_if_needed(msg2)
 
-        msg3 = create_dataframe_msg([2, 3, 4])
-        populate_hash_if_needed(msg3)
-        self.assertNotEqual(msg1.hash, msg3.hash)
+            self.assertNotEqual(msg1.hash, "")
+            self.assertNotEqual(msg2.hash, "")
+
+            self.assertEqual(msg1.hash, msg2.hash)
+            self.assertTrue(msg1.metadata.cacheable)
+            self.assertTrue(msg2.metadata.cacheable)
+
+            msg3 = create_dataframe_msg([2, 3, 4])
+            populate_hash_if_needed(msg3)
+            self.assertNotEqual(msg1.hash, msg3.hash)
+            self.assertTrue(msg3.metadata.cacheable)
+
+    def test_container_msg_hash(self):
+        """Test that container ForwardMsg hash generation works as expected
+        but aren't marked as cacheable."""
+        with patch_config_options({"global.minCachedMessageSize": 0}):
+            msg1 = create_container_msg()
+            msg2 = create_container_msg()
+            populate_hash_if_needed(msg1)
+            populate_hash_if_needed(msg2)
+
+            self.assertNotEqual(msg1.hash, "")
+            self.assertNotEqual(msg2.hash, "")
+            self.assertEqual(msg1.hash, msg2.hash)
+            # Container messages (add_block) are never cacheable
+            self.assertFalse(msg1.metadata.cacheable)
+            self.assertFalse(msg2.metadata.cacheable)
+
+    def test_not_cacheable_if_below_min_cached_message_size(self):
+        """Test that a ForwardMsg is not cacheable if its below the min cached
+        message size."""
+        with patch_config_options({"global.minCachedMessageSize": 1000}):
+            msg = create_dataframe_msg([1, 2, 3])
+            populate_hash_if_needed(msg)
+            self.assertFalse(msg.metadata.cacheable)
 
     def test_delta_metadata(self):
         """Test that delta metadata doesn't change the hash"""
@@ -54,3 +90,14 @@ class ForwardMsgCacheTest(unittest.TestCase):
 
         self.assertEqual(msg.hash, ref_msg.ref_hash)
         self.assertEqual(msg.metadata, ref_msg.metadata)
+        self.assertFalse(ref_msg.metadata.cacheable)
+
+    def test_no_hash_for_reference_msg(self):
+        """Test that reference message doesn't get a hash."""
+        with patch_config_options({"global.minCachedMessageSize": 0}):
+            msg = create_dataframe_msg([1, 2, 3], 34)
+            populate_hash_if_needed(msg)
+            ref_msg = create_reference_msg(msg)
+            populate_hash_if_needed(ref_msg)
+            self.assertEqual(ref_msg.hash, "")
+            self.assertFalse(ref_msg.metadata.cacheable)
