@@ -82,6 +82,8 @@ def serialize_forward_msg(msg: ForwardMsg) -> bytes:
             f"Showing error to the user: {msg_size_error}"
         )
         exception.marshall(msg.delta.new_element.exception, msg_size_error)
+        # Deactivate caching for this error message:
+        msg.metadata.cacheable = False
         msg_str = msg.SerializeToString()
 
     return msg_str
