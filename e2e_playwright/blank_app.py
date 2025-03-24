@@ -14,4 +14,6 @@
 
 import streamlit as st
 
-st.write("")
+# We intentionally use an empty markdown here since almost
+# every app uses markdown rendering in one way or another
+st.markdown("")
