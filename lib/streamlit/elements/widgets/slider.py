@@ -421,7 +421,7 @@ class SliderMixin:
             of two values is passed here, then a range slider with those lower
             and upper bounds is rendered. For example, if set to `(1, 10)` the
             slider will have a selectable range between 1 and 10.
-            This defaults to ``min_value``. If the type is not othwerwise
+            This defaults to ``min_value``. If the type is not otherwise
             specified in any of the numeric parameters, the widget will have an
             integer value.
 
