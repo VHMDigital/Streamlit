@@ -463,6 +463,7 @@ class DataframeUtilTest(unittest.TestCase):
 
         con = sqlite3.connect("file::memory:")
         cur = con.cursor()
+        cur.execute("DROP TABLE IF EXISTS movie")
         cur.execute("CREATE TABLE movie(title, year, score)")
         cur.execute("""
             INSERT INTO movie VALUES
