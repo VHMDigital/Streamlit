@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { memo, useCallback, useEffect, useState } from "react"
+import React, { memo, useCallback, useEffect, useRef, useState } from "react"
 
 import { isMobile } from "react-device-detect"
 import { ChevronDown } from "baseui/icon"
@@ -86,6 +86,7 @@ const Selectbox: React.FC<Props> = ({
 }) => {
   const theme: EmotionTheme = useTheme()
   const [value, setValue] = useState<number | null>(propValue)
+  const valueBeforeRemoval = useRef<number | null>(value)
 
   // Update the value whenever the value provided by the props changes
   // TODO: Find a better way to handle this to prevent unneeded re-renders
@@ -95,12 +96,21 @@ const Selectbox: React.FC<Props> = ({
 
   const handleChange = useCallback(
     (params: OnChangeParams): void => {
-      if (params.value.length === 0) {
+      // eslint-disable-next-line no-console
+      console.log("handleChange", params)
+
+      if (params.type === "remove") {
+        valueBeforeRemoval.current = params.option?.value
         setValue(null)
-        onChange(null)
         return
       }
 
+      valueBeforeRemoval.current = null
+      // if (params.value.length === 0) {
+      //   setValue(null)
+      //   onChange(null)
+      //   return
+      // }
       const [selected] = params.value
       const newValue = parseInt(selected.value, 10)
       setValue(newValue)
@@ -108,6 +118,23 @@ const Selectbox: React.FC<Props> = ({
     },
     [onChange]
   )
+
+  // const handleInputChange = useCallback(
+  //   (params: OnInputChangeEventType): void => {
+  //     // eslint-disable-next-line no-console
+  //     console.log("handleInputChange", params)
+  //     setNewValue(params.target.value)
+  //   },
+  //   []
+  // )
+
+  const handleBlur = useCallback(() => {
+    // eslint-disable-next-line no-console
+    console.log("handleBlur", valueBeforeRemoval.current)
+    if (valueBeforeRemoval.current !== null) {
+      setValue(valueBeforeRemoval.current)
+    }
+  }, [])
 
   const filterOptions = useCallback(
     (options: readonly Option[], filterValue: string): readonly Option[] =>
@@ -163,6 +190,8 @@ const Selectbox: React.FC<Props> = ({
         labelKey="label"
         aria-label={label || ""}
         onChange={handleChange}
+        // onInputChange={handleInputChange}
+        onBlur={handleBlur}
         options={selectOptions}
         filterOptions={filterOptions}
         clearable={clearable || false}
