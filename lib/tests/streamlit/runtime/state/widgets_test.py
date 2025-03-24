@@ -437,7 +437,7 @@ class ComputeElementIdTests(DeltaGeneratorTestCase):
                 widget_func()
         except errors.StreamlitDuplicateElementKey:
             # hybrid-widget `pydeck_chart` has a key configured and will throw
-            # an `StreamlitDuplicateElementKey` exception when using
+            # a `StreamlitDuplicateElementKey` exception when using
             # this test for all `WIDGET_ELEMENTS`
             pass
 
