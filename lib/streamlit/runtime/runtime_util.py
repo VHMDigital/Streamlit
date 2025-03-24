@@ -16,13 +16,16 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from logging import getLogger
+from typing import TYPE_CHECKING, Any, Final
 
 from streamlit import config
 from streamlit.errors import MarkdownFormattedException, StreamlitAPIException
 
 if TYPE_CHECKING:
     from streamlit.proto.ForwardMsg_pb2 import ForwardMsg
+
+_LOGGER: Final = getLogger(__name__)
 
 
 class MessageSizeError(MarkdownFormattedException):
@@ -69,11 +72,16 @@ def serialize_forward_msg(msg: ForwardMsg) -> bytes:
     msg_str = msg.SerializeToString()
 
     if len(msg_str) > get_max_message_size_bytes():
-        import streamlit.elements.exception as exception
-
         # Overwrite the offending ForwardMsg.delta with an error to display.
         # This assumes that the size limit wasn't exceeded due to metadata.
-        exception.marshall(msg.delta.new_element.exception, MessageSizeError(msg_str))
+        import streamlit.elements.exception as exception
+
+        msg_size_error = MessageSizeError(msg_str)
+        _LOGGER.warning(
+            "Websocket message size limit exceeded. "
+            f"Showing error to the user: {msg_size_error}"
+        )
+        exception.marshall(msg.delta.new_element.exception, msg_size_error)
         msg_str = msg.SerializeToString()
 
     return msg_str
