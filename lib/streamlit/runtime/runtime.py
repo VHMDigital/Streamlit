@@ -477,7 +477,6 @@ class Runtime:
         -----
         Threading: UNSAFE. Must be called on the eventloop thread.
         """
-        # print("handle_backmsg", msg.rerun_script.cached_messages)
         if self._state in (RuntimeState.STOPPING, RuntimeState.STOPPED):
             raise RuntimeStoppedError(f"Can't handle_backmsg (state={self._state})")
 
