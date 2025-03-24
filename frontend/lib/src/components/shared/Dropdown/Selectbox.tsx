@@ -86,6 +86,8 @@ const Selectbox: React.FC<Props> = ({
 }) => {
   const theme: EmotionTheme = useTheme()
   const [value, setValue] = useState<number | null>(propValue)
+  // This ref is used to store the value before the user starts removing characters so that we can restore
+  // the value in case the user dismisses the changes by clicking away.
   const valueBeforeRemoval = useRef<number | null>(value)
 
   // Update the value whenever the value provided by the props changes
@@ -96,21 +98,20 @@ const Selectbox: React.FC<Props> = ({
 
   const handleChange = useCallback(
     (params: OnChangeParams): void => {
-      // eslint-disable-next-line no-console
-      console.log("handleChange", params)
-
       if (params.type === "remove") {
         valueBeforeRemoval.current = params.option?.value
+        // We set the value so that BaseWeb updates the element's value while typing.
+        // We don't want to commit the change yet, so we don't call onChange.
         setValue(null)
         return
       }
 
       valueBeforeRemoval.current = null
-      // if (params.value.length === 0) {
-      //   setValue(null)
-      //   onChange(null)
-      //   return
-      // }
+      if (params.type === "clear") {
+        setValue(null)
+        onChange(null)
+        return
+      }
       const [selected] = params.value
       const newValue = parseInt(selected.value, 10)
       setValue(newValue)
@@ -119,18 +120,7 @@ const Selectbox: React.FC<Props> = ({
     [onChange]
   )
 
-  // const handleInputChange = useCallback(
-  //   (params: OnInputChangeEventType): void => {
-  //     // eslint-disable-next-line no-console
-  //     console.log("handleInputChange", params)
-  //     setNewValue(params.target.value)
-  //   },
-  //   []
-  // )
-
   const handleBlur = useCallback(() => {
-    // eslint-disable-next-line no-console
-    console.log("handleBlur", valueBeforeRemoval.current)
     if (valueBeforeRemoval.current !== null) {
       setValue(valueBeforeRemoval.current)
     }
@@ -190,7 +180,6 @@ const Selectbox: React.FC<Props> = ({
         labelKey="label"
         aria-label={label || ""}
         onChange={handleChange}
-        // onInputChange={handleInputChange}
         onBlur={handleBlur}
         options={selectOptions}
         filterOptions={filterOptions}
