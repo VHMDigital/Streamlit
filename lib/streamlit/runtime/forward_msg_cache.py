@@ -74,7 +74,11 @@ def create_reference_msg(msg: ForwardMsg) -> ForwardMsg:
         ref_hash field.
 
     """
-    # TODO(lukasmasuch): Log error if msg.hash is not set
+    if not msg.hash:
+        # Fallback to the original message if the hash is not set.
+        # However, this is not expected to happen.
+        return msg
+
     ref_msg = ForwardMsg()
     ref_msg.ref_hash = msg.hash
     ref_msg.metadata.CopyFrom(msg.metadata)

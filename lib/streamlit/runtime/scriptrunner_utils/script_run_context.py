@@ -201,7 +201,9 @@ class ScriptRunContext:
 
         msg.metadata.active_script_hash = self.active_script_hash
 
-        # We always populate the hash and cacheable field.
+        # We populate the hash and cacheable field for all messages.
+        # Besides the forward message cache, the hash might also be used
+        # for other aspects within the frontend.
         populate_hash_if_needed(msg)
         msg_to_send = msg
         if msg.metadata.cacheable and msg.hash and msg.hash in self.cached_messages:
@@ -215,8 +217,8 @@ class ScriptRunContext:
         if self._experimental_query_params_used and self._production_query_params_used:
             raise StreamlitAPIException(
                 "Using `st.query_params` together with either `st.experimental_get_query_params` "
-                "or `st.experimental_set_query_params` is not supported. Please convert your app "
-                "to only use `st.query_params`"
+                "or `st.experimental_set_query_params` is not supported. Please "
+                " convert your app to only use `st.query_params`"
             )
 
     def mark_experimental_query_params_used(self):
