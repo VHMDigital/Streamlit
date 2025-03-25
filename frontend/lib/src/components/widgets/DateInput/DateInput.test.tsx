@@ -150,15 +150,14 @@ describe("DateInput widget", () => {
     expect(screen.getByTestId("stDateInputField")).toBeDisabled()
   })
 
-  it("updates the widget value when it's changed", () => {
-    const props = getProps()
+  it("updates the widget value when it's changed", async () => {
+    const user = userEvent.setup()
+    const props = getProps({ default: undefined })
     vi.spyOn(props.widgetMgr, "setStringArrayValue")
 
     render(<DateInput {...props} />)
     const datePicker = screen.getByTestId("stDateInputField")
-    // TODO: Utilize user-event instead of fireEvent
-    // eslint-disable-next-line testing-library/prefer-user-event
-    fireEvent.change(datePicker, { target: { value: newDate } })
+    await user.type(datePicker, newDate)
 
     expect(screen.getByTestId("stDateInputField")).toHaveValue(newDate)
     expect(props.widgetMgr.setStringArrayValue).toHaveBeenCalledWith(
@@ -169,6 +168,43 @@ describe("DateInput widget", () => {
       },
       undefined
     )
+  })
+
+  it("displays an error tooltip when the entered date is out of range", async () => {
+    const user = userEvent.setup()
+    const props = getProps({
+      min: "2020/01/05",
+      max: "2020/01/25",
+    })
+    render(<DateInput {...props} />)
+    const dateInput = screen.getByTestId("stDateInputField")
+    const newDate = "2020/01/30"
+
+    await user.type(dateInput, newDate)
+
+    const tooltip = screen.getByTestId("stTooltipContent")
+    expect(tooltip).toHaveTextContent(
+      "Error: Date set outside allowed range. Please select a date between 2020/01/05 and 2020/01/25."
+    )
+  })
+
+  it("does not commit an invalid date", async () => {
+    const user = userEvent.setup()
+    const invalidDate = "2020/02/15"
+    const props = getProps({
+      default: undefined,
+      min: "2020/01/01",
+      max: "2020/01/31",
+    })
+    render(<DateInput {...props} />)
+    // Set up spy after initial setStringArrayValue call
+    vi.spyOn(props.widgetMgr, "setStringArrayValue")
+
+    const dateInput = screen.getByTestId("stDateInputField")
+    await user.type(dateInput, invalidDate)
+
+    expect(dateInput).toHaveValue(invalidDate)
+    expect(props.widgetMgr.setStringArrayValue).not.toHaveBeenCalled()
   })
 
   it("resets its value to default when it's closed with empty input", () => {

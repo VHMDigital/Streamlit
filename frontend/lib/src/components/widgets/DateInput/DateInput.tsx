@@ -160,7 +160,7 @@ function DateInput({
     [maxDate, dateFormat, loadedLocale]
   )
 
-  // Create error messages based on validation type
+  // Create tooltip error message based on validation error
   const createErrorMessage = useCallback(
     (errorType: string | null): string | null => {
       if (!errorType) return null
@@ -225,6 +225,9 @@ function DateInput({
     }: {
       date: Date | (Date | null | undefined)[] | null | undefined
     }): void => {
+      // Reset our error state
+      setError(null)
+
       if (isNullOrUndefined(date)) {
         setValueWithSource({ value: [], fromUi: true })
         setIsEmpty(true)
@@ -430,6 +433,12 @@ function DateInput({
                       borderTopWidth: sizes.borderWidth,
                       borderBottomWidth: sizes.borderWidth,
                       paddingRight: spacing.twoXS,
+
+                      // TODO: Override for dark theme error state
+                      ...(error &&
+                        !hasLightBackgroundColor(theme) && {
+                          backgroundColor: colors.red50,
+                        }),
                     },
                   },
                   ClearIcon: {
@@ -458,6 +467,12 @@ function DateInput({
                       paddingBottom: spacing.sm,
                       paddingTop: spacing.sm,
                       lineHeight: lineHeights.inputWidget,
+
+                      // TODO: Override for dark theme error state
+                      ...(error &&
+                        !hasLightBackgroundColor(theme) && {
+                          backgroundColor: colors.red50,
+                        }),
                     },
                     props: {
                       "data-testid": "stDateInputField",
