@@ -182,7 +182,7 @@ describe("DateInput widget", () => {
 
     await user.type(dateInput, newDate)
 
-    const tooltip = screen.getByTestId("stTooltipContent")
+    const tooltip = screen.getByTestId("stTooltipErrorContent")
     expect(tooltip).toHaveTextContent(
       "Error: Date set outside allowed range. Please select a date between 2020/01/05 and 2020/01/25."
     )

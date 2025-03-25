@@ -314,9 +314,10 @@ function DateInput({
         content={tooltipContent}
         placement={Placement.TOP}
         overrides={errorTooltipStyles}
+        // provides unique testids to distinguish between error and help tooltips
+        error
       >
         <UIDatePicker
-          error={!!error}
           locale={loadedLocale}
           density={DENSITY.high}
           formatString={dateFormat}
@@ -434,11 +435,12 @@ function DateInput({
                       borderBottomWidth: sizes.borderWidth,
                       paddingRight: spacing.twoXS,
 
-                      // TODO: Override for dark theme error state
-                      ...(error &&
-                        !hasLightBackgroundColor(theme) && {
-                          backgroundColor: colors.red50,
-                        }),
+                      // TODO: Confirm correct color for light/dark theme
+                      // Baseweb has an error prop for the input, but its coloring doesn't reconcile
+                      // with our dark theme - we handle error state coloring manually here
+                      ...(error && {
+                        backgroundColor: colors.dangerBg,
+                      }),
                     },
                   },
                   ClearIcon: {
@@ -459,6 +461,12 @@ function DateInput({
                       },
                     },
                   },
+                  InputContainer: {
+                    style: {
+                      // Explicitly specified so error background renders correctly
+                      backgroundColor: "transparent",
+                    },
+                  },
                   Input: {
                     style: {
                       // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
@@ -467,12 +475,6 @@ function DateInput({
                       paddingBottom: spacing.sm,
                       paddingTop: spacing.sm,
                       lineHeight: lineHeights.inputWidget,
-
-                      // TODO: Override for dark theme error state
-                      ...(error &&
-                        !hasLightBackgroundColor(theme) && {
-                          backgroundColor: colors.red50,
-                        }),
                     },
                     props: {
                       "data-testid": "stDateInputField",

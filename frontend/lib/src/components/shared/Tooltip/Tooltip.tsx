@@ -60,6 +60,7 @@ export interface TooltipProps {
   onMouseEnterDelay?: number
   overrides?: PopoverOverrides
   containerWidth?: boolean
+  error?: boolean
 }
 
 // Allows re-use/customization of default tooltip overrides
@@ -122,6 +123,7 @@ function Tooltip({
   onMouseEnterDelay,
   overrides,
   containerWidth,
+  error,
 }: TooltipProps): ReactElement {
   const theme: EmotionTheme = useTheme()
 
@@ -149,8 +151,8 @@ function Tooltip({
       content={
         content ? (
           <StyledTooltipContentWrapper
-            className="stTooltipContent"
-            data-testid="stTooltipContent"
+            className={error ? "stTooltipErrorContent" : "stTooltipContent"}
+            data-testid={error ? "stTooltipErrorContent" : "stTooltipContent"}
             ref={setTooltipElement}
           >
             {content}
@@ -177,8 +179,12 @@ function Tooltip({
           width: containerWidth ? "100%" : "auto",
           ...style,
         }}
-        data-testid="stTooltipHoverTarget"
-        className="stTooltipHoverTarget"
+        data-testid={
+          error ? "stTooltipErrorHoverTarget" : "stTooltipHoverTarget"
+        }
+        className={
+          error ? "stTooltipErrorHoverTarget" : "stTooltipHoverTarget"
+        }
       >
         {children}
       </div>
