@@ -47,7 +47,7 @@ more-itertools==10.6.0
 mypy==1.10.1
 mypy-extensions==1.0.0
 mypy-protobuf==3.6.0
-narwhals==1.31.0
+narwhals==1.32.0
 nh3==0.2.21
 nodeenv==1.9.1
 numpy==2.2.4
@@ -68,7 +68,7 @@ pycparser==2.22
 pydeck==0.9.1
 pyee==12.1.1
 Pygments==2.19.1
-pyparsing==3.2.2
+pyparsing==3.2.3
 pytest==8.3.5
 pytest-base-url==2.1.0
 pytest-benchmark==5.1.0
@@ -80,7 +80,7 @@ pytest-rerunfailures==15.0
 pytest-xdist==3.6.1
 python-dateutil==2.9.0.post0
 python-slugify==8.0.4
-pytz==2025.1
+pytz==2025.2
 PyYAML==6.0.2
 readme_renderer==44.0
 referencing==0.36.2
