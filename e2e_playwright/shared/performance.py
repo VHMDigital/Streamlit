@@ -133,6 +133,10 @@ def measure_performance(
 
         total_websocket_received_size_bytes = 0
         total_websocket_sent_size_bytes = 0
+        total_websocket_messages_sent = 0
+        total_websocket_messages_received = 0
+
+        # + numbrt of send & recived messages
 
         def on_web_socket(ws):
             def on_frame_sent(payload: str | bytes):
@@ -140,12 +144,14 @@ def measure_performance(
                 if isinstance(payload, str):
                     payload = payload.encode("utf-8")
                 total_websocket_sent_size_bytes += len(payload)
+                total_websocket_messages_sent += 1
 
             def on_frame_received(payload: str | bytes):
                 nonlocal total_websocket_received_size_bytes
                 if isinstance(payload, str):
                     payload = payload.encode("utf-8")
                 total_websocket_received_size_bytes += len(payload)
+                total_websocket_messages_received += 1
 
             ws.on("framesent", on_frame_sent)
             ws.on("framereceived", on_frame_received)
@@ -176,12 +182,20 @@ def measure_performance(
                 "value": total_network_encoded_bytes,
             },
             {
-                "name": "TotalWebsocketSentSizeBytes",
+                "name": "TotalWebsocketSentBytes",
                 "value": total_websocket_sent_size_bytes,
             },
             {
-                "name": "TotalWebsocketReceivedSizeBytes",
+                "name": "TotalWebsocketReceivedBytes",
                 "value": total_websocket_received_size_bytes,
+            },
+            {
+                "name": "NumWebsocketMessagesSent",
+                "value": total_websocket_messages_sent,
+            },
+            {
+                "name": "NumWebsocketMessagesReceived",
+                "value": total_websocket_messages_received,
             },
         ]
         # Get metrics from Chrome DevTools Protocol
