@@ -80,6 +80,12 @@ function datesToStrings(dates: Date[]): string[] {
   return dates.map((value: Date) => moment(value as Date).format(DATE_FORMAT))
 }
 
+// Types for date validation
+type ValidationResult = {
+  errorType: "Min" | "Max" | null
+  newDates: Date[]
+}
+
 function DateInput({
   disabled,
   element,
@@ -113,14 +119,18 @@ function DateInput({
   const { locale } = useContext(LibContext)
   const loadedLocale = useIntlLocale(locale)
 
-  const minDate = moment(element.min, DATE_FORMAT).toDate()
-  const maxDate = getMaxDate(element)
+  const minDate = useMemo(
+    () => moment(element.min, DATE_FORMAT).toDate(),
+    [element.min]
+  )
+
+  const maxDate = useMemo(() => getMaxDate(element), [element])
+
   const clearable = element.default.length === 0 && !disabled
 
   // We need to extract the mask and format (date-fns notation) from the provided format string
   // The user configured date format is based on the momentJS notation and is only allowed to contain
   // one of YYYY/MM/DD, DD/MM/YYYY, or MM/DD/YYYY" and can also use a period (.) or hyphen (-) as separators.
-
   // We need to convert the provided format into a mask supported by the Baseweb datepicker
   // Thereby, we need to replace all letters with 9s which refers to any number.
   // (Using useMemo to avoid recomputing every time for now reason)
@@ -138,37 +148,76 @@ function DateInput({
     [element.format]
   )
 
-  // Dates can be entered outside of min/max in UI, we check for this and set an error state if date invalid
-  // Issue #8475
-  const checkDateInRange = (date: Date): void => {
-    const minDateString = format(minDate, dateFormat, {
-      locale: loadedLocale,
-    })
-    const maxDateString = maxDate
-      ? format(maxDate, dateFormat, { locale: loadedLocale })
-      : ""
+  // Date strings used for error messages
+  const minDateString = useMemo(
+    () => format(minDate, dateFormat, { locale: loadedLocale }),
+    [minDate, dateFormat, loadedLocale]
+  )
 
-    let dateError = ""
-    if (maxDate && date > maxDate) {
-      dateError = "Max"
-    } else if (date < minDate) {
-      dateError = "Min"
-    }
+  const maxDateString = useMemo(
+    () =>
+      maxDate ? format(maxDate, dateFormat, { locale: loadedLocale }) : "",
+    [maxDate, dateFormat, loadedLocale]
+  )
 
-    if (element.isRange && dateError) {
-      const messageEnding =
-        dateError === "Max"
-          ? `before ${maxDateString}`
-          : `after ${minDateString}`
-      setError(
-        `**Error**: ${dateError} date set outside allowed range. Please select a date ${messageEnding}.`
-      )
-    } else if (!element.isRange && dateError) {
-      setError(
-        `**Error**: Date set outside allowed range. Please select a date between ${minDateString} and ${maxDateString}.`
-      )
-    }
-  }
+  // Create error messages based on validation type
+  const createErrorMessage = useCallback(
+    (errorType: string | null): string | null => {
+      if (!errorType) return null
+
+      if (element.isRange) {
+        const messageEnding =
+          errorType === "Max"
+            ? `before ${maxDateString}`
+            : `after ${minDateString}`
+
+        return `**Error**: ${errorType} date set outside allowed range. Please select a date ${messageEnding}.`
+      }
+
+      return `**Error**: Date set outside allowed range. Please select a date between ${minDateString} and ${maxDateString}.`
+    },
+    [element.isRange, maxDateString, minDateString]
+  )
+
+  // Handles FE date validation
+  const validateDates = useCallback(
+    (
+      dates: Date | (Date | null | undefined)[] | null | undefined
+    ): ValidationResult => {
+      const newDates: Date[] = []
+      let errorType: "Min" | "Max" | null = null
+
+      if (isNullOrUndefined(dates)) {
+        return { errorType: null, newDates: [] }
+      }
+
+      if (Array.isArray(dates)) {
+        dates.forEach((dt: Date | null | undefined) => {
+          if (dt) {
+            if (maxDate && dt > maxDate) {
+              errorType = "Max"
+            } else if (dt < minDate) {
+              errorType = "Min"
+            }
+            newDates.push(dt)
+          }
+        })
+      } else if (dates) {
+        if (maxDate && dates > maxDate) {
+          errorType = "Max"
+        } else if (dates < minDate) {
+          errorType = "Min"
+        }
+        newDates.push(dates)
+      }
+
+      return {
+        errorType,
+        newDates,
+      }
+    },
+    [minDate, maxDate]
+  )
 
   const handleChange = useCallback(
     ({
@@ -176,33 +225,21 @@ function DateInput({
     }: {
       date: Date | (Date | null | undefined)[] | null | undefined
     }): void => {
-      setError("")
-
       if (isNullOrUndefined(date)) {
         setValueWithSource({ value: [], fromUi: true })
         setIsEmpty(true)
         return
       }
 
-      // TODO (mayagbarnes): Refactor checkDateInRange to handle iteration over multiple dates
-      // Handle scenario where start after end date etc.
-      const newValue: Date[] = []
-      if (Array.isArray(date)) {
-        date.forEach((dt: Date | null | undefined) => {
-          if (dt) {
-            checkDateInRange(dt)
-            newValue.push(dt)
-          }
-        })
-      } else {
-        checkDateInRange(date)
-        newValue.push(date)
+      const validationResult = validateDates(date)
+      const { errorType, newDates } = validationResult
+      if (errorType) {
+        setError(createErrorMessage(errorType))
       }
-
-      setValueWithSource({ value: newValue, fromUi: true })
-      setIsEmpty(!newValue)
+      setValueWithSource({ value: newDates, fromUi: true })
+      setIsEmpty(!newDates)
     },
-    [setValueWithSource, checkDateInRange]
+    [setValueWithSource, validateDates, createErrorMessage, setError]
   )
 
   const handleClose = useCallback((): void => {
@@ -210,26 +247,47 @@ function DateInput({
 
     const newValue = stringsToDates(element.default)
     setValueWithSource({ value: newValue, fromUi: true })
-    setIsEmpty(!newValue)
+    setIsEmpty(newValue.length === 0)
   }, [isEmpty, element, setValueWithSource])
 
-  const errorTooltipBody = { style: { backgroundColor: colors.bgColor } }
-  const errorTooltipInner = {
-    style: {
-      // backgroundColor: colors.dangerBg,
-      backgroundColor: "transparent",
-      color: hasLightBackgroundColor(theme) ? colors.red100 : colors.red20,
-      paddingLeft: "0",
-      paddingRight: "0",
-      paddingTop: "0",
-      paddingBottom: "0",
-    },
-  }
-  const errorTooltipOverrides = generateDefaultTooltipOverrides(
-    theme,
-    errorTooltipBody,
-    errorTooltipInner
-  )
+  // Memoize tooltip styling to prevent unnecessary rerenders
+  const errorTooltipStyles = useMemo(() => {
+    const errorTooltipBody = { style: { backgroundColor: colors.bgColor } }
+    const errorTooltipInner = {
+      style: {
+        backgroundColor: "transparent",
+        color: hasLightBackgroundColor(theme) ? colors.red100 : colors.red20,
+        paddingLeft: "0",
+        paddingRight: "0",
+        paddingTop: "0",
+        paddingBottom: "0",
+      },
+    }
+
+    return generateDefaultTooltipOverrides(
+      theme,
+      errorTooltipBody,
+      errorTooltipInner
+    )
+  }, [theme, colors])
+
+  // Memoize tooltip content
+  const tooltipContent = useMemo(() => {
+    if (!error) return null
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: theme.spacing.twoXS,
+        }}
+      >
+        <Icon content={ErrorOutline} size="base" />
+        <StreamlitMarkdown source={error} allowHTML={false} />
+      </div>
+    )
+  }, [error, theme.spacing.twoXS])
 
   return (
     <div className="stDateInput" data-testid="stDateInput">
@@ -250,22 +308,9 @@ function DateInput({
         )}
       </WidgetLabel>
       <Tooltip
-        content={
-          error ? (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: theme.spacing.twoXS,
-              }}
-            >
-              <Icon content={ErrorOutline} size="base" />
-              <StreamlitMarkdown source={error} allowHTML={false} />
-            </div>
-          ) : null
-        }
+        content={tooltipContent}
         placement={Placement.TOP}
-        overrides={errorTooltipOverrides}
+        overrides={errorTooltipStyles}
       >
         <UIDatePicker
           error={!!error}
