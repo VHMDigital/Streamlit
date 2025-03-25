@@ -1060,7 +1060,7 @@ _create_theme_options(
     "primaryColor",
     categories=["theme", CustomThemeCategories.SIDEBAR],
     description="""
-        Primary accent color for interactive elements.
+        Primary accent color.
     """,
 )
 
@@ -1109,8 +1109,15 @@ _create_theme_options(
     categories=["theme", CustomThemeCategories.SIDEBAR],
     description="""
         The font family for all text, except code blocks. This can be one of
-        the following: "sans serif", "serif", "monospace", or the
-        `font` value for a custom font table under [[theme.fontFaces]].
+        the following:
+        - "sans-serif"
+        - "serif"
+        - "monospace"
+        - the `font` value for a custom font table under [[theme.fontFaces]]
+        - a comma-separated list of these (as a single string) to specify
+          fallbacks
+        For example, you can use the following:
+        font = "cool-font, fallback-cool-font, sans-serif"
     """,
 )
 
@@ -1119,8 +1126,13 @@ _create_theme_options(
     categories=["theme", CustomThemeCategories.SIDEBAR],
     description="""
         The font family to use for code (monospace) in the sidebar. This can be
-        one of the following: "sans serif", "serif", "monospace", or the `font`
-        value for a custom font table under [[theme.fontFaces]].
+        one of the following:
+        - "sans-serif"
+        - "serif"
+        - "monospace"
+        - the `font` value for a custom font table under [[theme.fontFaces]]
+        - a comma-separated list of these (as a single string) to specify
+          fallbacks
     """,
 )
 
@@ -1129,9 +1141,13 @@ _create_theme_options(
     categories=["theme", CustomThemeCategories.SIDEBAR],
     description="""
         The font family to use for headings. This can be one of the following:
-        "sans serif", "serif", "monospace", or the `font` value for a custom
-        font table under [[theme.fontFaces]]. If no heading font is set,
-        Streamlit uses `theme.font` for headings.
+        - "sans-serif"
+        - "serif"
+        - "monospace"
+        - the `font` value for a custom font table under [[theme.fontFaces]]
+        - a comma-separated list of these (as a single string) to specify
+          fallbacks
+        If no heading font is set, Streamlit uses `theme.font` for headings.
     """,
 )
 
@@ -1140,9 +1156,9 @@ _create_theme_options(
     categories=["theme"],
     description="""
         An array of fonts to use in your app. Each font in the array is a table
-        (dictionary) with the following three attributes: font, url, and
-        weight. To host a font with your app, enable static file serving with
-        `server.enableStaticServing=true`. You can define multiple
+        (dictionary) with the following three attributes: font, url, weight,
+        and style. To host a font with your app, enable static file serving
+        with `server.enableStaticServing=true`. You can define multiple
         [[theme.fontFaces]] tables.
 
         For example, each font is defined in a [[theme.fontFaces]] table as
@@ -1151,6 +1167,7 @@ _create_theme_options(
         font = "font_name"
         url = "app/static/font_file.woff"
         weight = 400
+        style = "normal"
     """,
 )
 
@@ -1161,7 +1178,8 @@ _create_theme_options(
         The radius used as basis for the corners of most UI elements. This can
         be one of the following: "none", "small", "medium", "large", "full",
         or the number in pixels or rem. For example, you can use "10px",
-        "0.5rem", or "2rem".
+        "0.5rem", or "2rem". To follow best practices, use rem instead of
+        pixels when specifying a numeric size.
     """,
 )
 
