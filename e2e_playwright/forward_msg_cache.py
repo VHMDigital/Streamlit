@@ -46,6 +46,19 @@ with st.container(height=300):
             "\n\n".join(kb_message_size * [message_1kb]),
         )
 
+
+@st.fragment
+def my_fragment():
+    st.button("Rerun fragment")
+    with st.expander("Message in Fragment", expanded=False):
+        st.write(
+            "**Message in Fragment:** \n\n",
+            "\n\n".join(kb_message_size * [message_1kb]),
+        )
+
+
+my_fragment()
+
 st.button("Re-run")
 st.write(f"Rerun count: {st.session_state['rerun_count']}")
 
