@@ -78,7 +78,16 @@ def test_simulate_many_small_messages_performance(app: Page):
     _rerun_app(app, 10)
 
 
-def test_check_websocket_message_size(page: Page, app_port: int):
+def test_check_total_websocket_message_size(page: Page, app_port: int):
+    """Test that verifies the total size of websocket messages during the simluated
+    forward message cache run is under a configured threshold.
+    """
+
+    # Define an acceptable threshold for total websocket message size (in MB)
+    # for a simulated forward message cache run with large messages.
+    # If the threshold is exceeded significantly, it might indicate a bug with
+    # the forward message cache. You can modify this threshold if it's needed,
+    # justified, and expected.
     TOTAL_WEBSOCKET_SENT_SIZE_THRESHOLD_MB: Final = 0.1
     TOTAL_WEBSOCKET_RECEIVED_SIZE_THRESHOLD_MB: Final = 55
 
