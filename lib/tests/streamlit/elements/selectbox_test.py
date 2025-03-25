@@ -23,6 +23,7 @@ import pytest
 from parameterized import parameterized
 
 import streamlit as st
+from streamlit.elements.lib.options_selector_utils import create_mappings
 from streamlit.elements.widgets.selectbox import SelectboxSerde
 from streamlit.errors import StreamlitAPIException
 from streamlit.proto.LabelVisibilityMessage_pb2 import LabelVisibilityMessage
@@ -140,6 +141,7 @@ class SelectboxTest(DeltaGeneratorTestCase):
 
         c = self.get_delta_from_queue().new_element.selectbox
         self.assertEqual(c.accept_new_options, True)
+        self.assertEqual(c.placeholder, "Choose or add an option")
 
     def test_invalid_value(self):
         """Test that value must be an int."""
@@ -298,24 +300,36 @@ def test_None_session_state_value_retained():
 class TestSelectboxSerde:
     def test_serialize(self):
         options = ["Option A", "Option B", "Option C"]
-        option_mapping = {"Option A": "A", "Option B": "B", "Option C": "C"}
-        serde = SelectboxSerde(options, option_mapping)
+        (formatted_options, formatted_option_to_option_index) = create_mappings(options)
+        serde = SelectboxSerde(
+            options,
+            formatted_options=formatted_options,
+            formatted_option_to_option_index=formatted_option_to_option_index,
+        )
 
-        res = serde.serialize("A")
-        assert res == "A"
+        res = serde.serialize("Option A")
+        assert res == "Option A"
 
     def test_serialize_none(self):
         options = ["Option A", "Option B", "Option C"]
-        option_mapping = {"Option A": "A", "Option B": "B", "Option C": "C"}
-        serde = SelectboxSerde(options, option_mapping)
+        (formatted_options, formatted_option_to_option_index) = create_mappings(options)
+        serde = SelectboxSerde(
+            options,
+            formatted_options=formatted_options,
+            formatted_option_to_option_index=formatted_option_to_option_index,
+        )
 
         res = serde.serialize(None)
         assert res is None
 
     def test_serialize_empty_options(self):
         options = []
-        option_mapping = {}
-        serde = SelectboxSerde(options, option_mapping)
+        (formatted_options, formatted_option_to_option_index) = create_mappings(options)
+        serde = SelectboxSerde(
+            options,
+            formatted_options=formatted_options,
+            formatted_option_to_option_index=formatted_option_to_option_index,
+        )
 
         res = serde.serialize("something")
         assert res == ""
@@ -323,57 +337,82 @@ class TestSelectboxSerde:
     def test_serialize_with_format_func(self):
         options = ["Option A", "Option B", "Option C"]
 
+        # Define format_func for testing purposes
         def format_func(x):
             return f"Format: {x}"
 
-        option_mapping = {
-            "Format: Option A": "Option A",
-            "Format: Option B": "Option B",
-            "Format: Option C": "Option C",
-        }
-        serde = SelectboxSerde(options, option_mapping, format_func=format_func)
+        (formatted_options, formatted_option_to_option_index) = create_mappings(
+            options, format_func
+        )
+        serde = SelectboxSerde(
+            options,
+            formatted_options=formatted_options,
+            formatted_option_to_option_index=formatted_option_to_option_index,
+        )
 
         res = serde.serialize("Option A")
         assert res == "Format: Option A"
 
     def test_deserialize(self):
         options = ["Option A", "Option B", "Option C"]
-        option_mapping = {"Option A": "A", "Option B": "B", "Option C": "C"}
-        serde = SelectboxSerde(options, option_mapping)
+        (formatted_options, formatted_option_to_option_index) = create_mappings(options)
+        serde = SelectboxSerde(
+            options,
+            formatted_options=formatted_options,
+            formatted_option_to_option_index=formatted_option_to_option_index,
+        )
 
         res = serde.deserialize("Option A", "")
-        assert res == "A"
+        assert res == "Option A"
 
     def test_deserialize_with_new_option(self):
         options = ["Option A", "Option B", "Option C"]
-        option_mapping = {"Option A": "A", "Option B": "B", "Option C": "C"}
-        serde = SelectboxSerde(options, option_mapping, accept_new_options=True)
+        (formatted_options, formatted_option_to_option_index) = create_mappings(options)
+        serde = SelectboxSerde(
+            options,
+            formatted_options=formatted_options,
+            formatted_option_to_option_index=formatted_option_to_option_index,
+        )
 
         res = serde.deserialize("New Option", "")
         assert res == "New Option"
 
     def test_deserialize_none(self):
         options = ["Option A", "Option B", "Option C"]
-        option_mapping = {"Option A": "A", "Option B": "B", "Option C": "C"}
-        serde = SelectboxSerde(options, option_mapping)
+        (formatted_options, formatted_option_to_option_index) = create_mappings(options)
+        serde = SelectboxSerde(
+            options,
+            formatted_options=formatted_options,
+            formatted_option_to_option_index=formatted_option_to_option_index,
+        )
 
         res = serde.deserialize(None, "")
         assert res is None
 
     def test_deserialize_with_default_index(self):
         options = ["Option A", "Option B", "Option C"]
-        option_mapping = {"Option A": "A", "Option B": "B", "Option C": "C"}
+        (formatted_options, formatted_option_to_option_index) = create_mappings(options)
         default_index = 2
-        serde = SelectboxSerde(options, option_mapping, default_index)
+        serde = SelectboxSerde(
+            options,
+            formatted_options=formatted_options,
+            formatted_option_to_option_index=formatted_option_to_option_index,
+            default_index=default_index,
+        )
 
         res = serde.deserialize(None, "")
         assert res == "Option C"
 
     def test_deserialize_empty_options_with_default_index(self):
         options = []
-        option_mapping = {}
+        (formatted_options, formatted_option_to_option_index) = create_mappings(options)
         default_index = 0
-        serde = SelectboxSerde(options, option_mapping, default_index)
+        serde = SelectboxSerde(
+            options,
+            formatted_options=formatted_options,
+            formatted_option_to_option_index=formatted_option_to_option_index,
+            default_index=default_index,
+        )
 
         res = serde.deserialize(None, "")
         assert res is None
@@ -386,16 +425,18 @@ class TestSelectboxSerde:
             {"id": 3, "name": "Third"},
         ]
 
+        # Define format_func for testing purposes
         def format_func(x):
             return x["name"]
 
-        formatted_options = [format_func(opt) for opt in complex_options]
-        option_mapping = {
-            formatted_options[i]: complex_options[i]
-            for i in range(len(complex_options))
-        }
-
-        serde = SelectboxSerde(complex_options, option_mapping, format_func=format_func)
+        (formatted_options, formatted_option_to_option_index) = create_mappings(
+            complex_options, format_func
+        )
+        serde = SelectboxSerde(
+            complex_options,
+            formatted_options=formatted_options,
+            formatted_option_to_option_index=formatted_option_to_option_index,
+        )
 
         res = serde.deserialize("First", "")
         assert res == complex_options[0]

@@ -42,7 +42,7 @@ function FixedSizeListItem(props: FixedSizeListItemProps): ReactElement {
   const { item, overrides, ...restChildProps } = data[index].props
 
   // isCreatable is set by baseui when the option is not in the list of options and the user is typing a new one
-  const label = item.isCreatable ? `Create: ${item.label}` : item.label
+  const label = item.isCreatable ? `Add: ${item.label}` : item.label
 
   return (
     <ThemedStyledDropdownListItem

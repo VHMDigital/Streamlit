@@ -91,7 +91,7 @@ const Selectbox: React.FC<Props> = ({
   const [value, setValue] = useState<string | null>(propValue)
   // This ref is used to store the value before the user starts removing characters so that we can restore
   // the value in case the user dismisses the changes by clicking away.
-  const valueBeforeRemoval = useRef<string  | null>(value)
+  const valueBeforeRemoval = useRef<string | null>(value)
 
   // Update the value whenever the value provided by the props changes
   // TODO: Find a better way to handle this to prevent unneeded re-renders
@@ -110,17 +110,13 @@ const Selectbox: React.FC<Props> = ({
       }
 
       valueBeforeRemoval.current = null
+
       if (params.type === "clear") {
         setValue(null)
-
-        // Baseweb will call handleChange with type='remove' when starting to
-        // delete characters. We want to prevent triggering an immediate rerun and cleared
-        // input when starting to delete characters.
-        if (params.type !== "remove") {
-          onChange(null)
-        }
+        onChange(null)
         return
       }
+
       const [selected] = params.value
       setValue(selected.value)
       onChange(selected.value)

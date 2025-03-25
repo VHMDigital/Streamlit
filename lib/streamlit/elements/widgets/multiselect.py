@@ -16,20 +16,14 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from textwrap import dedent
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Generic,
-    Literal,
-    cast,
-    overload,
-)
+from typing import TYPE_CHECKING, Any, Callable, Generic, Literal, cast, overload
 
 from streamlit.dataframe_util import OptionSequence
 from streamlit.elements.lib.form_utils import current_form_id
 from streamlit.elements.lib.options_selector_utils import (
+    convert_anything_to_list,
     convert_to_sequence_and_check_comparable,
+    create_mappings,
     get_default_indices,
     maybe_coerce_enum_sequence,
 )
@@ -71,45 +65,74 @@ if TYPE_CHECKING:
 
 class MultiSelectSerde(Generic[T]):
     options: Sequence[T]
-    formatted_option_to_option_mapping: dict[str, T]
+    formatted_options: list[str]
+    formatted_option_to_option_index: dict[str, int]
     default_options_indices: list[int]
-    format_func: Callable[[Any], str]
-    accept_new_options: bool
 
     def __init__(
         self,
         options: Sequence[T],
-        formatted_option_to_option_mapping: dict[str, T],
+        *,
+        formatted_options: list[str],
+        formatted_option_to_option_index: dict[str, int],
         default_options_indices: list[int] | None = None,
-        format_func: Callable[[Any], str] = str,
-        accept_new_options: bool = False,
     ):
+        """Initialize the MultiSelectSerde.
+
+        We do not store an option_to_formatted_option mapping because the generic
+        options might not be hashable, which would raise a RuntimeError. So we do
+        two lookups: option -> index -> formatted_option[index].
+
+
+        Parameters
+        ----------
+        options : Sequence[T]
+            The sequence of selectable options.
+        formatted_options : list[str]
+            The string representations of each option. The formatted_options correspond
+            to the options sequence by index.
+        formatted_option_to_option_index : dict[str, int]
+            A mapping from formatted option strings to their corresponding indices in
+            the options sequence.
+        default_option_index : int or None, optional
+            The index of the default option to use when no selection is made.
+            If None, no default option is selected.
+        """
+
         self.options = options
-        self.formatted_option_to_option_mapping = formatted_option_to_option_mapping
+        self.formatted_options = formatted_options
+        self.formatted_option_to_option_index = formatted_option_to_option_index
         self.default_options_indices = default_options_indices or []
-        self.accept_new_options = accept_new_options
-        self.format_func = format_func
 
     def serialize(self, value: list[T | str] | list[T]) -> list[str]:
-        return [self.format_func(v) for v in value] if value is not None else []
+        converted_value = convert_anything_to_list(value)
+        values: list[str] = []
+        for v in converted_value:
+            try:
+                option_index = self.options.index(v)
+                values.append(self.formatted_options[option_index])
+            except ValueError:
+                # at this point we know that v is a string, otherwise
+                # it would have been found in the options
+                values.append(cast("str", v))
+        return values
 
     def deserialize(
         self,
         ui_value: list[str] | None,
         widget_id: str = "",
     ) -> list[T | str] | list[T]:
-        return (
-            [
-                # check if the option is pointing to a complex option type T,
-                # otherwise return the option itself
-                self.formatted_option_to_option_mapping.get(
-                    selected_option, selected_option
-                )
-                for selected_option in ui_value
-            ]
-            if ui_value is not None
-            else [self.options[i] for i in self.default_options_indices]
-        )
+        if ui_value is None:
+            return [self.options[i] for i in self.default_options_indices]
+
+        values: list[T | str] = []
+        for v in ui_value:
+            try:
+                option_index = self.formatted_options.index(v)
+                values.append(self.options[option_index])
+            except ValueError:
+                values.append(v)
+        return values
 
 
 def _get_default_count(default: Sequence[Any] | Any | None) -> int:
@@ -148,7 +171,7 @@ class MultiSelectMixin:
         kwargs: WidgetKwargs | None = None,
         *,  # keyword-only arguments:
         max_selections: int | None = None,
-        placeholder: str = "Choose an option",
+        placeholder: str | None = None,
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: Literal[False] = False,
@@ -168,7 +191,7 @@ class MultiSelectMixin:
         kwargs: WidgetKwargs | None = None,
         *,  # keyword-only arguments:
         max_selections: int | None = None,
-        placeholder: str = "Choose an option",
+        placeholder: str | None = None,
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: Literal[True] = True,
@@ -188,7 +211,7 @@ class MultiSelectMixin:
         kwargs: WidgetKwargs | None = None,
         *,  # keyword-only arguments:
         max_selections: int | None = None,
-        placeholder: str = "Choose an option",
+        placeholder: str | None = None,
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: bool = False,
@@ -208,7 +231,7 @@ class MultiSelectMixin:
         kwargs: WidgetKwargs | None = None,
         *,  # keyword-only arguments:
         max_selections: int | None = None,
-        placeholder: str = "Choose an option",
+        placeholder: str | None = None,
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: Literal[False, True] | bool = False,
@@ -355,7 +378,7 @@ class MultiSelectMixin:
         kwargs: WidgetKwargs | None = None,
         *,  # keyword-only arguments:
         max_selections: int | None = None,
-        placeholder: str = "Choose an option",
+        placeholder: str | None = None,
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: bool = False,
@@ -373,14 +396,18 @@ class MultiSelectMixin:
         maybe_raise_label_warnings(label, label_visibility)
 
         indexable_options = convert_to_sequence_and_check_comparable(options)
-        formatted_option_to_option_mapping: dict[str, T] = {
-            format_func(option): option for option in indexable_options
-        }
-        formatted_options: list[str] = list(formatted_option_to_option_mapping.keys())
+        (formatted_options, formatted_option_to_option_index) = create_mappings(
+            indexable_options, format_func
+        )
+
         default_values = get_default_indices(indexable_options, default)
 
-        if accept_new_options:
-            placeholder = "Choose or create an option"
+        if placeholder is None:
+            placeholder = (
+                "Choose an option"
+                if not accept_new_options
+                else "Choose or add an option"
+            )
 
         form_id = current_form_id(self.dg)
         element_id = compute_and_register_element_id(
@@ -414,10 +441,9 @@ class MultiSelectMixin:
 
         serde = MultiSelectSerde(
             indexable_options,
-            formatted_option_to_option_mapping,
-            default_values,
-            format_func,
-            accept_new_options,
+            formatted_options=formatted_options,
+            formatted_option_to_option_index=formatted_option_to_option_index,
+            default_options_indices=default_values,
         )
 
         widget_state = register_widget(

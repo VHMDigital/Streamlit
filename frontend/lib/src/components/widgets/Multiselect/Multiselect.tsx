@@ -124,9 +124,8 @@ const Multiselect: FC<Props> = props => {
   }, [element.maxSelections, value.length])
 
   const valueFromState = useMemo(() => {
-    return value.map(i => {
-      const label = i
-      return { value: i.toString(), label }
+    return value.map(option => {
+      return { value: option, label: option }
     })
   }, [value])
 

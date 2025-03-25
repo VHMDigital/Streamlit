@@ -76,7 +76,7 @@ describe("VirtualDropdown element", () => {
     expect(screen.getAllByTestId("stTooltipHoverTarget")).toHaveLength(1)
   })
 
-  it("renders a FixedSizeList where children with isCreatable have label prefix of 'Create:'", () => {
+  it("renders a FixedSizeList where children with isCreatable have label prefix of 'Add:'", () => {
     render(
       <VirtualDropdown>
         <Option item={{ value: "abc", label: "abc", isCreatable: true }} />
@@ -90,8 +90,6 @@ describe("VirtualDropdown element", () => {
 
     expect(screen.getAllByTestId("stTooltipHoverTarget")).toHaveLength(2)
     expect(screen.getByText("def", { exact: true })).toBeInTheDocument()
-    expect(
-      screen.getByText("Create: abc", { exact: true })
-    ).toBeInTheDocument()
+    expect(screen.getByText("Add: abc", { exact: true })).toBeInTheDocument()
   })
 })
