@@ -944,8 +944,8 @@ export class App extends PureComponent<Props, State> {
     // page profile messages, and the session info is never reset.
     // That being said, we should not error here for the sake of a
     // page profile for any edge cases that are created. So we send
-    // what we can provide. We can detect in metrics if the appId,
-    // sessionId, and pythonVersion are missing.
+    // what we can provide. We can detect this scenario in metrics
+    // if the appId, sessionId, and pythonVersion are missing.
     if (!this.sessionInfo.isSet) {
       this.metricsMgr.enqueue("pageProfile", metricsToSend)
       return
@@ -1103,8 +1103,8 @@ export class App extends PureComponent<Props, State> {
     // the NewSession message (or the first time since disconnect), we
     // perform some one-time initialization.
     if (!this.sessionInfo.isSet || !this.sessionInfo.current.isConnected) {
-      // We're not initialized. Perform one-time initialization.
-      this.handleOneTimeInitialization(newSessionProto)
+      // We're not initialized (this is our first time, or we are reconnected)
+      this.handleInitialization(newSessionProto)
     }
 
     const { appHash, currentPageScriptHash: prevPageScriptHash } = this.state
@@ -1175,7 +1175,7 @@ export class App extends PureComponent<Props, State> {
   /**
    * Performs one-time initialization. This is called from `handleNewSession`.
    */
-  handleOneTimeInitialization = (newSessionProto: NewSession): void => {
+  handleInitialization = (newSessionProto: NewSession): void => {
     const initialize = newSessionProto.initialize as Initialize
     const config = newSessionProto.config as Config
 
