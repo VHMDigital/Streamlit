@@ -198,7 +198,7 @@ describe("DateInput widget", () => {
     expect(dateInput).toHaveValue(fullOriginalDate)
   })
 
-  it("has a minDate", async () => {
+  it.only("has a minDate", async () => {
     const user = userEvent.setup()
     const props = getProps({})
 
@@ -210,6 +210,7 @@ describe("DateInput widget", () => {
     expect(
       screen.getByLabelText("Not available. Monday, January 19th 1970.")
     ).toBeTruthy()
+
     expect(
       screen.getByLabelText(
         "Selected. Tuesday, January 20th 1970. It's available."

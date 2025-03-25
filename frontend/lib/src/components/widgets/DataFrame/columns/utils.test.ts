@@ -15,7 +15,8 @@
  */
 import { GridCell, GridCellKind } from "@glideapps/glide-data-grid"
 import { Field, Utf8 } from "apache-arrow"
-import moment, { Moment } from "moment-timezone"
+
+import { dayjs, Dayjs } from "@streamlit/utils"
 
 import { DataFrameCellType } from "~lib/dataframes/arrowTypeUtils"
 import { withTimezones } from "~lib/util/withTimezones"
@@ -567,10 +568,11 @@ describe("truncateDecimals", () => {
   )
 })
 
-withTimezones(() => {
+withTimezones(timezone => {
   describe("formatMoment", () => {
     beforeAll(() => {
-      const d = new Date("2022-04-28T00:00:00Z")
+      // Set the system time to a fixed date in the respective timezone
+      const d = dayjs("2022-04-28T00:00:00").toDate()
       vi.useFakeTimers()
       vi.setSystemTime(d)
     })
@@ -582,60 +584,67 @@ withTimezones(() => {
     it.each([
       [
         "YYYY-MM-DD HH:mm:ss z",
-        moment.utc("2023-04-27T10:20:30Z"),
+        dayjs.utc("2023-04-27T10:20:30Z"),
         "2023-04-27 10:20:30 UTC",
       ],
       [
         "YYYY-MM-DD HH:mm:ss z",
-        moment.utc("2023-04-27T10:20:30Z").tz("America/Los_Angeles"),
+        dayjs.utc("2023-04-27T10:20:30Z").tz("America/Los_Angeles"),
         "2023-04-27 03:20:30 PDT",
       ],
       [
         "YYYY-MM-DD HH:mm:ss Z",
-        moment.utc("2023-04-27T10:20:30Z").tz("America/Los_Angeles"),
+        dayjs.utc("2023-04-27T10:20:30Z").tz("America/Los_Angeles"),
         "2023-04-27 03:20:30 -07:00",
       ],
       [
         "YYYY-MM-DD HH:mm:ss Z",
-        moment.utc("2023-04-27T10:20:30Z").utcOffset("+04:00"),
+        dayjs.utc("2023-04-27T10:20:30Z").utcOffset("+04:00"),
         "2023-04-27 14:20:30 +04:00",
       ],
-      ["YYYY-MM-DD", moment.utc("2023-04-27T10:20:30Z"), "2023-04-27"],
+      ["YYYY-MM-DD", dayjs.utc("2023-04-27T10:20:30Z"), "2023-04-27"],
       [
         "MMM Do, YYYY [at] h:mm A",
-        moment.utc("2023-04-27T15:45:00Z"),
+        dayjs.utc("2023-04-27T15:45:00Z"),
         "Apr 27th, 2023 at 3:45 PM",
       ],
       [
         "MMMM Do, YYYY Z",
-        moment.utc("2023-04-27T10:20:30Z").utcOffset("-02:30"),
+        dayjs.utc("2023-04-27T10:20:30Z").utcOffset("-02:30"),
         "April 27th, 2023 -02:30",
       ],
       // Distance:
-      ["distance", moment.utc("2022-04-10T20:20:30Z"), "17 days ago"],
-      ["distance", moment.utc("2020-04-10T20:20:30Z"), "2 years ago"],
-      ["distance", moment.utc("2022-04-27T23:59:59Z"), "a few seconds ago"],
-      ["distance", moment.utc("2022-04-20T00:00:00Z"), "8 days ago"],
-      ["distance", moment.utc("2022-05-27T23:59:59Z"), "in a month"],
+      // The distance format leverages dayjs's fromNow() method, which is
+      // interprets UTC as needing to be converted to local timezone.
+      // We set it explicitly to the timezone we want to test.
+      ["distance", dayjs.tz("2022-04-10T20:20:30Z", timezone), "17 days ago"],
+      ["distance", dayjs.tz("2020-04-10T20:20:30Z", timezone), "2 years ago"],
+      [
+        "distance",
+        dayjs.tz("2022-04-27T23:59:59Z", timezone),
+        "a few seconds ago",
+      ],
+      ["distance", dayjs.tz("2022-04-20T00:00:00Z", timezone), "8 days ago"],
+      ["distance", dayjs.tz("2022-05-27T23:59:59Z", timezone), "in a month"],
       // Calendar:
-      ["calendar", moment.utc("2022-04-30T15:30:00Z"), "Saturday at 3:30 PM"],
+      ["calendar", dayjs.utc("2022-04-30T15:30:00Z"), "Saturday at 3:30 PM"],
       [
         "calendar",
-        moment.utc("2022-04-24T12:20:30Z"),
+        dayjs.utc("2022-04-24T12:20:30Z"),
         "Last Sunday at 12:20 PM",
       ],
-      ["calendar", moment.utc("2022-04-28T12:00:00Z"), "Today at 12:00 PM"],
-      ["calendar", moment.utc("2022-04-29T12:00:00Z"), "Tomorrow at 12:00 PM"],
+      ["calendar", dayjs.utc("2022-04-28T12:00:00Z"), "Today at 12:00 PM"],
+      ["calendar", dayjs.utc("2022-04-29T12:00:00Z"), "Tomorrow at 12:00 PM"],
       // ISO8601:
       [
         "iso8601",
-        moment.utc("2023-04-27T10:20:30.123Z"),
+        dayjs.utc("2023-04-27T10:20:30.123Z"),
         "2023-04-27T10:20:30.123Z",
       ],
     ])(
       "uses %s format to format %s to %s",
-      (format: string, momentDate: Moment, expected: string) => {
-        expect(formatMoment(momentDate, format)).toBe(expected)
+      (format: string, dayjsDate: Dayjs, expected: string) => {
+        expect(formatMoment(dayjsDate, format)).toBe(expected)
       }
     )
   })

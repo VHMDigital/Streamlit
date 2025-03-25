@@ -27,9 +27,9 @@ import pick from "lodash/pick"
 import { StyleProps, Slider as UISlider } from "baseui/slider"
 import { useTheme } from "@emotion/react"
 import { sprintf } from "sprintf-js"
-import moment from "moment"
 
 import { Slider as SliderProto } from "@streamlit/protobuf"
+import { dayjs } from "@streamlit/utils"
 
 import { WidgetStateManager } from "~lib/WidgetStateManager"
 import {
@@ -333,11 +333,11 @@ function isDateTimeType(element: SliderProto): boolean {
 function formatValue(value: number, element: SliderProto): string {
   const { format, options } = element
   if (isDateTimeType(element)) {
-    // Python datetime uses microseconds, but JS & Moment uses milliseconds
+    // Python datetime uses microseconds, but JS & dayjs uses milliseconds
     // The timestamp is always set to the UTC timezone, even so, the actual timezone
     // for this timestamp in the backend could be different.
     // However, the frontend component does not need to know about the actual timezone.
-    return moment.utc(value / 1000).format(format)
+    return dayjs.utc(value / 1000).format(format)
   }
 
   if (options.length > 0) {

@@ -16,7 +16,6 @@
 
 import React, { PureComponent, ReactNode } from "react"
 
-import moment from "moment"
 import Hotkeys from "react-hot-keys"
 import { enableAllPlugins as enableImmerPlugins } from "immer"
 import classNames from "classnames"
@@ -101,7 +100,7 @@ import {
   SessionStatus,
   WidgetStates,
 } from "@streamlit/protobuf"
-import { isNullOrUndefined, notNullOrUndefined } from "@streamlit/utils"
+import { dayjs, isNullOrUndefined, notNullOrUndefined } from "@streamlit/utils"
 import getBrowserInfo from "@streamlit/app/src/util/getBrowserInfo"
 import { isLocalhost } from "@streamlit/app/src/util/deploymentInfo"
 import { AppContext } from "@streamlit/app/src/components/AppContext"
@@ -1815,7 +1814,7 @@ export class App extends PureComponent<Props, State> {
   screencastCallback = (): void => {
     const { scriptName } = this.state
     const { startRecording } = this.props.screenCast
-    const date = moment().format("YYYY-MM-DD-HH-MM-SS")
+    const date = dayjs().format("YYYY-MM-DD-HH-MM-SS")
 
     startRecording(`streamlit-${scriptName}-${date}`)
   }

@@ -17,5 +17,6 @@
 import "./polyfills"
 
 export * from "./browser"
+export * from "./date"
 export * from "./types"
 export * from "./uri"
