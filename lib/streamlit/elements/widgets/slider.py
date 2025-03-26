@@ -398,20 +398,32 @@ class SliderMixin:
 
         min_value : a supported type or None
             The minimum permitted value.
-            Defaults to 0 if the value is an int, 0.0 if a float,
-            value - timedelta(days=14) if a date/datetime, time.min if a time
+            If this is ``None`` (default), the minimum value depends on the
+            type as follows:
+
+            - integer: ``0``
+            - float: ``0.0``
+            - date or datetime: ``value - timedelta(days=14)``
+            - time: ``time.min``
 
         max_value : a supported type or None
             The maximum permitted value.
-            Defaults to 100 if the value is an int, 1.0 if a float,
-            value + timedelta(days=14) if a date/datetime, time.max if a time
+            If this is ``None`` (default), the maximum value depends on the
+            type as follows:
+
+            - integer: ``100``
+            - float: ``1.0``
+            - date or datetime: ``value + timedelta(days=14)``
+            - time: ``time.max``
 
         value : a supported type or a tuple/list of supported types or None
             The value of the slider when it first renders. If a tuple/list
             of two values is passed here, then a range slider with those lower
             and upper bounds is rendered. For example, if set to `(1, 10)` the
             slider will have a selectable range between 1 and 10.
-            Defaults to min_value.
+            This defaults to ``min_value``. If the type is not otherwise
+            specified in any of the numeric parameters, the widget will have an
+            integer value.
 
         step : int, float, timedelta, or None
             The stepping interval.
@@ -693,7 +705,7 @@ class SliderMixin:
             ) and max_value - min_value < timedelta(days=1):
                 step = timedelta(minutes=15)
         if format is None:
-            format = cast(str, DEFAULTS[data_type]["format"])
+            format = cast("str", DEFAULTS[data_type]["format"])
 
         if step == 0:
             raise StreamlitAPIException(
@@ -811,7 +823,7 @@ class SliderMixin:
             value = list(map(_datetime_to_micros, value))
             min_value = _datetime_to_micros(min_value)
             max_value = _datetime_to_micros(max_value)
-            step = _delta_to_micros(cast(timedelta, step))
+            step = _delta_to_micros(cast("timedelta", step))
 
         # It would be great if we could guess the number of decimal places from
         # the `step` argument, but this would only be meaningful if step were a
@@ -826,7 +838,7 @@ class SliderMixin:
         slider_proto.default[:] = value
         slider_proto.min = min_value
         slider_proto.max = max_value
-        slider_proto.step = cast(float, step)
+        slider_proto.step = cast("float", step)
         slider_proto.data_type = data_type
         slider_proto.options[:] = []
         slider_proto.form_id = current_form_id(self.dg)
@@ -872,7 +884,7 @@ class SliderMixin:
             slider_proto.set_value = True
 
         self.dg._enqueue("slider", slider_proto)
-        return cast(SliderReturn, widget_state.value)
+        return cast("SliderReturn", widget_state.value)
 
     @property
     def dg(self) -> DeltaGenerator:

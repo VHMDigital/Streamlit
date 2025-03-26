@@ -32,7 +32,6 @@ from streamlit.proto.Video_pb2 import Video as VideoProto
 from streamlit.runtime import caching
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.time_util import time_to_seconds
-from streamlit.type_util import NumpyShape
 
 if TYPE_CHECKING:
     from typing import Any
@@ -40,6 +39,7 @@ if TYPE_CHECKING:
     from numpy import typing as npt
 
     from streamlit.delta_generator import DeltaGenerator
+    from streamlit.type_util import NumpyShape
 
 
 MediaData: TypeAlias = Union[
@@ -666,7 +666,7 @@ def _validate_and_normalize(data: npt.NDArray[Any]) -> tuple[bytes, int]:
 
     transformed_data: npt.NDArray[Any] = np.array(data, dtype=float)
 
-    if len(cast(NumpyShape, transformed_data.shape)) == 1:
+    if len(cast("NumpyShape", transformed_data.shape)) == 1:
         nchan = 1
     elif len(transformed_data.shape) == 2:
         # In wave files,channels are interleaved. E.g.,
@@ -681,7 +681,7 @@ def _validate_and_normalize(data: npt.NDArray[Any]) -> tuple[bytes, int]:
     if transformed_data.size == 0:
         return transformed_data.astype(np.int16).tobytes(), nchan
 
-    max_abs_value = np.max(np.abs(transformed_data))
+    max_abs_value: npt.NDArray[Any] = np.max(np.abs(transformed_data))
     # 16-bit samples are stored as 2's-complement signed integers,
     # ranging from -32768 to 32767.
     # scaled_data is PCM 16 bit numpy array, that's why we multiply [-1, 1] float
