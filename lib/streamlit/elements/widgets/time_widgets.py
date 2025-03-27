@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from textwrap import dedent
@@ -21,10 +22,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Final,
-    List,
     Literal,
-    Sequence,
-    Tuple,
     Union,
     cast,
     overload,
@@ -72,9 +70,9 @@ DateValue: TypeAlias = Union[NullableScalarDateValue, Sequence[NullableScalarDat
 
 # The return value of st.date_input.
 DateWidgetRangeReturn: TypeAlias = Union[
-    Tuple[()],
-    Tuple[date],
-    Tuple[date, date],
+    tuple[()],
+    tuple[date],
+    tuple[date, date],
 ]
 DateWidgetReturn: TypeAlias = Union[date, DateWidgetRangeReturn, None]
 
@@ -153,7 +151,7 @@ def _parse_date_value(value: DateValue) -> tuple[list[date] | None, bool]:
         value_tuple = value
     else:
         is_range = False
-        value_tuple = [cast(NullableScalarDateValue, value)]
+        value_tuple = [cast("NullableScalarDateValue", value)]
 
     if len(value_tuple) not in {0, 1, 2}:
         raise StreamlitAPIException(
@@ -229,7 +227,7 @@ class _DateInputValues:
         )
 
         if value == "today":
-            v = cast(List[date], parsed_value)[0]
+            v = cast("list[date]", parsed_value)[0]
             if v < parsed_min:
                 parsed_value = [parsed_min]
             if v > parsed_max:
@@ -302,7 +300,7 @@ class DateInputSerde:
 
         if not self.value.is_range:
             return return_value[0]
-        return cast(DateWidgetReturn, tuple(return_value))
+        return cast("DateWidgetReturn", tuple(return_value))
 
     def serialize(self, v: DateWidgetReturn) -> list[str]:
         if v is None:
@@ -406,10 +404,14 @@ class TimeWidgetsMixin:
             If this is omitted, a key will be generated for the widget
             based on its content. No two widgets may have the same key.
 
-        help : str
-            An optional tooltip that gets displayed next to the widget label.
-            Streamlit only displays the tooltip when
-            ``label_visibility="visible"``.
+        help : str or None
+            A tooltip that gets displayed next to the widget label. Streamlit
+            only displays the tooltip when ``label_visibility="visible"``. If
+            this is ``None`` (default), no tooltip is displayed.
+
+            The tooltip can optionally contain GitHub-flavored Markdown,
+            including the Markdown directives described in the ``body``
+            parameter of ``st.markdown``.
 
         on_change : callable
             An optional callback invoked when this time_input's value changes.
@@ -716,10 +718,14 @@ class TimeWidgetsMixin:
             If this is omitted, a key will be generated for the widget
             based on its content. No two widgets may have the same key.
 
-        help : str
-            An optional tooltip that gets displayed next to the widget label.
-            Streamlit only displays the tooltip when
-            ``label_visibility="visible"``.
+        help : str or None
+            A tooltip that gets displayed next to the widget label. Streamlit
+            only displays the tooltip when ``label_visibility="visible"``. If
+            this is ``None`` (default), no tooltip is displayed.
+
+            The tooltip can optionally contain GitHub-flavored Markdown,
+            including the Markdown directives described in the ``body``
+            parameter of ``st.markdown``.
 
         on_change : callable
             An optional callback invoked when this date_input's value changes.
@@ -863,13 +869,13 @@ class TimeWidgetsMixin:
             parsed = None
         elif isinstance(value, Sequence):
             parsed = [
-                parse_date_deterministic_for_id(cast(NullableScalarDateValue, v))
+                parse_date_deterministic_for_id(cast("NullableScalarDateValue", v))
                 for v in value
             ]
         else:
             parsed = parse_date_deterministic_for_id(value)
 
-        # TODO this is missing the error path, integrate with the dateinputvalues parsing
+        # TODO: this is missing the error path, integrate with the dateinputvalues parsing
 
         element_id = compute_and_register_element_id(
             "date_input",

@@ -182,8 +182,7 @@ styled_df = weather_df.style.pipe(make_pretty)
 st.table(styled_df)
 
 # Advanced styling example with styled headers, hovering and caption:
-
-styled_df = pd.DataFrame(
+df = pd.DataFrame(
     [[38.0, 2.0, 18.0, 22.0, 21, np.nan], [19, 439, 6, 452, 226, 232]],
     index=pd.Index(
         ["Tumour (Positive)", "Non-Tumour (Negative)"], name="Actual Label:"
@@ -192,7 +191,13 @@ styled_df = pd.DataFrame(
         [["Decision Tree", "Regression", "Random"], ["Tumour", "Non-Tumour"]],
         names=["Model:", "Predicted:"],
     ),
-).style
+)
+styled_df = df.style
+
+# Apply formatting
+styled_df.format("{:.0f}").hide(
+    [("Random", "Tumour"), ("Random", "Non-Tumour")], axis="columns"
+)
 
 cell_hover = {  # for row hover use <tr> instead of <td>
     "selector": "td:hover",
@@ -214,4 +219,59 @@ styled_df.set_table_styles(
     axis=0,
 )
 styled_df.set_caption("Confusion matrix for multiple cancer prediction models.")
+
+tt = pd.DataFrame(
+    [
+        [
+            "This model has a very strong true positive rate",
+            "This model's total number of false negatives is too high",
+        ]
+    ],
+    index=["Tumour (Positive)"],
+    columns=df.columns[[0, 3]],
+)
+styled_df.set_tooltips(
+    tt,
+    props="visibility: hidden; position: absolute; z-index: 1; border: 1px solid #000066;"
+    "background-color: white; color: #000066; font-size: 0.8em;"
+    "transform: translate(0px, -24px); padding: 0.6em; border-radius: 0.5em;",
+)
+
 st.table(styled_df)
+
+
+st.header("Markdown Support")
+index = pd.Index(
+    [
+        ":material/check_circle: Row 1",
+        ":streamlit: Row 2",
+        "**Bold** Row 3",
+        "*Italic* Row 4",
+        "~Strikethrough~ Row 5",
+        "`Code Block` Row 6",
+    ]
+)
+
+data = pd.DataFrame(
+    {
+        "**Basic** Formatting": [
+            "**Bold** text",
+            "*Italic* text",
+            "~Strikethrough~ text",
+            "`Code Block` text",
+            "# Heading 1",
+            "> This is a blockquote",
+        ],
+        "*Advanced* Features": [
+            ":red[Red text] :red-background[Red background]",
+            "[Streamlit](https://streamlit.io)",
+            "![Image](app/static/cat.jpg)",
+            "| Table | Row |\n|---|---|\n| Cell | Cell |",
+            "```python\ndef code():\n    pass\n```",
+            "<- -> <-> -- >= <= ~=",
+        ],
+    },
+    index=index,
+)
+
+st.table(data)

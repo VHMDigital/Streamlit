@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-import { createRef } from "react"
-
-import { act, renderHook } from "@testing-library/react-hooks"
+import { act, renderHook } from "@testing-library/react"
 import { View as VegaView } from "vega"
 import embed from "vega-embed"
 import { expressionInterpreter } from "vega-interpreter"
 import { Mock, Mocked } from "vitest"
 
-import { useFormClearHelper } from "@streamlit/lib/src/components/widgets/Form"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+import { useFormClearHelper } from "~lib/components/widgets/Form"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
 
 import { getDataArrays, getInlineData } from "./arrowUtils"
 import { useVegaEmbed } from "./useVegaEmbed"
@@ -42,7 +40,7 @@ vi.mock("./useVegaLiteSelections", () => ({
 }))
 
 // Mock "useFormClearHelper" to ensure it is called:
-vi.mock("@streamlit/lib/src/components/widgets/Form", () => ({
+vi.mock("~lib/components/widgets/Form", () => ({
   __esModule: true,
   useFormClearHelper: vi.fn(),
 }))
@@ -123,7 +121,7 @@ describe("useVegaEmbed hook", () => {
   })
 
   it("creates a new Vega view via embed, finalizes existing view, inserts data, and returns a VegaView", async () => {
-    const containerRef = createRef<HTMLDivElement>()
+    const containerRef = { current: null }
     const chartElement = {
       id: "chartId",
       data: null,
@@ -182,7 +180,7 @@ describe("useVegaEmbed hook", () => {
   })
 
   it("finalizes old view if one exists before creating a new one", async () => {
-    const containerRef = createRef<HTMLDivElement>()
+    const containerRef = { current: null }
     const chartElement = {
       id: "chartId",
       data: null,
@@ -249,7 +247,7 @@ describe("useVegaEmbed hook", () => {
       useVegaEmbed(chartElement, mockWidgetMgr)
     )
 
-    const containerRef = createRef<HTMLDivElement>()
+    const containerRef = { current: null }
     // @ts-expect-error We want the ref to be set correctly
     containerRef.current = document.createElement("div")
 
@@ -301,7 +299,7 @@ describe("useVegaEmbed hook", () => {
       useVegaEmbed(chartElement, mockWidgetMgr)
     )
 
-    const containerRef = createRef<HTMLDivElement>()
+    const containerRef = { current: null }
     // @ts-expect-error We want the ref to be set correctly
     containerRef.current = document.createElement("div")
 

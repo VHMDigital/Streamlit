@@ -18,16 +18,17 @@ import React, { memo, ReactElement } from "react"
 
 import range from "lodash/range"
 
-import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
+import { Quiver } from "~lib/dataframes/Quiver"
 import {
   DataFrameCellType,
   isNumericType,
-} from "@streamlit/lib/src/dataframes/arrowTypeUtils"
+} from "~lib/dataframes/arrowTypeUtils"
 import {
   getStyledCell,
   getStyledHeaders,
-} from "@streamlit/lib/src/dataframes/pandasStylerUtils"
-import { format as formatArrowCell } from "@streamlit/lib/src/dataframes/arrowFormatUtils"
+} from "~lib/dataframes/pandasStylerUtils"
+import { format as formatArrowCell } from "~lib/dataframes/arrowFormatUtils"
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown/StreamlitMarkdown"
 
 import {
   StyledEmptyTableCell,
@@ -94,14 +95,21 @@ function generateTableHeader(table: Quiver): ReactElement {
   return (
     <thead>
       {getStyledHeaders(table).map((headerRow, rowIndex) => (
+        // TODO: Update to match React best practices
+        // eslint-disable-next-line @eslint-react/no-array-index-key
         <tr key={rowIndex}>
           {headerRow.map((header, colIndex) => (
             <StyledTableCellHeader
+              // TODO: Update to match React best practices
+              // eslint-disable-next-line @eslint-react/no-array-index-key
               key={colIndex}
               className={header.cssClass}
               scope="col"
             >
-              {header.name || "\u00A0"}
+              <StreamlitMarkdown
+                source={header.name || "\u00A0"}
+                allowHTML={false}
+              />
             </StyledTableCellHeader>
           ))}
         </tr>
@@ -138,13 +146,27 @@ function generateTableCell(
   const { type, content, contentType } = table.getCell(rowIndex, columnIndex)
   const styledCell = getStyledCell(table, rowIndex, columnIndex)
 
-  const formattedContent =
+  let formattedContent =
     styledCell?.displayContent || formatArrowCell(content, contentType)
+  let hasStylerTooltip: boolean = false
 
   const style: React.CSSProperties = {
     textAlign: isNumericType(contentType) ? "right" : "left",
   }
 
+  if (
+    formattedContent &&
+    formattedContent.endsWith(`<span class="pd-t"></span>`)
+  ) {
+    // This is a bit hacky, but to support the Pandas Styler's tooltip feature,
+    // we need to convert the specific HTML element (used for tooltips) from
+    // the display value into an actual span element.
+    formattedContent = formattedContent.replace(
+      /<span class="pd-t"><\/span>$/,
+      ""
+    )
+    hasStylerTooltip = true
+  }
   switch (type) {
     // Index cells are from index columns which only exist if the DataFrame was created
     // based on a Pandas DataFrame.
@@ -156,7 +178,11 @@ function generateTableCell(
           id={styledCell?.cssId}
           className={styledCell?.cssClass}
         >
-          {formattedContent}
+          {hasStylerTooltip && <span className="pd-t" />}
+          <StreamlitMarkdown
+            source={formattedContent || "\u00A0"}
+            allowHTML={false}
+          />
         </StyledTableCellHeader>
       )
     }
@@ -168,7 +194,11 @@ function generateTableCell(
           className={styledCell?.cssClass}
           style={style}
         >
-          {formattedContent}
+          {hasStylerTooltip && <span className="pd-t" />}
+          <StreamlitMarkdown
+            source={formattedContent || "\u00A0"}
+            allowHTML={false}
+          />
         </StyledTableCell>
       )
     }

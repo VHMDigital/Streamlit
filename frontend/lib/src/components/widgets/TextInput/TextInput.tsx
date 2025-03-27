@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useCallback, useState } from "react"
+import React, { memo, ReactElement, useCallback, useState } from "react"
 
 import uniqueId from "lodash/uniqueId"
 import { Input as UIInput } from "baseui/input"
 import { useTheme } from "@emotion/react"
 
-import useOnInputChange from "@streamlit/lib/src/hooks/useOnInputChange"
-import { TextInput as TextInputProto } from "@streamlit/lib/src/proto"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+import { TextInput as TextInputProto } from "@streamlit/protobuf"
+
+import useOnInputChange from "~lib/hooks/useOnInputChange"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
 import {
   useBasicWidgetState,
   ValueWithSource,
-} from "@streamlit/lib/src/hooks/useBasicWidgetState"
-import useUpdateUiValue from "@streamlit/lib/src/hooks/useUpdateUiValue"
-import useSubmitFormViaEnterKey from "@streamlit/lib/src/hooks/useSubmitFormViaEnterKey"
-import InputInstructions from "@streamlit/lib/src/components/shared/InputInstructions/InputInstructions"
+} from "~lib/hooks/useBasicWidgetState"
+import useUpdateUiValue from "~lib/hooks/useUpdateUiValue"
+import useSubmitFormViaEnterKey from "~lib/hooks/useSubmitFormViaEnterKey"
+import InputInstructions from "~lib/components/shared/InputInstructions/InputInstructions"
 import {
   StyledWidgetLabelHelp,
   WidgetLabel,
-} from "@streamlit/lib/src/components/widgets/BaseWidget"
-import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
-import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
-import {
-  isInForm,
-  labelVisibilityProtoValueToEnum,
-} from "@streamlit/lib/src/util/utils"
+} from "~lib/components/widgets/BaseWidget"
+import { DynamicIcon } from "~lib/components/shared/Icon"
+import TooltipIcon from "~lib/components/shared/TooltipIcon"
+import { Placement } from "~lib/components/shared/Tooltip"
+import { isInForm, labelVisibilityProtoValueToEnum } from "~lib/util/utils"
+import { useCalculatedWidth } from "~lib/hooks/useCalculatedWidth"
 
 import { StyledTextInput } from "./styled-components"
 
@@ -47,7 +47,6 @@ export interface Props {
   disabled: boolean
   element: TextInputProto
   widgetMgr: WidgetStateManager
-  width: number
   fragmentId?: string
 }
 
@@ -55,7 +54,6 @@ function TextInput({
   disabled,
   element,
   widgetMgr,
-  width,
   fragmentId,
 }: Props): ReactElement {
   /**
@@ -63,8 +61,10 @@ function TextInput({
    * widget's UI, the default value is used.
    */
   const [uiValue, setUiValue] = useState<string | null>(
-    getStateFromWidgetMgr(widgetMgr, element) ?? null
+    () => getStateFromWidgetMgr(widgetMgr, element) ?? null
   )
+
+  const [width, elementRef] = useCalculatedWidth()
 
   /**
    * True if the user-specified state.value has not yet been synced to the WidgetStateManager.
@@ -142,11 +142,16 @@ function TextInput({
     fragmentId
   )
 
+  // Material icons need to be larger to render similar size of emojis,
+  // and we change their text color
+  const isMaterialIcon = element.icon?.startsWith(":material")
+  const dynamicIconSize = isMaterialIcon ? "lg" : "base"
+
   return (
     <StyledTextInput
       className="stTextInput"
       data-testid="stTextInput"
-      width={width}
+      ref={elementRef}
     >
       <WidgetLabel
         label={element.label}
@@ -177,6 +182,15 @@ function TextInput({
         id={id}
         type={getTypeString(element)}
         autoComplete={element.autocomplete}
+        startEnhancer={
+          element.icon && (
+            <DynamicIcon
+              data-testid="stTextInputIcon"
+              iconValue={element.icon}
+              size={dynamicIconSize}
+            />
+          )
+        }
         overrides={{
           Input: {
             style: {
@@ -207,6 +221,17 @@ function TextInput({
               borderRightWidth: theme.sizes.borderWidth,
               borderTopWidth: theme.sizes.borderWidth,
               borderBottomWidth: theme.sizes.borderWidth,
+              paddingLeft: element.icon ? theme.spacing.sm : 0,
+            },
+          },
+          StartEnhancer: {
+            style: {
+              paddingLeft: 0,
+              paddingRight: 0,
+              // Keeps emoji icons from being cut off on the right
+              minWidth: theme.iconSizes.lg,
+              // Material icons color changed as inactionable
+              color: isMaterialIcon ? theme.colors.fadedText60 : "inherit",
             },
           },
         }}
@@ -257,4 +282,4 @@ function getTypeString(element: TextInputProto): string {
   return element.type === TextInputProto.Type.PASSWORD ? "password" : "text"
 }
 
-export default TextInput
+export default memo(TextInput)

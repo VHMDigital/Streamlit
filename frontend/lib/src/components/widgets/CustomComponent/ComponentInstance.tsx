@@ -14,37 +14,41 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useEffect, useRef, useState } from "react"
+import React, {
+  memo,
+  ReactElement,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 
-import { withTheme } from "@emotion/react"
+import { useTheme } from "@emotion/react"
+import { getLogger } from "loglevel"
 import queryString from "query-string"
+import { flushSync } from "react-dom"
 
-import AlertElement from "@streamlit/lib/src/components/elements/AlertElement"
-import { Skeleton } from "@streamlit/lib/src/components/elements/Skeleton"
-import ErrorElement from "@streamlit/lib/src/components/shared/ErrorElement"
-import { Kind } from "@streamlit/lib/src/components/shared/AlertContainer"
-import useTimeout from "@streamlit/lib/src/hooks/useTimeout"
 import {
   ComponentInstance as ComponentInstanceProto,
   ISpecialArg,
   Skeleton as SkeletonProto,
-} from "@streamlit/lib/src/proto"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+} from "@streamlit/protobuf"
+
+import AlertElement from "~lib/components/elements/AlertElement"
+import { Skeleton } from "~lib/components/elements/Skeleton"
+import ErrorElement from "~lib/components/shared/ErrorElement"
+import { Kind } from "~lib/components/shared/AlertContainer"
+import useTimeout from "~lib/hooks/useTimeout"
+import { EmotionTheme } from "~lib/theme"
 import {
   DEFAULT_IFRAME_FEATURE_POLICY,
   DEFAULT_IFRAME_SANDBOX_POLICY,
-} from "@streamlit/lib/src/util/IFrameUtil"
-import { logWarning } from "@streamlit/lib/src/util/log"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
-import {
-  COMMUNITY_URL,
-  COMPONENT_DEVELOPER_URL,
-} from "@streamlit/lib/src/urls"
-import { ensureError } from "@streamlit/lib/src/util/ErrorHandling"
-import {
-  isNullOrUndefined,
-  notNullOrUndefined,
-} from "@streamlit/lib/src/util/utils"
+} from "~lib/util/IFrameUtil"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
+import { COMMUNITY_URL, COMPONENT_DEVELOPER_URL } from "~lib/urls"
+import { ensureError } from "~lib/util/ErrorHandling"
+import { isNullOrUndefined, notNullOrUndefined } from "~lib/util/utils"
+import { withCalculatedWidth } from "~lib/components/core/Layout/withCalculatedWidth"
 
 import { ComponentRegistry } from "./ComponentRegistry"
 import {
@@ -57,6 +61,7 @@ import {
 } from "./componentUtils"
 import { StyledComponentIframe } from "./styled-components"
 
+const LOG = getLogger("ComponentInstance")
 /**
  * If we haven't received a COMPONENT_READY message this many seconds
  * after the component has been created, explain to the user that there
@@ -70,7 +75,6 @@ export interface Props {
   disabled: boolean
   element: ComponentInstanceProto
   width: number
-  theme: EmotionTheme
   fragmentId?: string
 }
 
@@ -174,10 +178,10 @@ function compareDataframeArgs(
  * by {@link COMPONENT_READY_WARNING_TIME_MS}, a warning element is rendered instead.
  */
 function ComponentInstance(props: Props): ReactElement {
+  const theme: EmotionTheme = useTheme()
   const [componentError, setComponentError] = useState<Error>()
 
-  const { disabled, element, registry, theme, widgetMgr, width, fragmentId } =
-    props
+  const { disabled, element, registry, widgetMgr, width, fragmentId } = props
   const { componentName, jsonArgs, specialArgs, url } = element
 
   const [parsedNewArgs, parsedDataframeArgs] = tryParseArgs(
@@ -185,6 +189,11 @@ function ComponentInstance(props: Props): ReactElement {
     specialArgs,
     setComponentError,
     componentError
+  )
+
+  const componentSourceUrl = useMemo(
+    () => getSrc(componentName, registry, url),
+    [componentName, registry, url]
   )
 
   // Use a ref for the args so that we can use them inside the useEffect calls without the linter complaining
@@ -213,7 +222,7 @@ function ComponentInstance(props: Props): ReactElement {
   // custom components that define a height property, e.g. in Python
   // my_custom_component(height=100). undefined means no explicit height
   // was specified, but will be set to the default height of 0.
-  const [frameHeight, setFrameHeight] = useState<number | undefined>(
+  const [frameHeight, setFrameHeight] = useState<number | undefined>(() =>
     isNaN(parsedNewArgs.height) ? undefined : parsedNewArgs.height
   )
 
@@ -225,13 +234,34 @@ function ComponentInstance(props: Props): ReactElement {
 
   // Show a log in the console as a soft-warning to the developer before showing the more disrupting warning element
   const clearTimeoutLog = useTimeout(
-    () => logWarning(getWarnMessage(componentName, url)),
+    () => LOG.warn(getWarnMessage(componentName, url)),
     COMPONENT_READY_WARNING_TIME_MS / 4
   )
-  const clearTimeoutWarningElement = useTimeout(
-    () => setIsReadyTimeout(true),
-    COMPONENT_READY_WARNING_TIME_MS
-  )
+  const clearTimeoutWarningElement = useTimeout(() => {
+    /* eslint-disable-next-line @eslint-react/dom/no-flush-sync -- To keep
+     * behavior the same as before introducing `createRoot` and after, we ensure
+     * that the state updates are flushed immediately.
+     */
+    flushSync(() => {
+      setIsReadyTimeout(true)
+    })
+  }, COMPONENT_READY_WARNING_TIME_MS)
+
+  useEffect(() => {
+    // Iframe onerror event unreliable - check custom component
+    // src on mount to catch iframe load errors
+    registry.checkSourceUrlResponse(componentSourceUrl, componentName)
+  }, [componentSourceUrl, componentName, registry])
+
+  useEffect(() => {
+    if (isReadyTimeout && !isReadyRef.current) {
+      // Send timeout error if we've timed out waiting for the READY message from the component
+      LOG.error(
+        `Client Error: Custom Component ${componentName} timeout error`
+      )
+      registry.sendTimeoutError(componentSourceUrl, componentName)
+    }
+  }, [isReadyTimeout, componentSourceUrl, componentName, registry])
 
   // Send a render message to the custom component everytime relevant props change, such as the
   // input args or the theme / width
@@ -251,7 +281,7 @@ function ComponentInstance(props: Props): ReactElement {
   useEffect(() => {
     const handleSetFrameHeight = (height: number | undefined): void => {
       if (height === undefined) {
-        logWarning(`handleSetFrameHeight: missing 'height' prop`)
+        LOG.warn(`handleSetFrameHeight: missing 'height' prop`)
         return
       }
 
@@ -262,7 +292,7 @@ function ComponentInstance(props: Props): ReactElement {
 
       if (isNullOrUndefined(iframeRef.current)) {
         // This should not be possible.
-        logWarning(`handleSetFrameHeight: missing our iframeRef!`)
+        LOG.warn(`handleSetFrameHeight: missing our iframeRef!`)
         return
       }
 
@@ -272,7 +302,13 @@ function ComponentInstance(props: Props): ReactElement {
       // immediately change their frameHeight after mounting). This is wasteful,
       // and it also breaks certain components.
       iframeRef.current.height = height.toString()
-      setFrameHeight(height)
+      /* eslint-disable-next-line @eslint-react/dom/no-flush-sync -- To keep
+       * behavior the same as before introducing `createRoot` and after, we ensure
+       * that the state updates are flushed immediately.
+       */
+      flushSync(() => {
+        setFrameHeight(height)
+      })
     }
 
     const componentReadyCallback = (): void => {
@@ -287,7 +323,13 @@ function ComponentInstance(props: Props): ReactElement {
       clearTimeoutLog()
       clearTimeoutWarningElement()
       isReadyRef.current = true
-      setIsReadyTimeout(false)
+      /* eslint-disable-next-line @eslint-react/dom/no-flush-sync -- To keep
+       * behavior the same as before introducing `createRoot` and after, we ensure
+       * that the state updates are flushed immediately.
+       */
+      flushSync(() => {
+        setIsReadyTimeout(false)
+      })
     }
 
     // Update the reference fields for the callback that we
@@ -373,7 +415,6 @@ function ComponentInstance(props: Props): ReactElement {
     // eslint-disable-next-line react-compiler/react-compiler
     !isReadyRef.current && isReadyTimeout ? (
       <AlertElement
-        width={width}
         body={getWarnMessage(componentName, url)}
         kind={Kind.WARNING}
       />
@@ -402,7 +443,7 @@ function ComponentInstance(props: Props): ReactElement {
         data-testid="stCustomComponentV1"
         allow={DEFAULT_IFRAME_FEATURE_POLICY}
         ref={iframeRef}
-        src={getSrc(componentName, registry, url)}
+        src={componentSourceUrl}
         width={width}
         // for undefined height we set the height to 0 to avoid inconsistent behavior
         height={frameHeight ?? 0}
@@ -417,4 +458,4 @@ function ComponentInstance(props: Props): ReactElement {
   )
 }
 
-export default withTheme(ComponentInstance)
+export default withCalculatedWidth(memo(ComponentInstance))

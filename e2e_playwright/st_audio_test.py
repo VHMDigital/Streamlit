@@ -16,12 +16,31 @@ import re
 import pytest
 from playwright.sync_api import Page, expect
 
-from e2e_playwright.conftest import wait_until
+from e2e_playwright.conftest import ImageCompareFunction, wait_until
 from e2e_playwright.shared.app_utils import (
     check_top_level_class,
     click_button,
     click_checkbox,
 )
+
+AUDIO_ELEMENTS_WITH_PATH = 3
+AUDIO_ELEMENTS_WITH_URL = 3
+
+
+def check_audio_source_error_count(messages: list[str], expected_count: int):
+    """Check that the expected number of audio source error messages are logged."""
+    assert (
+        len(
+            [
+                message
+                for message in messages
+                if "Client Error: Audio source error" in message
+            ]
+        )
+        # when test run on webkit, it will sometimes log extra instances of the error
+        # for the same source - so we use >= expected_count to avoid flakiness
+        >= expected_count
+    )
 
 
 def test_audio_has_correct_properties(app: Page):
@@ -101,3 +120,79 @@ def test_audio_remount_no_autoplay(app: Page):
 def test_check_top_level_class(app: Page):
     """Check that the top level class is correctly set."""
     check_top_level_class(app, "stAudio")
+
+
+def test_audio_uses_unified_height(
+    themed_app: Page, assert_snapshot: ImageCompareFunction
+):
+    """Check that the audio component uses our default element height."""
+    audio_element = themed_app.get_by_test_id("stAudio").first
+
+    # To prevent flakiness, we wait for the audio to finish loading:
+    wait_until(
+        themed_app,
+        lambda: audio_element.evaluate("el => el.readyState") == 4,
+        timeout=15000,
+    )
+
+    expect(audio_element).to_have_css("height", "40px")
+    # Additional wait to ensure that the audio element is fully loaded
+    # and that its not causing flakiness in screenshots.
+    # This might not be 100% necessary.
+    themed_app.wait_for_timeout(1000)
+
+    assert_snapshot(audio_element, name="st_audio-unified_height")
+
+
+# TODO(mgbarnes): Figure out why this test is flaky on Firefox.
+@pytest.mark.skip_browser("firefox")
+def test_audio_source_error_with_url(app: Page, app_port: int):
+    """Test `st.audio` source error when data is a url."""
+    # Ensure audio source request return a 404 status
+    app.route(
+        "https://mdn.github.io/learning-area/html/multimedia-and-embedding/video-and-audio-content/viper.mp3",
+        lambda route: route.fulfill(
+            status=404, headers={"Content-Type": "text/plain"}, body="Not Found"
+        ),
+    )
+
+    # Capture console messages
+    messages = []
+    app.on("console", lambda msg: messages.append(msg.text))
+
+    # Navigate to the app
+    app.goto(f"http://localhost:{app_port}")
+
+    # Wait until the expected error is logged, indicating CLIENT_ERROR was sent
+    # Should be 3 instances of the error, one for each audio element with url
+    wait_until(
+        app,
+        lambda: check_audio_source_error_count(messages, AUDIO_ELEMENTS_WITH_URL),
+    )
+
+
+# TODO(mgbarnes): Figure out why this test is flaky on Firefox.
+@pytest.mark.skip_browser("firefox")
+def test_audio_source_error_with_path(app: Page, app_port: int):
+    """Test `st.audio` source error when data is path (media endpoint)."""
+    # Ensure audio source request return a 404 status
+    app.route(
+        f"http://localhost:{app_port}/media/**",
+        lambda route: route.fulfill(
+            status=404, headers={"Content-Type": "text/plain"}, body="Not Found"
+        ),
+    )
+
+    # Capture console messages
+    messages = []
+    app.on("console", lambda msg: messages.append(msg.text))
+
+    # Navigate to the app
+    app.goto(f"http://localhost:{app_port}")
+
+    # Wait until the expected errors are logged, indicating CLIENT_ERROR was sent
+    # Should be 3 instances of the error, one for each audio element with path
+    wait_until(
+        app,
+        lambda: check_audio_source_error_count(messages, AUDIO_ELEMENTS_WITH_PATH),
+    )

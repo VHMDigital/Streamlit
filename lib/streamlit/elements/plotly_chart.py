@@ -21,10 +21,7 @@ from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Final,
-    Iterable,
-    List,
     Literal,
     TypedDict,
     Union,
@@ -50,7 +47,9 @@ from streamlit.runtime.scriptrunner_utils.script_run_context import get_script_r
 from streamlit.runtime.state import WidgetCallback, register_widget
 
 if TYPE_CHECKING:
-    import matplotlib
+    from collections.abc import Iterable
+
+    import matplotlib as mpl
     import plotly.graph_objs as go
     from plotly.basedatatypes import BaseFigure
 
@@ -65,13 +64,13 @@ _AtomicFigureOrData: TypeAlias = Union[
 ]
 FigureOrData: TypeAlias = Union[
     _AtomicFigureOrData,
-    List[_AtomicFigureOrData],
+    list[_AtomicFigureOrData],
     # It is kind of hard to figure out exactly what kind of dict is supported
     # here, as plotly hasn't embraced typing yet. This version is chosen to
     # align with the docstring.
-    Dict[str, _AtomicFigureOrData],
+    dict[str, _AtomicFigureOrData],
     "BaseFigure",
-    "matplotlib.figure.Figure",
+    "mpl.figure.Figure",
 ]
 
 SelectionMode: TypeAlias = Literal["lasso", "points", "box"]
@@ -228,13 +227,13 @@ class PlotlyChartSelectionSerde:
         selection_state = (
             empty_selection_state
             if ui_value is None
-            else cast(PlotlyState, AttributeDictionary(json.loads(ui_value)))
+            else cast("PlotlyState", AttributeDictionary(json.loads(ui_value)))
         )
 
         if "selection" not in selection_state:
             selection_state = empty_selection_state
 
-        return cast(PlotlyState, AttributeDictionary(selection_state))
+        return cast("PlotlyState", AttributeDictionary(selection_state))
 
     def serialize(self, selection_state: PlotlyState) -> str:
         return json.dumps(selection_state, default=str)
@@ -475,7 +474,7 @@ class PlotlyMixin:
             check_widget_policies(
                 self.dg,
                 key,
-                on_change=cast(WidgetCallback, on_select) if is_callback else None,
+                on_change=cast("WidgetCallback", on_select) if is_callback else None,
                 default_value=None,
                 writes_allowed=False,
                 enable_check_callback_rules=is_callback,
@@ -537,7 +536,7 @@ class PlotlyMixin:
             )
 
             self.dg._enqueue("plotly_chart", plotly_chart_proto)
-            return cast(PlotlyState, widget_state.value)
+            return cast("PlotlyState", widget_state.value)
         else:
             return self.dg._enqueue("plotly_chart", plotly_chart_proto)
 

@@ -16,9 +16,11 @@ from __future__ import annotations
 
 import threading
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Iterator
+from typing import TYPE_CHECKING, Any, Callable
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     from streamlit.proto.WidgetStates_pb2 import WidgetState as WidgetStateProto
     from streamlit.proto.WidgetStates_pb2 import WidgetStates as WidgetStatesProto
     from streamlit.runtime.state.common import RegisterWidgetResult, T, WidgetMetadata
@@ -124,7 +126,7 @@ class SafeSessionState:
             raise AttributeError(f"{key} not found in session_state.")
 
     def __repr__(self):
-        """Presents itself as a simple dict of the underlying SessionState instance"""
+        """Presents itself as a simple dict of the underlying SessionState instance."""
         kv = ((k, self._state[k]) for k in self._state._keys())
         s = ", ".join(f"{k}: {v!r}" for k, v in kv)
         return f"{{{s}}}"

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { memo, ReactElement } from "react"
 
-import { ENABLE_PERIPHERALS_DOCS_URL } from "@streamlit/lib/src/urls"
+import { ENABLE_PERIPHERALS_DOCS_URL } from "~lib/urls"
 
 import {
   StyledErrorContainerDiv,
@@ -37,4 +37,4 @@ const NoMicPermissions = (): ReactElement => {
   )
 }
 
-export default NoMicPermissions
+export default memo(NoMicPermissions)

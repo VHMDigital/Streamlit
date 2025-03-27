@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { memo, useCallback, useEffect, useState } from "react"
+import React, { memo, useCallback, useEffect, useRef, useState } from "react"
 
 import { isMobile } from "react-device-detect"
 import { ChevronDown } from "baseui/icon"
@@ -23,32 +23,29 @@ import { useTheme } from "@emotion/react"
 import { hasMatch, score } from "fzy.js"
 import sortBy from "lodash/sortBy"
 
-import VirtualDropdown from "@streamlit/lib/src/components/shared/Dropdown/VirtualDropdown"
-import {
-  isNullOrUndefined,
-  LabelVisibilityOptions,
-} from "@streamlit/lib/src/util/utils"
-import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
-import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
+import VirtualDropdown from "~lib/components/shared/Dropdown/VirtualDropdown"
+import { isNullOrUndefined, LabelVisibilityOptions } from "~lib/util/utils"
+import { Placement } from "~lib/components/shared/Tooltip"
+import TooltipIcon from "~lib/components/shared/TooltipIcon"
 import {
   StyledWidgetLabelHelp,
   WidgetLabel,
-} from "@streamlit/lib/src/components/widgets/BaseWidget"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+} from "~lib/components/widgets/BaseWidget"
+import { EmotionTheme } from "~lib/theme"
 
 const NO_OPTIONS_MSG = "No options to select."
 
 export interface Props {
+  value: string | null
+  onChange: (value: string | null) => void
   disabled: boolean
-  width?: number
-  value: number | null
-  onChange: (value: number | null) => void
   options: any[]
   label?: string | null
   labelVisibility?: LabelVisibilityOptions
   help?: string
   placeholder?: string
   clearable?: boolean
+  acceptNewOptions?: boolean | null
 }
 
 interface SelectOption {
@@ -79,7 +76,6 @@ export function fuzzyFilterSelectOptions(
 
 const Selectbox: React.FC<Props> = ({
   disabled,
-  width,
   value: propValue,
   onChange,
   options: propOptions,
@@ -88,9 +84,14 @@ const Selectbox: React.FC<Props> = ({
   help,
   placeholder,
   clearable,
+  acceptNewOptions,
 }) => {
   const theme: EmotionTheme = useTheme()
-  const [value, setValue] = useState<number | null>(propValue)
+
+  const [value, setValue] = useState<string | null>(propValue)
+  // This ref is used to store the value before the user starts removing characters so that we can restore
+  // the value in case the user dismisses the changes by clicking away.
+  const valueBeforeRemoval = useRef<string | null>(value)
 
   // Update the value whenever the value provided by the props changes
   // TODO: Find a better way to handle this to prevent unneeded re-renders
@@ -100,19 +101,34 @@ const Selectbox: React.FC<Props> = ({
 
   const handleChange = useCallback(
     (params: OnChangeParams): void => {
-      if (params.value.length === 0) {
+      if (params.type === "remove") {
+        valueBeforeRemoval.current = params.option?.value
+        // We set the value so that BaseWeb updates the element's value while typing.
+        // We don't want to commit the change yet, so we don't call onChange.
+        setValue(null)
+        return
+      }
+
+      valueBeforeRemoval.current = null
+
+      if (params.type === "clear") {
         setValue(null)
         onChange(null)
         return
       }
 
       const [selected] = params.value
-      const newValue = parseInt(selected.value, 10)
-      setValue(newValue)
-      onChange(newValue)
+      setValue(selected.value)
+      onChange(selected.value)
     },
     [onChange]
   )
+
+  const handleBlur = useCallback(() => {
+    if (valueBeforeRemoval.current !== null) {
+      setValue(valueBeforeRemoval.current)
+    }
+  }, [])
 
   const filterOptions = useCallback(
     (options: readonly Option[], filterValue: string): readonly Option[] =>
@@ -121,37 +137,29 @@ const Selectbox: React.FC<Props> = ({
   )
 
   let selectDisabled = disabled
-  let options = propOptions
+  const opts = propOptions
 
   let selectValue: Option[] = []
-
   if (!isNullOrUndefined(value)) {
-    selectValue = [
-      {
-        label: options.length > 0 ? options[value] : NO_OPTIONS_MSG,
-        value: value.toString(),
-      },
-    ]
+    selectValue = [{ label: value, value }]
   }
 
-  if (options.length === 0) {
-    options = [NO_OPTIONS_MSG]
+  if (opts.length === 0) {
+    selectValue = [{ label: NO_OPTIONS_MSG }]
     selectDisabled = true
   }
 
-  const selectOptions: SelectOption[] = options.map(
-    (option: string, index: number) => ({
-      label: option,
-      value: index.toString(),
-    })
-  )
+  const selectOptions: SelectOption[] = opts.map((option: string) => ({
+    label: option,
+    value: option,
+  }))
 
   // Check if we have more than 10 options in the selectbox.
   // If that's true, we show the keyboard on mobile. If not, we hide it.
-  const showKeyboardOnMobile = options.length > 10
+  const showKeyboardOnMobile = opts.length > 10
 
   return (
-    <div className="stSelectbox" data-testid="stSelectbox" style={{ width }}>
+    <div className="stSelectbox" data-testid="stSelectbox">
       <WidgetLabel
         label={label}
         labelVisibility={labelVisibility}
@@ -164,10 +172,12 @@ const Selectbox: React.FC<Props> = ({
         )}
       </WidgetLabel>
       <UISelect
+        creatable={acceptNewOptions ?? false}
         disabled={selectDisabled}
         labelKey="label"
         aria-label={label || ""}
         onChange={handleChange}
+        onBlur={handleBlur}
         options={selectOptions}
         filterOptions={filterOptions}
         clearable={clearable || false}
@@ -215,6 +225,11 @@ const Selectbox: React.FC<Props> = ({
               paddingRight: theme.spacing.sm,
             }),
           },
+          Placeholder: {
+            style: () => ({
+              color: theme.colors.fadedText60,
+            }),
+          },
           ValueContainer: {
             style: () => ({
               // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
@@ -244,6 +259,12 @@ const Selectbox: React.FC<Props> = ({
                 },
               },
             },
+          },
+          SingleValue: {
+            style: () => ({
+              // remove margin from select value so that there is no jumpb, e.g. when pressing backspace on a selected option and removing a character.
+              marginLeft: theme.spacing.none,
+            }),
           },
           SelectArrow: {
             component: ChevronDown,

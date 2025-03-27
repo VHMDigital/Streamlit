@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-import React, { CSSProperties, ReactElement } from "react"
+import React, { CSSProperties, memo, ReactElement } from "react"
+
+import { getLogger } from "loglevel"
 
 import {
   ImageList as ImageListProto,
   Image as ImageProto,
-} from "@streamlit/lib/src/proto"
-import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
+} from "@streamlit/protobuf"
+
+import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
+import { ElementFullscreenContext } from "~lib/components/shared/ElementFullscreen/ElementFullscreenContext"
+import { withFullScreenWrapper } from "~lib/components/shared/FullScreenWrapper"
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
 import Toolbar, {
   StyledToolbarElementContainer,
-} from "@streamlit/lib/src/components/shared/Toolbar"
-import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
-import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
-import { withFullScreenWrapper } from "@streamlit/lib/src/components/shared/FullScreenWrapper"
-import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
+} from "~lib/components/shared/Toolbar"
+import { useRequiredContext } from "~lib/hooks/useRequiredContext"
 
 import {
   StyledCaption,
@@ -35,9 +38,10 @@ import {
   StyledImageList,
 } from "./styled-components"
 
+const LOG = getLogger("ImageList")
+
 export interface ImageListProps {
   endpoints: StreamlitEndpoints
-  width: number
   element: ImageListProto
   disableFullscreenMode?: boolean
 }
@@ -61,20 +65,19 @@ enum WidthBehavior {
  */
 function ImageList({
   element,
-  width,
   endpoints,
   disableFullscreenMode,
 }: Readonly<ImageListProps>): ReactElement {
   const {
     expanded: isFullScreen,
-    width: fullScreenWidth,
+    width,
     height,
     expand,
     collapse,
   } = useRequiredContext(ElementFullscreenContext)
 
   // The width of the element is the width of the container, not necessarily the image.
-  const elementWidth: number = isFullScreen ? fullScreenWidth : width
+  const elementWidth = width || 0
   // The width field in the proto sets the image width, but has special
   // cases the values in the WidthBehavior enum.
   let imageWidth: number | undefined
@@ -114,6 +117,19 @@ function ImageList({
     imgStyle.maxWidth = "100%"
   }
 
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement>
+  ): void => {
+    const imageUrl = e.currentTarget.src
+    LOG.error(`Client Error: Image source error - ${imageUrl}`)
+    endpoints.sendClientErrorToHost(
+      "Image",
+      "Image source failed to load",
+      "onerror triggered",
+      imageUrl
+    )
+  }
+
   return (
     <StyledToolbarElementContainer
       width={elementWidth}
@@ -132,11 +148,14 @@ function ImageList({
         {element.imgs.map((iimage, idx): ReactElement => {
           const image = iimage as ImageProto
           return (
+            // TODO: Update to match React best practices
+            // eslint-disable-next-line @eslint-react/no-array-index-key
             <StyledImageContainer data-testid="stImageContainer" key={idx}>
               <img
                 style={imgStyle}
                 src={endpoints.buildMediaURL(image.url)}
                 alt={idx.toString()}
+                onError={handleImageError}
               />
               {image.caption && (
                 <StyledCaption data-testid="stImageCaption" style={imgStyle}>
@@ -158,4 +177,5 @@ function ImageList({
   )
 }
 
-export default withFullScreenWrapper(ImageList)
+const ImageListWithFullScreen = withFullScreenWrapper(ImageList)
+export default memo(ImageListWithFullScreen)

@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { memo, ReactElement } from "react"
 
 import { useTheme } from "@emotion/react"
 import { ACCESSIBILITY_TYPE, PLACEMENT, Popover } from "baseui/popover"
 
-import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown/StreamlitMarkdown"
-import { StyledTooltipContentWrapper } from "@streamlit/lib/src/components/shared/Tooltip/styled-components"
-import {
-  EmotionTheme,
-  hasLightBackgroundColor,
-} from "@streamlit/lib/src/theme"
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown/StreamlitMarkdown"
+import { StyledTooltipContentWrapper } from "~lib/components/shared/Tooltip/styled-components"
+import { EmotionTheme, hasLightBackgroundColor } from "~lib/theme"
 
 export interface TooltipProps {
   // The top position of the tooltip.
@@ -140,4 +137,4 @@ function Tooltip({
   )
 }
 
-export default Tooltip
+export default memo(Tooltip)

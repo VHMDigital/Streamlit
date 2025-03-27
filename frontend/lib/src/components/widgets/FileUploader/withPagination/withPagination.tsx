@@ -18,7 +18,7 @@ import React, { ComponentType, ReactElement, useEffect, useState } from "react"
 
 import hoistNonReactStatics from "hoist-non-react-statics"
 
-import { usePrevious } from "@streamlit/lib/src/util/Hooks"
+import { usePrevious } from "~lib/util/Hooks"
 
 import Pagination from "./Pagination"
 
@@ -41,7 +41,7 @@ const withPagination = (
     ...props
   }: Props): ReactElement => {
     const [currentPage, updateCurrentPage] = useState<number>(0)
-    const [totalPages, updateTotalPages] = useState<number>(
+    const [totalPages, updateTotalPages] = useState<number>(() =>
       calculateNumPages(items, pageSize)
     )
 

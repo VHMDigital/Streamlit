@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { getLogger } from "loglevel"
 
-import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
-import { logWarning } from "@streamlit/lib/src/util/log"
-import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
+import { isNullOrUndefined } from "~lib/util/utils"
+import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
 
 import { ComponentMessageType } from "./enums"
 
@@ -24,6 +24,8 @@ export type ComponentMessageListener = (
   type: ComponentMessageType,
   data: any
 ) => void
+
+const LOG = getLogger("ComponentRegistry")
 
 /**
  * Dispatches iframe messages to ComponentInstances.
@@ -49,7 +51,7 @@ export class ComponentRegistry {
     listener: ComponentMessageListener
   ): void => {
     if (this.msgListeners.has(source)) {
-      logWarning(`MessageEventSource registered multiple times!`, source)
+      LOG.warn(`MessageEventSource registered multiple times!`, source)
     }
 
     this.msgListeners.set(source, listener)
@@ -58,8 +60,36 @@ export class ComponentRegistry {
   public deregisterListener = (source: MessageEventSource): void => {
     const removed = this.msgListeners.delete(source)
     if (!removed) {
-      logWarning(`Could not deregister unregistered MessageEventSource!`)
+      LOG.warn(`Could not deregister unregistered MessageEventSource!`)
     }
+  }
+
+  /**
+   * Check the source of a custom component for successful response
+   * If the response is not ok, or fetch otherwise fails, send an error to the host.
+   */
+  public checkSourceUrlResponse = (
+    sourceUrl: string,
+    customComponentName: string
+  ): Promise<void> => {
+    return this.endpoints.checkSourceUrlResponse(
+      sourceUrl,
+      "Custom Component",
+      customComponentName
+    )
+  }
+
+  public sendTimeoutError = (
+    source: string,
+    customComponentName: string
+  ): void => {
+    this.endpoints.sendClientErrorToHost(
+      "Custom Component",
+      "Request Timeout",
+      "Your app is having trouble loading the component.",
+      source,
+      customComponentName
+    )
   }
 
   /** Return a URL for fetching a resource for the given component. */
@@ -78,14 +108,14 @@ export class ComponentRegistry {
 
     if (isNullOrUndefined(event.source)) {
       // This should not be possible.
-      logWarning(`Received component message with no eventSource!`, event.data)
+      LOG.warn(`Received component message with no eventSource!`, event.data)
       return
     }
 
     // Get the ComponentInstance associated with the event
     const listener = this.msgListeners.get(event.source)
     if (isNullOrUndefined(listener) || typeof listener !== "function") {
-      logWarning(
+      LOG.warn(
         `Received component message for unregistered ComponentInstance!`,
         event.data
       )
@@ -94,7 +124,7 @@ export class ComponentRegistry {
 
     const { type } = event.data
     if (isNullOrUndefined(type)) {
-      logWarning(`Received Streamlit message with no type!`, event.data)
+      LOG.warn(`Received Streamlit message with no type!`, event.data)
       return
     }
 

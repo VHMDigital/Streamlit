@@ -33,7 +33,7 @@ class TextMixin:
         *,  # keyword-only arguments:
         help: str | None = None,
     ) -> DeltaGenerator:
-        """Write text without Markdown or HTML parsing.
+        r"""Write text without Markdown or HTML parsing.
 
         For monospace text, use |st.code|_.
 
@@ -45,14 +45,19 @@ class TextMixin:
         body : str
             The string to display.
 
-        help : str
-            An optional tooltip that gets displayed next to the text.
+        help : str or None
+            A tooltip that gets displayed next to the text. If this is ``None``
+            (default), no tooltip is displayed.
+
+            The tooltip can optionally contain GitHub-flavored Markdown,
+            including the Markdown directives described in the ``body``
+            parameter of ``st.markdown``.
 
         Example
         -------
         >>> import streamlit as st
         >>>
-        >>> st.text("This is text\\n[and more text](that's not a Markdown link).")
+        >>> st.text("This is text\n[and more text](that's not a Markdown link).")
 
         .. output ::
             https://doc-text.streamlit.app/

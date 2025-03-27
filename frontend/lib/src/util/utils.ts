@@ -20,10 +20,14 @@ import xxhash from "xxhashjs"
 
 import {
   Alert as AlertProto,
+  ChatInput as ChatInputProto,
   Element,
   LabelVisibilityMessage as LabelVisibilityMessageProto,
   Skeleton as SkeletonProto,
-} from "@streamlit/lib/src/proto"
+} from "@streamlit/protobuf"
+import { isNullOrUndefined, notNullOrUndefined } from "@streamlit/utils"
+
+import { assertNever } from "./assertNever"
 
 // This prefix should be in sync with the value on the python side:
 const GENERATED_ELEMENT_ID_PREFIX = "$$ID"
@@ -208,6 +212,45 @@ export function isInChildFrame(): boolean {
 }
 
 /**
+ * Returns the URL of the app, handling both embedded and non-embedded cases.
+ * If the app is embedded in an iframe, it attempts to get the parent frame's URL.
+ */
+export function getUrl(): string {
+  try {
+    // Try to access top location if we're in an iframe
+    if (isInChildFrame() && window.top) {
+      return window.top.location.href
+    }
+  } catch (e) {
+    // CSP error might occur when trying to access parent frame
+    // Just fall through to default case
+  }
+  // Default to current document location
+  return document.location.href
+}
+
+/**
+ * Returns the timezone from the browser's Intl API.
+ */
+export function getTimezone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone
+}
+
+/**
+ * Returns the timezone offset in minutes from the browser's Date API.
+ */
+export function getTimezoneOffset(): number {
+  return new Date().getTimezoneOffset()
+}
+
+/**
+ * Returns the browser's locale language setting.
+ */
+export function getLocaleLanguage(): string {
+  return navigator.language
+}
+
+/**
  * Returns a string with the type of loading screen to use while the app is
  * waiting for the backend to send displayable protos.
  */
@@ -275,33 +318,6 @@ export function notUndefined<T>(value: T | undefined): value is T {
 }
 
 /**
- * A type predicate that is true if the given value is not null.
- */
-export function notNull<T>(value: T | null): value is T {
-  return notNullOrUndefined(value)
-}
-
-/**
- * A type predicate that is true if the given value is neither undefined
- * nor null.
- */
-export function notNullOrUndefined<T>(
-  value: T | null | undefined
-): value is T {
-  return <T>value !== null && <T>value !== undefined
-}
-
-/**
- * A type predicate that is true if the given value is either undefined
- * or null.
- */
-export function isNullOrUndefined<T>(
-  value: T | null | undefined
-): value is null | undefined {
-  return <T>value === null || <T>value === undefined
-}
-
-/**
  * A promise that would be resolved after certain time
  * @param ms number
  */
@@ -321,14 +337,6 @@ export function isFromMac(): boolean {
  */
 export function isFromWindows(): boolean {
   return /^Win/i.test(navigator.platform)
-}
-
-/**
- * Returns cookie value
- */
-export function getCookie(name: string): string | undefined {
-  const r = document.cookie.match(`\\b${name}=([^;]*)\\b`)
-  return r ? r[1] : undefined
 }
 
 /**
@@ -399,6 +407,28 @@ export function labelVisibilityProtoValueToEnum(
       return LabelVisibilityOptions.Collapsed
     default:
       return LabelVisibilityOptions.Visible
+  }
+}
+
+export enum AcceptFileValue {
+  None,
+  Single,
+  Multiple,
+}
+
+export function chatInputAcceptFileProtoValueToEnum(
+  value: ChatInputProto.AcceptFile
+): AcceptFileValue {
+  switch (value) {
+    case ChatInputProto.AcceptFile.NONE:
+      return AcceptFileValue.None
+    case ChatInputProto.AcceptFile.SINGLE:
+      return AcceptFileValue.Single
+    case ChatInputProto.AcceptFile.MULTIPLE:
+      return AcceptFileValue.Multiple
+    default:
+      assertNever(value)
+      return AcceptFileValue.None
   }
 }
 
@@ -521,7 +551,7 @@ export function extractPageNameFromPathName(
   // weird-looking triple `replace()`.
   return decodeURIComponent(
     document.location.pathname
-      .replace(`/${basePath}`, "")
+      .replace(basePath, "")
       .replace(new RegExp("^/?"), "")
       .replace(new RegExp("/$"), "")
   )
@@ -570,3 +600,6 @@ export function keysToSnakeCase(
     return acc
   }, {} as Record<string, any>)
 }
+
+// TODO: Update all imports to use @streamlit/utils and remove this line.
+export { isNullOrUndefined, notNullOrUndefined } from "@streamlit/utils"
