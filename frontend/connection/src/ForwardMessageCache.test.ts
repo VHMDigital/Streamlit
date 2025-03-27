@@ -44,6 +44,21 @@ function createForwardMsg(hash: string, cacheable = true): ForwardMsg {
 }
 
 /**
+ * Create a mock ForwardMsg with the given hash and fragment ID
+ */
+function createForwardMsgWithFragment(
+  hash: string,
+  fragmentId: string,
+  cacheable = true
+): ForwardMsg {
+  return ForwardMsg.fromObject({
+    hash,
+    delta: { fragmentId },
+    metadata: { cacheable, deltaId: 0 },
+  })
+}
+
+/**
  * Create a mock reference ForwardMsg
  */
 function createRefMsg(msg: ForwardMsg): ForwardMsg {
@@ -144,4 +159,76 @@ test("removes expired messages", () => {
   // Bump our age over the expiration threshold.
   cache.incrementRunCount(1, [])
   expect(getCachedMessage(msg.hash)).toBeUndefined()
+})
+
+test("only expires messages with matching fragment IDs", () => {
+  const { cache, getCachedMessage } = createCache()
+
+  // Create messages with different fragment IDs
+  const msg1 = createForwardMsgWithFragment("msg1", "fragment-1")
+  const msg2 = createForwardMsgWithFragment("msg2", "fragment-2")
+  const msg3 = createForwardMsg("msg3") // Message without fragment ID
+
+  const encodedMsg1 = ForwardMsg.encode(msg1).finish()
+  const encodedMsg2 = ForwardMsg.encode(msg2).finish()
+  const encodedMsg3 = ForwardMsg.encode(msg3).finish()
+
+  // Add messages to the cache
+  // @ts-expect-error accessing into internals for testing
+  cache.maybeCacheMessage(msg1, encodedMsg1)
+  // @ts-expect-error accessing into internals for testing
+  cache.maybeCacheMessage(msg2, encodedMsg2)
+  // @ts-expect-error accessing into internals for testing
+  cache.maybeCacheMessage(msg3, encodedMsg3)
+
+  // Verify all messages are in cache
+  expect(getCachedMessage("msg1")).toEqual(msg1)
+  expect(getCachedMessage("msg2")).toEqual(msg2)
+  expect(getCachedMessage("msg3")).toEqual(msg3)
+
+  // Increment run count with fragment-1 - should only consider msg1 for expiration
+  cache.incrementRunCount(1, ["fragment-1"])
+
+  // Non-matching fragment IDs and messages without fragment ID should still be cached
+  expect(getCachedMessage("msg1")).toEqual(msg1) // Not expired yet (age = 1)
+  expect(getCachedMessage("msg2")).toEqual(msg2) // Not considered for expiration
+  expect(getCachedMessage("msg3")).toEqual(msg3) // Not considered for expiration
+
+  // Another increment with fragment-1 - should expire fragment-1 message
+  cache.incrementRunCount(1, ["fragment-1"])
+
+  // fragment1 (with fragment-1) should now be expired, others should remain
+  expect(getCachedMessage("msg1")).toBeUndefined() // Now expired (age > 1)
+  expect(getCachedMessage("msg2")).toEqual(msg2) // Still not considered
+  expect(getCachedMessage("msg3")).toEqual(msg3) // Still not considered
+
+  // Now run with no fragment IDs -> all should expire since
+  // we only allow an age of 1 after a fragment run (might be optimized at some point)
+  cache.incrementRunCount(1, [])
+
+  // Now all messages should be expired
+  expect(getCachedMessage("msg2")).toBeUndefined()
+  expect(getCachedMessage("msg3")).toBeUndefined()
+})
+
+test("throws error when reference message has no metadata", async () => {
+  const { cache } = createCache()
+  const msg1 = createForwardMsg("msg1")
+  const encodedMsg1 = ForwardMsg.encode(msg1).finish()
+
+  // Add message to the cache
+  // @ts-expect-error accessing into internals for testing
+  cache.maybeCacheMessage(msg1, encodedMsg1)
+
+  // Create a reference message without metadata
+  const refMsg = ForwardMsg.fromObject({
+    refHash: "msg1",
+    // Deliberately missing metadata
+  })
+  const encodedRefMsg = ForwardMsg.encode(refMsg).finish()
+
+  // Should throw an error
+  await expect(
+    cache.processMessagePayload(refMsg, encodedRefMsg)
+  ).rejects.toThrow("Reference ForwardMsg has no metadata")
 })
