@@ -404,6 +404,10 @@ export function getCellFromArrow(
   styledCell: StyledCell | undefined,
   cssStyles: string | undefined = undefined
 ): GridCell {
+  // We use arrowCell.contentType instead of column.arrowType here because
+  // to allow a bit more flexibility when data is loaded in chunks or added with
+  // add data to still work somewhat correctly even if the column arrow type
+  // (from the initial chunk) and the actual arrow type from the cell are different.
   let cellTemplate
   if (column.kind === "object" || column.kind === "json") {
     // Always use display value from Quiver for object types
