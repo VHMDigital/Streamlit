@@ -1189,7 +1189,7 @@ it("uses arrowCell.contentType instead of column.arrowType for object types", ()
       arrowField: new Field("object_column", new Utf8(), true),
       pandasType: undefined,
     },
-    type: "columns",
+    type: "data",
   } as object as DataFrameCell
 
   const cell = getCellFromArrow(
