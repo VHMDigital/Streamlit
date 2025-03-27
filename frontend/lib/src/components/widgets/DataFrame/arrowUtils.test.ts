@@ -1162,3 +1162,53 @@ describe("getColumnTypeFromArrow", () => {
     }
   )
 })
+
+it("uses arrowCell.contentType instead of column.arrowType for object types", () => {
+  const MOCK_OBJECT_COLUMN = ObjectColumn({
+    id: "1",
+    name: "object_column",
+    title: "Object column",
+    indexNumber: 0,
+    isEditable: false,
+    isHidden: false,
+    isIndex: false,
+    isPinned: false,
+    isStretched: false,
+    arrowType: {
+      type: DataFrameCellType.DATA,
+      arrowField: new Field("object_column", new Float64(), true),
+      pandasType: undefined,
+    },
+  })
+
+  // Create a mock arrowCell with a string content type instead of number
+  const arrowCell = {
+    content: 0.12345678,
+    contentType: {
+      type: DataFrameCellType.DATA,
+      arrowField: new Field("object_column", new Utf8(), true),
+      pandasType: undefined,
+    },
+    type: "columns",
+  } as object as DataFrameCell
+
+  const cell = getCellFromArrow(
+    MOCK_OBJECT_COLUMN,
+    arrowCell,
+    undefined,
+    undefined
+  )
+
+  // The cell should be formatted as a string since arrowCell.contentType is Utf8
+  expect(cell).toEqual({
+    allowOverlay: true,
+    contentAlignment: undefined,
+    // the float type would have formatted the number to 0.1235
+    data: "0.12345678",
+    displayData: "0.12345678",
+    isMissingValue: false,
+    kind: "text",
+    readonly: true,
+    style: "normal",
+  })
+})
