@@ -147,6 +147,35 @@ def _maybe_print_use_warning() -> None:
             )
 
 
+def _maybe_print_fragment_callback_warning(delta_type: str) -> None:
+    """Print a warning if elements are being modified during a fragment callback."""
+    ctx = get_script_run_ctx()
+    if ctx and getattr(ctx, "in_fragment_callback", False):
+        warning = cli_util.style_for_cli("Warning:", bold=True, fg="yellow")
+
+        logger.get_logger("root").warning(
+            f"\n  {warning} '{delta_type}' element, was called during a fragment widget's callback.\n"
+            " Modifying elements in fragment widget's callback may cause unexpected behaviour or elements to disappear.\n"
+            "  Recommended patterns:\n"
+            "  1. Use callbacks for state management only\n"
+            "  2. Use 'if widget' pattern\n"
+            "  Examples:\n\n"
+            "  # First Alternative pattern (session state):\n"
+            "  def on_click():\n"
+            "      st.session_state.clicked = True\n\n"
+            "  @st.fragment\n"
+            "  def my_fragment():\n"
+            "      if st.session_state.get('clicked'):\n"
+            "          st.write('Button was clicked!')\n"
+            "      st.button('Click me', on_click=on_click)\n\n"
+            "  # Second Alternative pattern (if st.button):\n"
+            "  @st.fragment\n"
+            "  def my_fragment():\n"
+            "      if st.button('Click me'):\n"
+            "          st.write('Button was clicked!')\n"
+        )
+
+
 class DeltaGenerator(
     AlertMixin,
     AudioInputMixin,
@@ -457,6 +486,8 @@ class DeltaGenerator(
 
         # Warn if an element is being changed but the user isn't running the streamlit server.
         _maybe_print_use_warning()
+        # Warn if an element is being changed during a fragment callback.
+        _maybe_print_fragment_callback_warning(delta_type)
 
         # Copy the marshalled proto into the overall msg proto
         msg = ForwardMsg_pb2.ForwardMsg()
