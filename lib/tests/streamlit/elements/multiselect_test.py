@@ -429,11 +429,11 @@ def test_multiselect_enum_coercion():
 class TestMultiSelectSerde:
     def test_serialize(self):
         options = ["Option A", "Option B", "Option C"]
-        (formatted_options, option_mapping) = create_mappings(options)
+        formatted_options, formatted_option_to_option_index = create_mappings(options)
         serde = MultiSelectSerde(
             options,
             formatted_options=formatted_options,
-            formatted_option_to_option_index=option_mapping,
+            formatted_option_to_option_index=formatted_option_to_option_index,
         )
 
         res = serde.serialize(["A", "C"])
@@ -441,11 +441,11 @@ class TestMultiSelectSerde:
 
     def test_serialize_empty_list(self):
         options = ["Option A", "Option B", "Option C"]
-        (formatted_options, option_mapping) = create_mappings(options)
+        formatted_options, formatted_option_to_option_index = create_mappings(options)
         serde = MultiSelectSerde(
             options,
             formatted_options=formatted_options,
-            formatted_option_to_option_index=option_mapping,
+            formatted_option_to_option_index=formatted_option_to_option_index,
         )
 
         res = serde.serialize([])
@@ -457,11 +457,13 @@ class TestMultiSelectSerde:
         def format_func(x):
             return f"Format: {x}"
 
-        (formatted_options, option_mapping) = create_mappings(options, format_func)
+        formatted_options, formatted_option_to_option_index = create_mappings(
+            options, format_func
+        )
         serde = MultiSelectSerde(
             options,
             formatted_options=formatted_options,
-            formatted_option_to_option_index=option_mapping,
+            formatted_option_to_option_index=formatted_option_to_option_index,
         )
 
         res = serde.serialize(["A", "Option C"])
@@ -469,11 +471,11 @@ class TestMultiSelectSerde:
 
     def test_deserialize(self):
         options = ["Option A", "Option B", "Option C"]
-        (formatted_options, option_mapping) = create_mappings(options)
+        formatted_options, formatted_option_to_option_index = create_mappings(options)
         serde = MultiSelectSerde(
             options,
             formatted_options=formatted_options,
-            formatted_option_to_option_index=option_mapping,
+            formatted_option_to_option_index=formatted_option_to_option_index,
         )
 
         res = serde.deserialize(["Option A", "Option C", "B"], "")
@@ -481,11 +483,11 @@ class TestMultiSelectSerde:
 
     def test_deserialize_empty_list(self):
         options = ["Option A", "Option B", "Option C"]
-        (formatted_options, option_mapping) = create_mappings(options)
+        formatted_options, formatted_option_to_option_index = create_mappings(options)
         serde = MultiSelectSerde(
             options,
             formatted_options=formatted_options,
-            formatted_option_to_option_index=option_mapping,
+            formatted_option_to_option_index=formatted_option_to_option_index,
         )
 
         res = serde.deserialize([], "")
@@ -494,11 +496,11 @@ class TestMultiSelectSerde:
     def test_deserialize_with_default_indices(self):
         options = ["Option A", "Option B", "Option C"]
         default_indices = [0, 2]
-        (formatted_options, option_mapping) = create_mappings(options)
+        formatted_options, formatted_option_to_option_index = create_mappings(options)
         serde = MultiSelectSerde(
             options,
             formatted_options=formatted_options,
-            formatted_option_to_option_index=option_mapping,
+            formatted_option_to_option_index=formatted_option_to_option_index,
             default_options_indices=default_indices,
         )
 
@@ -516,13 +518,13 @@ class TestMultiSelectSerde:
         def format_func(x):
             return x["name"]
 
-        (formatted_options, option_mapping) = create_mappings(
+        formatted_options, formatted_option_to_option_index = create_mappings(
             complex_options, format_func
         )
         serde = MultiSelectSerde(
             complex_options,
             formatted_options=formatted_options,
-            formatted_option_to_option_index=option_mapping,
+            formatted_option_to_option_index=formatted_option_to_option_index,
         )
 
         res = serde.deserialize(["First", "Third"], "")

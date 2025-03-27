@@ -420,25 +420,6 @@ class SelectboxMixin:
         opt = convert_anything_to_list(options)
         check_python_comparable(opt)
 
-        if placeholder is None:
-            placeholder = (
-                "Choose an option"
-                if not accept_new_options
-                else "Choose or add an option"
-            )
-
-        element_id = compute_and_register_element_id(
-            "selectbox",
-            user_key=key,
-            form_id=current_form_id(self.dg),
-            label=label,
-            options=[str(format_func(option)) for option in opt],
-            index=index,
-            help=help,
-            placeholder=placeholder,
-            accept_new_options=accept_new_options,
-        )
-
         if not isinstance(index, int) and index is not None:
             raise StreamlitAPIException(
                 "Selectbox Value has invalid type: %s" % type(index).__name__
@@ -450,13 +431,32 @@ class SelectboxMixin:
                 "and less than the length of options."
             )
 
+        if placeholder is None:
+            placeholder = (
+                "Choose an option"
+                if not accept_new_options
+                else "Choose or add an option"
+            )
+
+        formatted_options, formatted_option_to_option_index = create_mappings(
+            opt, format_func
+        )
+
+        element_id = compute_and_register_element_id(
+            "selectbox",
+            user_key=key,
+            form_id=current_form_id(self.dg),
+            label=label,
+            options=formatted_options,
+            index=index,
+            help=help,
+            placeholder=placeholder,
+            accept_new_options=accept_new_options,
+        )
+
         session_state = get_session_state().filtered_state
         if key is not None and key in session_state and session_state[key] is None:
             index = None
-
-        (formatted_options, formatted_option_to_option_index) = create_mappings(
-            opt, format_func
-        )
 
         selectbox_proto = SelectboxProto()
         selectbox_proto.id = element_id

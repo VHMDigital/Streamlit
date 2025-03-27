@@ -395,7 +395,7 @@ class MultiSelectMixin:
         maybe_raise_label_warnings(label, label_visibility)
 
         indexable_options = convert_to_sequence_and_check_comparable(options)
-        (formatted_options, formatted_option_to_option_index) = create_mappings(
+        formatted_options, formatted_option_to_option_index = create_mappings(
             indexable_options, format_func
         )
 

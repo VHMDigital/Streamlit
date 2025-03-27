@@ -256,6 +256,11 @@ def maybe_coerce_enum_sequence(register_widget_result, options, opt_sequence):
 def create_mappings(
     options: Sequence[T], format_func: Callable[[T], str] = str
 ) -> tuple[list[str], dict[str, int]]:
+    """Iterates through the options and formats them using the format_func.
+
+    Returns a tuple of the formatted options and a mapping of the formatted options to
+    the original options.
+    """
     formatted_option_to_option_mapping: dict[str, int] = {}
     formatted_options: list[str] = []
     for index, option in enumerate(options):
