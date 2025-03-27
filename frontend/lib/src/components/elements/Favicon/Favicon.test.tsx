@@ -78,14 +78,14 @@ describe("Favicon element", () => {
   })
 
   it("handles emoji shortcodes containing a dash correctly", () => {
-    handleFavicon("emoji::crescent-moon:", vi.fn(), endpoints)
+    handleFavicon(":crescent-moon:", vi.fn(), endpoints)
     // Check that its an svg that contains the crescent moon emoji bytecode:
     expect(getFaviconHref()).toContain("svg")
     expect(getFaviconHref()).toContain("%F0%9F%8C%99")
   })
 
   it("accepts emoji shortcodes", () => {
-    handleFavicon("emoji::pizza:", vi.fn(), endpoints)
+    handleFavicon(":pizza:", vi.fn(), endpoints)
     // Check that its an svg that contains the pizza emoji bytecode:
     expect(getFaviconHref()).toContain("svg")
     expect(getFaviconHref()).toContain("%F0%9F%8D%95")
@@ -93,7 +93,7 @@ describe("Favicon element", () => {
 
   it("updates the favicon when it changes", () => {
     handleFavicon("/media/1234567890.png", vi.fn(), endpoints)
-    handleFavicon("emoji::pizza:", vi.fn(), endpoints)
+    handleFavicon(":pizza:", vi.fn(), endpoints)
     // Check that its an svg that contains the pizza emoji bytecode:
     expect(getFaviconHref()).toContain("svg")
     expect(getFaviconHref()).toContain("%F0%9F%8D%95")
@@ -123,16 +123,16 @@ describe("Favicon element", () => {
     })
 
     it("handles emoji shortcodes", () => {
-      expect(extractEmoji("emoji::smile:")).toBe("😄")
-      expect(extractEmoji("emoji::rocket:")).toBe("🚀")
-      expect(extractEmoji("emoji::pizza:")).toBe("🍕")
-      expect(extractEmoji("emoji::star:")).toBe("⭐")
-      expect(extractEmoji("emoji::video_game:")).toBe("🎮")
+      expect(extractEmoji(":smile:")).toBe("😄")
+      expect(extractEmoji(":rocket:")).toBe("🚀")
+      expect(extractEmoji(":pizza:")).toBe("🍕")
+      expect(extractEmoji(":star:")).toBe("⭐")
+      expect(extractEmoji(":video_game:")).toBe("🎮")
     })
 
     it("handles shortcodes with dashes", () => {
-      expect(extractEmoji("emoji::crescent-moon:")).toBe("🌙")
-      expect(extractEmoji("emoji::lying-face:")).toBe("🤥")
+      expect(extractEmoji(":crescent-moon:")).toBe("🌙")
+      expect(extractEmoji(":lying-face:")).toBe("🤥")
     })
 
     it("handles skin tone modifiers", () => {
@@ -161,14 +161,14 @@ describe("Favicon element", () => {
       expect(extractEmoji("emoji:👨‍💻")).toBe("👨‍💻") // man technologist
       expect(extractEmoji("emoji:👩‍🚒")).toBe("👩‍🚒") // woman firefighter
       expect(extractEmoji("emoji:👨‍👨‍👧‍👧")).toBe("👨‍👨‍👧‍👧") // family with two men and two girls
-      expect(extractEmoji("emoji::woman_technologist:")).toBe("👩‍💻")
+      expect(extractEmoji(":woman_technologist:")).toBe("👩‍💻")
     })
 
     it("handles flags", () => {
       expect(extractEmoji("emoji:🇺🇸")).toBe("🇺🇸")
       expect(extractEmoji("emoji:🇯🇵")).toBe("🇯🇵")
       expect(extractEmoji("emoji:🇪🇸")).toBe("🇪🇸")
-      expect(extractEmoji("emoji::brazil:")).toBe("🇧🇷")
+      expect(extractEmoji(":brazil:")).toBe("🇧🇷")
     })
 
     it("handles material icons correctly", () => {

@@ -76,15 +76,13 @@ function overwriteFavicon(imageUrl: string): void {
 // Return the emoji if it exists, or empty string otherwise
 export function extractEmoji(maybeEmoji: string): string {
   const EMOJI_PREFIX = "emoji:"
-  if (!maybeEmoji.startsWith(EMOJI_PREFIX)) {
-    return ""
+  if (maybeEmoji.startsWith(EMOJI_PREFIX)) {
+    // Remove the 'emoji:' prefix
+    return maybeEmoji.substring(EMOJI_PREFIX.length)
   }
 
-  // Remove the 'emoji:' prefix
-  const emojiName = maybeEmoji.substring(EMOJI_PREFIX.length)
-
   // At this point, it must be a shortcode, so we normalize and check if it exists
-  const shortcode = emojiName.replace("-", "_")
+  const shortcode = maybeEmoji.replace("-", "_")
   const emoji = nodeEmoji.get(shortcode)
   if (emoji !== undefined && nodeEmoji.has(emoji)) {
     // Format: pizza or :pizza:
@@ -92,5 +90,5 @@ export function extractEmoji(maybeEmoji: string): string {
     return emoji
   }
 
-  return emojiName
+  return ""
 }
