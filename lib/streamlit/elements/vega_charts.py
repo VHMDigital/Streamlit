@@ -250,6 +250,26 @@ class VegaLiteStateSerde:
         return json.dumps(selection_state, default=str)
 
 
+def _patch_null_legend_titles(spec: VegaLiteSpec) -> None:
+    """Patches null legend titles in the 'color' channel of the spec."""
+    encoding = spec.get("encoding")
+    if not isinstance(encoding, dict):
+        return
+
+    color_spec = encoding.get("color")
+    if not isinstance(color_spec, dict):
+        return
+
+    if color_spec.get("title") is None:
+        # Patch legend title given null value directly in the encoding
+        color_spec["title"] = " "
+
+    legend = color_spec.get("legend")
+    if isinstance(legend, dict) and legend.get("title") is None:
+        # Patch legend title given null value in the legend
+        legend["title"] = " "
+
+
 def _prepare_vega_lite_spec(
     spec: VegaLiteSpec,
     use_container_width: bool,
@@ -277,6 +297,8 @@ def _prepare_vega_lite_spec(
             spec["autosize"] = {"type": "fit-x", "contains": "padding"}
         else:
             spec["autosize"] = {"type": "fit", "contains": "padding"}
+
+    _patch_null_legend_titles(spec)
 
     return spec
 
