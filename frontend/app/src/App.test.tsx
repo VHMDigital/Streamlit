@@ -1585,6 +1585,28 @@ describe("App", () => {
       ).toBe("some_other_page_hash")
     })
 
+    it("sends cached messages if connection manager has cached messages", () => {
+      renderApp(getProps())
+
+      const widgetStateManager =
+        getStoredValue<WidgetStateManager>(WidgetStateManager)
+      const connectionManager = getMockConnectionManager()
+
+      // Mock the getCachedMessageHashes method to return some cached message hashes
+      connectionManager.getCachedMessageHashes = vi
+        .fn()
+        .mockReturnValue(["hash1", "hash2"])
+
+      widgetStateManager.sendUpdateWidgetsMessage(undefined)
+      expect(connectionManager.sendMessage).toBeCalledTimes(1)
+
+      expect(
+        // @ts-expect-error
+        connectionManager.sendMessage.mock.calls[0][0].rerunScript
+          .cachedMessages
+      ).toEqual(["hash1", "hash2"])
+    })
+
     it("sets fragmentId in BackMsg", () => {
       renderApp(getProps())
 
