@@ -37,6 +37,8 @@ HOSTFRAME_TEST_HTML: Final[str] = (TEST_ASSETS_DIR / "hostframe.html").read_text
 
 EXPANDER_HEADER_IDENTIFIER = "summary"
 
+HOSTFRAME_TOOLBAR_BUTTON_COUNT = 14
+
 
 def _load_html_and_get_locators(
     iframed_app: IframedPage,
@@ -59,7 +61,7 @@ def _load_html_and_get_locators(
     toolbar = page.get_by_test_id("toolbar")
     expect(toolbar).to_have_count(1)
     toolbar_buttons = toolbar.get_by_role("button")
-    expect(toolbar_buttons).to_have_count(13)
+    expect(toolbar_buttons).to_have_count(HOSTFRAME_TOOLBAR_BUTTON_COUNT)
     wait_for_app_run(frame_locator)
     return frame_locator, toolbar_buttons
 
