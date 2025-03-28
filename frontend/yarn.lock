@@ -3169,6 +3169,7 @@ __metadata:
     dompurify: "npm:^3.2.4"
     eslint: "npm:^8.33.0"
     eslint-plugin-streamlit-custom: "file:../eslint-plugin-streamlit-custom"
+    eslint-plugin-vitest: "npm:^0.5.4"
     fzy.js: "npm:^0.4.1"
     hoist-non-react-statics: "npm:^3.3.2"
     immer: "npm:^9.0.19"
