@@ -15,7 +15,7 @@
 
 from playwright.sync_api import Page, expect
 
-from e2e_playwright.conftest import wait_for_app_loaded
+from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_loaded
 from e2e_playwright.shared.app_utils import (
     click_button,
     click_toggle,
@@ -51,7 +51,9 @@ def test_dataframe_renders_without_crashing(app: Page):
         wait_for_app_loaded(app)
 
 
-def test_change_underlying_data_does_not_crash(app: Page):
+def test_change_underlying_data_does_not_crash(
+    app: Page, assert_snapshot: ImageCompareFunction
+):
     """Test that changing the underlying data does not crash.
 
     Related issues: https://github.com/streamlit/streamlit/issues/10937
@@ -60,8 +62,6 @@ def test_change_underlying_data_does_not_crash(app: Page):
     expect(container).to_be_visible()
 
     df_element = container.get_by_test_id("stDataFrame").first
-    expect(df_element).to_have_css("height", "247px")
-
     expect(df_element).to_be_visible()
 
     # Change the underlying data:
@@ -71,6 +71,5 @@ def test_change_underlying_data_does_not_crash(app: Page):
     expect(df_element).to_be_visible()
     # Double check that there are no exceptions:
     expect_no_exception(app)
-    # Make sure that the data actually has changed by checking the height
-    # of the dataframe:
-    expect(df_element).to_have_css("height", "177px")
+    # Snapshot test to ensure that the dataframe shows the correct changed data:
+    assert_snapshot(df_element, name="st_dataframe-changed_underlying_data")
