@@ -304,22 +304,23 @@ def test_handles_set_inputs_disabled_message(iframed_app: IframedPage):
     # Verify that widgets are disabled
     # Slider
     slider = frame_locator.get_by_test_id("stSlider")
-    expect(slider.get_by_test_id("stWidgetLabel")).to_be_disabled()
+    # For <label> tags, we need to check the disabled attribute vs using to_be_disabled()
+    expect(slider.get_by_test_id("stWidgetLabel")).to_have_attribute("disabled")
     expect(slider.get_by_role("slider")).to_be_disabled()
     # Checkbox - widget label disabled if input is disabled
     checkbox = frame_locator.get_by_test_id("stCheckbox")
     expect(checkbox.get_by_role("checkbox")).to_be_disabled()
     # Radio
     radio = frame_locator.get_by_test_id("stRadio")
-    expect(radio.get_by_test_id("stWidgetLabel")).to_be_disabled()
+    expect(radio.get_by_test_id("stWidgetLabel")).to_have_attribute("disabled")
     expect(radio.get_by_role("radio").first).to_be_disabled()
     # File uploader
     file_uploader = frame_locator.get_by_test_id("stFileUploader")
-    expect(file_uploader.get_by_test_id("stWidgetLabel")).to_be_disabled()
+    expect(file_uploader.get_by_test_id("stWidgetLabel")).to_have_attribute("disabled")
     expect(file_uploader.get_by_role("button")).to_be_disabled()
     # Color picker
     color_picker = frame_locator.get_by_test_id("stColorPicker")
-    expect(color_picker.get_by_test_id("stWidgetLabel")).to_be_disabled()
+    expect(color_picker.get_by_test_id("stWidgetLabel")).to_have_attribute("disabled")
     expect(color_picker.get_by_test_id("stColorPickerBlock")).to_be_disabled()
 
     # Verify the expander is still active
