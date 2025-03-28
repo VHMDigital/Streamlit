@@ -21,6 +21,13 @@ import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
 import { EmotionTheme, getDividerColors } from "~lib/theme"
 import { isValidElementId } from "~lib/util/utils"
 import { WidgetStateManager } from "~lib/WidgetStateManager"
+import { Direction } from "~lib/components/core/Layout/utils"
+
+export function getClassnamePrefix(direction: Direction): string {
+  return direction === Direction.HORIZONTAL
+    ? "stHorizontalBlock"
+    : "stVerticalBlock"
+}
 
 export function shouldComponentBeEnabled(
   elementType: string,

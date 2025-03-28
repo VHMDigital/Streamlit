@@ -31,6 +31,7 @@ message Block {
     ChatMessage chat_message = 9;
     Popover popover = 10;
     Dialog dialog = 11;
+    FlexContainer flex_container = 13;
   }
 
   bool allow_empty = 8;
@@ -44,6 +45,20 @@ message Block {
 
   message Horizontal {
     string gap = 1;
+  }
+
+  message FlexContainer {
+    bool border = 1;
+    string height = 2;
+    string width = 3;
+    string gap = 4;
+    float scale =5;
+
+    enum Direction {
+      VERTICAL = 0;
+      HORIZONTAL = 1;
+    }
+    Direction direction = 6;
   }
 
   message Column {
@@ -112,5 +127,5 @@ message Block {
     AvatarType avatar_type = 3;
   }
 
-  // Next ID: 13
+  // Next ID: 14
 }

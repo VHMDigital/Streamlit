@@ -713,8 +713,7 @@ const RawElementNodeRenderer = (
 const ElementNodeRenderer = (
   props: ElementNodeRendererProps
 ): ReactElement => {
-  const { isFullScreen, fragmentIdsThisRun, scriptRunState, scriptRunId } =
-    React.useContext(LibContext)
+  const { isFullScreen, fragmentIdsThisRun } = React.useContext(LibContext)
   const { node } = props
 
   const elementType = node.element.type || ""

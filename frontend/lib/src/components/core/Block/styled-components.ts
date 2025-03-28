@@ -32,26 +32,6 @@ function translateGapWidth(gap: string, theme: EmotionTheme): string {
   }
   return gapWidth
 }
-export interface StyledHorizontalBlockProps {
-  gap: string
-}
-
-export const StyledHorizontalBlock = styled.div<StyledHorizontalBlockProps>(
-  ({ theme, gap }) => {
-    const gapWidth = translateGapWidth(gap, theme)
-
-    return {
-      // While using flex for columns, padding is used for large screens and gap
-      // for small ones. This can be adjusted once more information is passed.
-      // More information and discussions can be found: Issue #2716, PR #2811
-      display: "flex",
-      flexWrap: "wrap",
-      flexGrow: 1,
-      alignItems: "stretch",
-      gap: gapWidth,
-    }
-  }
-)
 
 export interface StyledElementContainerProps {
   isStale: boolean
@@ -155,42 +135,47 @@ export const StyledColumn = styled.div<StyledColumnProps>(
   }
 )
 
-export interface StyledVerticalBlockProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
-  ref?: React.RefObject<any>
-  width?: React.CSSProperties["width"]
-  maxWidth?: React.CSSProperties["maxWidth"]
+export interface StyledBlockWrapperProps {
+  border: boolean
+  height?: string
 }
 
-export const StyledVerticalBlock = styled.div<StyledVerticalBlockProps>(
-  ({ theme }) => ({
-    width: "100%",
-    maxWidth: "100%",
-    position: "relative", // Required for the automatic width computation.
-    display: "flex",
-    flex: 1,
-    flexDirection: "column",
-    gap: theme.spacing.lg,
+export const StyledBlockWrapper = styled.div<StyledBlockWrapperProps>(
+  ({ theme, border, height }) => ({
+    display: "block",
+    ...(border && {
+      border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+      borderRadius: theme.radii.default,
+      padding: `calc(${theme.spacing.lg} - ${theme.sizes.borderWidth})`,
+    }),
+    ...(height && {
+      height: `${height}px`,
+      overflow: "auto",
+    }),
   })
 )
 
-export interface StyledVerticalBlockBorderWrapperProps {
-  border: boolean
-  height?: number
+export interface StyledFlexContainerBlockProps {
+  direction: React.CSSProperties["flexDirection"]
+  gap?: string | undefined
+  flex?: React.CSSProperties["flex"]
 }
 
-export const StyledVerticalBlockBorderWrapper =
-  styled.div<StyledVerticalBlockBorderWrapperProps>(
-    ({ theme, border, height }) => ({
-      display: "block",
-      ...(border && {
-        border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
-        borderRadius: theme.radii.default,
-        padding: `calc(${theme.spacing.lg} - ${theme.sizes.borderWidth})`,
-      }),
-      ...(height && {
-        height: `${height}px`,
-        overflow: "auto",
-      }),
-    })
+export const StyledFlexContainerBlock =
+  styled.div<StyledFlexContainerBlockProps>(
+    ({ theme, direction, gap, flex }) => {
+      let gapWidth
+      if (!!gap) {
+        gapWidth = translateGapWidth(gap, theme)
+      }
+
+      return {
+        gap: gapWidth,
+        width: "100%",
+        maxWidth: "100%",
+        height: "100%",
+        flexDirection: direction,
+        flex,
+      }
+    }
   )

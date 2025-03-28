@@ -149,17 +149,17 @@ class LayoutsMixin:
         key = to_key(key)
         block_proto = BlockProto()
         block_proto.allow_empty = False
-        block_proto.vertical.border = border or False
+        block_proto.flex_container.border = border or False
 
         if height:
             # Activate scrolling container behavior:
             block_proto.allow_empty = True
-            block_proto.vertical.height = height
+            block_proto.flex_container.height = str(height)
             if border is None:
                 # If border is None, we activated the
                 # border as default setting for scrolling
                 # containers.
-                block_proto.vertical.border = True
+                block_proto.flex_container.border = True
 
         if key:
             # At the moment, the ID is only used for extracting the
@@ -372,7 +372,11 @@ class LayoutsMixin:
             return col_proto
 
         block_proto = BlockProto()
-        block_proto.horizontal.gap = gap_size
+        block_proto.flex_container.direction = (
+            BlockProto.FlexContainer.Direction.HORIZONTAL
+        )
+        block_proto.flex_container.gap = gap_size
+        block_proto.flex_container.scale = 1
         row = self.dg._block(block_proto)
         total_weight = sum(weights)
         return [row._block(column_proto(w / total_weight)) for w in weights]
