@@ -454,9 +454,9 @@ jobs:
               - Current PR: ${currentTotal.toFixed(4)}% (${currentCoverage.totals.num_statements} statements, ${currentCoverage.totals.missing_lines} missed)
               - Latest develop: ${developTotal.toFixed(4)}% (${developCoverage.totals.num_statements} statements, ${developCoverage.totals.missing_lines} missed)
 
-              ${absDiffPercent >= COVERAGE_CHANGE_THRESHOLD 
-                ? (diffPercent > 0 
-                    ? '🎉 Great job on improving test coverage!' 
+              ${absDiffPercent >= COVERAGE_CHANGE_THRESHOLD
+                ? (diffPercent > 0
+                    ? '🎉 Great job on improving test coverage!'
                     : '💡 Consider adding more unit tests to maintain or improve coverage.'
                   )
                 : '✅ Coverage change is within normal range.'
