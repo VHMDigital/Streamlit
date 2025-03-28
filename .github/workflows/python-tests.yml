@@ -433,7 +433,7 @@ jobs:
               const tc = require('@actions/tool-cache');
               
               // Download the zip file
-              const downloadedPath = await tc.downloadTool(developCoverageArtifact.archive_download_url, undefined, 
+              const downloadedPath = await tc.downloadTool(developCoverageArtifact.archive_download_url, undefined,
                 `token ${process.env.GITHUB_TOKEN}`);
               
               // Extract the zip
@@ -464,13 +464,15 @@ jobs:
               - Current PR: ${currentTotal.toFixed(4)}% (${currentCoverage.totals.num_statements} statements, ${currentCoverage.totals.missing_lines} missed)
               - Latest develop: ${developTotal.toFixed(4)}% (${developCoverage.totals.num_statements} statements, ${developCoverage.totals.missing_lines} missed)
 
-              ${absDiffPercent >= COVERAGE_CHANGE_THRESHOLD
-                ? (diffPercent > 0
-                    ? '🎉 Great job on improving test coverage!'
+              ${absDiffPercent >= COVERAGE_CHANGE_THRESHOLD 
+                ? (diffPercent > 0 
+                    ? '🎉 Great job on improving test coverage!' 
                     : '💡 Consider adding more unit tests to maintain or improve coverage.'
                   )
                 : '✅ Coverage change is within normal range.'
-              }`;
+              }
+
+              📊 [View detailed coverage comparison](https://issues.streamlit.app/Test_Coverage_(Python)?pr=${context.issue.number})`;
 
               // Unique identifier for our comment
               const commentIdentifier = '<!-- STREAMLIT-PYTHON-COVERAGE-CHECK -->';
