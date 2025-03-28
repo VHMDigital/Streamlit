@@ -388,59 +388,49 @@ jobs:
           path: lib/htmlcov
           retention-days: 14
 
+      - name: Get latest develop run ID
+        if: github.event_name == 'pull_request'
+        id: get-latest-run
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: runs } = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'python-tests.yml',
+              branch: 'develop',
+              status: 'success',
+              per_page: 1
+            });
+
+            if (runs.workflow_runs.length === 0) {
+              throw new Error('No successful workflow runs found on develop branch');
+            }
+
+            core.setOutput('run_id', runs.workflow_runs[0].id);
+
+      - name: Download develop coverage
+        if: github.event_name == 'pull_request'
+        uses: actions/download-artifact@v4
+        with:
+          repository: streamlit/streamlit
+          run-id: ${{ steps.get-latest-run.outputs.run_id }}
+          name: combined_coverage_json
+          path: /tmp/develop_coverage
+
       - name: Check coverage changes and comment
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
             const COVERAGE_CHANGE_THRESHOLD = 0.00; // 0.00%
-            const COVERAGE_ARTIFACT_NAME = 'combined_coverage_json';
 
             try {
               // Read current coverage from the existing file
               const currentCoverage = require('./lib/coverage.json');
-
-              // Get the latest successful workflow run on develop branch
-              const { data: runs } = await github.rest.actions.listWorkflowRuns({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                workflow_id: 'python-tests.yml',
-                branch: 'develop',
-                status: 'success',
-                per_page: 1
-              });
-
-              if (runs.workflow_runs.length === 0) {
-                throw new Error('No successful workflow runs found on develop branch');
-              }
-
-              const latestRun = runs.workflow_runs[0];
-              console.log(`Latest successful run on develop: ${latestRun.id}`);
-
-              // Get artifacts for the develop run
-              const { data: developArtifacts } = await github.rest.actions.listWorkflowRunArtifacts({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                run_id: latestRun.id
-              });
-
-              const developCoverageArtifact = developArtifacts.artifacts.find(artifact => artifact.name === COVERAGE_ARTIFACT_NAME);
-              if (!developCoverageArtifact) {
-                throw new Error(`No ${COVERAGE_ARTIFACT_NAME} artifact found in the develop workflow run`);
-              }
-
-              // Download and extract develop coverage file
-              const tc = require('@actions/tool-cache');
               
-              // Download the zip file
-              const downloadedPath = await tc.downloadTool(developCoverageArtifact.archive_download_url, undefined,
-                `token ${process.env.GITHUB_TOKEN}`);
-              
-              // Extract the zip
-              const extractPath = await tc.extractZip(downloadedPath);
-              
-              // Read and parse the coverage file
-              const developCoverage = require(`${extractPath}/coverage.json`);
+              // Read develop coverage from downloaded artifact
+              const developCoverage = require('/tmp/develop_coverage/coverage.json');
 
               // Calculate total coverage
               const currentTotal = currentCoverage.totals.percent_covered;
