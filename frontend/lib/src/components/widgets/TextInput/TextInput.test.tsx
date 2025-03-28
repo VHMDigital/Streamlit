@@ -16,7 +16,13 @@
 
 import React from "react"
 
-import { act, screen, waitFor, within } from "@testing-library/react"
+import {
+  act,
+  fireEvent,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 
 import {
@@ -358,6 +364,40 @@ describe("TextInput widget", () => {
       },
       undefined
     )
+  })
+
+  it("accepts autofilled value when focus is lost, simulating password manager autofill", async () => {
+    const user = userEvent.setup()
+    const props = getProps()
+
+    // Spy on widgetMgr
+    vi.spyOn(props.widgetMgr, "setStringValue")
+
+    render(<TextInput {...props} />)
+
+    const textInput = screen.getByRole("textbox")
+
+    await user.click(textInput)
+
+    // Simulate losing focus (onBlur) as a result of clicking in the autofill suggestion button
+    await user.tab()
+
+    // Simulate autofilling the pretended value
+    userEvent.type(textInput, "new value")
+    fireEvent.change(textInput, { target: { value: "autofilled-value" } })
+
+    // Check that the value was submitted correctly
+    await waitFor(() => {
+      expect(props.widgetMgr.setStringValue).toHaveBeenCalledWith(
+        props.element,
+        "autofilled-value",
+        { fromUi: true },
+        undefined
+      )
+    })
+
+    // Ensure the setStringValue was called twice (first time during render, second after autofill)
+    expect(props.widgetMgr.setStringValue).toHaveBeenCalledTimes(2)
   })
 
   it("resets its value when form is cleared", async () => {
