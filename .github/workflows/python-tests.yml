@@ -450,55 +450,58 @@ jobs:
               console.log(`Develop coverage: ${developTotal.toFixed(4)}%`);
               console.log(`Coverage difference: ${diffPercent.toFixed(4)}%`);
 
-              // Only proceed with comment if change is significant
-              if (absDiffPercent >= COVERAGE_CHANGE_THRESHOLD) {
-                const changeType = diffPercent > 0 ? 'increased' : 'decreased';
-                const emoji = diffPercent > 0 ? '📈' : '📉';
+              const changeType = diffPercent > 0 ? 'increased' : 'decreased';
+              const emoji = diffPercent > 0 ? '📈' : '📉';
 
-                const commentBody = `### ${emoji} Significant coverage change detected
+              const commentBody = `### ${emoji} Python coverage change detected
 
-                The test coverage has **${changeType} by ${Math.abs(diffPercent).toFixed(4)}%** (threshold: ${COVERAGE_CHANGE_THRESHOLD}%)
+              The Python unit test coverage has **${changeType} by ${Math.abs(diffPercent).toFixed(4)}%**
 
-                - Current PR: ${currentTotal.toFixed(4)}%
-                - Latest develop: ${developTotal.toFixed(4)}%
+              - Current PR: ${currentTotal.toFixed(4)}% (${currentCoverage.totals.num_statements} statements, ${currentCoverage.totals.missing_lines} missed)
+              - Latest develop: ${developTotal.toFixed(4)}% (${developCoverage.totals.num_statements} statements, ${developCoverage.totals.missing_lines} missed)
 
-                Please verify this change is expected.`;
+              ${absDiffPercent >= COVERAGE_CHANGE_THRESHOLD 
+                ? (diffPercent > 0 
+                    ? '🎉 Great job on improving test coverage!' 
+                    : '💡 Consider adding more unit tests to maintain or improve coverage.'
+                  )
+                : '✅ Coverage change is within normal range.'
+              }`;
 
-                // Unique identifier for our comment
-                const commentIdentifier = '<!-- STREAMLIT-COVERAGE-CHECK -->';
-                const fullCommentBody = `${commentIdentifier}\n${commentBody}`;
+              // Unique identifier for our comment
+              const commentIdentifier = '<!-- STREAMLIT-PYTHON-COVERAGE-CHECK -->';
+              const fullCommentBody = `${commentIdentifier}\n${commentBody}`;
 
-                // Get all comments on the PR
-                const { data: comments } = await github.rest.issues.listComments({
+              // Get all comments on the PR
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+              });
+
+              // Look for our previous coverage comment
+              const coverageComment = comments.find(comment => comment.body.includes(commentIdentifier));
+
+              if (coverageComment) {
+                // Update existing comment
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: coverageComment.id,
+                  body: fullCommentBody
+                });
+                console.log('Updated existing coverage comment');
+              } else if (absDiffPercent >= COVERAGE_CHANGE_THRESHOLD) {
+                // Only create new comment for significant changes
+                await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: context.issue.number,
+                  body: fullCommentBody
                 });
-
-                // Look for our previous coverage comment
-                const coverageComment = comments.find(comment => comment.body.includes(commentIdentifier));
-
-                if (coverageComment) {
-                  // Update existing comment
-                  await github.rest.issues.updateComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    comment_id: coverageComment.id,
-                    body: fullCommentBody
-                  });
-                  console.log('Updated existing coverage comment');
-                } else {
-                  // Create new comment
-                  await github.rest.issues.createComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: context.issue.number,
-                    body: fullCommentBody
-                  });
-                  console.log('Created new coverage comment');
-                }
+                console.log('Created new coverage comment');
               } else {
-                console.log('Coverage change is not significant, skipping comment');
+                console.log('Coverage change is not significant and no existing comment found, skipping comment');
               }
             } catch (error) {
               console.error(`Error checking coverage changes: ${error.message}`);
