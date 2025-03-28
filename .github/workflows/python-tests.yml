@@ -437,11 +437,17 @@ jobs:
                 }
               });
 
-              // The artifact is a zip file, so we need to download and extract it
-              const zipBuffer = await developCoverageResponse.arrayBuffer();
-              const zip = await require('jszip').loadAsync(zipBuffer);
-              const coverageFile = await zip.file('coverage.json').async('string');
-              const developCoverage = JSON.parse(coverageFile);
+              // Save the zip file
+              const zipData = await developCoverageResponse.arrayBuffer();
+              const fs = require('fs');
+              fs.writeFileSync('/tmp/coverage.zip', Buffer.from(zipData));
+
+              // Extract using unzip (available in Ubuntu runner)
+              const { execSync } = require('child_process');
+              execSync('unzip -o /tmp/coverage.zip -d /tmp/coverage');
+
+              // Read and parse the coverage file
+              const developCoverage = JSON.parse(fs.readFileSync('/tmp/coverage/coverage.json', 'utf8'));
 
               // Calculate total coverage
               const currentTotal = currentCoverage.totals.percent_covered;
@@ -465,9 +471,9 @@ jobs:
               - Current PR: ${currentTotal.toFixed(4)}% (${currentCoverage.totals.num_statements} statements, ${currentCoverage.totals.missing_lines} missed)
               - Latest develop: ${developTotal.toFixed(4)}% (${developCoverage.totals.num_statements} statements, ${developCoverage.totals.missing_lines} missed)
 
-              ${absDiffPercent >= COVERAGE_CHANGE_THRESHOLD 
-                ? (diffPercent > 0 
-                    ? '🎉 Great job on improving test coverage!' 
+              ${absDiffPercent >= COVERAGE_CHANGE_THRESHOLD
+                ? (diffPercent > 0
+                    ? '🎉 Great job on improving test coverage!'
                     : '💡 Consider adding more unit tests to maintain or improve coverage.'
                   )
                 : '✅ Coverage change is within normal range.'
