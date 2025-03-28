@@ -467,7 +467,14 @@ jobs:
                 : '✅ Coverage change is within normal range.'
               }
 
+              <details>
+              <summary>Coverage by files</summary>
+
+              ${process.env.GITHUB_STEP_SUMMARY}
+              </details>
+
               📊 [View detailed coverage comparison](https://issues.streamlit.app/Test_Coverage_(Python)?pr=${context.issue.number})`;
+
 
               // Unique identifier for our comment
               const commentIdentifier = '<!-- STREAMLIT-PYTHON-COVERAGE-CHECK -->';
