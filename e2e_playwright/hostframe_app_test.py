@@ -305,25 +305,25 @@ def test_handles_set_inputs_disabled_message(iframed_app: IframedPage):
     # Slider
     slider = frame_locator.get_by_test_id("stSlider")
     # For <label> tags, we need to check the disabled attribute vs using to_be_disabled()
-    expect(slider.get_by_test_id("stWidgetLabel")).to_have_attribute("disabled", "true")
+    expect(slider.get_by_test_id("stWidgetLabel")).to_have_attribute("disabled", "")
     expect(slider.get_by_role("slider")).to_be_disabled()
     # Checkbox - widget label disabled if input is disabled
     checkbox = frame_locator.get_by_test_id("stCheckbox")
     expect(checkbox.get_by_role("checkbox")).to_be_disabled()
     # Radio
     radio = frame_locator.get_by_test_id("stRadio")
-    expect(radio.get_by_test_id("stWidgetLabel")).to_have_attribute("disabled", "true")
+    expect(radio.get_by_test_id("stWidgetLabel")).to_have_attribute("disabled", "")
     expect(radio.get_by_role("radio").first).to_be_disabled()
     # File uploader
     file_uploader = frame_locator.get_by_test_id("stFileUploader")
     expect(file_uploader.get_by_test_id("stWidgetLabel")).to_have_attribute(
-        "disabled", "true"
+        "disabled", ""
     )
     expect(file_uploader.get_by_role("button")).to_be_disabled()
     # Color picker
     color_picker = frame_locator.get_by_test_id("stColorPicker")
     expect(color_picker.get_by_test_id("stWidgetLabel")).to_have_attribute(
-        "disabled", "true"
+        "disabled", ""
     )
     expect(color_picker.get_by_test_id("stColorPickerBlock")).to_be_disabled()
 
@@ -366,7 +366,7 @@ def test_disables_widgets_and_sidebar_page_nav_when_connection_is_lost(
     # Verify that widgets are disabled
     # Slider
     slider = frame_locator.get_by_test_id("stSlider")
-    expect(slider.get_by_role("slider")).to_be_disabled()
+    expect(slider.get_by_role("slider")).to_have_attribute("disabled", "")
     # Checkbox
     checkbox = frame_locator.get_by_test_id("stCheckbox")
     expect(checkbox.get_by_role("checkbox")).to_be_disabled()
@@ -378,7 +378,9 @@ def test_disables_widgets_and_sidebar_page_nav_when_connection_is_lost(
     expect(file_uploader.get_by_role("button")).to_be_disabled()
     # Color picker
     color_picker = frame_locator.get_by_test_id("stColorPicker")
-    expect(color_picker.get_by_test_id("stColorPickerBlock")).to_be_disabled()
+    expect(color_picker.get_by_test_id("stColorPickerBlock")).to_have_attribute(
+        "disabled", ""
+    )
 
     # Verify the expander is still active
     expander = frame_locator.get_by_test_id("stExpander")
@@ -391,5 +393,5 @@ def test_disables_widgets_and_sidebar_page_nav_when_connection_is_lost(
         "link"
     )
     expect(sidebar_nav_links).to_have_count(2)
-    expect(sidebar_nav_links.nth(0)).to_be_disabled()
-    expect(sidebar_nav_links.nth(1)).to_be_disabled()
+    expect(sidebar_nav_links.nth(0)).to_have_attribute("disabled", "")
+    expect(sidebar_nav_links.nth(1)).to_have_attribute("disabled", "")
