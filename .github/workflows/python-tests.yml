@@ -429,25 +429,18 @@ jobs:
                 throw new Error(`No ${COVERAGE_ARTIFACT_NAME} artifact found in the develop workflow run`);
               }
 
-              // Download and parse develop coverage file
-              const developCoverageUrl = developCoverageArtifact.archive_download_url;
-              const developCoverageResponse = await fetch(developCoverageUrl, {
-                headers: {
-                  authorization: `token ${process.env.GITHUB_TOKEN}`
-                }
-              });
-
-              // Save the zip file
-              const zipData = await developCoverageResponse.arrayBuffer();
-              const fs = require('fs');
-              fs.writeFileSync('/tmp/coverage.zip', Buffer.from(zipData));
-
-              // Extract using unzip (available in Ubuntu runner)
-              const { execSync } = require('child_process');
-              execSync('unzip -o /tmp/coverage.zip -d /tmp/coverage');
-
+              // Download and extract develop coverage file
+              const tc = require('@actions/tool-cache');
+              
+              // Download the zip file
+              const downloadedPath = await tc.downloadTool(developCoverageArtifact.archive_download_url, undefined, 
+                `token ${process.env.GITHUB_TOKEN}`);
+              
+              // Extract the zip
+              const extractPath = await tc.extractZip(downloadedPath);
+              
               // Read and parse the coverage file
-              const developCoverage = JSON.parse(fs.readFileSync('/tmp/coverage/coverage.json', 'utf8'));
+              const developCoverage = require(`${extractPath}/coverage.json`);
 
               // Calculate total coverage
               const currentTotal = currentCoverage.totals.percent_covered;
