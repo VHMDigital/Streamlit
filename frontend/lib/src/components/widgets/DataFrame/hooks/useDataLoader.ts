@@ -71,7 +71,7 @@ function useDataLoader(
         // Use editing state if editable or if it is an appended row
         if (column.isEditable || isAddedRow) {
           // TODO(lukasmasuch): Investigate why this might throw an error when
-          // the input data of a ready-only dataframe changes its dimensions.
+          // the input data of a read-only dataframe changes its dimensions.
           // https://github.com/streamlit/streamlit/issues/10937
           const editedCell = editingState.current.getCell(
             originalCol,
