@@ -37,7 +37,12 @@ export default defineConfig({
         "utils/src/**/*",
         "connection/src/**/*",
       ],
-      exclude: ["**/*.test.ts", "**/*.test.tsx", "**/node_modules/**"],
+      exclude: [
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/node_modules/**",
+        "lib/src/vendor/**",
+      ],
     },
   },
 })
