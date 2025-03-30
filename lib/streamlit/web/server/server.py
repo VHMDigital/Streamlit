@@ -92,6 +92,8 @@ MAX_PORT_SEARCH_RETRIES: Final = 100
 UNIX_SOCKET_PREFIX: Final = "unix://"
 
 MEDIA_ENDPOINT: Final = "/media"
+COMPONENT_ENDPOINT: Final = "/component"
+STATIC_SERVING_ENDPOINT: Final = "/app/static"
 UPLOAD_FILE_ENDPOINT: Final = "/_stcore/upload_file"
 STREAM_ENDPOINT: Final = r"_stcore/stream"
 METRIC_ENDPOINT: Final = r"(?:st-metrics|_stcore/metrics)"
@@ -102,6 +104,7 @@ HOST_CONFIG_ENDPOINT: Final = r"_stcore/host-config"
 SCRIPT_HEALTH_CHECK_ENDPOINT: Final = (
     r"(?:script-health-check|_stcore/script-health-check)"
 )
+
 
 OAUTH2_CALLBACK_ENDPOINT: Final = "/oauth2callback"
 AUTH_LOGIN_ENDPOINT: Final = "/auth/login"
@@ -351,7 +354,7 @@ class Server:
                 {"path": ""},
             ),
             (
-                make_url_path_regex(base, "component/(.*)"),
+                make_url_path_regex(base, f"{COMPONENT_ENDPOINT}/(.*)"),
                 ComponentRequestHandler,
                 {"registry": self._runtime.component_registry},
             ),
@@ -374,7 +377,7 @@ class Server:
             routes.extend(
                 [
                     (
-                        make_url_path_regex(base, "app/static/(.*)"),
+                        make_url_path_regex(base, f"{STATIC_SERVING_ENDPOINT}/(.*)"),
                         AppStaticFileHandler,
                         {"path": file_util.get_app_static_dir(self.main_script_path)},
                     ),

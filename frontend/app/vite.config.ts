@@ -84,6 +84,27 @@ export default defineConfig({
   server: {
     open: true,
     port: 3000,
+    proxy: {
+      // You can find all backend endpoints in
+      // https://github.com/streamlit/streamlit/blob/develop/lib/streamlit/web/server/server.py
+      "/_stcore": {
+        target: "http://localhost:8501",
+        changeOrigin: true,
+        ws: true,
+      },
+      "/media": {
+        target: "http://localhost:8501",
+        changeOrigin: true,
+      },
+      "/component": {
+        target: "http://localhost:8501",
+        changeOrigin: true,
+      },
+      "/app/static": {
+        target: "http://localhost:8501",
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     outDir: "build",
