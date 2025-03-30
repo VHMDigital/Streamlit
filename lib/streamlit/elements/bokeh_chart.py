@@ -25,7 +25,7 @@ from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.util import calc_md5
 
 if TYPE_CHECKING:
-    from bokeh.plotting.figure import Figure
+    from bokeh.plotting.figure import Figure  # type: ignore
 
     from streamlit.delta_generator import DeltaGenerator
 
@@ -89,7 +89,7 @@ class BokehMixin:
            height: 700px
 
         """
-        import bokeh
+        import bokeh  # type: ignore
 
         if bokeh.__version__ != ST_BOKEH_VERSION:
             raise StreamlitAPIException(
