@@ -47,7 +47,8 @@ const SidebarNavLink = ({
   const theme: EmotionTheme = useTheme()
   // If connection state not connected, or host has disabled inputs,
   // disable sidebar nav links
-  const { disableSidebarNavLinks } = React.useContext(AppContext)
+  const { widgetsDisabled: disableSidebarNavLinks } =
+    React.useContext(AppContext)
 
   return (
     <StyledSidebarNavLinkContainer

@@ -48,7 +48,7 @@ function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
     showColoredLine: false,
     pageLinkBaseUrl: "",
     sidebarChevronDownshift: 0,
-    disableSidebarNavLinks: false,
+    widgetsDisabled: false,
     gitInfo: null,
     appConfig: {},
     ...context,
@@ -120,7 +120,7 @@ describe("SidebarNavLink", () => {
     const realUseContext = React.useContext
     vi.spyOn(React, "useContext").mockImplementation(input => {
       if (input === AppContext) {
-        return getContextOutput({ disableSidebarNavLinks: true })
+        return getContextOutput({ widgetsDisabled: true })
       }
 
       return realUseContext(input)

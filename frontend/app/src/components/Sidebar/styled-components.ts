@@ -116,9 +116,7 @@ export const StyledSidebarNavLinkContainer =
   styled.div<StyledSidebarNavLinkContainerProps>(({ disabled }) => ({
     display: "flex",
     flexDirection: "column",
-    ...(disabled && {
-      cursor: "not-allowed",
-    }),
+    cursor: disabled ? "not-allowed" : "pointer",
   }))
 
 export interface StyledSidebarNavIconProps {

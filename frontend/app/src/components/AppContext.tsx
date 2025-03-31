@@ -80,11 +80,11 @@ export interface Props {
   sidebarChevronDownshift: number
 
   /**
-   * Whether to disable the sidebar page navigation links, based on connection
+   * Whether to disable widgets and sidebar page navigation links, based on connection
    * state and whether the host has disabled inputs.
    * @see SidebarNavLink
    */
-  disableSidebarNavLinks: boolean
+  widgetsDisabled: boolean
 
   /**
    * The latest state of the git information related to the app.
@@ -107,7 +107,7 @@ export const AppContext = React.createContext<Props>({
   showColoredLine: false,
   pageLinkBaseUrl: "",
   sidebarChevronDownshift: 0,
-  disableSidebarNavLinks: false,
+  widgetsDisabled: false,
   gitInfo: null,
   appConfig: {},
 })
