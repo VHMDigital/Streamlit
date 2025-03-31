@@ -40,3 +40,14 @@ def test_url(app: Page, app_port):
     """Test that the URL is correctly set."""
     expected_url = f"http://localhost:{app_port}/"
     expect_prefixed_markdown(app, "Full url:", expected_url)
+
+
+def test_primary_color(themed_app: Page, request: pytest.FixtureRequest):
+    """Test that the primary color is correctly set."""
+    expected_value = ""
+    if request.getfixturevalue("app_theme") == "light_theme":
+        expected_value = "Light"
+    elif request.getfixturevalue("app_theme") == "dark_theme":
+        expected_value = "Dark"
+
+    expect_prefixed_markdown(themed_app, "Primary color:", expected_value)

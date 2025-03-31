@@ -22,3 +22,5 @@ st.write(f"Timezone offset: {st.context.timezone_offset}")
 st.write(f"Locale primary language: {st.context.locale}")
 
 st.write(f"Full url: {st.context.url}")
+
+st.write(f"Primary color: {st.context.theme['primary_color']}")
