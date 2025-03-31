@@ -92,8 +92,8 @@ MAX_PORT_SEARCH_RETRIES: Final = 100
 UNIX_SOCKET_PREFIX: Final = "unix://"
 
 MEDIA_ENDPOINT: Final = "/media"
-COMPONENT_ENDPOINT: Final = "/component"
-STATIC_SERVING_ENDPOINT: Final = "/app/static"
+COMPONENT_ENDPOINT: Final = "component"
+STATIC_SERVING_ENDPOINT: Final = "app/static"
 UPLOAD_FILE_ENDPOINT: Final = "/_stcore/upload_file"
 STREAM_ENDPOINT: Final = r"_stcore/stream"
 METRIC_ENDPOINT: Final = r"(?:st-metrics|_stcore/metrics)"
@@ -104,7 +104,6 @@ HOST_CONFIG_ENDPOINT: Final = r"_stcore/host-config"
 SCRIPT_HEALTH_CHECK_ENDPOINT: Final = (
     r"(?:script-health-check|_stcore/script-health-check)"
 )
-
 
 OAUTH2_CALLBACK_ENDPOINT: Final = "/oauth2callback"
 AUTH_LOGIN_ENDPOINT: Final = "/auth/login"
