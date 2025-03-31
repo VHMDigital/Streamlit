@@ -23,4 +23,4 @@ st.write(f"Locale primary language: {st.context.locale}")
 
 st.write(f"Full url: {st.context.url}")
 
-st.write(f"Primary color: {st.context.theme['primary_color']}")
+st.write(f"Primary color: {st.context.theme_color_scheme}")

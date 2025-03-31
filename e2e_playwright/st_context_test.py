@@ -46,8 +46,8 @@ def test_primary_color(themed_app: Page, request: pytest.FixtureRequest):
     """Test that the primary color is correctly set."""
     expected_value = ""
     if request.getfixturevalue("app_theme") == "light_theme":
-        expected_value = "Light"
+        expected_value = "light"
     elif request.getfixturevalue("app_theme") == "dark_theme":
-        expected_value = "Dark"
+        expected_value = "dark"
 
     expect_prefixed_markdown(themed_app, "Primary color:", expected_value)

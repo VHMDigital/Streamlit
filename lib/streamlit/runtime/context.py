@@ -249,15 +249,14 @@ class ContextProxy:
         return StreamlitCookies.from_tornado_cookies(cookies)
 
     @property
-    @gather_metrics("context.theme")
-    def theme(self) -> StreamlitThemeInfo:
-        """A read-only, dict-like object containing theme information sent in the initial request."""
-        # We have a docstring in line above as one-liner, to have a correct docstring
-        # in the st.write(st,context) call.
+    @gather_metrics("context.color_scheme")
+    def theme_color_scheme(self) -> str | None:
+        """The read-only field shows current Streamlit app theme color scheme."""
         ctx = get_script_run_ctx()
+
         if ctx is None or ctx.context_info is None:
-            return StreamlitThemeInfo({})
-        return StreamlitThemeInfo.from_context_theme_info(ctx.context_info.theme)
+            return None
+        return ctx.context_info.color_scheme
 
     @property
     @gather_metrics("context.timezone")

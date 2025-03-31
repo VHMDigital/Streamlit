@@ -49,6 +49,7 @@ import {
   getUrl,
   handleFavicon,
   hashString,
+  hasLightBackgroundColor,
   HostCommunicationManager,
   IMenuItem,
   isColoredLineDisplayed,
@@ -99,7 +100,6 @@ import {
   ParentMessage,
   SessionEvent,
   SessionStatus,
-  ThemeContextInfo,
   WidgetStates,
 } from "@streamlit/protobuf"
 import { isNullOrUndefined, notNullOrUndefined } from "@streamlit/utils"
@@ -1590,7 +1590,7 @@ export class App extends PureComponent<Props, State> {
       timezoneOffset: getTimezoneOffset(),
       locale: getLocaleLanguage(),
       url: getUrl(),
-      theme: this.getThemeInfo(),
+      colorScheme: this.getThemeColorScheme(),
     }
 
     if (pageScriptHash) {
@@ -1878,15 +1878,14 @@ export class App extends PureComponent<Props, State> {
     return queryString.startsWith("?") ? queryString.substring(1) : queryString
   }
 
-  getThemeInfo = (): ThemeContextInfo => {
+  getThemeColorScheme = (): string => {
     const { activeTheme } = this.props.theme
 
-    const themeInfo = {
-      primaryColor: activeTheme.name,
-      backgroundColor: activeTheme.emotion.colors.bgColor,
+    if (hasLightBackgroundColor(activeTheme.emotion)) {
+      return "light"
+    } else {
+      return "dark"
     }
-
-    return new ThemeContextInfo(themeInfo)
   }
 
   isInCloudEnvironment = (): boolean => {
