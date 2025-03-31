@@ -106,7 +106,7 @@ describe("uri", () => {
     })
 
     it("returns true given 127.0.0.1", () => {
-      window.location.hostname = "localhost"
+      window.location.hostname = "127.0.0.1"
       expect(isLocalhost()).toBe(true)
     })
 
