@@ -40,7 +40,7 @@ def get_min_version(specifier_set: SpecifierSet) -> str | None:
         return None
 
     # Find the minimum version from all specifiers
-    min_version = None
+    min_version: str | None = None
     for spec in specifier_set:
         if spec.operator in (">=", ">", "=="):
             version = str(spec.version)
