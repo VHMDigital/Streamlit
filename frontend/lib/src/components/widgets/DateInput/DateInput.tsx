@@ -48,12 +48,9 @@ import {
 import Icon from "~lib/components/shared/Icon"
 import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
 import TooltipIcon from "~lib/components/shared/TooltipIcon"
-import Tooltip, {
-  generateDefaultTooltipOverrides,
-  Placement,
-} from "~lib/components/shared/Tooltip"
+import Tooltip, { Placement } from "~lib/components/shared/Tooltip"
 import { LibContext } from "~lib/components/core/LibContext"
-import { EmotionTheme } from "~lib/theme"
+import { EmotionTheme, hasLightBackgroundColor } from "~lib/theme"
 
 import { useIntlLocale } from "./useIntlLocale"
 
@@ -253,27 +250,6 @@ function DateInput({
     setIsEmpty(newValue.length === 0)
   }, [isEmpty, element, setValueWithSource])
 
-  // Memoize tooltip styling to prevent unnecessary rerenders
-  const errorTooltipStyles = useMemo(() => {
-    const errorTooltipBody = { style: { backgroundColor: colors.bgColor } }
-    const errorTooltipInner = {
-      style: {
-        backgroundColor: "transparent",
-        color: colors.bodyText,
-        paddingLeft: "0",
-        paddingRight: "0",
-        paddingTop: "0",
-        paddingBottom: "0",
-      },
-    }
-
-    return generateDefaultTooltipOverrides(
-      theme,
-      errorTooltipBody,
-      errorTooltipInner
-    )
-  }, [theme, colors])
-
   return (
     <div className="stDateInput" data-testid="stDateInput">
       <WidgetLabel
@@ -400,14 +376,14 @@ function DateInput({
               // Clearing the maskChar so empty dates will not display
               maskChar: null,
 
-              // Passes error icon/tooltip to underlying input
+              // Passes error icon/tooltip to underlying input in error state
+              // otherwise no end enhancer is shown
               endEnhancer: error && (
                 <Tooltip
                   content={
                     <StreamlitMarkdown source={error} allowHTML={false} />
                   }
                   placement={Placement.TOP_RIGHT}
-                  overrides={errorTooltipStyles}
                   // provides unique testids to distinguish between error and help tooltips
                   error
                 >
@@ -418,8 +394,10 @@ function DateInput({
               overrides: {
                 EndEnhancer: {
                   style: {
-                    // TODO: Review for theme compatibility
-                    color: colors.red90,
+                    // Match text color with st.error in light and dark mode
+                    color: hasLightBackgroundColor(theme)
+                      ? colors.red100
+                      : colors.red20,
                     backgroundColor: colors.transparent,
                   },
                 },
@@ -472,10 +450,12 @@ function DateInput({
                     paddingTop: spacing.sm,
                     lineHeight: lineHeights.inputWidget,
 
-                    // Change text color on error state
+                    // Change input valuetext color in error state
                     ...(error && {
-                      // TODO: Review for theme compatibility
-                      color: colors.red90,
+                      // Match text color with st.error in light and dark mode
+                      color: hasLightBackgroundColor(theme)
+                        ? colors.red100
+                        : colors.red20,
                     }),
                   },
                   props: {

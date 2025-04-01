@@ -65,7 +65,7 @@ export interface TooltipProps {
 
 // Allows re-use/customization of default tooltip overrides
 // for Body & Inner components
-export const generateDefaultTooltipOverrides = (
+const generateDefaultTooltipOverrides = (
   theme: EmotionTheme,
   bodyOverrides?: PopoverOverrides["Body"],
   innerOverrides?: PopoverOverrides["Inner"]
