@@ -22,7 +22,7 @@ import React, {
   useState,
 } from "react"
 
-import { useTheme } from "@emotion/react"
+import { Theme, useTheme } from "@emotion/react"
 import { ALIGN, RadioGroup, Radio as UIRadio } from "baseui/radio"
 
 import {
@@ -33,6 +33,7 @@ import TooltipIcon from "~lib/components/shared/TooltipIcon"
 import { LabelVisibilityOptions } from "~lib/util/utils"
 import { Placement } from "~lib/components/shared/Tooltip"
 import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown/StreamlitMarkdown"
+import { addCssUnit, convertRemToPx } from "~lib/theme"
 
 export interface Props {
   disabled: boolean
@@ -44,6 +45,30 @@ export interface Props {
   label?: string
   labelVisibility?: LabelVisibilityOptions
   help?: string
+}
+
+function getRadioInnerSizes(theme: Theme): [string, string] {
+  // If checked, the radio inner circle should fill 37.5% of the total radio size.
+  // If not checked, it should show a border of spacing.threeXS.
+
+  // However, fractional pixels could cause the radio border to look uneven. This happens
+  // when (checkbox - threeXS) in rem is not an integer number of pixels. To avoid this,
+  // we round the number converted from rem to pixels then add back the unit.
+  const checkboxSize = parseFloat(theme.sizes.checkbox.replace("rem", ""))
+  const threeXSSpacing = parseFloat(theme.spacing.threeXS.replace("rem", ""))
+
+  const outerSize = convertRemToPx(checkboxSize.toString())
+  const checkedInnerSize = Math.round(outerSize * 0.375)
+
+  let innerSize = Math.round(
+    convertRemToPx((checkboxSize - threeXSSpacing).toString())
+  )
+  // If rounding makes the inner size larger than the checkbox, reduce it by 1px
+  if (innerSize >= outerSize) {
+    innerSize -= 1
+  }
+
+  return [addCssUnit(checkedInnerSize, "px"), addCssUnit(innerSize, "px")]
 }
 
 function Radio({
@@ -95,6 +120,8 @@ function Radio({
     const spacer = caption == "" && horizontal && hasCaptions
     return spacer ? "&nbsp;" : caption
   }
+
+  const [checkedRadioInnerSize, radioInnerSize] = getRadioInnerSizes(theme)
 
   return (
     <div className="stRadio" data-testid="stRadio">
@@ -175,12 +202,11 @@ function Radio({
                 style: ({ $checked }: { $checked: boolean }) => ({
                   // If checked, it should fill 37.5% of the total radio size.
                   // if not checked, show a border of spacing.threeXS.
-                  height: $checked
-                    ? "37.5%"
-                    : `calc(${theme.sizes.checkbox} - ${theme.spacing.threeXS})`,
-                  width: $checked
-                    ? "37.5%"
-                    : `calc(${theme.sizes.checkbox} - ${theme.spacing.threeXS})`,
+                  // However, fractional pixels could cause the radio border to look
+                  // uneven. This happens when {checkbox} - {threeXS} is not an integer number of pixels.
+                  // To avoid this, we need to convert rem to a rounded number px size.
+                  height: $checked ? checkedRadioInnerSize : radioInnerSize,
+                  width: $checked ? checkedRadioInnerSize : radioInnerSize,
                 }),
               },
               Label: {
