@@ -200,11 +200,6 @@ function Radio({
               },
               RadioMarkInner: {
                 style: ({ $checked }: { $checked: boolean }) => ({
-                  // If checked, it should fill 37.5% of the total radio size.
-                  // if not checked, show a border of spacing.threeXS.
-                  // However, fractional pixels could cause the radio border to look
-                  // uneven. This happens when {checkbox} - {threeXS} is not an integer number of pixels.
-                  // To avoid this, we need to convert rem to a rounded number px size.
                   height: $checked ? checkedRadioInnerSize : radioInnerSize,
                   width: $checked ? checkedRadioInnerSize : radioInnerSize,
                 }),
