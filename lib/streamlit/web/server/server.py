@@ -141,7 +141,6 @@ def start_listening(app: tornado.web.Application) -> None:
         app,
         max_buffer_size=config.get_option("server.maxUploadSize") * 1024 * 1024,
         ssl_options=ssl_options,
-        xheaders=True,
     )
 
     if server_address_is_unix_socket():
