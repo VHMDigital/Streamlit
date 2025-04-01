@@ -1,0 +1,37 @@
+---
+description:
+globs: *.ts, *.tsx
+alwaysApply: false
+---
+# TypeScript Guide
+
+- TypeScript version: 5.7.3
+- Linter: eslint
+- Formatter: prettier
+- Framework: React 18
+- Styling: @emotion/styled
+- Build tool: vite
+- Package manager: yarn v4 with workspaces
+
+## Key TypeScript Principles:
+
+- Prefer functional, declarative programming.
+- Prefer iteration and modularization over duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading).
+- Use the Receive an Object, Return an Object (RORO) pattern.
+- Ensure functions have explicit return types.
+
+## Key Frontend Principles:
+
+- Leverage all of best practices of React 18.
+- Write performant frontend code.
+- Ensure referential stability by leveraging React Hooks.
+- Prefix event handlers with "handle" (eg: handleClick, handleSubmit).
+- Favor leveraging @emotion/styled instead of inline styles.
+- Use proper naming conventions for styled-components (e.g., StyledButton)
+
+## Yarn Workspaces
+
+- This is a monorepo with multiple packages managed by yarn workspaces.
+- You can find the list of packages by running `cat frontend/package.json | jq ".workspaces"`.
+- Scripts are commonly run in the scope of the package, rather than at the top-level.
