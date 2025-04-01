@@ -89,8 +89,11 @@ def test_check_total_websocket_message_number_and_size(page: Page, app_port: int
     TOTAL_WEBSOCKET_RECEIVED_SIZE_THRESHOLD_MB: Final = 55
     # Max number of websocket messages received.
     EXPECTED_WEBSOCKET_MESSAGES_RECEIVED: Final = 2540
-    # There can be a bit of fluctuation because of
-    # some optimization logic (e.g. composable messages)
+    # There can be a bit of fluctuation because of optimization logic:
+    # See the composable messages logic in
+    # lib/streamlit/runtime/forward_msg_queue.py (-> `_maybe_compose_delta_msgs`)
+    # the queues can be flushed to the browser before
+    # the optimization is able to be applied.
     ALLOWED_WEBSOCKET_MESSAGES_RECEIVED_DIFFERENCE: Final = 25
 
     total_websocket_sent_size_bytes = 0
