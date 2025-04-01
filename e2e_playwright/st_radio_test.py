@@ -28,12 +28,13 @@ from e2e_playwright.shared.app_utils import (
 @pytest.fixture(scope="module")
 @pytest.mark.early
 def configure_base_font_size():
-    """Configure sidebar custom theme."""
-    os.environ["STREAMLIT_THEME_BASE_FONT_SIZE"] = "13"
+    """Configure base font size so that the rem does not convert to px in integer."""
+    os.environ["STREAMLIT_THEME_BASE_FONT_SIZE"] = "17"
     yield
     del os.environ["STREAMLIT_THEME_BASE_FONT_SIZE"]
 
 
+@pytest.mark.usefixtures("configure_base_font_size")
 def test_radio_widget_rendering(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
@@ -152,13 +153,6 @@ def test_calls_callback_on_change(app: Page):
         "radio changed: False",
         use_inner_text=True,
     )
-
-
-@pytest.mark.usefixtures("configure_base_font_size")
-def test_radio_in_different_font_size(app: Page, assert_snapshot: ImageCompareFunction):
-    radio_widgets = app.get_by_test_id("stRadio")
-    assert_snapshot(radio_widgets.nth(8), name="st_radio-markdown_options-font-size-13")
-    assert_snapshot(radio_widgets.nth(9), name="st_radio-captions-font-size-13")
 
 
 def test_check_top_level_class(app: Page):
