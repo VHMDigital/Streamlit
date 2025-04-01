@@ -114,11 +114,12 @@ def test_empty_date_input_behaves_correctly(
     """Test that st.date_input behaves correctly when empty."""
     # Enter 10 in the first empty input:
     empty_number_input = app.get_by_test_id("stDateInput").nth(12).locator("input")
-    empty_number_input.type("1970/01/02", delay=50)
+    # Since no min value set, min selectable date 10 years before today
+    empty_number_input.type("2025/01/02", delay=50)
     empty_number_input.press("Enter")
     wait_for_app_run(app)
     expect(app.get_by_test_id("stMarkdown").nth(13)).to_have_text(
-        "Value 13: 1970-01-02", use_inner_text=True
+        "Value 13: 2025-01-02", use_inner_text=True
     )
 
     # Click outside to remove focus:
