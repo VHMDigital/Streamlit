@@ -91,7 +91,7 @@ class ScriptRunContext:
     pages_manager: PagesManager
 
     # Hashes of messages that are cached in the client browser:
-    cached_messages: set[str] = field(default_factory=set)
+    cached_message_hashes: set[str] = field(default_factory=set)
     context_info: ContextInfo | None = None
     gather_usage_stats: bool = False
     command_tracking_deactivated: bool = False
@@ -146,7 +146,7 @@ class ScriptRunContext:
         query_string: str = "",
         page_script_hash: str = "",
         fragment_ids_this_run: list[str] | None = None,
-        cached_messages: set[str] | None = None,
+        cached_message_hashes: set[str] | None = None,
         context_info: ContextInfo | None = None,
     ) -> None:
         self.cursors = {}
@@ -168,7 +168,7 @@ class ScriptRunContext:
         self.fragment_ids_this_run = fragment_ids_this_run
         self.new_fragment_ids = set()
         self.has_dialog_opened = False
-        self.cached_messages = cached_messages or set()
+        self.cached_message_hashes = cached_message_hashes or set()
 
         in_cached_function.set(False)
 
@@ -206,7 +206,11 @@ class ScriptRunContext:
         # for other aspects within the frontend.
         populate_hash_if_needed(msg)
         msg_to_send = msg
-        if msg.metadata.cacheable and msg.hash and msg.hash in self.cached_messages:
+        if (
+            msg.metadata.cacheable
+            and msg.hash
+            and msg.hash in self.cached_message_hashes
+        ):
             _LOGGER.debug("Sending cached message ref (hash=%s)", msg.hash)
             msg_to_send = create_reference_msg(msg)
 

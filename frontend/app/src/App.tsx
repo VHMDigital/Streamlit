@@ -1632,7 +1632,7 @@ export class App extends PureComponent<Props, State> {
           pageName,
           fragmentId,
           isAutoRerun,
-          cachedMessages: cachedMessageHashes,
+          cachedMessageHashes,
           contextInfo,
         },
       })

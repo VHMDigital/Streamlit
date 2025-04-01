@@ -1603,7 +1603,7 @@ describe("App", () => {
       expect(
         // @ts-expect-error
         connectionManager.sendMessage.mock.calls[0][0].rerunScript
-          .cachedMessages
+          .cachedMessageHashes
       ).toEqual(["hash1", "hash2"])
     })
 
