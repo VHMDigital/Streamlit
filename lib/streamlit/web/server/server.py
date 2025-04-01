@@ -90,7 +90,12 @@ MAX_PORT_SEARCH_RETRIES: Final = 100
 # to an unix socket.
 UNIX_SOCKET_PREFIX: Final = "unix://"
 
+# Please make sure to also update frontend/app/vite.config.ts
+# dev server proxy when changing or updating these endpoints as well
+# as the endpoints in frontend/connection/src/DefaultStreamlitEndpoints
 MEDIA_ENDPOINT: Final = "/media"
+COMPONENT_ENDPOINT: Final = "/component"
+STATIC_SERVING_ENDPOINT: Final = "/app/static"
 UPLOAD_FILE_ENDPOINT: Final = "/_stcore/upload_file"
 STREAM_ENDPOINT: Final = r"_stcore/stream"
 METRIC_ENDPOINT: Final = r"(?:st-metrics|_stcore/metrics)"
@@ -345,7 +350,7 @@ class Server:
                 {"path": ""},
             ),
             (
-                make_url_path_regex(base, "component/(.*)"),
+                make_url_path_regex(base, f"{COMPONENT_ENDPOINT}/(.*)"),
                 ComponentRequestHandler,
                 {"registry": self._runtime.component_registry},
             ),
@@ -368,7 +373,7 @@ class Server:
             routes.extend(
                 [
                     (
-                        make_url_path_regex(base, "app/static/(.*)"),
+                        make_url_path_regex(base, f"{STATIC_SERVING_ENDPOINT}/(.*)"),
                         AppStaticFileHandler,
                         {"path": file_util.get_app_static_dir(self.main_script_path)},
                     ),
