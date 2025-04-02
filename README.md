@@ -180,3 +180,53 @@ Before contributing, please read our guidelines here: https://github.com/streaml
 ## License
 
 Streamlit is completely free and open-source and licensed under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license.
+
+# Streamlit Plotly Stacked Bar Chart Fix
+
+This repository addresses an issue with Plotly stacked bar charts not displaying correctly in Streamlit Cloud with version 1.44.0/1.44.1.
+
+## Issue Description
+
+When using Plotly Graph Objects to create stacked bar charts with `barmode='stack'` in the `update_layout()` method, the bars appear side-by-side instead of stacked when deployed to Streamlit Cloud. However, the same code works correctly when run locally.
+
+This issue was reported in:
+- [Streamlit GitHub Issue](https://github.com/streamlit/streamlit/issues)
+- [Streamlit Discussion](https://discuss.streamlit.io/t/stacked-plotly-barcharts-not-working-since-version-1-44-0/98281)
+
+## Reproduction
+
+The file `stacked_bar_chart_example.py` demonstrates the issue. When running locally, both charts display correctly as stacked. However, when deployed to Streamlit Cloud, the first chart (using `fig.update_layout(barmode='stack')`) may display as side-by-side bars instead of stacked.
+
+## Suggested Fixes
+
+The file `stacked_bar_chart_fix.py` demonstrates three workaround approaches that should display correctly on Streamlit Cloud:
+
+1. **Use Plotly Express**: Use `px.bar()` with `barmode="stack"` parameter
+2. **Set Layout in Constructor**: Use `go.Figure(layout={'barmode': 'stack'})` to set the layout in the constructor
+3. **Use the Update Method**: Use `fig.update(layout_barmode='stack')` instead of `fig.update_layout(barmode='stack')`
+
+## Installation
+
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+```bash
+streamlit run stacked_bar_chart_example.py
+```
+
+or
+
+```bash
+streamlit run stacked_bar_chart_fix.py
+```
+
+## Requirements
+
+- Python 3.7+
+- Streamlit 1.44.1
+- Plotly 5.21.0
+- Pandas 2.1.1
+- Numpy 1.26.1
