@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
-import pytest
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_run
@@ -25,16 +22,6 @@ from e2e_playwright.shared.app_utils import (
 )
 
 
-@pytest.fixture(scope="module")
-@pytest.mark.early
-def configure_base_font_size():
-    """Configure base font size so that the rem does not convert to px in integer."""
-    os.environ["STREAMLIT_THEME_BASE_FONT_SIZE"] = "17"
-    yield
-    del os.environ["STREAMLIT_THEME_BASE_FONT_SIZE"]
-
-
-@pytest.mark.usefixtures("configure_base_font_size")
 def test_radio_widget_rendering(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
