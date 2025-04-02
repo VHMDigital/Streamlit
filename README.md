@@ -19,6 +19,22 @@ pip install streamlit==1.44.1
 streamlit run test_app.py
 ```
 
+## Issue Fixed
+
+This repository demonstrates the fix for the issue where certain Streamlit features, like the `toggle()` widget, were not available in older versions of Streamlit. The issue was fixed by upgrading from Streamlit 1.12.0 to 1.44.1.
+
+If you encounter similar issues with missing features, check your Streamlit version with:
+
+```bash
+pip show streamlit
+```
+
+And upgrade to the latest version with:
+
+```bash
+pip install --upgrade streamlit
+```
+
 ## Requirements
 
 - Python 3.7+
