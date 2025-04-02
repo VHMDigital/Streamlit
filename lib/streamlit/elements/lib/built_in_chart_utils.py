@@ -139,6 +139,9 @@ def generate_chart(
     height: int | None = None,
     # Bar & Area charts only:
     stack: bool | ChartStackType | None = None,
+    # Sorting parameters:
+    sort_by: str | None = None,
+    ascending: bool = False,
 ) -> tuple[alt.Chart | alt.LayerChart, AddRowsMetadata]:
     """Function to use the chart's type, data columns and indices to figure out the chart's spec."""
     import altair as alt
@@ -147,6 +150,17 @@ def generate_chart(
 
     # From now on, use "df" instead of "data". Deleting "data" to guarantee we follow this.
     del data
+    
+    # Sort the dataframe if sort_by is specified and exists in the dataframe
+    sorted_cat_values = None
+    if sort_by is not None and sort_by in df.columns:
+        # Get the sorted order of values
+        df = df.sort_values(by=sort_by, ascending=ascending)
+        
+        # Store the sorted categorical values for later use in encoding
+        # This is crucial for implementing GitHub issue #7111 properly
+        if x_from_user is not None and x_from_user in df.columns:
+            sorted_cat_values = df[x_from_user].unique().tolist()
 
     # Convert arguments received from the user to things Vega-Lite understands.
     # Get name of column to use for x.
@@ -182,7 +196,7 @@ def generate_chart(
 
     # At this point, x_column is only None if user did not provide one AND df is empty.
 
-    # Get x and y encodings
+    # Get x and y encodings - pass the sorting parameters
     x_encoding, y_encoding = _get_axis_encodings(
         df,
         chart_type,
@@ -193,6 +207,9 @@ def generate_chart(
         x_axis_label,
         y_axis_label,
         stack,
+        sort_by=sort_by,  # Pass the sort_by parameter
+        ascending=ascending,  # Pass the ascending parameter
+        sorted_cat_values=sorted_cat_values,  # Pass the sorted categorical values
     )
 
     # Create a Chart with x and y encodings.
@@ -790,20 +807,29 @@ def _get_axis_encodings(
     x_axis_label: str | None,
     y_axis_label: str | None,
     stack: bool | ChartStackType | None,
+    sort_by: str | None = None,  # Added sort_by parameter
+    ascending: bool = False,      # Added ascending parameter
+    sorted_cat_values: list | None = None,  # Added sorted category values for consistent ordering
 ) -> tuple[alt.X, alt.Y]:
     stack_encoding: alt.X | alt.Y
     if chart_type == ChartType.HORIZONTAL_BAR:
         # Handle horizontal bar chart - switches x and y data:
+        # For horizontal bar charts, sort_by affects the y-axis
         x_encoding = _get_x_encoding(
             df, y_column, y_from_user, x_axis_label, chart_type
         )
         y_encoding = _get_y_encoding(
-            df, x_column, x_from_user, y_axis_label, chart_type
+            df, x_column, x_from_user, y_axis_label, chart_type,
+            sort_by=sort_by, ascending=ascending,  # Pass to y-encoding for horizontal bars
+            sorted_cat_values=sorted_cat_values  # Pass sorted categories
         )
         stack_encoding = x_encoding
     else:
+        # For all other charts, sort_by affects the x-axis
         x_encoding = _get_x_encoding(
-            df, x_column, x_from_user, x_axis_label, chart_type
+            df, x_column, x_from_user, x_axis_label, chart_type,
+            sort_by=sort_by, ascending=ascending,  # Pass to x-encoding for vertical bars
+            sorted_cat_values=sorted_cat_values  # Pass sorted categories
         )
         y_encoding = _get_y_encoding(
             df, y_column, y_from_user, y_axis_label, chart_type
@@ -822,6 +848,9 @@ def _get_x_encoding(
     x_from_user: str | Sequence[str] | None,
     x_axis_label: str | None,
     chart_type: ChartType,
+    sort_by: str | None = None,  # Added sort_by parameter
+    ascending: bool = False,      # Added ascending parameter
+    sorted_cat_values: list | None = None,  # Added sorted category values for consistent ordering
 ) -> alt.X:
     import altair as alt
 
@@ -854,14 +883,60 @@ def _get_x_encoding(
 
     # grid lines on x axis for horizontal bar charts only
     grid = True if chart_type == ChartType.HORIZONTAL_BAR else False
+    
+    # Get the encoding type
+    encoding_type = _get_x_encoding_type(df, chart_type, x_column)
+    
+    # Configure sorting for the x-axis (important for bar charts)
+    # This is the key change to implement GitHub issue #7111
+    sort_spec = None
+    
+    # First priority: Use pre-sorted category values when available
+    # This ensures consistent sorting when displaying different columns
+    if sorted_cat_values is not None and x_column is not None and encoding_type in ["ordinal", "nominal"]:
+        # Use the pre-sorted categorical values
+        # This is crucial for properly implementing GitHub issue #7111
+        sort_spec = sorted_cat_values
+    
+    # Second priority: Other sorting mechanisms when pre-sorted values aren't available
+    elif chart_type in [ChartType.VERTICAL_BAR, ChartType.HORIZONTAL_BAR] and sort_by is not None and x_column is not None:
+        # Special case: sort alphabetically by x-axis labels
+        if sort_by == "_x_axis_labels" and encoding_type in ["ordinal", "nominal"]:
+            # For alphabetical sorting by the field itself
+            sort_spec = "ascending" if ascending else "descending"
+        
+        # Regular case: sort by a data column
+        elif encoding_type in ["ordinal", "nominal"] and sort_by in df.columns:
+            if sort_by == x_column:
+                # Sorting by the x-axis column itself
+                sort_spec = "ascending" if ascending else "descending"
+            else:
+                # Sorting by a different column - get the unique values in the sorted order
+                # This is the key functionality for issue #7111
+                sorted_df = df.sort_values(by=sort_by, ascending=ascending)
+                if len(sorted_df) > 0:  # Only create sort array if we have data
+                    sort_spec = sorted_df[x_column].unique().tolist()
 
-    return alt.X(
-        x_field,
-        title=x_title,
-        type=_get_x_encoding_type(df, chart_type, x_column),
-        scale=alt.Scale(),
-        axis=_get_axis_config(df, x_column, grid=grid),
-    )
+    # Create the X encoding with appropriate sorting
+    if sort_spec is not None:
+        # Use the appropriate sorting specification (array, boolean, or None)
+        return alt.X(
+            x_field,
+            title=x_title,
+            type=encoding_type,
+            scale=alt.Scale(),
+            axis=_get_axis_config(df, x_column, grid=grid),
+            sort=sort_spec  # Apply sorting based on the specification
+        )
+    else:
+        # Use default encoding without special sorting
+        return alt.X(
+            x_field,
+            title=x_title,
+            type=encoding_type,
+            scale=alt.Scale(),
+            axis=_get_axis_config(df, x_column, grid=grid),
+        )
 
 
 def _get_y_encoding(
@@ -870,6 +945,9 @@ def _get_y_encoding(
     y_from_user: str | Sequence[str] | None,
     y_axis_label: str | None,
     chart_type: ChartType,
+    sort_by: str | None = None,  # Added sort_by parameter for horizontal bar charts
+    ascending: bool = False,      # Added ascending parameter
+    sorted_cat_values: list | None = None,  # Added sorted category values for consistent ordering
 ) -> alt.Y:
     import altair as alt
 
@@ -902,14 +980,60 @@ def _get_y_encoding(
 
     # grid lines on y axis for all charts except horizontal bar charts
     grid = False if chart_type == ChartType.HORIZONTAL_BAR else True
-
-    return alt.Y(
-        field=y_field,
-        title=y_title,
-        type=_get_y_encoding_type(df, chart_type, y_column),
-        scale=alt.Scale(),
-        axis=_get_axis_config(df, y_column, grid=grid),
-    )
+    
+    # Get the encoding type
+    encoding_type = _get_y_encoding_type(df, chart_type, y_column)
+    
+    # Configure sorting for the y-axis (important for horizontal bar charts)
+    # This is similar to the x-axis sorting for GitHub issue #7111
+    sort_spec = None
+    
+    # First priority: Use pre-sorted category values when available
+    # This ensures consistent sorting when displaying different columns
+    if sorted_cat_values is not None and y_column is not None and encoding_type in ["ordinal", "nominal"]:
+        # Use the pre-sorted categorical values 
+        # This is crucial for properly implementing GitHub issue #7111
+        sort_spec = sorted_cat_values
+        
+    # Second priority: Other sorting mechanisms when pre-sorted values aren't available
+    elif chart_type == ChartType.HORIZONTAL_BAR and sort_by is not None and y_column is not None:
+        # Special case: sort alphabetically by y-axis labels
+        if sort_by == "_y_axis_labels" and encoding_type in ["ordinal", "nominal"]:
+            # For alphabetical sorting by the field itself
+            sort_spec = "ascending" if ascending else "descending"
+        
+        # Regular case: sort by a data column
+        elif encoding_type in ["ordinal", "nominal"] and sort_by in df.columns:
+            if sort_by == y_column:
+                # Sorting by the y-axis column itself
+                sort_spec = "ascending" if ascending else "descending"
+            else:
+                # Sorting by a different column - get the unique values in the sorted order
+                # This is the key functionality for issue #7111 for horizontal bar charts
+                sorted_df = df.sort_values(by=sort_by, ascending=ascending)
+                if len(sorted_df) > 0:  # Only create sort array if we have data
+                    sort_spec = sorted_df[y_column].unique().tolist()
+    
+    # Create the Y encoding with appropriate sorting
+    if sort_spec is not None:
+        # Use the appropriate sorting specification (array, boolean, or None)
+        return alt.Y(
+            field=y_field,
+            title=y_title,
+            type=encoding_type,
+            scale=alt.Scale(),
+            axis=_get_axis_config(df, y_column, grid=grid),
+            sort=sort_spec  # Apply sorting based on the specification
+        )
+    else:
+        # Use default encoding without special sorting
+        return alt.Y(
+            field=y_field,
+            title=y_title,
+            type=encoding_type,
+            scale=alt.Scale(),
+            axis=_get_axis_config(df, y_column, grid=grid),
+        )
 
 
 def _update_encoding_with_stack(

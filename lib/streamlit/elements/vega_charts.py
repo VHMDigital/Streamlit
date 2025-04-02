@@ -670,6 +670,17 @@ class VegaChartsMixin:
             parent container. If ``use_container_width`` is ``False``,
             Streamlit sets the chart's width according to ``width``.
 
+        sort_by : str or None
+            Column name to use for sorting the bars. If ``sort_by`` is
+            ``None`` (default), Streamlit uses the x-axis values for sorting.
+            This is useful when you want to display bars sorted by one column
+            while using a different column for the x-axis labels.
+
+        ascending : bool
+            Whether to sort in ascending order. If ``ascending`` is ``False``
+            (default), Streamlit sorts in descending order. Only applicable
+            when ``sort_by`` is not ``None``.
+
         Examples
         --------
         >>> import streamlit as st
@@ -879,6 +890,17 @@ class VegaChartsMixin:
             parent container. If ``use_container_width`` is ``False``,
             Streamlit sets the chart's width according to ``width``.
 
+        sort_by : str or None
+            Column name to use for sorting the bars. If ``sort_by`` is
+            ``None`` (default), Streamlit uses the x-axis values for sorting.
+            This is useful when you want to display bars sorted by one column
+            while using a different column for the x-axis labels.
+
+        ascending : bool
+            Whether to sort in ascending order. If ``ascending`` is ``False``
+            (default), Streamlit sorts in descending order. Only applicable
+            when ``sort_by`` is not ``None``.
+
         Examples
         --------
         >>> import streamlit as st
@@ -1009,6 +1031,8 @@ class VegaChartsMixin:
         width: int | None = None,
         height: int | None = None,
         use_container_width: bool = True,
+        sort_by: str | None = None,
+        ascending: bool = False,
     ) -> DeltaGenerator:
         """Display a bar chart.
 
@@ -1127,6 +1151,17 @@ class VegaChartsMixin:
             Streamlit sets the width of the chart to match the width of the
             parent container. If ``use_container_width`` is ``False``,
             Streamlit sets the chart's width according to ``width``.
+
+        sort_by : str or None
+            Column name to use for sorting the bars. If ``sort_by`` is
+            ``None`` (default), Streamlit uses the x-axis values for sorting.
+            This is useful when you want to display bars sorted by one column
+            while using a different column for the x-axis labels.
+
+        ascending : bool
+            Whether to sort in ascending order. If ``ascending`` is ``False``
+            (default), Streamlit sorts in descending order. Only applicable
+            when ``sort_by`` is not ``None``.
 
         Examples
         --------
@@ -1249,6 +1284,8 @@ class VegaChartsMixin:
             width=width,
             height=height,
             stack=stack,
+            sort_by=sort_by,
+            ascending=ascending,
         )
         return cast(
             "DeltaGenerator",
@@ -1382,6 +1419,17 @@ class VegaChartsMixin:
             Streamlit sets the width of the chart to match the width of the
             parent container. If ``use_container_width`` is ``False``,
             Streamlit sets the chart's width according to ``width``.
+
+        sort_by : str or None
+            Column name to use for sorting the bars. If ``sort_by`` is
+            ``None`` (default), Streamlit uses the x-axis values for sorting.
+            This is useful when you want to display bars sorted by one column
+            while using a different column for the x-axis labels.
+
+        ascending : bool
+            Whether to sort in ascending order. If ``ascending`` is ``False``
+            (default), Streamlit sorts in descending order. Only applicable
+            when ``sort_by`` is not ``None``.
 
         Examples
         --------
@@ -1520,280 +1568,25 @@ class VegaChartsMixin:
             https://altair-viz.github.io/gallery/ for examples of graph
             descriptions.
 
-        use_container_width : bool or None
-            Whether to override the chart's native width with the width of
-            the parent container. This can be one of the following:
+        use_container_width : bool
+            Whether to override ``width`` with the width of the parent
+            container. If ``use_container_width`` is ``True`` (default),
+            Streamlit sets the width of the chart to match the width of the
+            parent container. If ``use_container_width`` is ``False``,
+            Streamlit sets the chart's width according to ``width``.
 
-            - ``None`` (default): Streamlit will use the parent container's
-              width for all charts except those with known incompatibility
-              (``altair.Facet``, ``altair.HConcatChart``, and
-              ``altair.RepeatChart``).
-            - ``True``: Streamlit sets the width of the chart to match the
-              width of the parent container.
-            - ``False``: Streamlit sets the width of the chart to fit its
-              contents according to the plotting library, up to the width of
-              the parent container.
+        sort_by : str or None
+            Column name to use for sorting the bars. If ``sort_by`` is
+            ``None`` (default), Streamlit uses the x-axis values for sorting.
+            This is useful when you want to display bars sorted by one column
+            while using a different column for the x-axis labels.
 
-        theme : "streamlit" or None
-            The theme of the chart. If ``theme`` is ``"streamlit"`` (default),
-            Streamlit uses its own design default. If ``theme`` is ``None``,
-            Streamlit falls back to the default behavior of the library.
+        ascending : bool
+            Whether to sort in ascending order. If ``ascending`` is ``False``
+            (default), Streamlit sorts in descending order. Only applicable
+            when ``sort_by`` is not ``None``.
 
-        key : str
-            An optional string to use for giving this element a stable
-            identity. If ``key`` is ``None`` (default), this element's identity
-            will be determined based on the values of the other parameters.
-
-            Additionally, if selections are activated and ``key`` is provided,
-            Streamlit will register the key in Session State to store the
-            selection state. The selection state is read-only.
-
-        on_select : "ignore", "rerun", or callable
-            How the figure should respond to user selection events. This
-            controls whether or not the figure behaves like an input widget.
-            ``on_select`` can be one of the following:
-
-            - ``"ignore"`` (default): Streamlit will not react to any selection
-              events in the chart. The figure will not behave like an input
-              widget.
-
-            - ``"rerun"``: Streamlit will rerun the app when the user selects
-              data in the chart. In this case, ``st.altair_chart`` will return
-              the selection data as a dictionary.
-
-            - A ``callable``: Streamlit will rerun the app and execute the
-              ``callable`` as a callback function before the rest of the app.
-              In this case, ``st.altair_chart`` will return the selection data
-              as a dictionary.
-
-            To use selection events, the object passed to ``altair_chart`` must
-            include selection paramters. To learn about defining interactions
-            in Altair and how to declare selection-type parameters, see
-            `Interactive Charts \
-            <https://altair-viz.github.io/user_guide/interactions.html>`_
-            in Altair's documentation.
-
-        selection_mode : str or Iterable of str
-            The selection parameters Streamlit should use. If
-            ``selection_mode`` is ``None`` (default), Streamlit will use all
-            selection parameters defined in the chart's Altair spec.
-
-            When Streamlit uses a selection parameter, selections from that
-            parameter will trigger a rerun and be included in the selection
-            state. When Streamlit does not use a selection parameter,
-            selections from that parameter will not trigger a rerun and not be
-            included in the selection state.
-
-            Selection parameters are identified by their ``name`` property.
-
-        Returns
-        -------
-        element or dict
-            If ``on_select`` is ``"ignore"`` (default), this command returns an
-            internal placeholder for the chart element that can be used with
-            the ``.add_rows()`` method. Otherwise, this command returns a
-            dictionary-like object that supports both key and attribute
-            notation. The attributes are described by the ``VegaLiteState``
-            dictionary schema.
-
-        Example
-        -------
-
-        >>> import streamlit as st
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> import altair as alt
-        >>>
-        >>> chart_data = pd.DataFrame(np.random.randn(20, 3), columns=["a", "b", "c"])
-        >>>
-        >>> c = (
-        ...    alt.Chart(chart_data)
-        ...    .mark_circle()
-        ...    .encode(x="a", y="b", size="c", color="c", tooltip=["a", "b", "c"])
-        ... )
-        >>>
-        >>> st.altair_chart(c)
-
-        .. output::
-           https://doc-vega-lite-chart.streamlit.app/
-           height: 450px
-
-        """
-        return self._altair_chart(
-            altair_chart=altair_chart,
-            use_container_width=use_container_width,
-            theme=theme,
-            key=key,
-            on_select=on_select,
-            selection_mode=selection_mode,
-        )
-
-    # When on_select=Ignore, return DeltaGenerator.
-    @overload
-    def vega_lite_chart(
-        self,
-        data: Data = None,
-        spec: VegaLiteSpec | None = None,
-        *,
-        use_container_width: bool | None = None,
-        theme: Literal["streamlit"] | None = "streamlit",
-        key: Key | None = None,
-        on_select: Literal["ignore"],  # No default value here to make it work with mypy
-        selection_mode: str | Iterable[str] | None = None,
-        **kwargs: Any,
-    ) -> DeltaGenerator: ...
-
-    # When on_select=rerun, return VegaLiteState.
-    @overload
-    def vega_lite_chart(
-        self,
-        data: Data = None,
-        spec: VegaLiteSpec | None = None,
-        *,
-        use_container_width: bool | None = None,
-        theme: Literal["streamlit"] | None = "streamlit",
-        key: Key | None = None,
-        on_select: Literal["rerun"] | WidgetCallback = "rerun",
-        selection_mode: str | Iterable[str] | None = None,
-        **kwargs: Any,
-    ) -> VegaLiteState: ...
-
-    @gather_metrics("vega_lite_chart")
-    def vega_lite_chart(
-        self,
-        data: Data = None,
-        spec: VegaLiteSpec | None = None,
-        *,
-        use_container_width: bool | None = None,
-        theme: Literal["streamlit"] | None = "streamlit",
-        key: Key | None = None,
-        on_select: Literal["rerun", "ignore"] | WidgetCallback = "ignore",
-        selection_mode: str | Iterable[str] | None = None,
-        **kwargs: Any,
-    ) -> DeltaGenerator | VegaLiteState:
-        """Display a chart using the Vega-Lite library.
-
-        `Vega-Lite <https://vega.github.io/vega-lite/>`_ is a high-level
-        grammar for defining interactive graphics.
-
-        Parameters
-        ----------
-        data : Anything supported by st.dataframe
-            Either the data to be plotted or a Vega-Lite spec containing the
-            data (which more closely follows the Vega-Lite API).
-
-        spec : dict or None
-            The Vega-Lite spec for the chart. If ``spec`` is ``None`` (default),
-            Streamlit uses the spec passed in ``data``. You cannot pass a spec
-            to both ``data`` and ``spec``. See
-            https://vega.github.io/vega-lite/docs/ for more info.
-
-        use_container_width : bool or None
-            Whether to override the chart's native width with the width of
-            the parent container. This can be one of the following:
-
-            - ``None`` (default): Streamlit will use the parent container's
-              width for all charts except those with known incompatibility
-              (``altair.Facet``, ``altair.HConcatChart``, and
-              ``altair.RepeatChart``).
-            - ``True``: Streamlit sets the width of the chart to match the
-              width of the parent container.
-            - ``False``: Streamlit sets the width of the chart to fit its
-              contents according to the plotting library, up to the width of
-              the parent container.
-
-        theme : "streamlit" or None
-            The theme of the chart. If ``theme`` is ``"streamlit"`` (default),
-            Streamlit uses its own design default. If ``theme`` is ``None``,
-            Streamlit falls back to the default behavior of the library.
-
-        key : str
-            An optional string to use for giving this element a stable
-            identity. If ``key`` is ``None`` (default), this element's identity
-            will be determined based on the values of the other parameters.
-
-            Additionally, if selections are activated and ``key`` is provided,
-            Streamlit will register the key in Session State to store the
-            selection state. The selection state is read-only.
-
-        on_select : "ignore", "rerun", or callable
-            How the figure should respond to user selection events. This
-            controls whether or not the figure behaves like an input widget.
-            ``on_select`` can be one of the following:
-
-            - ``"ignore"`` (default): Streamlit will not react to any selection
-              events in the chart. The figure will not behave like an input
-              widget.
-
-            - ``"rerun"``: Streamlit will rerun the app when the user selects
-              data in the chart. In this case, ``st.vega_lite_chart`` will
-              return the selection data as a dictionary.
-
-            - A ``callable``: Streamlit will rerun the app and execute the
-              ``callable`` as a callback function before the rest of the app.
-              In this case, ``st.vega_lite_chart`` will return the selection data
-              as a dictionary.
-
-            To use selection events, the Vega-Lite spec defined in ``data`` or
-            ``spec`` must include selection parameters from the the charting
-            library. To learn about defining interactions in Vega-Lite, see
-            `Dynamic Behaviors with Parameters \
-            <https://vega.github.io/vega-lite/docs/parameter.html>`_
-            in Vega-Lite's documentation.
-
-        selection_mode : str or Iterable of str
-            The selection parameters Streamlit should use. If
-            ``selection_mode`` is ``None`` (default), Streamlit will use all
-            selection parameters defined in the chart's Vega-Lite spec.
-
-            When Streamlit uses a selection parameter, selections from that
-            parameter will trigger a rerun and be included in the selection
-            state. When Streamlit does not use a selection parameter,
-            selections from that parameter will not trigger a rerun and not be
-            included in the selection state.
-
-            Selection parameters are identified by their ``name`` property.
-
-        **kwargs : any
-            The Vega-Lite spec for the chart as keywords. This is an alternative
-            to ``spec``.
-
-        Returns
-        -------
-        element or dict
-            If ``on_select`` is ``"ignore"`` (default), this command returns an
-            internal placeholder for the chart element that can be used with
-            the ``.add_rows()`` method. Otherwise, this command returns a
-            dictionary-like object that supports both key and attribute
-            notation. The attributes are described by the ``VegaLiteState``
-            dictionary schema.
-
-        Example
-        -------
-        >>> import streamlit as st
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>>
-        >>> chart_data = pd.DataFrame(np.random.randn(200, 3), columns=["a", "b", "c"])
-        >>>
-        >>> st.vega_lite_chart(
-        ...    chart_data,
-        ...    {
-        ...        "mark": {"type": "circle", "tooltip": True},
-        ...        "encoding": {
-        ...            "x": {"field": "a", "type": "quantitative"},
-        ...            "y": {"field": "b", "type": "quantitative"},
-        ...            "size": {"field": "c", "type": "quantitative"},
-        ...            "color": {"field": "c", "type": "quantitative"},
-        ...        },
-        ...    },
-        ... )
-
-        .. output::
-           https://doc-vega-lite-chart.streamlit.app/
-           height: 450px
-
-        Examples of Vega-Lite usage without Streamlit can be found at
+        Examples
         https://vega.github.io/vega-lite/examples/. Most of those can be easily
         translated to the syntax shown above.
 
