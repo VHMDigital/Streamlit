@@ -37,6 +37,11 @@ def run():
                 icon=":material/show_chart:",
             ),
             st.Page(
+                dir_path / "bar_chart_demo.py",
+                title="Bar Chart demo",
+                icon=":material/bar_chart:",
+            ),
+            st.Page(
                 dir_path / "mapping_demo.py",
                 title="Mapping demo",
                 icon=":material/public:",

@@ -139,6 +139,9 @@ def generate_chart(
     height: int | None = None,
     # Bar & Area charts only:
     stack: bool | ChartStackType | None = None,
+    # Bar charts only:
+    sort_by: str | None = None,
+    ascending: bool = False,
 ) -> tuple[alt.Chart | alt.LayerChart, AddRowsMetadata]:
     """Function to use the chart's type, data columns and indices to figure out the chart's spec."""
     import altair as alt
@@ -193,6 +196,8 @@ def generate_chart(
         x_axis_label,
         y_axis_label,
         stack,
+        sort_by,
+        ascending,
     )
 
     # Create a Chart with x and y encodings.
@@ -790,23 +795,25 @@ def _get_axis_encodings(
     x_axis_label: str | None,
     y_axis_label: str | None,
     stack: bool | ChartStackType | None,
+    sort_by: str | None = None,
+    ascending: bool = False,
 ) -> tuple[alt.X, alt.Y]:
     stack_encoding: alt.X | alt.Y
     if chart_type == ChartType.HORIZONTAL_BAR:
         # Handle horizontal bar chart - switches x and y data:
         x_encoding = _get_x_encoding(
-            df, y_column, y_from_user, x_axis_label, chart_type
+            df, y_column, y_from_user, x_axis_label, chart_type, sort_by, ascending
         )
         y_encoding = _get_y_encoding(
-            df, x_column, x_from_user, y_axis_label, chart_type
+            df, x_column, x_from_user, y_axis_label, chart_type, sort_by, ascending
         )
         stack_encoding = x_encoding
     else:
         x_encoding = _get_x_encoding(
-            df, x_column, x_from_user, x_axis_label, chart_type
+            df, x_column, x_from_user, x_axis_label, chart_type, sort_by, ascending
         )
         y_encoding = _get_y_encoding(
-            df, y_column, y_from_user, y_axis_label, chart_type
+            df, y_column, y_from_user, y_axis_label, chart_type, sort_by, ascending
         )
         stack_encoding = y_encoding
 
@@ -822,6 +829,8 @@ def _get_x_encoding(
     x_from_user: str | Sequence[str] | None,
     x_axis_label: str | None,
     chart_type: ChartType,
+    sort_by: str | None = None,
+    ascending: bool = False,
 ) -> alt.X:
     import altair as alt
 
@@ -855,13 +864,27 @@ def _get_x_encoding(
     # grid lines on x axis for horizontal bar charts only
     grid = True if chart_type == ChartType.HORIZONTAL_BAR else False
 
-    return alt.X(
+    # In a vertical bar chart, apply sorting to x-axis if needed and sort_by is provided
+    encoding = alt.X(
         x_field,
         title=x_title,
         type=_get_x_encoding_type(df, chart_type, x_column),
         scale=alt.Scale(),
         axis=_get_axis_config(df, x_column, grid=grid),
     )
+
+    # For vertical bar charts, apply sorting to x-axis
+    if (
+        chart_type == ChartType.VERTICAL_BAR
+        and sort_by is not None
+        and x_column is not None
+    ):
+        if sort_by in df.columns:
+            # Determine sort order
+            order = "ascending" if ascending else "descending"
+            encoding["sort"] = {"field": sort_by, "order": order}
+
+    return encoding
 
 
 def _get_y_encoding(
@@ -870,6 +893,8 @@ def _get_y_encoding(
     y_from_user: str | Sequence[str] | None,
     y_axis_label: str | None,
     chart_type: ChartType,
+    sort_by: str | None = None,
+    ascending: bool = False,
 ) -> alt.Y:
     import altair as alt
 
@@ -903,13 +928,26 @@ def _get_y_encoding(
     # grid lines on y axis for all charts except horizontal bar charts
     grid = False if chart_type == ChartType.HORIZONTAL_BAR else True
 
-    return alt.Y(
+    encoding = alt.Y(
         field=y_field,
         title=y_title,
         type=_get_y_encoding_type(df, chart_type, y_column),
         scale=alt.Scale(),
         axis=_get_axis_config(df, y_column, grid=grid),
     )
+
+    # For horizontal bar charts, apply sorting to y-axis
+    if (
+        chart_type == ChartType.HORIZONTAL_BAR
+        and sort_by is not None
+        and y_column is not None
+    ):
+        if sort_by in df.columns:
+            # Determine sort order
+            order = "ascending" if ascending else "descending"
+            encoding["sort"] = {"field": sort_by, "order": order}
+
+    return encoding
 
 
 def _update_encoding_with_stack(

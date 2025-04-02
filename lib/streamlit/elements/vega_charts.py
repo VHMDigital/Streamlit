@@ -1009,6 +1009,8 @@ class VegaChartsMixin:
         width: int | None = None,
         height: int | None = None,
         use_container_width: bool = True,
+        sort_by: str | None = None,
+        ascending: bool = False,
     ) -> DeltaGenerator:
         """Display a bar chart.
 
@@ -1128,6 +1130,16 @@ class VegaChartsMixin:
             parent container. If ``use_container_width`` is ``False``,
             Streamlit sets the chart's width according to ``width``.
 
+        sort_by : str or None
+            Column name to use for sorting the bars. If this is ``None`` (default),
+            the bars will be ordered by the x-axis values. This is useful when you
+            want to display bars sorted by a column other than what's shown on the
+            x-axis.
+
+        ascending : bool
+            Whether to sort the bars in ascending order. If this is ``False``
+            (default), the bars will be sorted in descending order.
+
         Examples
         --------
         >>> import streamlit as st
@@ -1217,6 +1229,22 @@ class VegaChartsMixin:
            https://doc-bar-chart-unstacked.streamlit.app/
            height: 440px
 
+        You can sort your bar charts by a specific column.
+
+        >>> import streamlit as st
+        >>> import pandas as pd
+        >>>
+        >>> top_users = pd.DataFrame(
+        ...     {
+        ...         "name": ["John", "Emma", "Kelly", "Brad", "Rachel"],
+        ...         "views": [300, 200, 250, 400, 50],
+        ...     }
+        ... )
+        >>>
+        >>> st.bar_chart(
+        ...     top_users, x="name", y="views", sort_by="views", ascending=False
+        ... )
+
         """
 
         # Check that the stack parameter is valid, raise more informative error message if not
@@ -1249,6 +1277,8 @@ class VegaChartsMixin:
             width=width,
             height=height,
             stack=stack,
+            sort_by=sort_by,
+            ascending=ascending,
         )
         return cast(
             "DeltaGenerator",
