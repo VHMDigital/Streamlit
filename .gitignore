@@ -139,5 +139,5 @@ frontend/cypress/snapshots/linux/1x
 .cursor/rules/*
 !.cursor/rules/python.mdc
 !.cursor/rules/python_lib.mdc
-!.cursor/rules/protobuf.mdc
 !.cursor/rules/python_tests.mdc
+!.cursor/rules/protobuf.mdc
