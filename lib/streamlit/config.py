@@ -1359,8 +1359,10 @@ def _update_config_with_toml(raw_toml: str, where_defined: str) -> None:
         import toml
 
         parsed_config_file = toml.loads(raw_toml)
-    except Exception as e:
-        _LOGGER.exception("Error parsing config file: %s", exc_info=e)
+    except Exception:
+        # Catching any parsing exception to prevent this from breaking our
+        # config change watcher logic.
+        _LOGGER.exception("Error parsing config file.")
         return
 
     def process_section(section_path: str, section_data: dict[str, Any]) -> None:
