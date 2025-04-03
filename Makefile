@@ -166,11 +166,6 @@ bare-execution-tests:
 cli-smoke-tests:
 	python3 scripts/cli_smoke_tests.py
 
-.PHONY: cli-regression-tests
-# Verify that CLI boots as expected when called with `python -m streamlit`.
-cli-regression-tests: develop
-	pytest scripts/cli_regression_tests.py
-
 .PHONY: distribution
 # Create Python distribution files in dist/.
 distribution:
