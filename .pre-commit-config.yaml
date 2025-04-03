@@ -192,7 +192,7 @@ repos:
           |^e2e_playwright/test_assets/
           |^LICENSE$
       - id: mixed-line-ending
-        args: [--fix=auto]
+        args: [--fix=lf]
         exclude: |
           (?x)
           ^NOTICES$
