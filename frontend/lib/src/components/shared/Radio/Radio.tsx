@@ -54,8 +54,8 @@ function getRadioInnerSizes(theme: Theme): [string, string] {
   // However, fractional pixels could cause the radio border to look uneven. This happens
   // when (checkbox - threeXS) in rem is not an integer number of pixels. To avoid this,
   // we round the number converted from rem to pixels then add back the unit.
-  const checkboxSize = parseFloat(theme.sizes.checkbox.replace("rem", ""))
-  const threeXSSpacing = parseFloat(theme.spacing.threeXS.replace("rem", ""))
+  const checkboxSize = parseFloat(theme.sizes.checkbox)
+  const threeXSSpacing = parseFloat(theme.spacing.threeXS)
 
   const outerSize = convertRemToPx(checkboxSize.toString())
   const checkedInnerSize = Math.round(outerSize * 0.375)
