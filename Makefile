@@ -258,7 +258,7 @@ protobuf:
 	cd frontend/ ; yarn workspace @streamlit/protobuf run generate-protobuf
 
 .PHONY: react-init
-# React init.
+# Install all frontend dependencies.
 react-init:
 	cd frontend/ ; yarn install --immutable
 
