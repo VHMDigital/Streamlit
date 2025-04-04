@@ -1,15 +1,15 @@
 ---
-description:
+description: 
 globs: *.py
 alwaysApply: false
 ---
 # Python Guide
 
 - Supported Python versions: 3.9 - 3.13
-- Linter: Ruff
-- Formatter: Ruff
-- Type Checker: mypy
-- Testing: pytest
+- Linter: Ruff 0.x
+- Formatter: Ruff 0.x
+- Type Checker: mypy 1.x
+- Testing: pytest 8.x
 
 ## Key Principles
 
@@ -28,7 +28,7 @@ alwaysApply: false
 
 ## Docstrings
 
-- Use [Numpydoc style](mdc:https:/numpydoc.readthedocs.io/en/latest/format.html).
+- Use Numpydoc style.
 - Docstrings are meant for users of a function, not developers who may be edit the internals of that function in the future. If you want to talk to future developers, use comments.
 - All modules that we expect users to interact with must have top-level docstrings. If a user is not meant to interact with a module, docstrings are optional.
 

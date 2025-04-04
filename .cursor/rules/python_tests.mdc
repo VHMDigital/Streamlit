@@ -1,5 +1,5 @@
 ---
-description:
+description: 
 globs: lib/tests/**/*.py
 alwaysApply: false
 ---
@@ -29,6 +29,7 @@ PYTHONPATH=lib pytest lib/tests/streamlit/my_example_test.py
 ```
 
 - Run a specific test inside a test file with:
+
 ```bash
 PYTHONPATH=lib pytest lib/tests/streamlit/my_example_test.py -k test_that_something_works
 ```
