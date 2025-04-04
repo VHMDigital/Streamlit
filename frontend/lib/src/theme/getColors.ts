@@ -120,11 +120,11 @@ export function getDividerColors(theme: EmotionTheme): any {
 
 export function getMarkdownTextColors(theme: EmotionTheme): any {
   const lightTheme = hasLightBackgroundColor(theme)
-  const red = lightTheme ? theme.colors.red80 : theme.colors.red70
+  const red = theme.colors.red
   const orange = lightTheme ? theme.colors.orange100 : theme.colors.orange60
-  const yellow = lightTheme ? theme.colors.yellow100 : theme.colors.yellow40
-  const green = lightTheme ? theme.colors.green90 : theme.colors.green60
-  const blue = lightTheme ? theme.colors.blue80 : theme.colors.blue50
+  const yellow = theme.colors.yellow
+  const green = theme.colors.green
+  const blue = theme.colors.blue
   const violet = lightTheme ? theme.colors.purple80 : theme.colors.purple50
   const purple = lightTheme ? theme.colors.purple100 : theme.colors.purple80
   const gray = lightTheme ? theme.colors.gray80 : theme.colors.gray70
