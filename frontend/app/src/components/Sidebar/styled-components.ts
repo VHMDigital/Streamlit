@@ -26,8 +26,15 @@ import { hasLightBackgroundColor } from "@streamlit/lib"
  * @param isActive Whether the nav text should show as active.
  * @returns The color of the text in the sidebar nav.
  */
-const getNavTextColor = (theme: any, isActive: boolean): string => {
+const getNavTextColor = (
+  theme: any,
+  isActive: boolean,
+  disabled: boolean = false
+): string => {
   const isLightTheme = hasLightBackgroundColor(theme)
+  if (disabled) {
+    return theme.colors.fadedText40
+  }
   if (isActive) {
     return theme.colors.bodyText
   }
@@ -52,6 +59,11 @@ export const StyledSidebar = styled.section<StyledSidebarProps>(
       // Nudge the sidebar by 2px so the header decoration doesn't go below it
       top: adjustTop ? theme.sizes.headerDecorationHeight : theme.spacing.none,
       backgroundColor: theme.colors.bgColor,
+      // Since the sidebar can have a different theme (+ background)
+      // we need to explicitly set the font color and color scheme
+      // here again so that it is inherited correctly by all sidebar elements:
+      color: theme.colors.bodyText,
+      colorScheme: hasLightBackgroundColor(theme) ? "light" : "dark",
       zIndex: theme.zIndices.header + 1,
 
       minWidth,
@@ -96,11 +108,16 @@ export const StyledSidebarNavItems = styled.ul(({ theme }) => {
     paddingLeft: theme.spacing.none,
   }
 })
+export interface StyledSidebarNavLinkContainerProps {
+  disabled: boolean
+}
 
-export const StyledSidebarNavLinkContainer = styled.div({
-  display: "flex",
-  flexDirection: "column",
-})
+export const StyledSidebarNavLinkContainer =
+  styled.div<StyledSidebarNavLinkContainerProps>(({ disabled }) => ({
+    display: "flex",
+    flexDirection: "column",
+    cursor: disabled ? "not-allowed" : "pointer",
+  }))
 
 export interface StyledSidebarNavIconProps {
   isActive: boolean
@@ -123,10 +140,11 @@ export const StyledSidebarNavIcon = styled.span<StyledSidebarNavIconProps>(
 
 export interface StyledSidebarNavLinkProps {
   isActive: boolean
+  disabled: boolean
 }
 
 export const StyledSidebarNavLink = styled.a<StyledSidebarNavLinkProps>(
-  ({ theme, isActive }) => {
+  ({ theme, isActive, disabled }) => {
     const defaultPageLinkStyles = {
       textDecoration: "none",
       fontWeight: isActive ? theme.fontWeights.bold : theme.fontWeights.normal,
@@ -149,6 +167,10 @@ export const StyledSidebarNavLink = styled.a<StyledSidebarNavLinkProps>(
 
       color: getNavTextColor(theme, isActive),
       backgroundColor: isActive ? theme.colors.darkenedBgMix25 : "transparent",
+
+      ...(disabled && {
+        pointerEvents: "none",
+      }),
 
       "&:hover": {
         backgroundColor: transparentize(theme.colors.darkenedBgMix25, 0.1),
@@ -174,9 +196,9 @@ export const StyledSidebarNavLink = styled.a<StyledSidebarNavLinkProps>(
 )
 
 export const StyledSidebarLinkText = styled.span<StyledSidebarNavLinkProps>(
-  ({ isActive, theme }) => {
+  ({ isActive, theme, disabled }) => {
     return {
-      color: getNavTextColor(theme, isActive),
+      color: getNavTextColor(theme, isActive, disabled),
       overflow: "hidden",
       whiteSpace: "nowrap",
       textOverflow: "ellipsis",
@@ -197,12 +219,12 @@ export const StyledSidebarUserContent =
     paddingRight: theme.spacing.twoXL,
   }))
 
-export const StyledSidebarContent = styled.div(({}) => ({
+export const StyledSidebarContent = styled.div({
   position: "relative",
   height: "100%",
   width: "100%",
   overflow: ["auto", "overlay"],
-}))
+})
 
 export const RESIZE_HANDLE_WIDTH = "8px"
 
@@ -212,12 +234,12 @@ export const StyledResizeHandle = styled.div(({ theme }) => ({
   height: "100%",
   cursor: "col-resize",
   zIndex: theme.zIndices.sidebarMobile,
-  backgroundImage: theme.showSidebarSeparator
-    ? `linear-gradient(to right, transparent 20%, ${theme.colors.fadedText20} 28%, transparent 36%)`
+  backgroundImage: theme.showSidebarBorder
+    ? `linear-gradient(to right, transparent 20%, ${theme.colors.borderColor} 28%, transparent 36%)`
     : "none",
 
   "&:hover": {
-    backgroundImage: `linear-gradient(to right, transparent 20%, ${theme.colors.fadedText20} 28%, transparent 36%)`,
+    backgroundImage: `linear-gradient(to right, transparent 20%, ${theme.colors.borderColor} 28%, transparent 44%)`,
   },
 }))
 
@@ -230,11 +252,11 @@ export const StyledSidebarHeaderContainer = styled.div(({ theme }) => ({
   paddingTop: `calc(${theme.spacing.twoXL} - ${theme.sizes.headerDecorationHeight})`,
 }))
 
-export const StyledLogoLink = styled.a(({}) => ({
+export const StyledLogoLink = styled.a({
   "&:hover": {
     opacity: "0.7",
   },
-}))
+})
 
 export interface StyledLogoProps {
   size: string

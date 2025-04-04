@@ -134,7 +134,14 @@ def _mpa_v1(main_script_path: str):
     # Read out the my_pages folder and create a page for every script:
     pages = PAGES_FOLDER.glob("*.py")
     pages = sorted(
-        [page for page in pages if page.name.endswith(".py")], key=page_sort_key
+        [
+            page
+            for page in pages
+            if page.name.endswith(".py")
+            and not page.name.startswith(".")
+            and not page.name == "__init__.py"
+        ],
+        key=page_sort_key,
     )
 
     # Use this script as the main page and
@@ -149,7 +156,7 @@ def _mpa_v1(main_script_path: str):
         else "sidebar"
     )
     page = _navigation(
-        cast(list[PageType], all_pages),
+        cast("list[PageType]", all_pages),
         position=position,
         expanded=False,
     )
@@ -380,7 +387,7 @@ class ScriptRunner:
         )
 
     def _is_in_script_thread(self) -> bool:
-        """True if the calling function is running in the script thread"""
+        """True if the calling function is running in the script thread."""
         return self._script_thread == threading.current_thread()
 
     def _enqueue_forward_msg(self, msg: ForwardMsg) -> None:
@@ -514,6 +521,7 @@ class ScriptRunner:
                 query_string=rerun_data.query_string,
                 page_script_hash=page_script_hash,
                 fragment_ids_this_run=fragment_ids_this_run,
+                cached_message_hashes=rerun_data.cached_message_hashes,
                 context_info=rerun_data.context_info,
             )
 
@@ -550,7 +558,7 @@ class ScriptRunner:
 
             except Exception as ex:
                 # We got a compile error. Send an error event and bail immediately.
-                _LOGGER.debug("Fatal script error", exc_info=ex)
+                _LOGGER.exception("Script compilation error", exc_info=ex)
                 self._session_state[SCRIPT_RUN_WITHOUT_ERRORS_KEY] = False
                 self.on_event.send(
                     self,

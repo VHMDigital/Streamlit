@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 
 import re
 import subprocess
@@ -42,7 +43,7 @@ IGNORE_PATTERN = re.compile(
     # Exclude files, because they make it obvious which product they relate to.
     r"|(LICENSE|NOTICES|CODE_OF_CONDUCT\.md|README\.md|CONTRIBUTING\.md|SECURITY.md)$"
     # Exclude files, because they do not support comments
-    r"|\.(json|prettierrc|nvmrc)$"
+    r"|\.(json|prettierrc|nvmrc|mdc)$"
     # Exclude generated files, because they don't have any degree of creativity.
     r"|yarn\.lock$"
     # Exclude pytest config files, because they don't have any degree of creativity.
@@ -60,9 +61,8 @@ IGNORE_PATTERN = re.compile(
     r"|^.*-requirements\.txt$"
     r"|^lib/min-constraints-gen\.txt"
     r"|\.isort\.cfg$"
-    r"|\.credentials/\.gitignore$"
-    r"|^frontend/app/performance/lighthouse/\.gitignore$"
-    r"|^e2e_playwright/\.gitignore$"
+    # Exclude all .gitignore files
+    r"|\.gitignore$"
     # Excluding test files, because adding headers may cause tests to fail.
     r"|/(fixtures|__snapshots__|test_data|data|test)/"
     # Exclude vendored files.
@@ -96,7 +96,7 @@ def main():
             if LICENSE_TEXT not in file_content:
                 print("Found file without license header", fileloc)
                 invalid_files_count += 1
-        except:
+        except Exception:
             print(
                 f"Failed to open the file: {fileloc}. Is it binary file?",
             )

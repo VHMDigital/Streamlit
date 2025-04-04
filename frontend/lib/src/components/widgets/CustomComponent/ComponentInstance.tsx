@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-import React, { memo, ReactElement, useEffect, useRef, useState } from "react"
+import React, {
+  memo,
+  ReactElement,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 
 import { useTheme } from "@emotion/react"
 import { getLogger } from "loglevel"
@@ -184,6 +191,11 @@ function ComponentInstance(props: Props): ReactElement {
     componentError
   )
 
+  const componentSourceUrl = useMemo(
+    () => getSrc(componentName, registry, url),
+    [componentName, registry, url]
+  )
+
   // Use a ref for the args so that we can use them inside the useEffect calls without the linter complaining
   // as in the useEffect dependencies array, we don't use the parsed arg objects, but their string representation
   // and a comparing function result for the jsonArgs and dataframeArgs, respectively, for deep-equal checks and to
@@ -210,7 +222,7 @@ function ComponentInstance(props: Props): ReactElement {
   // custom components that define a height property, e.g. in Python
   // my_custom_component(height=100). undefined means no explicit height
   // was specified, but will be set to the default height of 0.
-  const [frameHeight, setFrameHeight] = useState<number | undefined>(
+  const [frameHeight, setFrameHeight] = useState<number | undefined>(() =>
     isNaN(parsedNewArgs.height) ? undefined : parsedNewArgs.height
   )
 
@@ -226,12 +238,30 @@ function ComponentInstance(props: Props): ReactElement {
     COMPONENT_READY_WARNING_TIME_MS / 4
   )
   const clearTimeoutWarningElement = useTimeout(() => {
-    // To keep behavior the same as before introducing `createRoot` and after,
-    // we ensure that the state updates are flushed immediately.
+    /* eslint-disable-next-line @eslint-react/dom/no-flush-sync -- To keep
+     * behavior the same as before introducing `createRoot` and after, we ensure
+     * that the state updates are flushed immediately.
+     */
     flushSync(() => {
       setIsReadyTimeout(true)
     })
   }, COMPONENT_READY_WARNING_TIME_MS)
+
+  useEffect(() => {
+    // Iframe onerror event unreliable - check custom component
+    // src on mount to catch iframe load errors
+    registry.checkSourceUrlResponse(componentSourceUrl, componentName)
+  }, [componentSourceUrl, componentName, registry])
+
+  useEffect(() => {
+    if (isReadyTimeout && !isReadyRef.current) {
+      // Send timeout error if we've timed out waiting for the READY message from the component
+      LOG.error(
+        `Client Error: Custom Component ${componentName} timeout error`
+      )
+      registry.sendTimeoutError(componentSourceUrl, componentName)
+    }
+  }, [isReadyTimeout, componentSourceUrl, componentName, registry])
 
   // Send a render message to the custom component everytime relevant props change, such as the
   // input args or the theme / width
@@ -272,8 +302,10 @@ function ComponentInstance(props: Props): ReactElement {
       // immediately change their frameHeight after mounting). This is wasteful,
       // and it also breaks certain components.
       iframeRef.current.height = height.toString()
-      // To keep behavior the same as before introducing `createRoot` and after,
-      // we ensure that the state updates are flushed immediately.
+      /* eslint-disable-next-line @eslint-react/dom/no-flush-sync -- To keep
+       * behavior the same as before introducing `createRoot` and after, we ensure
+       * that the state updates are flushed immediately.
+       */
       flushSync(() => {
         setFrameHeight(height)
       })
@@ -291,8 +323,10 @@ function ComponentInstance(props: Props): ReactElement {
       clearTimeoutLog()
       clearTimeoutWarningElement()
       isReadyRef.current = true
-      // To keep behavior the same as before introducing `createRoot` and after,
-      // we ensure that the state updates are flushed immediately.
+      /* eslint-disable-next-line @eslint-react/dom/no-flush-sync -- To keep
+       * behavior the same as before introducing `createRoot` and after, we ensure
+       * that the state updates are flushed immediately.
+       */
       flushSync(() => {
         setIsReadyTimeout(false)
       })
@@ -409,7 +443,7 @@ function ComponentInstance(props: Props): ReactElement {
         data-testid="stCustomComponentV1"
         allow={DEFAULT_IFRAME_FEATURE_POLICY}
         ref={iframeRef}
-        src={getSrc(componentName, registry, url)}
+        src={componentSourceUrl}
         width={width}
         // for undefined height we set the height to 0 to avoid inconsistent behavior
         height={frameHeight ?? 0}

@@ -254,7 +254,7 @@ const RawElementNodeRenderer = (
     case "balloons":
       return hideIfStale(
         props.isStale,
-        <Balloons scriptRunId={props.scriptRunId} />
+        <Balloons scriptRunId={node.scriptRunId} />
       )
 
     case "bokehChart":
@@ -387,7 +387,7 @@ const RawElementNodeRenderer = (
     case "snow":
       return hideIfStale(
         props.isStale,
-        <Snow scriptRunId={props.scriptRunId} />
+        <Snow scriptRunId={node.scriptRunId} />
       )
 
     case "spinner":
@@ -448,7 +448,7 @@ const RawElementNodeRenderer = (
       )
     }
 
-    case "arrowVegaLiteChart":
+    case "arrowVegaLiteChart": {
       const vegaLiteElement = node.vegaLiteChartElement as VegaLiteChartElement
       return (
         <ArrowVegaLiteChart
@@ -461,6 +461,7 @@ const RawElementNodeRenderer = (
           {...widgetProps}
         />
       )
+    }
 
     case "audioInput": {
       const audioInputProto = node.element.audioInput as AudioInputProto
@@ -607,8 +608,7 @@ const RawElementNodeRenderer = (
 
     case "linkButton": {
       const linkButtonProto = node.element.linkButton as LinkButtonProto
-      widgetProps.disabled = widgetProps.disabled || linkButtonProto.disabled
-      return <LinkButton element={linkButtonProto} {...widgetProps} />
+      return <LinkButton element={linkButtonProto} {...elementProps} />
     }
 
     case "multiselect": {

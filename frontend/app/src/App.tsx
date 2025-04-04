@@ -43,6 +43,10 @@ import {
   getEmbeddingIdClassName,
   getHostSpecifiedTheme,
   getIFrameEnclosingApp,
+  getLocaleLanguage,
+  getTimezone,
+  getTimezoneOffset,
+  getUrl,
   handleFavicon,
   hashString,
   HostCommunicationManager,
@@ -97,9 +101,12 @@ import {
   SessionStatus,
   WidgetStates,
 } from "@streamlit/protobuf"
-import { isNullOrUndefined, notNullOrUndefined } from "@streamlit/utils"
+import {
+  isLocalhost,
+  isNullOrUndefined,
+  notNullOrUndefined,
+} from "@streamlit/utils"
 import getBrowserInfo from "@streamlit/app/src/util/getBrowserInfo"
-import { isLocalhost } from "@streamlit/app/src/util/deploymentInfo"
 import { AppContext } from "@streamlit/app/src/components/AppContext"
 import AppView from "@streamlit/app/src/components/AppView"
 import StatusWidget from "@streamlit/app/src/components/StatusWidget"
@@ -109,7 +116,9 @@ import DeployButton from "@streamlit/app/src/components/DeployButton"
 import Header from "@streamlit/app/src/components/Header"
 import {
   DialogProps,
+  ScriptCompileErrorProps,
   StreamlitDialog,
+  WarningProps,
 } from "@streamlit/app/src/components/StreamlitDialog"
 import { DialogType } from "@streamlit/app/src/components/StreamlitDialog/constants"
 import {
@@ -374,6 +383,22 @@ export class App extends PureComponent<Props, State> {
     this.endpoints = new DefaultStreamlitEndpoints({
       getServerUri: this.getBaseUriParts,
       csrfEnabled: true,
+      sendClientError: (
+        component: string,
+        error: string | number,
+        message: string,
+        source: string,
+        customComponentName?: string
+      ) => {
+        this.hostCommunicationMgr.sendMessageToHost({
+          type: "CLIENT_ERROR",
+          component,
+          error,
+          message,
+          source,
+          customComponentName,
+        })
+      },
     })
 
     this.uploadClient = new FileUploadClient({
@@ -415,6 +440,19 @@ export class App extends PureComponent<Props, State> {
       connectionStateChanged: this.handleConnectionStateChanged,
       claimHostAuthToken: this.hostCommunicationMgr.claimAuthToken,
       resetHostAuthToken: this.hostCommunicationMgr.resetAuthToken,
+      sendClientError: (
+        error: string | number,
+        message: string,
+        source: string
+      ) => {
+        this.hostCommunicationMgr.sendMessageToHost({
+          type: "CLIENT_ERROR",
+          component: "Websocket Connection",
+          error,
+          message,
+          source,
+        })
+      },
       onHostConfigResp: (response: IHostConfigResponse) => {
         const {
           allowedOrigins,
@@ -424,12 +462,14 @@ export class App extends PureComponent<Props, State> {
           mapboxToken,
           enforceDownloadInNewTab,
           metricsUrl,
+          blockErrorDialogs,
         } = response
 
         const appConfig: AppConfig = {
           allowedOrigins,
           useExternalAuthToken,
           enableCustomParentMessages,
+          blockErrorDialogs,
         }
         const libConfig: LibConfig = {
           mapboxToken,
@@ -550,6 +590,33 @@ export class App extends PureComponent<Props, State> {
     window.removeEventListener("popstate", this.onHistoryChange, false)
   }
 
+  /**
+   * Checks whether to show error dialog or send error info
+   * to be handled by the host.
+   */
+  maybeShowErrorDialog(
+    newDialog: WarningProps | ScriptCompileErrorProps,
+    errorMsg: string
+  ): void {
+    // Show dialog only if blockErrorDialogs host config is false
+    const { blockErrorDialogs } = this.state.appConfig
+    if (!blockErrorDialogs) {
+      this.openDialog(newDialog)
+    }
+
+    const isScriptCompileError =
+      newDialog.type === DialogType.SCRIPT_COMPILE_ERROR
+    // script compile error has no title
+    const error = isScriptCompileError ? newDialog.type : newDialog.title
+
+    // Send error info to host via postMessage
+    this.hostCommunicationMgr.sendMessageToHost({
+      type: "CLIENT_ERROR_DIALOG",
+      error,
+      message: errorMsg,
+    })
+  }
+
   showError(title: string, errorMarkdown: string): void {
     LOG.error(errorMarkdown)
     const newDialog: DialogProps = {
@@ -558,7 +625,7 @@ export class App extends PureComponent<Props, State> {
       msg: <StreamlitMarkdown source={errorMarkdown} allowHTML={false} />,
       onClose: () => {},
     }
-    this.openDialog(newDialog)
+    this.maybeShowErrorDialog(newDialog, errorMarkdown)
   }
 
   showDeployError = (
@@ -566,14 +633,15 @@ export class App extends PureComponent<Props, State> {
     errorNode: ReactNode,
     onContinue?: () => void
   ): void => {
-    this.openDialog({
+    const newDialog: DialogProps = {
       type: DialogType.DEPLOY_ERROR,
       title,
       msg: errorNode,
       onContinue,
       onClose: () => {},
       onTryAgain: this.sendLoadGitInfoBackMsg,
-    })
+    }
+    this.openDialog(newDialog)
   }
 
   /**
@@ -666,7 +734,7 @@ export class App extends PureComponent<Props, State> {
       }
 
       if (this.sessionInfo.isSet) {
-        this.sessionInfo.clearCurrent()
+        this.sessionInfo.disconnect()
       }
     }
 
@@ -676,11 +744,13 @@ export class App extends PureComponent<Props, State> {
       // The setState will be applied in the expected render cycle in this case.
       this.setState({ connectionState: newState })
     } else {
-      // We are using `flushSync` here because there is code that expects every
-      // state to be observed. With React batched updates, it is possible that
-      // multiple `connectionState` changes are applied in 1 render cycle, leading
-      // to the last state change being the only one observed. Utilizing
-      // `flushSync` ensures that we apply every state change.
+      /* eslint-disable-next-line @eslint-react/dom/no-flush-sync --
+       * We are using `flushSync` here because there is code that expects every
+       * state to be observed. With React batched updates, it is possible that
+       * multiple `connectionState` changes are applied in 1 render cycle, leading
+       * to the last state change being the only one observed. Utilizing
+       * `flushSync` ensures that we apply every state change.
+       */
       flushSync(() => {
         this.setState({ connectionState: newState })
       })
@@ -863,15 +933,12 @@ export class App extends PureComponent<Props, State> {
 
   handlePageProfileMsg = (pageProfile: PageProfile): void => {
     const pageProfileObj = PageProfile.toObject(pageProfile)
-
     const browserInfo = getBrowserInfo()
+
     this.metricsMgr.enqueue("pageProfile", {
       ...pageProfileObj,
       isFragmentRun: Boolean(pageProfileObj.isFragmentRun),
-      appId: this.sessionInfo.current.appId,
       numPages: this.state.appPages?.length,
-      sessionId: this.sessionInfo.current.sessionId,
-      pythonVersion: this.sessionInfo.current.pythonVersion,
       pageScriptHash: this.state.currentPageScriptHash,
       activeTheme: this.props.theme?.activeTheme?.name,
       totalLoadTime: Math.round(
@@ -954,7 +1021,10 @@ export class App extends PureComponent<Props, State> {
         exception: sessionEvent.scriptCompilationException,
         onClose: () => {},
       }
-      this.openDialog(newDialog)
+      this.maybeShowErrorDialog(
+        newDialog,
+        sessionEvent.scriptCompilationException?.message ?? "No message"
+      )
     }
   }
 
@@ -1019,10 +1089,11 @@ export class App extends PureComponent<Props, State> {
 
     // First, handle initialization logic. Each NewSession message has
     // initialization data. If this is the _first_ time we're receiving
-    // the NewSession message, we perform some one-time initialization.
-    if (!this.sessionInfo.isSet) {
-      // We're not initialized. Perform one-time initialization.
-      this.handleOneTimeInitialization(newSessionProto)
+    // the NewSession message (or the first time since disconnect), we
+    // perform some one-time initialization.
+    if (!this.sessionInfo.isSet || !this.sessionInfo.current.isConnected) {
+      // We're not initialized (this is our first time, or we are reconnected)
+      this.handleInitialization(newSessionProto)
     }
 
     const { appHash, currentPageScriptHash: prevPageScriptHash } = this.state
@@ -1091,9 +1162,10 @@ export class App extends PureComponent<Props, State> {
   }
 
   /**
-   * Performs one-time initialization. This is called from `handleNewSession`.
+   * Performs initialization based on first connection and reconnection.
+   * This is called from `handleNewSession`.
    */
-  handleOneTimeInitialization = (newSessionProto: NewSession): void => {
+  handleInitialization = (newSessionProto: NewSession): void => {
     const initialize = newSessionProto.initialize as Initialize
     const config = newSessionProto.config as Config
 
@@ -1151,13 +1223,10 @@ export class App extends PureComponent<Props, State> {
       return "hash_for_undefined_custom_theme"
     }
 
-    const themeInputEntries = Object.entries(themeInput)
-    // Ensure that our themeInput fields are in a consistent order when
-    // stringified below. Sorting an array of arrays in javascript sorts by the
-    // 0th element of the inner arrays, uses the 1st element to tiebreak, and
-    // so on.
-    themeInputEntries.sort()
-    return hashString(themeInputEntries.join(":"))
+    // Hash the sorted representation of the theme input:
+    return hashString(
+      JSON.stringify(themeInput, Object.keys(themeInput).sort())
+    )
   }
 
   processThemeInput(themeInput: CustomThemeConfig): void {
@@ -1192,7 +1261,7 @@ export class App extends PureComponent<Props, State> {
       }
     }
 
-    if (themeInput?.fontFaces) {
+    if (themeInput?.fontFaces && themeInput.fontFaces.length > 0) {
       // If font faces are provided, we need to set the imported theme with the theme
       // manager to make the font faces available.
       this.props.theme.setImportedTheme(themeInput)
@@ -1242,6 +1311,8 @@ export class App extends PureComponent<Props, State> {
             // Tell the WidgetManager which widgets still exist. It will remove
             // widget state for widgets that have been removed.
             const activeWidgetIds = new Set(
+              // TODO: Update to match React best practices
+              // eslint-disable-next-line @eslint-react/no-access-state-in-setstate
               Array.from(this.state.elements.getElements())
                 .map(element => getElementId(element))
                 .filter(notUndefined)
@@ -1263,7 +1334,8 @@ export class App extends PureComponent<Props, State> {
         this.sessionInfo.isSet
       ) {
         this.connectionManager.incrementMessageCacheRunCount(
-          this.sessionInfo.current.maxCachedMessageAge
+          this.sessionInfo.current.maxCachedMessageAge,
+          this.state.fragmentIdsThisRun
         )
       }
     }
@@ -1294,6 +1366,8 @@ export class App extends PureComponent<Props, State> {
       },
       () => {
         const activeWidgetIds = new Set(
+          // TODO: Update to match React best practices
+          // eslint-disable-next-line @eslint-react/no-access-state-in-setstate
           Array.from(this.state.elements.getElements())
             .map(element => getElementId(element))
             .filter(notUndefined)
@@ -1511,9 +1585,10 @@ export class App extends PureComponent<Props, State> {
     let pageName = ""
 
     const contextInfo = {
-      timezone: this.getTimezone(),
-      timezoneOffset: this.getTimezoneOffset(),
-      locale: this.getLocaleLanguage(),
+      timezone: getTimezone(),
+      timezoneOffset: getTimezoneOffset(),
+      locale: getLocaleLanguage(),
+      url: getUrl(),
     }
 
     if (pageScriptHash) {
@@ -1545,6 +1620,9 @@ export class App extends PureComponent<Props, State> {
       pageScriptHash = ""
     }
 
+    const cachedMessageHashes =
+      this.connectionManager?.getCachedMessageHashes() ?? []
+
     this.sendBackMsg(
       new BackMsg({
         rerunScript: {
@@ -1554,6 +1632,7 @@ export class App extends PureComponent<Props, State> {
           pageName,
           fragmentId,
           isAutoRerun,
+          cachedMessageHashes,
           contextInfo,
         },
       })
@@ -1790,18 +1869,6 @@ export class App extends PureComponent<Props, State> {
       ? this.connectionManager.getBaseUriParts()
       : undefined
 
-  getTimezone = (): string => {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone
-  }
-
-  getTimezoneOffset = (): number => {
-    return new Date().getTimezoneOffset()
-  }
-
-  getLocaleLanguage = (): string => {
-    return navigator.language
-  }
-
   getQueryString = (): string => {
     const { queryParams } = this.state
 
@@ -1836,7 +1903,9 @@ export class App extends PureComponent<Props, State> {
   }
 
   requestFileURLs = (requestId: string, files: File[]): void => {
-    if (this.isServerConnected()) {
+    const isConnected = this.isServerConnected()
+    const isSessionInfoSet = this.sessionInfo.isSet
+    if (isConnected && isSessionInfoSet) {
       const backMsg = new BackMsg({
         fileUrlsRequest: {
           requestId,
@@ -1846,6 +1915,10 @@ export class App extends PureComponent<Props, State> {
       })
       backMsg.type = "fileUrlsRequest"
       this.sendBackMsg(backMsg)
+    } else {
+      LOG.warn(
+        `Cannot request file URLs (isServerConnected: ${isConnected}, isSessionInfoSet: ${isSessionInfoSet})`
+      )
     }
   }
 
@@ -1921,9 +1994,6 @@ export class App extends PureComponent<Props, State> {
         })
       : null
 
-    const widgetsDisabled =
-      inputsDisabled || connectionState !== ConnectionState.CONNECTED
-
     return (
       <AppContext.Provider
         value={{
@@ -1935,9 +2005,10 @@ export class App extends PureComponent<Props, State> {
           showToolbar: !isEmbed() || isToolbarDisplayed(),
           showColoredLine:
             (!hideColoredLine && !isEmbed()) || isColoredLineDisplayed(),
-          // host communication manager elements
           pageLinkBaseUrl,
           sidebarChevronDownshift,
+          widgetsDisabled:
+            inputsDisabled || connectionState !== ConnectionState.CONNECTED,
           gitInfo: this.state.gitInfo,
           appConfig,
         }}
@@ -2027,7 +2098,6 @@ export class App extends PureComponent<Props, State> {
                 scriptRunId={scriptRunId}
                 scriptRunState={scriptRunState}
                 widgetMgr={this.widgetMgr}
-                widgetsDisabled={widgetsDisabled}
                 uploadClient={this.uploadClient}
                 componentRegistry={this.componentRegistry}
                 formsData={this.state.formsData}

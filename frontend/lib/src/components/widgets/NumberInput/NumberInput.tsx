@@ -19,7 +19,6 @@ import React, {
   ReactElement,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react"
@@ -41,14 +40,14 @@ import { useFormClearHelper } from "~lib/components/widgets/Form"
 import { Source, WidgetStateManager } from "~lib/WidgetStateManager"
 import TooltipIcon from "~lib/components/shared/TooltipIcon"
 import { Placement } from "~lib/components/shared/Tooltip"
-import Icon from "~lib/components/shared/Icon"
+import Icon, { DynamicIcon } from "~lib/components/shared/Icon"
 import InputInstructions from "~lib/components/shared/InputInstructions/InputInstructions"
 import {
   StyledWidgetLabelHelp,
   WidgetLabel,
 } from "~lib/components/widgets/BaseWidget"
-import { EmotionTheme } from "~lib/theme"
-import { useResizeObserver } from "~lib/hooks/useResizeObserver"
+import { convertRemToPx, EmotionTheme } from "~lib/theme"
+import { useCalculatedWidth } from "~lib/hooks/useCalculatedWidth"
 
 import {
   canDecrement,
@@ -85,20 +84,18 @@ const NumberInput: React.FC<Props> = ({
     formId: elementFormId,
     default: elementDefault,
     format: elementFormat,
+    icon,
+    min,
+    max,
   } = element
-  const min = element.hasMin ? element.min : -Infinity
-  const max = element.hasMax ? element.max : +Infinity
 
-  const {
-    values: [width],
-    elementRef,
-  } = useResizeObserver(useMemo(() => ["width"], []))
+  const [width, elementRef] = useCalculatedWidth()
 
-  const [step, setStep] = useState<number>(getStep(element))
+  const [step, setStep] = useState<number>(() => getStep(element))
   const initialValue = getInitialValue({ element, widgetMgr })
   const [dirty, setDirty] = useState(false)
   const [value, setValue] = useState<number | null>(initialValue)
-  const [formattedValue, setFormattedValue] = useState<string | null>(
+  const [formattedValue, setFormattedValue] = useState<string | null>(() =>
     formatValue({ value: initialValue, ...element, step })
   )
   const [isFocused, setIsFocused] = useState(false)
@@ -204,6 +201,21 @@ const NumberInput: React.FC<Props> = ({
       commitValue({ value, source: { fromUi: false } })
     }
 
+    const numberInput = inputRef.current
+    if (numberInput) {
+      const preventScroll: EventListener = (e): void => {
+        e.preventDefault()
+      }
+
+      // Issue #8867: Disable wheel events on the input to avoid accidental changes
+      // caused by scrolling.
+      numberInput.addEventListener("wheel", preventScroll)
+
+      return () => {
+        numberInput.removeEventListener("wheel", preventScroll)
+      }
+    }
+
     // I don't want to run this effect on every render, only on mount.
     // Additionally, it's okay if commitValue changes, because we only call
     // it once in the beginning anyways.
@@ -302,6 +314,21 @@ const NumberInput: React.FC<Props> = ({
     [dirty, value, commitValue, widgetMgr, elementFormId, fragmentId]
   )
 
+  // Material icons need to be larger to render similar size of emojis,
+  // and we change their text color
+  const isMaterialIcon = icon?.startsWith(":material")
+  const dynamicIconSize = isMaterialIcon ? "lg" : "base"
+
+  // Adjust breakpoint for icon so the total width of the input element
+  // is same when input controls hidden
+  const iconAdjustment =
+    // Account for icon size + its left/right padding
+    convertRemToPx(theme.iconSizes.lg) +
+    2 * convertRemToPx(theme.spacing.twoXS)
+  const numberInputControlBreakpoint = icon
+    ? theme.breakpoints.hideNumberInputControls + iconAdjustment
+    : theme.breakpoints.hideNumberInputControls
+
   return (
     <div
       className="stNumberInput"
@@ -343,6 +370,15 @@ const NumberInput: React.FC<Props> = ({
           clearOnEscape={clearable}
           disabled={disabled}
           aria-label={element.label}
+          startEnhancer={
+            element.icon && (
+              <DynamicIcon
+                data-testid="stNumberInputIcon"
+                iconValue={element.icon}
+                size={dynamicIconSize}
+              />
+            )
+          }
           id={id.current}
           overrides={{
             ClearIconContainer: {
@@ -384,7 +420,7 @@ const NumberInput: React.FC<Props> = ({
                 lineHeight: theme.lineHeights.inputWidget,
                 // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
                 paddingRight: theme.spacing.sm,
-                paddingLeft: theme.spacing.sm,
+                paddingLeft: theme.spacing.md,
                 paddingBottom: theme.spacing.sm,
                 paddingTop: theme.spacing.sm,
               },
@@ -407,12 +443,23 @@ const NumberInput: React.FC<Props> = ({
                 borderTopWidth: 0,
                 borderBottomWidth: 0,
                 paddingRight: 0,
+                paddingLeft: icon ? theme.spacing.sm : 0,
+              },
+            },
+            StartEnhancer: {
+              style: {
+                paddingLeft: 0,
+                paddingRight: 0,
+                // Keeps emoji icons from being cut off on the right
+                minWidth: theme.iconSizes.lg,
+                // Material icons color changed as inactionable
+                color: isMaterialIcon ? theme.colors.fadedText60 : "inherit",
               },
             },
           }}
         />
         {/* We only want to show the increment/decrement controls when there is sufficient room to display the value and these controls. */}
-        {width > theme.breakpoints.hideNumberInputControls && (
+        {width > numberInputControlBreakpoint && (
           <StyledInputControls>
             <StyledInputControl
               data-testid="stNumberInputStepDown"

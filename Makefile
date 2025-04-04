@@ -202,7 +202,7 @@ cli-regression-tests: install
 distribution:
 	# Get rid of the old build and dist folders to make sure that we clean old js and css.
 	rm -rfv lib/build lib/dist
-	cd lib ; python3 setup.py bdist_wheel --universal sdist
+	cd lib ; python3 setup.py bdist_wheel sdist
 
 .PHONY: package
 # Build lib and frontend, and then run 'distribution'.
@@ -344,12 +344,12 @@ jsformat:
 .PHONY: jstest
 # Run JS unit tests.
 jstest: frontend-dependencies
-	cd frontend; TESTPATH=$(TESTPATH) yarn workspaces foreach --all run test
+	cd frontend; TESTPATH=$(TESTPATH) yarn test
 
 .PHONY: jstestcoverage
 # Run JS unit tests and generate a coverage report.
 jstestcoverage: frontend-dependencies
-	cd frontend; TESTPATH=$(TESTPATH) yarn workspaces foreach --all run test --coverage
+	cd frontend; TESTPATH=$(TESTPATH) yarn testCoverage
 
 .PHONY: update-snapshots
 # Update e2e playwright snapshots based on the latest completed CI run.
@@ -443,7 +443,7 @@ debug-e2e-test:
 	fi
 	@echo "Running test: $(filter-out $@,$(MAKECMDGOALS)) in debug mode."
 	@TEST_SCRIPT=$$(echo $(filter-out $@,$(MAKECMDGOALS)) | sed 's|^e2e_playwright/||'); \
-	cd e2e_playwright && PWDEBUG=1 pytest $$TEST_SCRIPT || ( \
+	cd e2e_playwright && PWDEBUG=1 pytest $$TEST_SCRIPT --tracing on || ( \
 		echo "If you implemented changes in the frontend, make sure to call \`make frontend-fast\` to use the up-to-date frontend build in the test."; \
 		echo "You can find test-results in ./e2e_playwright/test-results"; \
 		exit 1 \
@@ -463,3 +463,18 @@ run-e2e-test:
 		echo "You can find test-results in ./e2e_playwright/test-results"; \
 		exit 1 \
 	)
+
+.PHONY: autofix
+# Autofix linting and formatting errors.
+autofix:
+	# Python fixes:
+	make pyformat
+	ruff check --fix
+	# JS fixes:
+	make react-init
+	make jsformat
+	cd frontend/ ; yarn workspaces foreach --all run lint --fix
+	# Other fixes:
+	make notices
+	# Run all pre-commit fixes but not fail if any of them don't work.
+	pre-commit run --all-files --hook-stage manual || true
