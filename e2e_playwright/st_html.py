@@ -57,13 +57,14 @@ st.write("Before tag:")
 st.html(
     """
     <style>
-        #random {
-            color:blue;
+        #style-test {
+            color: purple;
         }
     </style>
     """
 )
 st.write("After tag")
+st.write("## Style test")
 
 # Test that we can load HTML files from str paths
 HTML_PATH = TEST_ASSETS_DIR / "test_div.html"

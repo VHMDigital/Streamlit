@@ -94,26 +94,20 @@ class HtmlMixin:
         else:
             html_content = clean_text(cast("SupportsStr", body))
 
+        # Raise an error if the body is empty
         if html_content == "":
             raise StreamlitAPIException("`st.html` body cannot be empty")
+
+        # Handle the case where there are only style tags - issue #9388
+        # Use event container for style tags so they don't take up space in the app content
+        if _html_only_style_tags(html_content):
+            # If true, there are only style tags - send html to the event container
+            html_proto.body = html_content
+            return self._event_dg._enqueue("html", html_proto)
         else:
-            # Extract style tags from the HTML, returning both the cleaned HTML and styles separately
-            html_without_styles, styles = _extract_style_tags(html_content)
-
-        returned_dg = self.dg
-        if styles:
-            # Send the styles to be rendered by the event container,
-            # that way they don't take up space in the app content
-            styles_proto = HtmlProto()
-            styles_proto.body = styles
-            returned_dg = self._event_dg._enqueue("html", styles_proto)
-
-        if html_without_styles:
-            # Set the non-style HTML as the body
-            html_proto.body = html_without_styles
-            returned_dg = self.dg._enqueue("html", html_proto)
-
-        return returned_dg
+            # Otherwise, send the html to the main container as normal
+            html_proto.body = html_content
+            return self.dg._enqueue("html", html_proto)
 
     @property
     def dg(self) -> DeltaGenerator:
@@ -126,18 +120,16 @@ class HtmlMixin:
         return get_dg_singleton_instance().event_dg
 
 
-def _extract_style_tags(html_content: str) -> tuple[str, str]:
-    """Extract style tags and their contents from HTML, returning both the non-style HTML and styles."""
+def _html_only_style_tags(html_content: str) -> bool:
+    """Check if the HTML content is only style tags."""
     # Pattern to match style tags and their contents
     style_pattern = r"<style[^>]*>.*?</style>"
 
-    # Extract all style tags and their contents
-    styles = "\n".join(re.findall(style_pattern, html_content, re.DOTALL))
-
-    # Remove style tags and their contents from the HTML
+    # See if any content remains after removing style tags
     html_without_styles = re.sub(style_pattern, "", html_content, flags=re.DOTALL)
 
-    return html_without_styles, styles
+    # Return whether html content is empty after removing style tags
+    return html_without_styles == ""
 
 
 def _is_file(obj: Any) -> bool:

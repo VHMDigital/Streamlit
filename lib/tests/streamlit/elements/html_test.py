@@ -43,7 +43,8 @@ class StHtmlAPITest(DeltaGeneratorTestCase):
         # The style tag should be enqueued to the event delta generator
         style_msg = self.get_message_from_queue()
         self.assertEqual(
-            [2, 0],  # The path indicates it's the first element in event container
+            # The path indicates it's the first element in event container (starts with 2)
+            [2, 0],
             style_msg.metadata.delta_path,
         )
 
@@ -57,25 +58,18 @@ class StHtmlAPITest(DeltaGeneratorTestCase):
         """Test st.html with style and other tags."""
         st.html("<style>.stHeading h3 { color: purple; }</style><h1>Hello, World!</h1>")
 
-        # The style tag is enqueued to the event delta generator first
-        style_msg = self.get_message_from_queue(-2)
-        self.assertEqual(
-            [2, 0],  # The path indicates it's the first element in event container
-            style_msg.metadata.delta_path,
-        )
-        style_el = self.get_delta_from_queue(-2).new_element
-        self.assertEqual(
-            style_el.html.body, "<style>.stHeading h3 { color: purple; }</style>"
-        )
-
-        # Then the non-style html enqueued to the main delta generator
+        # Since there's a mix of style and other tags, html is enqueued to the main delta generator
         msg = self.get_message_from_queue()
         self.assertEqual(
-            [0, 0],  # The path indicates it's the first element in main container
+            # The path indicates it's the first element in main container (starts with 0)
+            [0, 0],
             msg.metadata.delta_path,
         )
         el = self.get_delta_from_queue().new_element
-        self.assertEqual(el.html.body, "<h1>Hello, World!</h1>")
+        self.assertEqual(
+            el.html.body,
+            "<style>.stHeading h3 { color: purple; }</style><h1>Hello, World!</h1>",
+        )
 
     def test_st_html_with_css_file(self):
         """Test st.html with CSS file."""
