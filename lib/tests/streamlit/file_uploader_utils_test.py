@@ -63,8 +63,8 @@ class EnforceFilenameRestrictionTest(unittest.TestCase):
             ("valid_multi_part_zip", "data.zip", [".tar.gz", ".zip"], True),
             (
                 "valid_multiple_periods",
-                "my.file.coffee.md",
-                [".coffee.md", ".pdf"],
+                "my.file.tar.gz",
+                [".tar.gz", ".pdf"],
                 True,
             ),
             # Invalid cases
