@@ -66,15 +66,11 @@ def _load_html_and_get_locators(
     return frame_locator, toolbar_buttons
 
 
-def _open_embed(iframed_app: IframedPage, embed: bool = False) -> FrameLocator:
+def _open_embed(iframed_app: IframedPage) -> FrameLocator:
     """Open the iframe with embed=True and return the frame locator."""
-    src_query_params = {}
-    if embed:
-        src_query_params["embed"] = "true"
-
     frame_locator: FrameLocator = iframed_app.open_app(
         IframedPageAttrs(
-            src_query_params=src_query_params,
+            src_query_params={"embed": "true"},
         )
     )
     wait_for_app_run(frame_locator)
@@ -210,7 +206,7 @@ def test_handles_set_file_upload_client_config_message(iframed_app: IframedPage)
 
 
 def test_set_is_embedded_context_field_embed_true(iframed_app: IframedPage):
-    frame_locator = _open_embed(iframed_app, embed=True)
+    frame_locator = _open_embed(iframed_app)
 
     # Check that the context option is set correctly to True
     expect_prefixed_markdown(frame_locator, "Is app embedded:", "True")
