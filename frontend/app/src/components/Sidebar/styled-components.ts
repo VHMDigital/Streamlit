@@ -301,6 +301,14 @@ function translateLogoHeight(theme: any, size: string): string {
   return theme.sizes.defaultLogoHeight
 }
 
+/**
+ * The width of the scrollbar gutter is estimated to be 8px.
+ *
+ * Note that the actual width of the scrollbar gutter is browser and OS
+ * dependent.
+ */
+const SCROLLBAR_GUTTER_WIDTH_ESTIMATE = "8px"
+
 export const StyledLogo = styled.img<StyledLogoProps>(
   ({ theme, size, sidebarWidth }) => ({
     height: translateLogoHeight(theme, size),
@@ -315,12 +323,11 @@ export const StyledLogo = styled.img<StyledLogoProps>(
     ...(sidebarWidth && {
       // Control max width of logo so sidebar collapse button always shows (issue #8707)
       // L & R padding (lg) + scrollbarGutter on both sides (2 * 8px) + R margin (sm) + collapse button (2.25rem)
-      //
-      // Note that 8px for scrollbarGutter is an estimate, since the actual
-      // value changes depending on the browser and OS.
       maxWidth: `calc(${sidebarWidth}px - 2 * ${getSidebarHorizontalSpacing(
         theme
-      )} * 8px - ${theme.spacing.sm} - 2.25rem)`,
+      )} - (2 * ${SCROLLBAR_GUTTER_WIDTH_ESTIMATE}) - ${
+        theme.spacing.sm
+      } - 2.25rem)`,
     }),
   })
 )
