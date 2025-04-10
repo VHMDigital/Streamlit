@@ -27,7 +27,6 @@ from streamlit.errors import (
     StreamlitInvalidColumnSpecError,
     StreamlitInvalidVerticalAlignmentError,
 )
-from typing import Optional, Union, Sequence
 from streamlit.proto.Block_pb2 import Block as BlockProto
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.string_util import validate_icon_or_emoji
@@ -382,7 +381,9 @@ class LayoutsMixin:
         return [row._block(column_proto(w / total_weight)) for w in weights]
 
     @gather_metrics("tabs")
-    def tabs(self, tabs: Sequence[str],default: Optional[Union[str, int]] = 0) -> Sequence[DeltaGenerator]:
+    def tabs(
+        self, tabs: Sequence[str], default: str | int | None = 0
+    ) -> Sequence[DeltaGenerator]:
         r"""Insert containers separated into tabs.
 
         Inserts a number of multi-element containers as tabs.
@@ -479,7 +480,9 @@ class LayoutsMixin:
         if isinstance(default, str):
             default_index = tabs.index(default) if default in tabs else 0
         else:
-            default_index = min(max(default, 0), len(tabs) - 1)  # Ensure it's within bounds
+            default_index = min(
+                max(default, 0), len(tabs) - 1
+            )  # Ensure it's within bounds
 
         def tab_proto(label: str) -> BlockProto:
             tab_proto = BlockProto()
