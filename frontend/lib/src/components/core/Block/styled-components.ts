@@ -161,9 +161,9 @@ export interface StyledVerticalBlockProps {
 }
 
 export const StyledVerticalBlock = styled.div<StyledVerticalBlockProps>(
-  ({ width, maxWidth, theme }) => ({
-    width,
-    maxWidth,
+  ({ theme }) => ({
+    width: "100%",
+    maxWidth: "100%",
     position: "relative", // Required for the automatic width computation.
     display: "flex",
     flex: 1,
