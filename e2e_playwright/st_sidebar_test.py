@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
+
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction
@@ -78,3 +80,71 @@ def test_sidebar_chart_and_toolbar(app: Page):
 def test_check_top_level_class(app: Page):
     """Check that the top level class is correctly set."""
     check_top_level_class(app, "stSidebar")
+
+
+def test_sidebar_resize_functionality(app: Page):
+    """Test that sidebar can be resized by dragging and not by clicking."""
+
+    # Get the sidebar element
+    sidebar = app.get_by_test_id("stSidebar")
+    expect(sidebar).to_be_visible()
+
+    # Get the initial width of the sidebar
+    initial_width = sidebar.evaluate("el => el.getBoundingClientRect().width")
+
+    # Find the resize handle (the element with cursor: col-resize)
+    resize_handle = app.locator("div[style*='cursor: col-resize']")
+    expect(resize_handle).to_be_visible()
+
+    # Get resize handle position
+    handle_box = resize_handle.bounding_box()
+    assert handle_box is not None
+
+    # Get the handle's starting position
+    handle_x = handle_box["x"] + handle_box["width"] / 2
+    handle_y = handle_box["y"] + handle_box["height"] / 2
+
+    # Drag the handle to the right by 20 pixels
+    drag_distance = 20
+    app.mouse.move(handle_x, handle_y)
+    app.mouse.down()
+    app.mouse.move(handle_x + drag_distance, handle_y)
+    app.mouse.up()
+
+    # Give the resize a moment to take effect
+    app.wait_for_timeout(500)
+
+    # Measure the width after dragging
+    after_drag_width = sidebar.evaluate("el => el.getBoundingClientRect().width")
+
+    # Verify the width increased by approximately drag_distance
+    # We use a tolerance of +/- 3px to account for rounding and rendering differences
+    width_change = after_drag_width - initial_width
+    assert math.isclose(width_change, drag_distance, abs_tol=3), (
+        f"Expected width change of ~{drag_distance}px, got {width_change}px"
+    )
+
+    # Now just click the resize handle without dragging
+    resize_handle.click()
+
+    # Measure the width after clicking
+    after_click_width = sidebar.evaluate("el => el.getBoundingClientRect().width")
+
+    # Verify clicking didn't change the width
+    assert after_click_width == after_drag_width, (
+        f"Width changed after clicking: {after_click_width} != {after_drag_width}"
+    )
+
+    # Finally, test double-click to reset width
+    resize_handle.dblclick()
+
+    # Give the reset a moment to take effect
+    app.wait_for_timeout(500)
+
+    # Measure the width after double-clicking
+    after_dblclick_width = sidebar.evaluate("el => el.getBoundingClientRect().width")
+
+    # Verify the width changed (reset to default)
+    assert after_dblclick_width != after_click_width, (
+        f"Width didn't reset after double-clicking: {after_dblclick_width} == {after_click_width}"
+    )
