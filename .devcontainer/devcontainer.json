@@ -18,6 +18,7 @@
         "ms-python.mypy-type-checker",
         "ms-python.python",
         "ms-python.debugpy",
+        "ms-python.vscode-pylance",
         "charliermarsh.ruff",
         "EditorConfig.EditorConfig",
         "vitest.explorer",
