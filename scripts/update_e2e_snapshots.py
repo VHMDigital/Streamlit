@@ -45,7 +45,9 @@ def get_token_from_credential_manager() -> str:
     """
     cmd = ["git", "credential", "fill"]
     input_data = "protocol=https\nhost=github.com\n\n"
-    result = subprocess.run(cmd, input=input_data, capture_output=True, text=True, check=False)
+    result = subprocess.run(
+        cmd, input=input_data, capture_output=True, text=True, check=False
+    )
     if result.returncode != 0:
         print(
             f"Error getting credentials from git credential manager: {result.stderr.strip()}"
