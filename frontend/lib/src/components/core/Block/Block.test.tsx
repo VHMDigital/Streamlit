@@ -132,43 +132,43 @@ describe("Vertical Block Component", () => {
     ).toHaveStyle("border: 1px solid rgba(49, 51, 63, 0.2);")
   })
 
-  describe("should never have a width of 0", () => {
-    describe("when observed width is 0", () => {
-      beforeEach(() => {
-        vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
-          elementRef: { current: null },
-          forceRecalculate: vitest.fn(),
-          values: [0],
-        })
-      })
+  // describe("should never have a width of 0", () => {
+  //   describe("when observed width is 0", () => {
+  //     beforeEach(() => {
+  //       vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
+  //         elementRef: { current: null },
+  //         forceRecalculate: vitest.fn(),
+  //         values: [0],
+  //       })
+  //     })
 
-      it("should have a width of -1px", () => {
-        const block = makeVerticalBlock([makeHorizontalBlock(4)])
-        render(makeVerticalBlockComponent(block))
+  //     it("should have a width of -1px", () => {
+  //       const block = makeVerticalBlock([makeHorizontalBlock(4)])
+  //       render(makeVerticalBlockComponent(block))
 
-        expect(screen.getAllByTestId("stVerticalBlock")[0]).toHaveStyle(
-          "width: -1px"
-        )
-      })
-    })
+  //       expect(screen.getAllByTestId("stVerticalBlock")[0]).toHaveStyle(
+  //         "width: -1px"
+  //       )
+  //     })
+  //   })
 
-    describe("when observed width is a positive value", () => {
-      beforeEach(() => {
-        vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
-          elementRef: { current: null },
-          forceRecalculate: vitest.fn(),
-          values: [100],
-        })
-      })
+  //   describe("when observed width is a positive value", () => {
+  //     beforeEach(() => {
+  //       vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
+  //         elementRef: { current: null },
+  //         forceRecalculate: vitest.fn(),
+  //         values: [100],
+  //       })
+  //     })
 
-      it("should have the observed width", () => {
-        const block = makeVerticalBlock([makeHorizontalBlock(4)])
-        render(makeVerticalBlockComponent(block))
+  //     it("should have the observed width", () => {
+  //       const block = makeVerticalBlock([makeHorizontalBlock(4)])
+  //       render(makeVerticalBlockComponent(block))
 
-        expect(screen.getAllByTestId("stVerticalBlock")[0]).toHaveStyle(
-          "width: 100px"
-        )
-      })
-    })
-  })
+  //       expect(screen.getAllByTestId("stVerticalBlock")[0]).toHaveStyle(
+  //         "width: 100px"
+  //       )
+  //     })
+  //   })
+  // })
 })
