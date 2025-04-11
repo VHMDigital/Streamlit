@@ -334,7 +334,7 @@ const VerticalBlock = (props: BlockPropsWithoutWidth): ReactElement => {
   // Extract the user-specified key from the block ID (if provided):
   const userKey = getKeyFromId(props.node.deltaBlock.id)
   const styles = useLayoutStyles({
-    width: "",
+    width: "100%",
     element: undefined,
   })
 
