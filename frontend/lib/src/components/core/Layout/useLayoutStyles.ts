@@ -47,7 +47,12 @@ export const useLayoutStyles = <T>({
   // subpixel widths, which leads to blurriness on screen
 
   const layoutStyles = useMemo((): UseLayoutStylesShape => {
-    if (useContainerWidth) {
+    // The st.image element is potentially a list of images, so we always want
+    // the enclosing container to be full width. The size of individual
+    // images is managed in the ImageList component.
+    const isImgList = element && "imgs" in element
+
+    if (useContainerWidth || isImgList) {
       return {
         width: "100%",
       }
