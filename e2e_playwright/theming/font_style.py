@@ -22,30 +22,30 @@ def run_font_style_test():
     st.header("NotoSans Font Test")
 
     # Test normal text
-    st.markdown("This is normal text in NotoSans", key="normal_text")
+    with st.container(key="normal_text_container"):
+        st.markdown("This is normal text in NotoSans")
 
     # Test italic text with markdown
-    st.markdown("This has *italic text* in NotoSans", key="italic_text")
+    with st.container(key="italic_text_container"):
+        st.markdown("This has *italic text* in NotoSans")
 
     # Test mixed formatting
-    st.markdown(
-        "This has both **bold** and *italic* text in NotoSans", key="mixed_text"
-    )
+    with st.container(key="mixed_text_container"):
+        st.markdown("This has both **bold** and *italic* text in NotoSans")
 
     # Test code and italic together
-    st.markdown("Code `example` with *italics* mixed in", key="code_italic")
-
-    # Empty paragraph to create space
-    st.markdown("")
+    with st.container(key="code_italic_container"):
+        st.markdown("Code `example` with *italics* mixed in")
 
     # A longer paragraph with mixed text
-    st.markdown(
-        "This is a longer paragraph with *italic phrases* mixed in throughout the text. "
-        "The NotoSans font should properly render both the normal and *italic* variants "
-        "to provide a consistent typography experience in the app.",
-        key="long_paragraph",
-    )
+    with st.container(key="long_paragraph_container"):
+        st.markdown(
+            "This is a longer paragraph with *italic phrases* mixed in throughout the text. "
+            "The NotoSans font should properly render both the normal and *italic* variants "
+            "to provide a consistent typography experience in the app."
+        )
 
 
+# Run the app when this file is run directly
 if __name__ == "__main__":
     run_font_style_test()

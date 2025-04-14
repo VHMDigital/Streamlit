@@ -16,8 +16,8 @@
 import json
 import os
 
-import pytest
-from playwright.sync_api import Page, expect
+import pytest  # type: ignore
+from playwright.sync_api import Page, expect  # type: ignore
 
 from e2e_playwright.conftest import ImageCompareFunction
 from e2e_playwright.shared.app_utils import expect_font
@@ -60,27 +60,34 @@ def test_font_style(app: Page, assert_snapshot: ImageCompareFunction):
     # Make sure that all elements are rendered and no skeletons are shown
     expect(app.get_by_test_id("stSkeleton")).to_have_count(0, timeout=25000)
 
-    # Add additional timeout to ensure fonts can load
-    app.wait_for_timeout(5000)
-
     # Verify Noto Sans font is loaded
     expect_font(app, "Noto Sans")
 
     # Take snapshot of the entire app
     assert_snapshot(app, name="notosans_font_full")
 
-    # Take snapshots of specific text elements
-    normal_text = app.locator('[data-testid="stMarkdown"][key="normal_text"]')
+    # Take snapshots of specific text elements inside their containers
+    normal_text = app.locator(
+        '[data-testid="stContainer"][key="normal_text_container"] [data-testid="stMarkdown"]'
+    )
     assert_snapshot(normal_text, name="notosans_normal_text")
 
-    italic_text = app.locator('[data-testid="stMarkdown"][key="italic_text"]')
+    italic_text = app.locator(
+        '[data-testid="stContainer"][key="italic_text_container"] [data-testid="stMarkdown"]'
+    )
     assert_snapshot(italic_text, name="notosans_italic_text")
 
-    mixed_text = app.locator('[data-testid="stMarkdown"][key="mixed_text"]')
+    mixed_text = app.locator(
+        '[data-testid="stContainer"][key="mixed_text_container"] [data-testid="stMarkdown"]'
+    )
     assert_snapshot(mixed_text, name="notosans_mixed_text")
 
-    code_italic = app.locator('[data-testid="stMarkdown"][key="code_italic"]')
+    code_italic = app.locator(
+        '[data-testid="stContainer"][key="code_italic_container"] [data-testid="stMarkdown"]'
+    )
     assert_snapshot(code_italic, name="notosans_code_italic")
 
-    long_paragraph = app.locator('[data-testid="stMarkdown"][key="long_paragraph"]')
+    long_paragraph = app.locator(
+        '[data-testid="stContainer"][key="long_paragraph_container"] [data-testid="stMarkdown"]'
+    )
     assert_snapshot(long_paragraph, name="notosans_long_paragraph")
