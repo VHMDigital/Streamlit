@@ -24,11 +24,9 @@ import { StyledElementContainer } from "./styled-components"
 export const StyledElementContainerLayoutWrapper: FC<
   Omit<Parameters<typeof StyledElementContainer>[0], "width"> & {
     node: ElementNode
-    //width: React.CSSProperties["width"]
   }
 > = ({ node, ...rest }) => {
   const styles = useLayoutStyles({
-    width: "100%",
     element:
       (node.element?.type && node.element[node.element.type]) || undefined,
   })

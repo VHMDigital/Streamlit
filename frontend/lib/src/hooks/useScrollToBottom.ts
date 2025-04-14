@@ -72,7 +72,7 @@ export function useScrollToBottom<T extends HTMLElement>(): RefObject<T> {
   useEffect(() => {
     // Set isSticky to true to ensure first load scrolls to bottom
     setIsSticky(true)
-  }, [])
+  }, [setIsSticky])
 
   // Internal context
   const ignoreScrollEventBeforeRef = useRef(0)
