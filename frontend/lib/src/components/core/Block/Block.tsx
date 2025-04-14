@@ -297,10 +297,6 @@ const VerticalBlock = (props: BlockPropsWithoutWidth): ReactElement => {
   // Extract the user-specified key from the block ID (if provided):
   const userKey = getKeyFromId(props.node.deltaBlock.id)
 
-  // Widths of children autosizes to container width (and therefore window width).
-  // StyledVerticalBlocks are the only things that calculate their own widths. They should never use
-  // the width value coming from the parent via props.
-
   // To apply a border, we need to wrap the StyledVerticalBlockWrapper again, otherwise the width
   // calculation would not take the padding into consideration.
   return (
