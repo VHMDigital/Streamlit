@@ -60,59 +60,59 @@ class UserInfoProxyTest(DeltaGeneratorTestCase):
 
     def test_user_email_attr(self):
         """Test that `st.user.email` returns user info from ScriptRunContext"""
-        self.assertEqual(st.experimental_user.email, "test@example.com")
+        self.assertEqual(st.user.email, "test@example.com")
 
     def test_user_email_key(self):
-        self.assertEqual(st.experimental_user["email"], "test@example.com")
+        self.assertEqual(st.user["email"], "test@example.com")
 
     def test_user_non_existing_attr(self):
         """Test that an error is raised when called non existed attr."""
         with self.assertRaises(AttributeError):
-            st.write(st.experimental_user.attribute)
+            st.write(st.user.attribute)
 
     def test_user_non_existing_key(self):
         """Test that an error is raised when called non existed key."""
         with self.assertRaises(KeyError):
-            st.write(st.experimental_user["key"])
+            st.write(st.user["key"])
 
     def test_user_cannot_be_modified_existing_key(self):
         """
         Test that an error is raised when try to assign new value to existing key.
         """
         with self.assertRaises(StreamlitAPIException) as e:
-            st.experimental_user["email"] = "NEW_VALUE"
+            st.user["email"] = "NEW_VALUE"
 
-        self.assertEqual(str(e.exception), "st.experimental_user cannot be modified")
+        self.assertEqual(str(e.exception), "st.user cannot be modified")
 
     def test_user_cannot_be_modified_new_key(self):
         """
         Test that an error is raised when try to assign new value to new key.
         """
         with self.assertRaises(StreamlitAPIException) as e:
-            st.experimental_user["foo"] = "bar"
+            st.user["foo"] = "bar"
 
-        self.assertEqual(str(e.exception), "st.experimental_user cannot be modified")
+        self.assertEqual(str(e.exception), "st.user cannot be modified")
 
     def test_user_cannot_be_modified_existing_attr(self):
         """
         Test that an error is raised when try to assign new value to existing attr.
         """
         with self.assertRaises(StreamlitAPIException) as e:
-            st.experimental_user.email = "bar"
+            st.user.email = "bar"
 
-        self.assertEqual(str(e.exception), "st.experimental_user cannot be modified")
+        self.assertEqual(str(e.exception), "st.user cannot be modified")
 
     def test_user_cannot_be_modified_new_attr(self):
         """
         Test that an error is raised when try to assign new value to new attr.
         """
         with self.assertRaises(StreamlitAPIException) as e:
-            st.experimental_user.foo = "bar"
+            st.user.foo = "bar"
 
-        self.assertEqual(str(e.exception), "st.experimental_user cannot be modified")
+        self.assertEqual(str(e.exception), "st.user cannot be modified")
 
     def test_user_len(self):
-        self.assertEqual(len(st.experimental_user), 1)
+        self.assertEqual(len(st.user), 1)
 
     def test_st_user_reads_from_context_(self):
         """Test that st.user reads information from current ScriptRunContext
@@ -138,7 +138,7 @@ class UserInfoProxyTest(DeltaGeneratorTestCase):
                 ),
             )
 
-            self.assertEqual(st.experimental_user.email, "something@else.com")
+            self.assertEqual(st.user.email, "something@else.com")
         except Exception as e:
             raise e
         finally:

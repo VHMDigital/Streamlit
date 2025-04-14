@@ -60,6 +60,7 @@ _os.environ["MPLBACKEND"] = "Agg"
 from streamlit import logger as _logger
 from streamlit import config as _config
 from streamlit.deprecation_util import deprecate_func_name as _deprecate_func_name
+from streamlit.deprecation_util import deprecate_obj_name as _deprecate_obj_name
 from streamlit.version import STREAMLIT_VERSION_STRING as _STREAMLIT_VERSION_STRING
 
 # Give the package a version.
@@ -277,11 +278,19 @@ fragment = _fragment
 login = _login
 logout = _logout
 
+# User
+user = _UserInfoProxy()
+
 # Experimental APIs
 experimental_audio_input = _main.experimental_audio_input
 experimental_dialog = _experimental_dialog_decorator
 experimental_fragment = _experimental_fragment
-experimental_user = _UserInfoProxy()
+experimental_user = _deprecate_obj_name(
+    _UserInfoProxy(),
+    "experimental_user",
+    "user",
+    "2025-11-06",
+)
 
 _EXPERIMENTAL_QUERY_PARAMS_DEPRECATE_MSG = "Refer to our [docs page](https://docs.streamlit.io/develop/api-reference/caching-and-state/st.query_params) for more information."
 
