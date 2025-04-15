@@ -29,6 +29,8 @@ if TYPE_CHECKING:
     from tornado.httputil import HTTPHeaders, HTTPServerRequest
     from tornado.web import RequestHandler
 
+    from streamlit.runtime.pages_manager import PagesManager
+
 
 def _get_request() -> HTTPServerRequest | None:
     ctx = get_script_run_ctx()
@@ -121,6 +123,32 @@ class StreamlitCookies(Mapping[str, str]):
 
     def to_dict(self) -> dict[str, str]:
         return dict(self._cookies)
+
+
+def maybe_trim_page_path(url: str, page_manager: PagesManager) -> str:
+    """Trim the page path from the URL if it exists."""
+    url = url.removesuffix("/")
+
+    for page in page_manager.get_pages().values():
+        page_url = page.get("url_pathname", "")
+        if page_url and url.endswith(page_url):
+            return url.removesuffix(page_url)
+
+    return url
+
+
+def maybe_add_page_path(url: str, page_manager: PagesManager) -> str:
+    """Add the page path to the URL if it exists."""
+    url = url.removesuffix("/")
+
+    current_page_script_hash = page_manager.current_page_script_hash
+    current_page_path = page_manager.get_pages().get(current_page_script_hash, "")
+    if current_page_path:
+        page_url = current_page_path.get("url_pathname", "")
+        if page_url:
+            return f"{url}/{page_url}"
+
+    return url
 
 
 class ContextProxy:
@@ -306,7 +334,16 @@ class ContextProxy:
         ctx = get_script_run_ctx()
         if ctx is None or ctx.context_info is None:
             return None
-        return ctx.context_info.url
+
+        url_from_frontend = ctx.context_info.url
+        url_without_page_prefix = maybe_trim_page_path(
+            url_from_frontend, ctx.pages_manager
+        )
+        url_with_page_prefix = maybe_add_page_path(
+            url_without_page_prefix, ctx.pages_manager
+        )
+
+        return url_with_page_prefix
 
     @property
     @gather_metrics("context.ip_address")
