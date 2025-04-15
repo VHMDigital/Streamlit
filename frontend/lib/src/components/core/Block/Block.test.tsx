@@ -116,7 +116,7 @@ describe("Vertical Block Component", () => {
 
     expect(
       screen.getAllByTestId("stVerticalBlockBorderWrapper")[0]
-    ).toHaveStyle("overflow-y: auto")
+    ).toHaveStyle("overflow: auto")
   })
 
   it("should show border when border is True", () => {
