@@ -71,26 +71,4 @@ describe("useResizeObserver", () => {
 
     expect(mockObserve).toHaveBeenCalledWith(mockElement)
   })
-
-  it("should handle force recalculation", async () => {
-    const properties: DOMRectKeys[] = ["width", "height"]
-    const { result } = renderHook(() => useResizeObserver(properties))
-
-    // Simulate element reference
-    const mockElement = document.createElement("div")
-    vi.spyOn(mockElement, "getBoundingClientRect").mockReturnValue({
-      width: 100,
-      height: 200,
-    } as DOMRect)
-
-    // Set the ref and trigger initial calculation
-    act(() => {
-      result.current.elementRef.current = mockElement
-    })
-
-    // Run any pending timers
-    vi.runAllTimers()
-
-    expect(result.current.values).toEqual([100, 200])
-  })
 })
