@@ -189,7 +189,7 @@ export const StyledVerticalBlockBorderWrapper =
       }),
       ...(height && {
         height: `${height}px`,
-        overflowY: "auto",
+        overflow: "auto",
       }),
     })
   )
