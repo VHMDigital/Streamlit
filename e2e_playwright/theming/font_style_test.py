@@ -31,13 +31,13 @@ def configure_notosans_font():
         [
             {
                 "family": "Noto Sans",
-                "url": "https://fonts.gstatic.com/s/notosans/v30/o-0IIpQlx3QUlC5A4PNr5TRA.woff2",
+                "url": "./app/static/NotoSans-only_letters_and_numbers.woff2",
                 "weight": 400,
                 "style": "normal",
             },
             {
                 "family": "Noto Sans",
-                "url": "https://fonts.gstatic.com/s/notosans/v30/o-0OIpQlx3QUlC5A4PNr5TRG.woff2",
+                "url": "./app/static/NotoSans-Italics_only_letters_and_numbers.woff2",
                 "weight": 400,
                 "style": "italic",
             },
