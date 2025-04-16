@@ -72,6 +72,8 @@ def test_shows_disabled_widget_correctly(
     assert_snapshot(disabled_camera_input, name="st_camera_input-disabled")
 
 
+# Webkit CI camera permission issue
+@pytest.mark.skip_browser("webkit")
 def test_take_photo_button_styling(app: Page):
     """Test that the Take Photo button is rendered properly when active/disabled."""
     camera_input_widgets = app.get_by_test_id("stCameraInput")
