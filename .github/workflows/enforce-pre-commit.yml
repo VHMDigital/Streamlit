@@ -52,8 +52,7 @@ jobs:
           pre-commit install-hooks
         shell: bash
       - name: Enable and Prepare Latest Yarn
-        run: |
-          corepack enable
+        run: corepack enable
         shell: bash
       - name: Install prettier
         run: cd frontend && yarn install
