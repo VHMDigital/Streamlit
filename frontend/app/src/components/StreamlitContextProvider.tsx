@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { memo, PropsWithChildren, useContext, useMemo } from "react"
+import React, { memo, PropsWithChildren, useMemo } from "react"
 
 import { AppConfig } from "@streamlit/connection"
 import {
@@ -22,6 +22,7 @@ import {
   LibContext,
   LibContextProps,
   ThemeConfig,
+  useRequiredContext,
 } from "@streamlit/lib"
 import { IGitInfo, PageConfig } from "@streamlit/protobuf"
 import {
@@ -180,11 +181,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
  * Throws an error if used outside of an AppContext.Provider.
  */
 export const useAppContext = (): AppContextProps => {
-  const context = useContext(AppContext)
-  if (context === undefined) {
-    throw new Error("useAppContext must be used within an AppContext.Provider")
-  }
-  return context
+  return useRequiredContext(AppContext)
 }
 
 export default memo(StreamlitContextProvider)

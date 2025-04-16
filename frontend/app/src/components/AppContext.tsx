@@ -97,7 +97,7 @@ export interface AppContextProps {
   appConfig: AppConfig
 }
 
-export const AppContext = React.createContext<AppContextProps>({
+export const AppContext = React.createContext<AppContextProps | null>({
   wideMode: false,
   initialSidebarState: PageConfig.SidebarState.AUTO,
   embedded: false,
@@ -111,3 +111,4 @@ export const AppContext = React.createContext<AppContextProps>({
   gitInfo: null,
   appConfig: {},
 })
+AppContext.displayName = "AppContext"
