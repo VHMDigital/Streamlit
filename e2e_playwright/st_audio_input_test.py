@@ -97,6 +97,8 @@ def test_audio_input_disabled_snapshot(
     assert_snapshot(disabled_audio_input_element, name="st_audio_input-disabled")
 
 
+# Webkit CI audio permission issue
+@pytest.mark.skip_browser("webkit")
 def test_audio_input_action_buttons_styling(app: Page):
     """Test that the audio input action buttons are styled correctly."""
     # Enabled audio input
