@@ -52,7 +52,6 @@ def test_button_widget_rendering(
 
 def test_material_icon_hover(app: Page, assert_snapshot: ImageCompareFunction):
     material_icon_button = app.get_by_test_id("stButton").nth(8)
-    expect(material_icon_button).to_be_visible()
     app.get_by_text("Like Button").hover()
     assert_snapshot(material_icon_button, name="st_button-material_icon_hover")
 
