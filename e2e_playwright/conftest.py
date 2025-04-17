@@ -284,7 +284,25 @@ def app_server(
 @pytest.fixture(scope="function")
 def app(page: Page, app_port: int) -> Page:
     """Fixture that opens the app."""
-    page.goto(f"http://localhost:{app_port}/")
+    try:
+        response = page.goto(f"http://localhost:{app_port}/")
+
+    except Exception as e:
+        print(e, flush=True)
+
+    if response is None:
+        raise RuntimeError("Unable to load page")
+    elif response.status != 200:
+        print(f"Unsuccessful in loading page. Status: {response.status}", flush=True)
+        if response.status == 404:
+            print(
+                "404 error: try building the frontend with make frontend-fast",
+                flush=True,
+            )
+        raise RuntimeError("Unable to load page")
+    else:
+        print("Successfully loaded page", flush=True)
+
     start_capture_traces(page)
     wait_for_app_loaded(page)
     return page
@@ -883,7 +901,7 @@ def wait_for_app_loaded(page: Page):
     """Wait for the app to fully load."""
     # Wait for the app view container to appear:
     page.wait_for_selector(
-        "[data-testid='stAppViewContainer']", timeout=30000, state="attached"
+        "[data-testid='stAppViewContainer']", timeout=3000, state="attached"
     )
 
     wait_for_app_run(page)
