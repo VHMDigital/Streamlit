@@ -195,7 +195,7 @@ def _get_stable_random_machine_id() -> str:
     if not config.get_option("browser.gatherUsageStats"):
         # This value will never be sent to our telemetry. Just including it here
         # to help debug.
-        return "no-stable-random-id"
+        return "no-stable-random-machine-id"
 
     filepath = file_util.get_streamlit_file_path("stable_random_machine_id")
     stable_id = None
