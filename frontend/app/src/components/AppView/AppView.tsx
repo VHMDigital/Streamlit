@@ -95,6 +95,8 @@ export interface AppViewProps {
 
   wideMode: boolean
 
+  embedded: boolean
+
   hideSidebarNav: boolean
 
   expandSidebarNav: boolean
@@ -118,6 +120,7 @@ function AppView(props: AppViewProps): ReactElement {
     onPageChange,
     currentPageScriptHash,
     wideMode,
+    embedded,
     expandSidebarNav,
     hideSidebarNav,
     sendMessageToHost,
@@ -137,7 +140,6 @@ function AppView(props: AppViewProps): ReactElement {
 
   const {
     initialSidebarState,
-    embedded,
     showPadding,
     disableScrolling,
     showToolbar,

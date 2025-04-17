@@ -1997,7 +1997,6 @@ export class App extends PureComponent<Props, State> {
     return (
       <StreamlitContextProvider
         initialSidebarState={initialSidebarState}
-        embedded={isEmbed()}
         showPadding={!isEmbed() || isPaddingDisplayed()}
         disableScrolling={isScrollingHidden()}
         showToolbar={!isEmbed() || isToolbarDisplayed()}
@@ -2039,7 +2038,7 @@ export class App extends PureComponent<Props, State> {
             data-test-connection-state={connectionState}
           >
             {/* The tabindex below is required for testing. */}
-            <Header>
+            <Header embedded={isEmbed()}>
               {!hideTopBar && (
                 <>
                   <StatusWidget
@@ -2096,6 +2095,7 @@ export class App extends PureComponent<Props, State> {
               onPageChange={this.onPageChange}
               currentPageScriptHash={currentPageScriptHash}
               wideMode={userSettings.wideMode}
+              embedded={isEmbed()}
               hideSidebarNav={hideSidebarNav || hostHideSidebarNav}
               expandSidebarNav={expandSidebarNav}
             />

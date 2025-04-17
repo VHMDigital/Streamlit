@@ -18,7 +18,6 @@ import styled from "@emotion/styled"
 
 export interface StyledHeaderProps {
   showHeader: boolean
-  isWideMode: boolean
   isStale?: boolean
 }
 

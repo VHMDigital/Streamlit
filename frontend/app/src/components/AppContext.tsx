@@ -27,12 +27,6 @@ export interface AppContextProps {
   initialSidebarState: PageConfig.SidebarState
 
   /**
-   * True if the app is embedded.
-   * @see isEmbed
-   */
-  embedded: boolean
-
-  /**
    * True if padding is enabled.
    * @see isPaddingDisplayed
    */
@@ -92,7 +86,6 @@ export interface AppContextProps {
 
 export const AppContext = React.createContext<AppContextProps | null>({
   initialSidebarState: PageConfig.SidebarState.AUTO,
-  embedded: false,
   showPadding: false,
   disableScrolling: false,
   showToolbar: false,

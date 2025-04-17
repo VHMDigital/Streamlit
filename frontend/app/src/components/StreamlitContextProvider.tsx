@@ -33,7 +33,6 @@ import {
 // Type for AppContext props
 type AppContextValues = {
   initialSidebarState: PageConfig.SidebarState
-  embedded: boolean
   showPadding: boolean
   disableScrolling: boolean
   showToolbar: boolean
@@ -73,7 +72,6 @@ export type StreamlitContextProviderProps = PropsWithChildren<
 const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
   // AppContext
   initialSidebarState,
-  embedded,
   showPadding,
   disableScrolling,
   showToolbar,
@@ -103,7 +101,6 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
   const appContextProps = useMemo<AppContextProps>(
     () => ({
       initialSidebarState,
-      embedded,
       showPadding,
       disableScrolling,
       showToolbar,
@@ -116,7 +113,6 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
     }),
     [
       initialSidebarState,
-      embedded,
       showPadding,
       disableScrolling,
       showToolbar,

@@ -25,12 +25,12 @@ import {
 } from "./styled-components"
 
 export interface HeaderProps {
+  embedded: boolean
   children: ReactNode
-  isStale?: boolean
 }
 
-function Header({ isStale, children }: Readonly<HeaderProps>): ReactElement {
-  const { wideMode, embedded, showToolbar, showColoredLine } = useAppContext()
+function Header({ embedded, children }: Readonly<HeaderProps>): ReactElement {
+  const { showToolbar, showColoredLine } = useAppContext()
 
   let showHeader = true
   if (embedded) {
@@ -39,10 +39,8 @@ function Header({ isStale, children }: Readonly<HeaderProps>): ReactElement {
   return (
     <StyledHeader
       showHeader={showHeader}
-      isWideMode={wideMode}
       // The tabindex below is required for testing.
       tabIndex={-1}
-      isStale={isStale}
       className="stAppHeader"
       data-testid="stHeader"
     >
