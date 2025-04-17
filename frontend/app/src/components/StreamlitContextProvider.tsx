@@ -16,7 +16,6 @@
 
 import React, { memo, PropsWithChildren, useMemo } from "react"
 
-import { AppConfig } from "@streamlit/connection"
 import {
   LibConfig,
   LibContext,
@@ -37,7 +36,6 @@ type AppContextValues = {
   sidebarChevronDownshift: number
   widgetsDisabled: boolean
   gitInfo: IGitInfo | null
-  appConfig: AppConfig
 }
 
 // Type for LibContext props
@@ -72,7 +70,6 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
   sidebarChevronDownshift,
   widgetsDisabled,
   gitInfo,
-  appConfig,
   // LibContext
   isFullScreen,
   setFullScreen,
@@ -97,7 +94,6 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       sidebarChevronDownshift,
       widgetsDisabled,
       gitInfo,
-      appConfig,
     }),
     [
       initialSidebarState,
@@ -105,7 +101,6 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       sidebarChevronDownshift,
       widgetsDisabled,
       gitInfo,
-      appConfig,
     ]
   )
 

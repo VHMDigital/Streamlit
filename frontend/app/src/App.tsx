@@ -1968,7 +1968,6 @@ export class App extends PureComponent<Props, State> {
       hostMenuItems,
       hostToolbarItems,
       libConfig,
-      appConfig,
       inputsDisabled,
       appPages,
       navSections,
@@ -2010,7 +2009,6 @@ export class App extends PureComponent<Props, State> {
           inputsDisabled || connectionState !== ConnectionState.CONNECTED
         }
         gitInfo={this.state.gitInfo}
-        appConfig={appConfig}
         isFullScreen={isFullScreen}
         setFullScreen={this.handleFullScreen}
         addScriptFinishedHandler={this.addScriptFinishedHandler}

@@ -16,19 +16,21 @@
 
 import React from "react"
 
-import { AppConfig } from "@streamlit/connection"
 import { IGitInfo, PageConfig } from "@streamlit/protobuf"
 
 export interface AppContextProps {
   /**
    * The sidebar's default display state.
    * Set from the PageConfig protobuf.
+   * Pulled from appContext in AppView as prop to ThemedSidebar.
+   * @see Sidebar
    */
   initialSidebarState: PageConfig.SidebarState
 
   /**
    * Part of URL construction for an app page in a multi-page app;
    * this is set from the host communication manager via host message.
+   * Pulled from appContext in SidebarNav
    * @see SidebarNav
    */
   pageLinkBaseUrl: string
@@ -38,26 +40,28 @@ export interface AppContextProps {
    * "chevron" icon is shifted. (If sidebarChevronDownshift is 0, then
    * the current theme's spacing is used.);
    * this is set from the host communication manager via host message.
-   * @see StyledSidebarCollapsedControl
+   * Pulled from appContext in AppView & ThemedSidebar
+   * @see AppView (StyledSidebarOpenContainer)
+   * @see Sidebar (StyledSidebarOpenContainer)
    */
   sidebarChevronDownshift: number
 
   /**
    * Whether to disable widgets and sidebar page navigation links, based on connection
    * state and whether the host has disabled inputs.
+   * Pulled from appContext in AppView as prop to VerticalBlock > ElementNodeRenderer
+   * Pulled from appContext in SidebarNavLink
+   * @see ElementNodeRenderer
    * @see SidebarNavLink
    */
   widgetsDisabled: boolean
 
   /**
    * The latest state of the git information related to the app.
+   * Pulled from appContext in DeployDialog
+   * @see DeployDialog
    */
   gitInfo: IGitInfo | null
-
-  /** The app-specific configuration from the apps host which is requested via the
-   * _stcore/host-config endpoint.
-   */
-  appConfig: AppConfig
 }
 
 export const AppContext = React.createContext<AppContextProps | null>({
@@ -66,6 +70,5 @@ export const AppContext = React.createContext<AppContextProps | null>({
   sidebarChevronDownshift: 0,
   widgetsDisabled: false,
   gitInfo: null,
-  appConfig: {},
 })
 AppContext.displayName = "AppContext"

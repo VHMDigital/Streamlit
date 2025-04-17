@@ -63,7 +63,6 @@ function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
     sidebarChevronDownshift: 0,
     widgetsDisabled: false,
     gitInfo: null,
-    appConfig: {},
     ...context,
   }
 }
