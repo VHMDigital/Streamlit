@@ -35,8 +35,6 @@ type AppContextValues = {
   initialSidebarState: PageConfig.SidebarState
   showPadding: boolean
   disableScrolling: boolean
-  showToolbar: boolean
-  showColoredLine: boolean
   pageLinkBaseUrl: string
   sidebarChevronDownshift: number
   widgetsDisabled: boolean
@@ -74,8 +72,6 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
   initialSidebarState,
   showPadding,
   disableScrolling,
-  showToolbar,
-  showColoredLine,
   pageLinkBaseUrl,
   sidebarChevronDownshift,
   widgetsDisabled,
@@ -103,8 +99,6 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       initialSidebarState,
       showPadding,
       disableScrolling,
-      showToolbar,
-      showColoredLine,
       pageLinkBaseUrl,
       sidebarChevronDownshift,
       widgetsDisabled,
@@ -115,8 +109,6 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       initialSidebarState,
       showPadding,
       disableScrolling,
-      showToolbar,
-      showColoredLine,
       pageLinkBaseUrl,
       sidebarChevronDownshift,
       widgetsDisabled,

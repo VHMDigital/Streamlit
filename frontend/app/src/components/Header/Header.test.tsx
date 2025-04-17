@@ -19,54 +19,24 @@ import React from "react"
 import { screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib"
-import { PageConfig } from "@streamlit/protobuf"
-import { AppContextProps } from "@streamlit/app/src/components/AppContext"
-import * as StreamlitContextProviderModule from "@streamlit/app/src/components/StreamlitContextProvider"
 
 import Header, { HeaderProps } from "./Header"
 
-function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
-  return {
-    initialSidebarState: PageConfig.SidebarState.AUTO,
-    showPadding: false,
-    disableScrolling: false,
-    showToolbar: false,
-    showColoredLine: false,
-    pageLinkBaseUrl: "",
-    sidebarChevronDownshift: 0,
-    widgetsDisabled: false,
-    gitInfo: null,
-    appConfig: {},
-    ...context,
-  }
-}
-
 const getProps = (propOverrides: Partial<HeaderProps> = {}): HeaderProps => ({
-  embedded: false,
+  showToolbar: true,
+  showColoredLine: true,
   children: <div>Test</div>,
   ...propOverrides,
 })
 
 describe("Header", () => {
-  beforeEach(() => {
-    // Mock the useAppContext hook to return default values
-    vi.spyOn(
-      StreamlitContextProviderModule,
-      "useAppContext"
-    ).mockImplementation(() => getContextOutput({}))
-  })
-
-  it("renders a Header", () => {
+  it("renders a Header without crashing", () => {
     render(<Header {...getProps()} />)
 
     expect(screen.getByTestId("stHeader")).toBeInTheDocument()
   })
 
-  it("renders correctly when not embedded, showToolbar & showColoredLine true", () => {
-    vi.spyOn(StreamlitContextProviderModule, "useAppContext").mockReturnValue(
-      getContextOutput({ showToolbar: true, showColoredLine: true })
-    )
-
+  it("renders correctly when showToolbar & showColoredLine both true", () => {
     render(<Header {...getProps()} />)
 
     expect(screen.getByTestId("stHeader")).toHaveStyle("display: block")
@@ -74,9 +44,33 @@ describe("Header", () => {
     expect(screen.getByTestId("stToolbar")).toBeVisible()
   })
 
-  it("renders correctly when embedded, showToolbar & showColoredLine false", () => {
-    render(<Header {...getProps({ embedded: true })} />)
+  it("renders correctly when showToolbar & showColoredLine both false", () => {
+    render(
+      <Header {...getProps({ showToolbar: false, showColoredLine: false })} />
+    )
 
-    expect(screen.getByTestId("stHeader")).toHaveStyle("display: none")
+    expect(screen.getByTestId("stHeader")).toHaveStyle("display: block")
+    expect(screen.queryByTestId("stDecoration")).toBeNull()
+    expect(screen.queryByTestId("stToolbar")).toBeNull()
+  })
+
+  it("renders correctly when showToolbar false & showColoredLine true", () => {
+    render(
+      <Header {...getProps({ showToolbar: false, showColoredLine: true })} />
+    )
+
+    expect(screen.getByTestId("stHeader")).toHaveStyle("display: block")
+    expect(screen.getByTestId("stDecoration")).toBeVisible()
+    expect(screen.queryByTestId("stToolbar")).toBeNull()
+  })
+
+  it("renders correctly when showToolbar true & showColoredLine false", () => {
+    render(
+      <Header {...getProps({ showToolbar: true, showColoredLine: false })} />
+    )
+
+    expect(screen.getByTestId("stHeader")).toHaveStyle("display: block")
+    expect(screen.queryByTestId("stDecoration")).toBeNull()
+    expect(screen.getByTestId("stToolbar")).toBeVisible()
   })
 })

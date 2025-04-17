@@ -61,8 +61,6 @@ function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
     initialSidebarState: PageConfig.SidebarState.AUTO,
     showPadding: false,
     disableScrolling: false,
-    showToolbar: false,
-    showColoredLine: false,
     pageLinkBaseUrl: "",
     sidebarChevronDownshift: 0,
     widgetsDisabled: false,
@@ -109,6 +107,7 @@ function getProps(props: Partial<AppViewProps> = {}): AppViewProps {
     currentPageScriptHash: "main_page_script_hash",
     wideMode: false,
     embedded: false,
+    addPaddingForHeader: false,
     hideSidebarNav: false,
     expandSidebarNav: false,
     ...props,
@@ -337,13 +336,12 @@ describe("AppView element", () => {
       expect(style.paddingBottom).toEqual("10rem")
     })
 
-    it("showToolbar triggers expected top padding", () => {
-      vi.spyOn(
-        StreamlitContextProviderModule,
-        "useAppContext"
-      ).mockReturnValue(getContextOutput({ showToolbar: true }))
-
-      render(<AppView {...getProps({ embedded: true })} />)
+    it("addPaddingForHeader triggers expected top padding", () => {
+      render(
+        <AppView
+          {...getProps({ embedded: true, addPaddingForHeader: true })}
+        />
+      )
       const style = window.getComputedStyle(
         screen.getByTestId("stMainBlockContainer")
       )

@@ -97,6 +97,8 @@ export interface AppViewProps {
 
   embedded: boolean
 
+  addPaddingForHeader: boolean
+
   hideSidebarNav: boolean
 
   expandSidebarNav: boolean
@@ -121,6 +123,7 @@ function AppView(props: AppViewProps): ReactElement {
     currentPageScriptHash,
     wideMode,
     embedded,
+    addPaddingForHeader,
     expandSidebarNav,
     hideSidebarNav,
     sendMessageToHost,
@@ -142,8 +145,6 @@ function AppView(props: AppViewProps): ReactElement {
     initialSidebarState,
     showPadding,
     disableScrolling,
-    showToolbar,
-    showColoredLine,
     sidebarChevronDownshift,
     widgetsDisabled,
   } = useAppContext()
@@ -298,7 +299,7 @@ function AppView(props: AppViewProps): ReactElement {
             data-testid="stMainBlockContainer"
             isWideMode={wideMode}
             showPadding={showPadding}
-            addPaddingForHeader={showToolbar || showColoredLine}
+            addPaddingForHeader={addPaddingForHeader}
             hasBottom={hasBottomElements}
             isEmbedded={embedded}
             hasSidebar={showSidebar}

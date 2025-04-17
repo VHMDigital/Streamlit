@@ -39,18 +39,6 @@ export interface AppContextProps {
   disableScrolling: boolean
 
   /**
-   * True if the toolbar should be displayed.
-   * @see isToolbarDisplayed
-   */
-  showToolbar: boolean
-
-  /**
-   * True if the thin colored line at the top of the app should be displayed.
-   * @see isColoredLineDisplayed
-   */
-  showColoredLine: boolean
-
-  /**
    * Part of URL construction for an app page in a multi-page app;
    * this is set from the host communication manager via host message.
    * @see SidebarNav
@@ -88,8 +76,6 @@ export const AppContext = React.createContext<AppContextProps | null>({
   initialSidebarState: PageConfig.SidebarState.AUTO,
   showPadding: false,
   disableScrolling: false,
-  showToolbar: false,
-  showColoredLine: false,
   pageLinkBaseUrl: "",
   sidebarChevronDownshift: 0,
   widgetsDisabled: false,

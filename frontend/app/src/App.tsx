@@ -1994,15 +1994,16 @@ export class App extends PureComponent<Props, State> {
         })
       : null
 
+    const showToolbar = !isEmbed() || isToolbarDisplayed()
+    const showColoredLine =
+      (!hideColoredLine && !isEmbed()) || isColoredLineDisplayed()
+    const showHeader = isEmbed() ? showToolbar || showColoredLine : true
+
     return (
       <StreamlitContextProvider
         initialSidebarState={initialSidebarState}
         showPadding={!isEmbed() || isPaddingDisplayed()}
         disableScrolling={isScrollingHidden()}
-        showToolbar={!isEmbed() || isToolbarDisplayed()}
-        showColoredLine={
-          (!hideColoredLine && !isEmbed()) || isColoredLineDisplayed()
-        }
         pageLinkBaseUrl={pageLinkBaseUrl}
         sidebarChevronDownshift={sidebarChevronDownshift}
         widgetsDisabled={
@@ -2037,47 +2038,55 @@ export class App extends PureComponent<Props, State> {
             }
             data-test-connection-state={connectionState}
           >
-            {/* The tabindex below is required for testing. */}
-            <Header embedded={isEmbed()}>
-              {!hideTopBar && (
-                <>
-                  <StatusWidget
-                    connectionState={connectionState}
-                    sessionEventDispatcher={this.sessionEventDispatcher}
-                    scriptRunState={scriptRunState}
-                    rerunScript={this.rerunScript}
-                    stopScript={this.stopScript}
-                    allowRunOnSave={allowRunOnSave}
+            {showHeader && (
+              <Header
+                showToolbar={showToolbar}
+                showColoredLine={showColoredLine}
+              >
+                {!hideTopBar && (
+                  <>
+                    <StatusWidget
+                      connectionState={connectionState}
+                      sessionEventDispatcher={this.sessionEventDispatcher}
+                      scriptRunState={scriptRunState}
+                      rerunScript={this.rerunScript}
+                      stopScript={this.stopScript}
+                      allowRunOnSave={allowRunOnSave}
+                    />
+                    <ToolbarActions
+                      hostToolbarItems={hostToolbarItems}
+                      sendMessageToHost={
+                        this.hostCommunicationMgr.sendMessageToHost
+                      }
+                      metricsMgr={this.metricsMgr}
+                    />
+                  </>
+                )}
+                {this.showDeployButton() && (
+                  <DeployButton
+                    onClick={this.deployButtonClicked.bind(this)}
                   />
-                  <ToolbarActions
-                    hostToolbarItems={hostToolbarItems}
-                    sendMessageToHost={
-                      this.hostCommunicationMgr.sendMessageToHost
-                    }
-                    metricsMgr={this.metricsMgr}
-                  />
-                </>
-              )}
-              {this.showDeployButton() && (
-                <DeployButton onClick={this.deployButtonClicked.bind(this)} />
-              )}
-              <MainMenu
-                isServerConnected={this.isServerConnected()}
-                quickRerunCallback={this.rerunScript}
-                clearCacheCallback={this.openClearCacheDialog}
-                settingsCallback={this.settingsCallback}
-                aboutCallback={this.aboutCallback}
-                printCallback={this.printCallback}
-                screencastCallback={this.screencastCallback}
-                screenCastState={this.props.screenCast.currentState}
-                hostMenuItems={hostMenuItems}
-                developmentMode={developmentMode}
-                sendMessageToHost={this.hostCommunicationMgr.sendMessageToHost}
-                menuItems={menuItems}
-                metricsMgr={this.metricsMgr}
-                toolbarMode={this.state.toolbarMode}
-              />
-            </Header>
+                )}
+                <MainMenu
+                  isServerConnected={this.isServerConnected()}
+                  quickRerunCallback={this.rerunScript}
+                  clearCacheCallback={this.openClearCacheDialog}
+                  settingsCallback={this.settingsCallback}
+                  aboutCallback={this.aboutCallback}
+                  printCallback={this.printCallback}
+                  screencastCallback={this.screencastCallback}
+                  screenCastState={this.props.screenCast.currentState}
+                  hostMenuItems={hostMenuItems}
+                  developmentMode={developmentMode}
+                  sendMessageToHost={
+                    this.hostCommunicationMgr.sendMessageToHost
+                  }
+                  menuItems={menuItems}
+                  metricsMgr={this.metricsMgr}
+                  toolbarMode={this.state.toolbarMode}
+                />
+              </Header>
+            )}
 
             <AppView
               endpoints={this.endpoints}
@@ -2096,6 +2105,7 @@ export class App extends PureComponent<Props, State> {
               currentPageScriptHash={currentPageScriptHash}
               wideMode={userSettings.wideMode}
               embedded={isEmbed()}
+              addPaddingForHeader={showToolbar || showColoredLine}
               hideSidebarNav={hideSidebarNav || hostHideSidebarNav}
               expandSidebarNav={expandSidebarNav}
             />

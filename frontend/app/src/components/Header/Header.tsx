@@ -16,8 +16,6 @@
 
 import React, { ReactElement, ReactNode } from "react"
 
-import { useAppContext } from "@streamlit/app/src/components/StreamlitContextProvider"
-
 import {
   StyledHeader,
   StyledHeaderDecoration,
@@ -25,20 +23,18 @@ import {
 } from "./styled-components"
 
 export interface HeaderProps {
-  embedded: boolean
+  showToolbar: boolean
+  showColoredLine: boolean
   children: ReactNode
 }
 
-function Header({ embedded, children }: Readonly<HeaderProps>): ReactElement {
-  const { showToolbar, showColoredLine } = useAppContext()
-
-  let showHeader = true
-  if (embedded) {
-    showHeader = showToolbar || showColoredLine
-  }
+function Header({
+  showToolbar,
+  showColoredLine,
+  children,
+}: Readonly<HeaderProps>): ReactElement {
   return (
     <StyledHeader
-      showHeader={showHeader}
       // The tabindex below is required for testing.
       tabIndex={-1}
       className="stAppHeader"
