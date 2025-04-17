@@ -189,7 +189,15 @@ def _get_stable_random_id() -> str:
     Instead of relying on a hardware address in the container or host we'll
     generate a UUID and store it in the ~/.streamlit hidden folder.
     """
-    filepath = file_util.get_streamlit_file_path(".stable_random_id")
+    # If gatherUsageStats is False skip this whole code.
+    # This is just for people who don't want the extra stable_random_id file
+    # in their file system.
+    if not config.get_option("browser.gatherUsageStats"):
+        # This value will never be sent to our telemetry. Just including it here
+        # to help debug.
+        return "no-stable-random-id"
+
+    filepath = file_util.get_streamlit_file_path("stable_random_id")
     stable_id = None
 
     if os.path.exists(filepath):
