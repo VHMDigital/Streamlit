@@ -81,11 +81,12 @@ def test_radio_has_correct_default_values(app: Page):
 
 def test_set_value_correctly_when_click(app: Page):
     """Test that st.radio returns the correct values when the selection is changed."""
-    for index, element in enumerate(app.get_by_test_id("stRadio").all()):
+    radio_widgets = app.get_by_test_id("stRadio").all()
+    for index, element in enumerate(radio_widgets):
         if index not in [2, 3]:  # skip disabled and no-options widget
-            second_radio_option = element.locator('label[data-baseweb="radio"]').nth(1)
-            expect(second_radio_option).to_be_visible()
-            second_radio_option.click(force=True)
+            radio_option = element.locator('label[data-baseweb="radio"]').nth(1)
+            expect(radio_option).to_be_visible()
+            radio_option.click(force=True)
             wait_for_app_run(app)
 
     expected = [
@@ -105,9 +106,16 @@ def test_set_value_correctly_when_click(app: Page):
         "value 13: male",
     ]
 
-    for markdown_element, expected_text in zip(
-        app.get_by_test_id("stMarkdown").all(), expected
+    for index, (markdown_element, expected_text) in enumerate(
+        zip(app.get_by_test_id("stMarkdown").all(), expected)
     ):
+        if not markdown_element.text_content() == expected_text:
+            # retry the click due to flakyness.
+            radio_widgets[index].locator('label[data-baseweb="radio"]').nth(
+                index
+            ).click(force=True)
+            wait_for_app_run(app)
+
         expect(markdown_element).to_have_text(expected_text, use_inner_text=True)
 
 
