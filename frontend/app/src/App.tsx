@@ -2009,6 +2009,7 @@ export class App extends PureComponent<Props, State> {
         navSections={navSections}
         sidebarChevronDownshift={sidebarChevronDownshift}
         expandSidebarNav={expandSidebarNav}
+        hideSidebarNav={hideSidebarNav || hostHideSidebarNav}
         widgetsDisabled={
           inputsDisabled || connectionState !== ConnectionState.CONNECTED
         }

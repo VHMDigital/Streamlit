@@ -74,6 +74,13 @@ export interface AppContextProps {
   expandSidebarNav: boolean
 
   /**
+   * Whether to hide the sidebar nav. Can also be configured via host message.
+   * Pulled from appContext in Sidebar
+   * @see Sidebar
+   */
+  hideSidebarNav: boolean
+
+  /**
    * Whether to disable widgets and sidebar page navigation links, based on connection
    * state and whether the host has disabled inputs.
    * Pulled from appContext in AppView as prop to VerticalBlock > ElementNodeRenderer
@@ -99,6 +106,7 @@ export const AppContext = React.createContext<AppContextProps | null>({
   navSections: [],
   sidebarChevronDownshift: 0,
   expandSidebarNav: false,
+  hideSidebarNav: false,
   widgetsDisabled: false,
   gitInfo: null,
 })

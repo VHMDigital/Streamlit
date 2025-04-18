@@ -255,7 +255,6 @@ function AppView(props: AppViewProps): ReactElement {
             appLogo={appLogo}
             appPages={appPages}
             hasElements={hasSidebarElements}
-            hideSidebarNav={hideSidebarNav}
           >
             <StyledSidebarBlockContainer>
               {renderBlock(elements.sidebar)}

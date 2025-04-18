@@ -46,6 +46,7 @@ import {
 import { IAppPage, Logo, PageConfig } from "@streamlit/protobuf"
 import { localStorageAvailable } from "@streamlit/utils"
 import { shouldCollapse } from "@streamlit/app/src/components/Sidebar/utils"
+import { useAppContext } from "@streamlit/app/src/components/StreamlitContextProvider"
 
 import {
   RESIZE_HANDLE_WIDTH,
@@ -71,7 +72,6 @@ export interface SidebarProps {
   hasElements: boolean
   appLogo: Logo | null
   appPages: IAppPage[]
-  hideSidebarNav: boolean
 }
 
 const MIN_WIDTH = "336"
@@ -105,7 +105,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   children,
   initialSidebarState,
   hasElements,
-  hideSidebarNav,
 }) => {
   const theme: EmotionTheme = useTheme()
   const mediumBreakpointPx = calculateMaxBreakpoint(theme.breakpoints.md)
@@ -132,6 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   )
 
   const { activeTheme } = React.useContext(LibContext)
+  const { hideSidebarNav } = useAppContext()
 
   useEffect(() => {
     setCollapsedSidebar(

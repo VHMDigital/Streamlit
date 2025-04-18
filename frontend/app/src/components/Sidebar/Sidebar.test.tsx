@@ -25,6 +25,8 @@ import {
 
 import { mockEndpoints, render } from "@streamlit/lib"
 import { Logo, PageConfig } from "@streamlit/protobuf"
+import { AppContextProps } from "@streamlit/app/src/components/AppContext"
+import * as StreamlitContextProviderModule from "@streamlit/app/src/components/StreamlitContextProvider"
 
 import Sidebar, { SidebarProps } from "./Sidebar"
 
@@ -49,13 +51,34 @@ function renderSidebar(props: Partial<SidebarProps> = {}): RenderResult {
       appLogo={null}
       appPages={[]}
       hasElements
-      hideSidebarNav={false}
       {...props}
     />
   )
 }
 
+function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
+  return {
+    initialSidebarState: PageConfig.SidebarState.AUTO,
+    pageLinkBaseUrl: "",
+    currentPageScriptHash: "",
+    onPageChange: vi.fn(),
+    navSections: [],
+    sidebarChevronDownshift: 0,
+    expandSidebarNav: false,
+    hideSidebarNav: false,
+    widgetsDisabled: false,
+    gitInfo: null,
+    ...context,
+  }
+}
+
 describe("Sidebar Component", () => {
+  beforeEach(() => {
+    vi.spyOn(StreamlitContextProviderModule, "useAppContext").mockReturnValue(
+      getContextOutput({})
+    )
+  })
+
   it("should render without crashing", () => {
     renderSidebar({})
 
@@ -228,11 +251,15 @@ describe("Sidebar Component", () => {
   })
 
   it("can hide SidebarNav with the hideSidebarNav option", () => {
+    // Update the mock to return a context with hideSidebarNav set to true
+    vi.spyOn(StreamlitContextProviderModule, "useAppContext").mockReturnValue(
+      getContextOutput({ hideSidebarNav: true })
+    )
     const appPages = [
       { pageName: "streamlit_app", pageScriptHash: "page_hash" },
       { pageName: "streamlit_app2", pageScriptHash: "page_hash2" },
     ]
-    renderSidebar({ appPages, hideSidebarNav: true })
+    renderSidebar({ appPages })
 
     expect(screen.queryByTestId("stSidebarNav")).not.toBeInTheDocument()
   })

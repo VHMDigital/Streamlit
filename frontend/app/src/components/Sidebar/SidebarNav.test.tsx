@@ -62,6 +62,7 @@ function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
     navSections: [],
     sidebarChevronDownshift: 0,
     expandSidebarNav: false,
+    hideSidebarNav: false,
     widgetsDisabled: false,
     gitInfo: null,
     ...context,

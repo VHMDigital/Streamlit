@@ -38,6 +38,7 @@ type AppContextValues = {
   navSections: string[]
   sidebarChevronDownshift: number
   expandSidebarNav: boolean
+  hideSidebarNav: boolean
   widgetsDisabled: boolean
   gitInfo: IGitInfo | null
 }
@@ -74,6 +75,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
   navSections,
   sidebarChevronDownshift,
   expandSidebarNav,
+  hideSidebarNav,
   widgetsDisabled,
   gitInfo,
   // LibContext
@@ -103,6 +105,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       navSections,
       sidebarChevronDownshift,
       expandSidebarNav,
+      hideSidebarNav,
       widgetsDisabled,
       gitInfo,
     }),
@@ -114,6 +117,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       navSections,
       sidebarChevronDownshift,
       expandSidebarNav,
+      hideSidebarNav,
       widgetsDisabled,
       gitInfo,
     ]
