@@ -16,7 +16,7 @@
 
 import React from "react"
 
-import { IAppPage, IGitInfo, PageConfig } from "@streamlit/protobuf"
+import { IAppPage, IGitInfo, Logo, PageConfig } from "@streamlit/protobuf"
 
 export interface AppContextProps {
   /**
@@ -61,6 +61,13 @@ export interface AppContextProps {
    * @see SidebarNav
    */
   appPages: IAppPage[]
+
+  /**
+   * The app logo (displayed in top left corner of app)
+   * Pulled from appContext in Sidebar
+   * @see SidebarNav
+   */
+  appLogo: Logo | null
 
   /**
    * If non-zero, this is the number of pixels that the sidebar's
@@ -112,6 +119,7 @@ export const AppContext = React.createContext<AppContextProps | null>({
   onPageChange: () => {},
   navSections: [],
   appPages: [],
+  appLogo: null,
   sidebarChevronDownshift: 0,
   expandSidebarNav: false,
   hideSidebarNav: false,

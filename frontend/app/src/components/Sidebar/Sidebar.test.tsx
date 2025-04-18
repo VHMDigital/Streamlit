@@ -48,7 +48,6 @@ function renderSidebar(props: Partial<SidebarProps> = {}): RenderResult {
     <Sidebar
       endpoints={mockEndpointProp}
       chevronDownshift={0}
-      appLogo={null}
       hasElements
       {...props}
     />
@@ -63,6 +62,7 @@ function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
     onPageChange: vi.fn(),
     navSections: [],
     appPages: [],
+    appLogo: null,
     sidebarChevronDownshift: 0,
     expandSidebarNav: false,
     hideSidebarNav: false,
@@ -324,7 +324,8 @@ describe("Sidebar Component", () => {
     })
 
     it("renders spacer if no logo provided", () => {
-      renderSidebar({ appLogo: null })
+      // Mock returns a context with appLogo set to null by default
+      renderSidebar()
       const sidebarLogoSpacer = within(
         screen.getByTestId("stSidebar")
       ).getByTestId("stLogoSpacer")
@@ -332,11 +333,20 @@ describe("Sidebar Component", () => {
     })
 
     it("renders logo when sidebar collapsed - uses iconImage if provided", () => {
+      // Update the mock to return a context with appLogo set to fullAppLogo
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          appLogo: fullAppLogo,
+        })
+      )
       const sourceSpy = vi.spyOn(mockEndpointProp, "buildMediaURL")
       renderSidebar({
         initialSidebarState: PageConfig.SidebarState.COLLAPSED,
-        appLogo: fullAppLogo,
       })
+
       const openSidebarContainer = screen.getByTestId(
         "stSidebarCollapsedControl"
       )
@@ -349,10 +359,18 @@ describe("Sidebar Component", () => {
     })
 
     it("renders logo when sidebar collapsed - defaults to image if no iconImage", () => {
+      // Update the mock to return a context with appLogo
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          appLogo: imageOnly,
+        })
+      )
       const sourceSpy = vi.spyOn(mockEndpointProp, "buildMediaURL")
       renderSidebar({
         initialSidebarState: PageConfig.SidebarState.COLLAPSED,
-        appLogo: imageOnly,
       })
       const openSidebarContainer = screen.getByTestId(
         "stSidebarCollapsedControl"
@@ -366,8 +384,17 @@ describe("Sidebar Component", () => {
     })
 
     it("renders logo's image param when sidebar expanded", () => {
+      // Update the mock to return a context with appLogo
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          appLogo: fullAppLogo,
+        })
+      )
       const sourceSpy = vi.spyOn(mockEndpointProp, "buildMediaURL")
-      renderSidebar({ appLogo: fullAppLogo })
+      renderSidebar({})
       const sidebarLogoContainer = screen.getByTestId("stSidebarHeader")
       expect(sidebarLogoContainer).toBeInTheDocument()
       const sidebarLogo = within(sidebarLogoContainer).getByTestId("stLogo")
@@ -378,7 +405,17 @@ describe("Sidebar Component", () => {
     })
 
     it("renders logo - default image has no link & medium size", () => {
-      renderSidebar({ appLogo: imageOnly })
+      // Update the mock to return a context with appLogo
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          appLogo: imageOnly,
+        })
+      )
+      renderSidebar()
+
       const sidebarLogoLink = within(
         screen.getByTestId("stSidebar")
       ).queryByTestId("stLogoLink")
@@ -390,7 +427,17 @@ describe("Sidebar Component", () => {
     })
 
     it("renders logo - image has link if provided", () => {
-      renderSidebar({ appLogo: imageWithLink })
+      // Update the mock to return a context with appLogo
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          appLogo: imageWithLink,
+        })
+      )
+      renderSidebar()
+
       const sidebarLogoLink = within(
         screen.getByTestId("stSidebar")
       ).getByTestId("stLogoLink")
@@ -402,7 +449,17 @@ describe("Sidebar Component", () => {
     })
 
     it("renders logo - small size when specified", () => {
-      renderSidebar({ appLogo: logoWithSize })
+      // Update the mock to return a context with appLogo
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          appLogo: logoWithSize,
+        })
+      )
+      renderSidebar()
+
       const sidebarLogo = within(screen.getByTestId("stSidebar")).getByTestId(
         "stLogo"
       )
@@ -410,7 +467,17 @@ describe("Sidebar Component", () => {
     })
 
     it("sets maxWidth of logo based on sidebar width", () => {
-      renderSidebar({ appLogo: imageWithLink })
+      // Update the mock to return a context with appLogo
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          appLogo: imageWithLink,
+        })
+      )
+      renderSidebar()
+
       const sidebarWidth = window.getComputedStyle(
         screen.getByTestId("stSidebar")
       ).width
@@ -424,7 +491,17 @@ describe("Sidebar Component", () => {
     })
 
     it("sends an CLIENT_ERROR message when the logo source fails to load", () => {
-      renderSidebar({ appLogo: fullAppLogo })
+      // Update the mock to return a context with appLogo
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          appLogo: fullAppLogo,
+        })
+      )
+      renderSidebar()
+
       const sidebarLogo = within(
         screen.getByTestId("stSidebarHeader")
       ).getByTestId("stLogo")

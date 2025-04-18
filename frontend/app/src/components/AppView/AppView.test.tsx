@@ -64,6 +64,7 @@ function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
     onPageChange: vi.fn(),
     navSections: [],
     appPages: [],
+    appLogo: null,
     sidebarChevronDownshift: 0,
     expandSidebarNav: false,
     hideSidebarNav: false,
@@ -446,6 +447,7 @@ describe("AppView element", () => {
     it("defaults to image if no iconImage", () => {
       const sourceSpy = vi.spyOn(mockEndpointProp, "buildMediaURL")
       render(<AppView {...getProps({ appLogo: imageOnly })} />)
+
       const openSidebarContainer = screen.getByTestId(
         "stSidebarCollapsedControl"
       )

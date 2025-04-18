@@ -43,6 +43,7 @@ function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
     onPageChange: vi.fn(),
     navSections: [],
     appPages: [],
+    appLogo: null,
     sidebarChevronDownshift: 0,
     expandSidebarNav: false,
     hideSidebarNav: false,

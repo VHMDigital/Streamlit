@@ -2008,6 +2008,7 @@ export class App extends PureComponent<Props, State> {
         onPageChange={this.onPageChange}
         navSections={navSections}
         appPages={appPages}
+        appLogo={elements.logo}
         sidebarChevronDownshift={sidebarChevronDownshift}
         expandSidebarNav={expandSidebarNav}
         hideSidebarNav={hideSidebarNav || hostHideSidebarNav}

@@ -35,7 +35,6 @@ function getProps(
   return {
     endpoints: mockEndpoints(),
     hasElements: true,
-    appLogo: null,
     ...props,
   }
 }

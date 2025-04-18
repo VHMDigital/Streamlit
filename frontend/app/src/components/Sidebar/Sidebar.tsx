@@ -43,7 +43,7 @@ import {
   IsSidebarContext,
   LibContext,
 } from "@streamlit/lib"
-import { Logo, PageConfig } from "@streamlit/protobuf"
+import { PageConfig } from "@streamlit/protobuf"
 import { localStorageAvailable } from "@streamlit/utils"
 import { shouldCollapse } from "@streamlit/app/src/components/Sidebar/utils"
 import { useAppContext } from "@streamlit/app/src/components/StreamlitContextProvider"
@@ -70,7 +70,6 @@ export interface SidebarProps {
   children?: ReactElement
   initialSidebarState?: PageConfig.SidebarState
   hasElements: boolean
-  appLogo: Logo | null
 }
 
 const MIN_WIDTH = "336"
@@ -97,7 +96,6 @@ function headerDecorationVisible(): boolean {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
-  appLogo,
   endpoints,
   chevronDownshift,
   children,
@@ -129,7 +127,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   )
 
   const { activeTheme } = React.useContext(LibContext)
-  const { hideSidebarNav, appPages } = useAppContext()
+  const { hideSidebarNav, appPages, appLogo } = useAppContext()
 
   useEffect(() => {
     setCollapsedSidebar(

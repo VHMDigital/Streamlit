@@ -23,7 +23,7 @@ import {
   ThemeConfig,
   useRequiredContext,
 } from "@streamlit/lib"
-import { IAppPage, IGitInfo, PageConfig } from "@streamlit/protobuf"
+import { IAppPage, IGitInfo, Logo, PageConfig } from "@streamlit/protobuf"
 import {
   AppContext,
   AppContextProps,
@@ -37,6 +37,7 @@ type AppContextValues = {
   onPageChange: (pageScriptHash: string) => void
   navSections: string[]
   appPages: IAppPage[]
+  appLogo: Logo | null
   sidebarChevronDownshift: number
   expandSidebarNav: boolean
   hideSidebarNav: boolean
@@ -75,6 +76,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
   pageLinkBaseUrl,
   navSections,
   appPages,
+  appLogo,
   sidebarChevronDownshift,
   expandSidebarNav,
   hideSidebarNav,
@@ -106,6 +108,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       onPageChange,
       navSections,
       appPages,
+      appLogo,
       sidebarChevronDownshift,
       expandSidebarNav,
       hideSidebarNav,
@@ -119,6 +122,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       onPageChange,
       navSections,
       appPages,
+      appLogo,
       sidebarChevronDownshift,
       expandSidebarNav,
       hideSidebarNav,

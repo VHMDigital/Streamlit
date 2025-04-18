@@ -252,7 +252,6 @@ function AppView(props: AppViewProps): ReactElement {
           <ThemedSidebar
             endpoints={endpoints}
             initialSidebarState={initialSidebarState}
-            appLogo={appLogo}
             hasElements={hasSidebarElements}
           >
             <StyledSidebarBlockContainer>
