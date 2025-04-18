@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from tornado.web import RequestHandler
 
     from streamlit.runtime.pages_manager import PagesManager
+    from streamlit.source_util import PageInfo
 
 
 def _get_request() -> HTTPServerRequest | None:
@@ -142,9 +143,11 @@ def maybe_add_page_path(url: str, page_manager: PagesManager) -> str:
     url = url.removesuffix("/")
 
     current_page_script_hash = page_manager.current_page_script_hash
-    current_page_path = page_manager.get_pages().get(current_page_script_hash, "")
-    if current_page_path:
-        page_url = current_page_path.get("url_pathname", "")
+    current_page_info: PageInfo | None = page_manager.get_pages().get(
+        current_page_script_hash, None
+    )
+    if current_page_info is not None:
+        page_url = current_page_info.get("url_pathname", "")
         if page_url:
             return f"{url}/{page_url}"
 
