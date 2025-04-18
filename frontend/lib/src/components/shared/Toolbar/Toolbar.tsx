@@ -110,7 +110,7 @@ const Toolbar: React.FC<React.PropsWithChildren<ToolbarProps>> = ({
       locked={locked || isFullScreen}
       target={target}
     >
-      <StyledToolbar>
+      <StyledToolbar data-testid="stElementToolbarButtonContainer">
         {children}
         {onExpand && !disableFullscreenMode && !isFullScreen && (
           <ToolbarAction
