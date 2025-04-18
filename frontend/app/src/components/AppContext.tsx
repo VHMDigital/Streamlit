@@ -43,6 +43,12 @@ export interface AppContextProps {
   currentPageScriptHash: string
 
   /**
+   * Change the page in a multi-page app.
+   * @see SidebarNav
+   */
+  onPageChange: (pageScriptHash: string) => void
+
+  /**
    * If non-zero, this is the number of pixels that the sidebar's
    * "chevron" icon is shifted. (If sidebarChevronDownshift is 0, then
    * the current theme's spacing is used.);
@@ -82,6 +88,7 @@ export const AppContext = React.createContext<AppContextProps | null>({
   initialSidebarState: PageConfig.SidebarState.AUTO,
   pageLinkBaseUrl: "",
   currentPageScriptHash: "",
+  onPageChange: () => {},
   sidebarChevronDownshift: 0,
   expandSidebarNav: false,
   widgetsDisabled: false,

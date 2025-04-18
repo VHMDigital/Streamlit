@@ -36,7 +36,6 @@ function getProps(
     endpoints: mockEndpoints(),
     appPages: [],
     navSections: [],
-    onPageChange: vi.fn(),
     hasElements: true,
     hideSidebarNav: false,
     appLogo: null,

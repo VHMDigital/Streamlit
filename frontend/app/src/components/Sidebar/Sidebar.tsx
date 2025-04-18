@@ -72,7 +72,6 @@ export interface SidebarProps {
   appLogo: Logo | null
   appPages: IAppPage[]
   navSections: string[]
-  onPageChange: (pageName: string) => void
   hideSidebarNav: boolean
 }
 
@@ -107,7 +106,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   children,
   initialSidebarState,
   hasElements,
-  onPageChange,
   hideSidebarNav,
   navSections,
 }) => {
@@ -374,7 +372,6 @@ const Sidebar: React.FC<SidebarProps> = ({
               collapseSidebar={toggleCollapse}
               navSections={navSections}
               hasSidebarElements={hasElements}
-              onPageChange={onPageChange}
             />
           )}
           <StyledSidebarUserContent

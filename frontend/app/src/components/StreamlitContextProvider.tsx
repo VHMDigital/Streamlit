@@ -33,6 +33,8 @@ import {
 type AppContextValues = {
   initialSidebarState: PageConfig.SidebarState
   pageLinkBaseUrl: string
+  currentPageScriptHash: string
+  onPageChange: (pageScriptHash: string) => void
   sidebarChevronDownshift: number
   expandSidebarNav: boolean
   widgetsDisabled: boolean
@@ -81,12 +83,12 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
   setTheme,
   availableThemes,
   addThemes,
-  onPageChange,
   libConfig,
   fragmentIdsThisRun,
   locale,
   // Used in both contexts
   currentPageScriptHash,
+  onPageChange,
   children,
 }: StreamlitContextProviderProps) => {
   // Memoized object for AppContext values
@@ -95,6 +97,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       initialSidebarState,
       pageLinkBaseUrl,
       currentPageScriptHash,
+      onPageChange,
       sidebarChevronDownshift,
       expandSidebarNav,
       widgetsDisabled,
@@ -104,6 +107,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       initialSidebarState,
       pageLinkBaseUrl,
       currentPageScriptHash,
+      onPageChange,
       sidebarChevronDownshift,
       expandSidebarNav,
       widgetsDisabled,

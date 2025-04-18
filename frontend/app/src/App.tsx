@@ -2100,7 +2100,6 @@ export class App extends PureComponent<Props, State> {
               appLogo={elements.logo}
               appPages={appPages}
               navSections={navSections}
-              onPageChange={this.onPageChange}
               wideMode={userSettings.wideMode}
               embedded={isEmbed()}
               addPaddingForHeader={showToolbar || showColoredLine}

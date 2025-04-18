@@ -50,7 +50,6 @@ const getProps = (props: Partial<Props> = {}): Props => ({
   navSections: [],
   collapseSidebar: vi.fn(),
   hasSidebarElements: false,
-  onPageChange: vi.fn(),
   endpoints: mockEndpoints(),
   ...props,
 })
@@ -60,6 +59,7 @@ function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
     initialSidebarState: PageConfig.SidebarState.AUTO,
     pageLinkBaseUrl: "",
     currentPageScriptHash: "",
+    onPageChange: vi.fn(),
     sidebarChevronDownshift: 0,
     expandSidebarNav: false,
     widgetsDisabled: false,
@@ -480,6 +480,10 @@ describe("SidebarNav", () => {
   })
 
   it("passes the pageScriptHash to onPageChange if a link is clicked", async () => {
+    const onPageChange = vi.fn()
+    vi.spyOn(StreamlitContextProviderModule, "useAppContext").mockReturnValue(
+      getContextOutput({ onPageChange })
+    )
     const user = userEvent.setup()
     const props = getProps()
     render(<SidebarNav {...props} />)
@@ -487,11 +491,16 @@ describe("SidebarNav", () => {
     const links = screen.getAllByTestId("stSidebarNavLink")
     await user.click(links[1])
 
-    expect(props.onPageChange).toHaveBeenCalledWith("other_page_hash")
+    // Check the onPageChange func from context is called with the correct pageScriptHash
+    expect(onPageChange).toHaveBeenCalledWith("other_page_hash")
     expect(props.collapseSidebar).not.toHaveBeenCalled()
   })
 
   it("collapses sidebar on page change when on mobile", async () => {
+    const onPageChange = vi.fn()
+    vi.spyOn(StreamlitContextProviderModule, "useAppContext").mockReturnValue(
+      getContextOutput({ onPageChange })
+    )
     const user = userEvent.setup()
     // @ts-expect-error
     reactDeviceDetect.isMobile = true
@@ -502,7 +511,8 @@ describe("SidebarNav", () => {
     const links = screen.getAllByTestId("stSidebarNavLink")
     await user.click(links[1])
 
-    expect(props.onPageChange).toHaveBeenCalledWith("other_page_hash")
+    // Check the onPageChange func from context is called with the correct pageScriptHash
+    expect(onPageChange).toHaveBeenCalledWith("other_page_hash")
     expect(props.collapseSidebar).toHaveBeenCalled()
   })
 
