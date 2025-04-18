@@ -34,9 +34,13 @@ import { StyledModalButton } from "./styled-components"
 
 export interface ModalHeaderProps {
   children: ReactNode
+  overrides?: React.CSSProperties
 }
 
-function ModalHeader({ children }: Readonly<ModalHeaderProps>): ReactElement {
+function ModalHeader({
+  children,
+  overrides,
+}: Readonly<ModalHeaderProps>): ReactElement {
   const {
     genericFonts,
     fontSizes,
@@ -54,7 +58,7 @@ function ModalHeader({ children }: Readonly<ModalHeaderProps>): ReactElement {
         marginBottom: spacing.none,
         paddingTop: spacing.twoXL,
         paddingRight: spacing.twoXL,
-        paddingBottom: spacing.xl,
+        paddingBottom: spacing.md,
         paddingLeft: spacing.twoXL,
         fontFamily: genericFonts.bodyFont,
         fontSize: fontSizes.xl,
@@ -66,6 +70,7 @@ function ModalHeader({ children }: Readonly<ModalHeaderProps>): ReactElement {
         alignItems: "center",
         maxHeight: "80vh",
         flexDirection: "row",
+        ...overrides,
       }}
     >
       {children}
