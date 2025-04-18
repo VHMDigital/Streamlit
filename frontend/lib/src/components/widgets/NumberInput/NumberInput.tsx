@@ -119,18 +119,15 @@ const NumberInput: React.FC<Props> = ({
     setStep(getStep({ step: element.step, dataType: element.dataType }))
   }, [element.dataType, element.step])
 
+  const [hasError, setHasError] = useState(false)
+
   const commitValue = useCallback(
-    ({
-      value: valueArg,
-      source,
-    }: {
-      value: number | null
-      source: Source
-    }) => {
-      if (notNullOrUndefined(valueArg) && (min > valueArg || valueArg > max)) {
-        inputRef.current?.reportValidity()
+    ({ value, source }: { value: number | null; source: Source }) => {
+      if (notNullOrUndefined(value) && (min > value || value > max)) {
+        setHasError(true)
       } else {
-        const newValue = valueArg ?? elementDefault ?? null
+        setHasError(false)
+        const newValue = value ?? elementDefault ?? null
 
         switch (elementDataType) {
           case NumberInputProto.DataType.INT:
