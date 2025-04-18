@@ -429,9 +429,12 @@ autofix:
 
 .PHONY: frontend-typesync
 # Run typesync in each frontend workspace to check for unsynced types.
+# If types are unsynced, print a message and exit with a non-zero exit code.
 frontend-typesync:
-	cd frontend/ ; yarn workspaces foreach --all --exclude @streamlit/typescript-config run typesync:ci --dry=fail
-	cd component-lib/ ; yarn typesync:ci --dry=fail
+	cd frontend/ ; yarn workspaces foreach --all --exclude @streamlit/typescript-config run typesync:ci --dry=fail || (\
+		echo -e "\033[0;31mTypesync check failed. Run 'make frontend-typesync-update' to fix.\033[0m"; \
+		exit 1 \
+	)
 
 .PHONY: frontend-typesync-update
 # Run typesync in each frontend workspace to update types.
