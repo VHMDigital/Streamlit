@@ -50,21 +50,27 @@ export const StyledToolbarWrapper = styled.div<StyledToolbarWrapperProps>(
   })
 )
 
-export const StyledToolbar = styled.div(({ theme }) => ({
-  color: hasLightBackgroundColor(theme)
-    ? theme.colors.fadedText60
-    : theme.colors.bodyText,
-  display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  boxShadow: "1px 2px 8px rgba(0, 0, 0, 0.08)",
-  borderRadius: theme.radii.default,
-  backgroundColor: theme.colors.lightenedBg05,
-  width: "fit-content",
-  zIndex: theme.zIndices.sidebar + 1,
-  padding: theme.spacing.twoXS,
-}))
+export interface StyledToolbarProps {
+  hasActions?: boolean
+}
+
+export const StyledToolbar = styled.div<StyledToolbarProps>(
+  ({ theme, hasActions }) => ({
+    color: hasLightBackgroundColor(theme)
+      ? theme.colors.fadedText60
+      : theme.colors.bodyText,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    boxShadow: "1px 2px 8px rgba(0, 0, 0, 0.08)",
+    borderRadius: theme.radii.default,
+    backgroundColor: theme.colors.lightenedBg05,
+    width: "fit-content",
+    zIndex: theme.zIndices.sidebar + 1,
+    padding: hasActions ? theme.spacing.twoXS : theme.spacing.none,
+  })
+)
 
 export const StyledToolbarElementContainer = styled.div<{
   width?: number | string

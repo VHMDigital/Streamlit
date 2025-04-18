@@ -27,7 +27,6 @@ import Toolbar, {
   ToolbarActionProps,
   ToolbarProps,
 } from "./Toolbar"
-
 import { TOP_DISTANCE } from "./styled-components"
 
 const onExpand = vi.fn()
@@ -75,7 +74,7 @@ describe("Toolbar element", () => {
     expect(toolbarButton).toHaveLength(2)
   })
 
-  it("styles toolbar & buttons correctly", async () => {
+  it("styles toolbar & buttons correctly", () => {
     render(<Toolbar {...getToolbarProps()} />)
 
     const toolbar = screen.getByTestId("stElementToolbar")
@@ -88,6 +87,15 @@ describe("Toolbar element", () => {
     )
     expect(toolbarButtonContainer).toHaveStyle("padding: 0.25rem")
     expect(toolbarButtonContainer).toHaveStyle("color: rgba(49, 51, 63, 0.6)")
+  })
+
+  it("does not apply padding if there are no actions", () => {
+    render(<Toolbar {...getToolbarProps({ disableFullscreenMode: true })} />)
+
+    const toolbarButtonContainer = screen.getByTestId(
+      "stElementToolbarButtonContainer"
+    )
+    expect(toolbarButtonContainer).toHaveStyle("padding: 0px")
   })
 
   it("doesn't show toolbar if not locked", async () => {
