@@ -110,10 +110,10 @@ def test_set_value_correctly_when_click(app: Page):
         zip(app.get_by_test_id("stMarkdown").all(), expected)
     ):
         if not markdown_element.text_content() == expected_text:
-            # retry the click due to flakyness.
-            radio_widgets[index].locator('label[data-baseweb="radio"]').nth(
-                index
-            ).click(force=True)
+            # Retry the click due to flakyness.
+            radio_widgets[index].locator('label[data-baseweb="radio"]').nth(1).click(
+                force=True
+            )
             wait_for_app_run(app)
 
         expect(markdown_element).to_have_text(expected_text, use_inner_text=True)
