@@ -109,7 +109,7 @@ const Toolbar: React.FC<React.PropsWithChildren<ToolbarProps>> = ({
     onCollapse && !disableFullscreenMode && isFullScreen
   // Need to check if there are any actions to show, otherwise padding visible with no actions
   const hasActions =
-    !!children || showFullscreenButton || showCloseFullscreenButton
+    !!children || !!showFullscreenButton || !!showCloseFullscreenButton
 
   return (
     <StyledToolbarWrapper

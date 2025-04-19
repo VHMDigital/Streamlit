@@ -51,7 +51,7 @@ export const StyledToolbarWrapper = styled.div<StyledToolbarWrapperProps>(
 )
 
 export interface StyledToolbarProps {
-  hasActions?: boolean
+  hasActions: boolean
 }
 
 export const StyledToolbar = styled.div<StyledToolbarProps>(
