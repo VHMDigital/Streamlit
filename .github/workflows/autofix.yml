@@ -91,6 +91,8 @@ jobs:
 
       - name: Run make update-snapshots
         run: make update-snapshots
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for changes
         id: git-check-snapshots
