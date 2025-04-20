@@ -9,6 +9,10 @@ jobs:
   autofix:
     if: contains(github.event.pull_request.labels.*.name, 'autofix')
     runs-on: ubuntu-latest
+    # Add permissions for GITHUB_TOKEN
+    permissions:
+      contents: write
+      pull-requests: write
 
     # Avoid duplicate workflows on same branch
     concurrency:
