@@ -416,12 +416,12 @@ run-e2e-test:
 # Autofix linting and formatting errors.
 autofix:
 	# Python fixes:
-	make pyformat
 	ruff check --fix
+	make pyformat
 	# JS fixes:
 	make react-init
-	make jsformat
 	cd frontend/ ; yarn workspaces foreach --all run lint --fix
+	make jsformat
 	# Other fixes:
 	make notices
 	# Run all pre-commit fixes but not fail if any of them don't work.
