@@ -211,30 +211,26 @@ def main() -> None:
     token = args.token
 
     if not token:
-        if os.environ.get("GITHUB_TOKEN"):
-            print("Using GITHUB_TOKEN environment variable...")
-            token = os.environ.get("GITHUB_TOKEN")
-        else:
-            print(
-                "GitHub token not provided via argument. Attempting to retrieve it from the Git credential manager..."
-            )
-            token = get_token_from_credential_manager()
-            if not token:
-                # Add interactive prompt for token
-                try:
-                    token = input(
-                        "Please enter your GitHub Personal Access Token (only requires the repo/public_repo scope): "
-                    ).strip()
-                except (KeyboardInterrupt, EOFError):
-                    token = None
+        print(
+            "GitHub token not provided via argument. Attempting to retrieve it from the Git credential manager..."
+        )
+        token = get_token_from_credential_manager()
+        if not token:
+            # Add interactive prompt for token
+            try:
+                token = input(
+                    "Please enter your GitHub Personal Access Token (only requires the repo/public_repo scope): "
+                ).strip()
+            except (KeyboardInterrupt, EOFError):
+                token = None
 
-                if not token:
-                    print(
-                        "GitHub token is required. Please provide it via --token or configure your git credential manager."
-                    )
-                    sys.exit(1)
-            else:
-                print("Token retrieved from git credential manager.")
+            if not token:
+                print(
+                    "GitHub token is required. Please provide it via --token or configure your git credential manager."
+                )
+                sys.exit(1)
+        else:
+            print("Token retrieved from git credential manager.")
 
     print("Retrieving latest workflow run...")
 
