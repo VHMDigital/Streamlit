@@ -226,7 +226,7 @@ class StContextTest(unittest.TestCase):
                 {"hash1": {"url_pathname": "page1"}},
                 "https://example.com/page1",
             ),
-            # Test case: URL with current page hash that doesn't exist in pages
+            # Test case: URL with the current page hash that doesn't exist in pages
             (
                 "https://example.com",
                 "unknown",
