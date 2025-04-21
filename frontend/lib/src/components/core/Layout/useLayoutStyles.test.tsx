@@ -16,8 +16,8 @@
 
 import { describe, expect, it } from "vitest"
 import { renderHook } from "@testing-library/react"
-import { streamlit } from "@streamlit/protobuf"
 
+import { streamlit } from "@streamlit/protobuf"
 import { useLayoutStyles } from "./useLayoutStyles"
 
 describe("#useLayoutStyles", () => {
@@ -112,9 +112,10 @@ describe("#useLayoutStyles", () => {
       )
     })
 
-    describe("with unexpected variations on element", () => {
+    describe("with variations on element", () => {
       it.each([
         [undefined, { width: "auto" }],
+        [null, { width: "auto" }],
         [{ widthType: 999, useContainerWidth: false }, { width: "auto" }],
         [{ widthType: 999, useContainerWidth: true }, { width: "100%" }],
       ])("and with element %o, returns %o", (element, expected) => {

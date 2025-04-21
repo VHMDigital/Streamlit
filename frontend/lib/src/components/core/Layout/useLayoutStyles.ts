@@ -15,17 +15,18 @@
  */
 
 import { useMemo } from "react"
-import { streamlit } from "@streamlit/protobuf"
 
-export type UseLayoutStylesArgs<T> = {
-  element: (T & LayoutElement) | undefined
-}
+import { streamlit } from "@streamlit/protobuf"
 
 type LayoutElement = {
   width?: number
   pixelWidth?: number
   widthType?: streamlit.Width
   useContainerWidth?: boolean | null
+}
+
+export type UseLayoutStylesArgs<T> = {
+  element: (T & LayoutElement) | undefined
 }
 
 const isNonZeroPositiveNumber = (value: unknown): value is number =>
@@ -36,11 +37,17 @@ type LayoutWidth = {
   layoutWidthType: streamlit.Width
 }
 
-const getWidth = <T>(element: LayoutElement): LayoutWidth => {
+const getWidth = (element: LayoutElement | undefined): LayoutWidth => {
   // This can be simplified once all elements have been updated to use the
   // new `pixelWidth` and `widthType` fields.
   let pixels: number | undefined
   let type: streamlit.Width = streamlit.Width.CONTENT
+  if (!element) {
+    return {
+      pixels,
+      layoutWidthType: streamlit.Width.CONTENT,
+    }
+  }
 
   if (element.widthType === streamlit.Width.STRETCH) {
     type = streamlit.Width.STRETCH
@@ -77,16 +84,7 @@ export type UseLayoutStylesShape = {
 export const useLayoutStyles = <T>({
   element,
 }: UseLayoutStylesArgs<T>): UseLayoutStylesShape => {
-  /**
-   * The width set from the `st.<command>`
-   */
-  if (!element) {
-    return {
-      width: "auto",
-    }
-  }
   const { pixels: commandWidth, layoutWidthType } = getWidth(element)
-
   // The st.image element is potentially a list of images, so we always want
   // the enclosing container to be full width. The size of individual
   // images is managed in the ImageList component.
@@ -95,6 +93,12 @@ export const useLayoutStyles = <T>({
   // Note: Consider rounding the width to the nearest pixel so we don't have
   // subpixel widths, which leads to blurriness on screen
   const layoutStyles = useMemo((): UseLayoutStylesShape => {
+    if (!element) {
+      return {
+        width: "auto",
+      }
+    }
+
     if (layoutWidthType === streamlit.Width.STRETCH || isImgList) {
       return {
         width: "100%",
