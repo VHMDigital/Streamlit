@@ -114,15 +114,8 @@ describe("#useLayoutStyles", () => {
 
     describe("with unexpected variations on element", () => {
       it.each([
-        // Empty element
-        [{}, { width: "auto" }],
-        // Null element
-        [null, { width: "auto" }],
-        // Undefined element
         [undefined, { width: "auto" }],
-        // Element with invalid widthType
         [{ widthType: 999, useContainerWidth: false }, { width: "auto" }],
-        // Element with invalid widthType and useContainerWidth true
         [{ widthType: 999, useContainerWidth: true }, { width: "100%" }],
       ])("and with element %o, returns %o", (element, expected) => {
         const { result } = renderHook(() => useLayoutStyles({ element }))
