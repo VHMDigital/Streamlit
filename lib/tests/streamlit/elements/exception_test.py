@@ -31,7 +31,7 @@ from streamlit.elements.exception import (
     _format_syntax_error_message,
     _split_list,
 )
-from streamlit.errors import StreamlitAPIException
+from streamlit.errors import StreamlitAPIException, StreamlitInvalidWidthError
 from streamlit.proto.Exception_pb2 import Exception as ExceptionProto
 from streamlit.proto.Layout_pb2 import Width as WidthProto
 from tests import testutil
@@ -290,8 +290,14 @@ class ExceptionWidthTest(DeltaGeneratorTestCase):
     def test_exception_with_invalid_width(self):
         """Test that an invalid width raises an exception."""
         e = RuntimeError("This is an exception")
-        with self.assertRaises(StreamlitAPIException):
+        with self.assertRaises(StreamlitInvalidWidthError):
             st.exception(e, width="invalid")
+
+    def test_exception_with_negative_width(self):
+        """Test that a negative width raises an exception."""
+        e = RuntimeError("This is an exception")
+        with self.assertRaises(StreamlitInvalidWidthError):
+            st.exception(e, width=-100)
 
 
 class StExceptionAPITest(DeltaGeneratorTestCase):

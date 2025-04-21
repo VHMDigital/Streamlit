@@ -19,9 +19,9 @@ import traceback
 from typing import TYPE_CHECKING, Callable, Final, TypeVar, cast
 
 from streamlit import config
+from streamlit.elements.lib.layout_utils import validate_width
 from streamlit.errors import (
     MarkdownFormattedException,
-    StreamlitAPIException,
     StreamlitAPIWarning,
 )
 from streamlit.logger import get_logger
@@ -116,12 +116,7 @@ def marshall(
     is_uncaught_app_exception: bool
         The exception originates from an uncaught error during script execution.
     """
-    if not isinstance(width, (int, str)) or (
-        isinstance(width, str) and width != "stretch"
-    ):
-        raise StreamlitAPIException(
-            f"Invalid width value: {width}. Width must be either an integer (pixels) or 'stretch'."
-        )
+    validate_width(width)
 
     is_markdown_exception = isinstance(exception, MarkdownFormattedException)
 
@@ -137,7 +132,6 @@ def marshall(
     exception_proto.stack_trace.extend(stack_trace)
     exception_proto.is_warning = isinstance(exception, Warning)
 
-    # Set the width fields
     if isinstance(width, int):
         exception_proto.width_type = WidthProto.PIXEL
         exception_proto.pixel_width = width

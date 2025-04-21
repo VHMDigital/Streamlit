@@ -14,5 +14,36 @@
 
 from typing import Literal, TypeAlias, Union
 
+from streamlit.errors import StreamlitInvalidWidthError
+
 WidthWithoutContent: TypeAlias = Union[int, Literal["stretch"]]
 Width: TypeAlias = Union[int, Literal["stretch", "content"]]
+
+
+def validate_width(width: Width, allow_content: bool = False) -> None:
+    """Validate the width parameter.
+
+    Parameters
+    ----------
+    width : Any
+        The width value to validate.
+    allow_content : bool
+        Whether to allow "content" as a valid width value.
+
+    Raises
+    ------
+    StreamlitInvalidWidthError
+        If the width value is invalid.
+    """
+    if not isinstance(width, (int, str)):
+        raise StreamlitInvalidWidthError(width, allow_content)
+
+    if isinstance(width, str):
+        valid_strings = ["stretch"]
+        if allow_content:
+            valid_strings.append("content")
+
+        if width not in valid_strings:
+            raise StreamlitInvalidWidthError(width, allow_content)
+    elif width <= 0:
+        raise StreamlitInvalidWidthError(width, allow_content)

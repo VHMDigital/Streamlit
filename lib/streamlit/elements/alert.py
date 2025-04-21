@@ -16,12 +16,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
+from streamlit.elements.lib.layout_utils import validate_width
 from streamlit.proto.Alert_pb2 import Alert as AlertProto
+from streamlit.proto.Layout_pb2 import Width as WidthProto
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.string_util import clean_text, validate_icon_or_emoji
 
 if TYPE_CHECKING:
     from streamlit.delta_generator import DeltaGenerator
+    from streamlit.elements.lib.layout_utils import WidthWithoutContent
     from streamlit.type_util import SupportsStr
 
 
@@ -32,6 +35,7 @@ class AlertMixin:
         body: SupportsStr,
         *,  # keyword-only args:
         icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
     ) -> DeltaGenerator:
         """Display error message.
 
@@ -62,6 +66,9 @@ class AlertMixin:
               Thumb Up icon. Find additional icons in the `Material Symbols \
               <https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Rounded>`_
               font library.
+        width : int or "stretch"
+            The width of the alert. Can be either an integer (pixels) or "stretch".
+            Defaults to "stretch".
 
         Example
         -------
@@ -75,6 +82,15 @@ class AlertMixin:
         alert_proto.icon = validate_icon_or_emoji(icon)
         alert_proto.body = clean_text(body)
         alert_proto.format = AlertProto.ERROR
+
+        validate_width(width)
+
+        if isinstance(width, int):
+            alert_proto.width_type = WidthProto.PIXEL
+            alert_proto.pixel_width = width
+        else:
+            alert_proto.width_type = WidthProto.STRETCH
+
         return self.dg._enqueue("alert", alert_proto)
 
     @gather_metrics("warning")
@@ -83,6 +99,7 @@ class AlertMixin:
         body: SupportsStr,
         *,  # keyword-only args:
         icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
     ) -> DeltaGenerator:
         """Display warning message.
 
@@ -113,6 +130,9 @@ class AlertMixin:
               Thumb Up icon. Find additional icons in the `Material Symbols \
               <https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Rounded>`_
               font library.
+        width : int or "stretch"
+            The width of the alert. Can be either an integer (pixels) or "stretch".
+            Defaults to "stretch".
 
         Example
         -------
@@ -125,6 +145,15 @@ class AlertMixin:
         alert_proto.body = clean_text(body)
         alert_proto.icon = validate_icon_or_emoji(icon)
         alert_proto.format = AlertProto.WARNING
+
+        validate_width(width)
+
+        if isinstance(width, int):
+            alert_proto.width_type = WidthProto.PIXEL
+            alert_proto.pixel_width = width
+        else:
+            alert_proto.width_type = WidthProto.STRETCH
+
         return self.dg._enqueue("alert", alert_proto)
 
     @gather_metrics("info")
@@ -133,6 +162,7 @@ class AlertMixin:
         body: SupportsStr,
         *,  # keyword-only args:
         icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
     ) -> DeltaGenerator:
         """Display an informational message.
 
@@ -163,6 +193,9 @@ class AlertMixin:
               Thumb Up icon. Find additional icons in the `Material Symbols \
               <https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Rounded>`_
               font library.
+        width : int or "stretch"
+            The width of the alert. Can be either an integer (pixels) or "stretch".
+            Defaults to "stretch".
 
         Example
         -------
@@ -176,6 +209,15 @@ class AlertMixin:
         alert_proto.body = clean_text(body)
         alert_proto.icon = validate_icon_or_emoji(icon)
         alert_proto.format = AlertProto.INFO
+
+        validate_width(width)
+
+        if isinstance(width, int):
+            alert_proto.width_type = WidthProto.PIXEL
+            alert_proto.pixel_width = width
+        else:
+            alert_proto.width_type = WidthProto.STRETCH
+
         return self.dg._enqueue("alert", alert_proto)
 
     @gather_metrics("success")
@@ -184,6 +226,7 @@ class AlertMixin:
         body: SupportsStr,
         *,  # keyword-only args:
         icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
     ) -> DeltaGenerator:
         """Display a success message.
 
@@ -214,6 +257,9 @@ class AlertMixin:
               Thumb Up icon. Find additional icons in the `Material Symbols \
               <https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Rounded>`_
               font library.
+        width : int or "stretch"
+            The width of the alert. Can be either an integer (pixels) or "stretch".
+            Defaults to "stretch".
 
         Example
         -------
@@ -226,6 +272,15 @@ class AlertMixin:
         alert_proto.body = clean_text(body)
         alert_proto.icon = validate_icon_or_emoji(icon)
         alert_proto.format = AlertProto.SUCCESS
+
+        validate_width(width)
+
+        if isinstance(width, int):
+            alert_proto.width_type = WidthProto.PIXEL
+            alert_proto.pixel_width = width
+        else:
+            alert_proto.width_type = WidthProto.STRETCH
+
         return self.dg._enqueue("alert", alert_proto)
 
     @property
