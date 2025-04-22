@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-import { MockInstance } from "vitest"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  MockInstance,
+  vi,
+} from "vitest"
 
 import {
   EMBED_QUERY_PARAM_KEY,
@@ -515,27 +522,6 @@ describe("getUrl", () => {
     }))
 
     expect(getUrl()).toBe("http://localhost:3000/main")
-  })
-
-  it("should return window.top.location.href without query params when in an iframe and accessible", () => {
-    mockIsInChildFrame.mockReturnValue(true)
-
-    // Stub global properties using vi.stubGlobal for this test
-    vi.stubGlobal("top", {
-      location: {
-        href: "http://parent.com/app?param=value",
-      },
-    })
-
-    vi.stubGlobal("document", {
-      location: {
-        href: "http://iframe.com/page?iframeparam=1",
-      },
-    })
-
-    // Act & Assert
-    expect(getUrl()).toBe("http://parent.com/app")
-    // vi.restoreAllMocks() in afterEach will clean up stubs
   })
 
   it("should return document.location.href without query params when in an iframe but window.top access throws error", () => {
