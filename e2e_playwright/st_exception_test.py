@@ -31,6 +31,7 @@ def test_st_exception_displays_correctly(
     wait_for_app_run(themed_app)
 
     exception_elements = themed_app.get_by_test_id("stException")
+    expect(exception_elements).to_have_count(6)
     for i in range(6):
         assert_snapshot(exception_elements.nth(i), name=f"st_exception-{i}")
 
