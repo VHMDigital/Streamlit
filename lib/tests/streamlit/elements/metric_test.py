@@ -274,9 +274,13 @@ class MetricTest(DeltaGeneratorTestCase):
             (
                 "invalid_string",
                 "invalid",
-                "'invalid' is not a valid width. Width must be an integer or one of: 'stretch', 'content'",
+                "Invalid width value: 'invalid'. Width must be either an integer (pixels), 'stretch', or 'content'.",
             ),
-            ("negative_integer", -100, "Width must be a positive integer"),
+            (
+                "negative_integer",
+                -100,
+                "Invalid width value: -100. Width must be either an integer (pixels), 'stretch', or 'content'.",
+            ),
         ]
     )
     def test_invalid_width(self, name, width_value, expected_error_message):
