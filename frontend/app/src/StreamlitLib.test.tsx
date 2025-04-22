@@ -27,7 +27,6 @@ import {
 } from "@streamlit/connection"
 import {
   AppRoot,
-  ComponentRegistry,
   createFormsData,
   FileUploadClient,
   FormsData,
@@ -120,8 +119,6 @@ class StreamlitLibExample extends PureComponent<Props, State> {
   private readonly sessionInfo = new SessionInfo()
 
   private readonly endpoints = new Endpoints()
-
-  private readonly componentRegistry = new ComponentRegistry(this.endpoints)
 
   private readonly widgetMgr: WidgetStateManager
 
@@ -230,7 +227,6 @@ class StreamlitLibExample extends PureComponent<Props, State> {
         widgetMgr={this.widgetMgr}
         uploadClient={this.uploadClient}
         widgetsDisabled={false}
-        componentRegistry={this.componentRegistry}
       />
     )
   }

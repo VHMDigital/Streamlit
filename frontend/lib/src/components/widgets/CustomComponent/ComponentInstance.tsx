@@ -17,6 +17,7 @@
 import React, {
   memo,
   ReactElement,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -34,6 +35,7 @@ import {
   Skeleton as SkeletonProto,
 } from "@streamlit/protobuf"
 
+import { LibContext } from "~lib/components/core/LibContext"
 import AlertElement from "~lib/components/elements/AlertElement"
 import { Skeleton } from "~lib/components/elements/Skeleton"
 import ErrorElement from "~lib/components/shared/ErrorElement"
@@ -70,7 +72,6 @@ const LOG = getLogger("ComponentInstance")
 export const COMPONENT_READY_WARNING_TIME_MS = 60000 // 60 seconds
 
 export interface Props {
-  registry: ComponentRegistry
   widgetMgr: WidgetStateManager
   disabled: boolean
   element: ComponentInstanceProto
@@ -179,9 +180,11 @@ function compareDataframeArgs(
  */
 function ComponentInstance(props: Props): ReactElement {
   const theme: EmotionTheme = useTheme()
+  const { componentRegistry: registry } = useContext(LibContext)
+
   const [componentError, setComponentError] = useState<Error>()
 
-  const { disabled, element, registry, widgetMgr, width, fragmentId } = props
+  const { disabled, element, widgetMgr, width, fragmentId } = props
   const { componentName, jsonArgs, specialArgs, url } = element
 
   const [parsedNewArgs, parsedDataframeArgs] = tryParseArgs(
@@ -192,6 +195,7 @@ function ComponentInstance(props: Props): ReactElement {
   )
 
   const componentSourceUrl = useMemo(
+    // @ts-expect-error
     () => getSrc(componentName, registry, url),
     [componentName, registry, url]
   )
@@ -250,6 +254,7 @@ function ComponentInstance(props: Props): ReactElement {
   useEffect(() => {
     // Iframe onerror event unreliable - check custom component
     // src on mount to catch iframe load errors
+    // @ts-expect-error
     registry.checkSourceUrlResponse(componentSourceUrl, componentName)
   }, [componentSourceUrl, componentName, registry])
 
@@ -259,6 +264,7 @@ function ComponentInstance(props: Props): ReactElement {
       LOG.error(
         `Client Error: Custom Component ${componentName} timeout error`
       )
+      // @ts-expect-error
       registry.sendTimeoutError(componentSourceUrl, componentName)
     }
   }, [isReadyTimeout, componentSourceUrl, componentName, registry])
@@ -368,6 +374,7 @@ function ComponentInstance(props: Props): ReactElement {
     // By creating the callback using the reference variable, we
     // can access up-to-date information from the component when the callback
     // is called without the need to re-register the callback
+    // @ts-expect-error
     registry.registerListener(
       contentWindow,
       createIframeMessageHandler(onBackMsgRef)
@@ -378,6 +385,7 @@ function ComponentInstance(props: Props): ReactElement {
       if (!contentWindow) {
         return
       }
+      // @ts-expect-error
       registry.deregisterListener(contentWindow)
     }
   }, [registry, componentName])

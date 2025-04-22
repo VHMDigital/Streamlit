@@ -29,7 +29,6 @@ import { ScriptRunState } from "~lib/ScriptRunState"
 import { ElementNode } from "~lib/AppNode"
 import { WidgetStateManager } from "~lib/WidgetStateManager"
 import { FileUploadClient } from "~lib/FileUploadClient"
-import { ComponentRegistry } from "~lib/components/widgets/CustomComponent"
 import { mockEndpoints, mockSessionInfo } from "~lib/mocks/mocks"
 
 import ElementNodeRenderer, {
@@ -83,7 +82,6 @@ function getProps(
       formsWithPendingRequestsChanged: () => {},
       requestFileURLs: vi.fn(),
     }),
-    componentRegistry: new ComponentRegistry(endpoints),
     ...props,
   }
 }

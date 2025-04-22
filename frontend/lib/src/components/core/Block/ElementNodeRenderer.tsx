@@ -569,7 +569,6 @@ const RawElementNodeRenderer = (
     case "componentInstance":
       return (
         <ComponentInstance
-          registry={props.componentRegistry}
           element={node.element.componentInstance as ComponentInstanceProto}
           {...widgetProps}
         />

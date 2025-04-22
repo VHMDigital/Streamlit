@@ -28,7 +28,6 @@ import { StreamlitEndpoints } from "@streamlit/connection"
 import {
   AppRoot,
   BlockNode,
-  ComponentRegistry,
   FileUploadClient,
   IGuestToHostMessage,
   LibContext,
@@ -72,8 +71,6 @@ export interface AppViewProps {
 
   uploadClient: FileUploadClient
 
-  componentRegistry: ComponentRegistry
-
   appLogo: Logo | null
 
   multiplePages: boolean
@@ -99,7 +96,6 @@ function AppView(props: AppViewProps): ReactElement {
     elements,
     widgetMgr,
     uploadClient,
-    componentRegistry,
     appLogo,
     multiplePages,
     wideMode,
@@ -221,7 +217,6 @@ function AppView(props: AppViewProps): ReactElement {
       widgetMgr={widgetMgr}
       widgetsDisabled={widgetsDisabled}
       uploadClient={uploadClient}
-      componentRegistry={componentRegistry}
     />
   )
 

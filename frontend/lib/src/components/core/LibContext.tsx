@@ -17,6 +17,7 @@
 import React from "react"
 
 import { ScriptRunState } from "~lib/ScriptRunState"
+import { ComponentRegistry } from "~lib/components/widgets/CustomComponent"
 import { baseTheme, ThemeConfig } from "~lib/theme"
 import { createFormsData, FormsData } from "~lib/WidgetStateManager"
 
@@ -109,8 +110,9 @@ export interface LibContextProps {
    * internal FormsData instance, and calls a callback (`formsDataChanged`)
    * when forms are updated. This FormsData instance should be updated
    * from that callback.
-   * Pulled from context in BlockNodeRenderer
-   * @see Block
+   * Pulled from context in BlockNodeRenderer/FormSubmitButton
+   * @see BlockNodeRenderer
+   * @see FormSubmitButton
    */
   formsData: FormsData
 
@@ -137,6 +139,13 @@ export interface LibContextProps {
    * @see Tabs
    */
   scriptRunId: string
+
+  /**
+   * The app's ComponentRegistry instance. Dispatches "Custom Component"
+   * iframe messages to ComponentInstances.
+   * Pulled from context in
+   */
+  componentRegistry: ComponentRegistry | null
 }
 
 export const LibContext = React.createContext<LibContextProps>({
@@ -156,4 +165,5 @@ export const LibContext = React.createContext<LibContextProps>({
   formsData: createFormsData(),
   scriptRunState: ScriptRunState.NOT_RUNNING,
   scriptRunId: "",
+  componentRegistry: null,
 })

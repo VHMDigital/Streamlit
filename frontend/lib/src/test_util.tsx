@@ -24,6 +24,8 @@ import {
   RenderResult,
 } from "@testing-library/react"
 
+import { DefaultStreamlitEndpoints } from "@streamlit/connection"
+
 /* eslint-enable */
 import ThemeProvider from "./components/core/ThemeProvider"
 import { baseTheme } from "./theme"
@@ -32,6 +34,7 @@ import { LibContext, LibContextProps } from "./components/core/LibContext"
 import { ScriptRunState } from "./ScriptRunState"
 import { WindowDimensionsProvider } from "./components/shared/WindowDimensions/Provider"
 import { createFormsData } from "./WidgetStateManager"
+import { ComponentRegistry } from "./components/widgets/CustomComponent/ComponentRegistry"
 
 export const TestAppWrapper: FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -93,6 +96,13 @@ export const customRenderLibContext = (
     formsData: createFormsData(),
     scriptRunState: ScriptRunState.NOT_RUNNING,
     scriptRunId: "script run 123",
+    componentRegistry: new ComponentRegistry(
+      new DefaultStreamlitEndpoints({
+        getServerUri: () => new URL("http://localhost:8501"),
+        csrfEnabled: true,
+        sendClientError: vi.fn(),
+      })
+    ),
   }
 
   return reactTestingLibraryRender(component, {

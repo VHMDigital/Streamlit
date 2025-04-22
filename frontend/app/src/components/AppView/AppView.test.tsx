@@ -21,7 +21,6 @@ import { fireEvent, screen, within } from "@testing-library/react"
 import {
   AppRoot,
   BlockNode,
-  ComponentRegistry,
   ElementNode,
   FileUploadClient,
   makeElementWithInfoText,
@@ -96,7 +95,6 @@ function getProps(props: Partial<AppViewProps> = {}): AppViewProps {
       formsWithPendingRequestsChanged: () => {},
       requestFileURLs: vi.fn(),
     }),
-    componentRegistry: new ComponentRegistry(mockEndpointProp),
     appLogo: null,
     multiplePages: false,
     wideMode: false,

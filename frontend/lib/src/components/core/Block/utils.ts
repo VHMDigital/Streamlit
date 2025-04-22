@@ -15,7 +15,6 @@
  */
 
 import { AppNode, BlockNode } from "~lib/AppNode"
-import { ComponentRegistry } from "~lib/components/widgets/CustomComponent"
 import { FileUploadClient } from "~lib/FileUploadClient"
 import { ScriptRunState } from "~lib/ScriptRunState"
 import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
@@ -122,12 +121,6 @@ export interface BaseBlockProps {
    * to send files to the Streamlit backend.
    */
   uploadClient: FileUploadClient
-
-  /**
-   * The app's ComponentRegistry instance. Dispatches "Custom Component"
-   * iframe messages to ComponentInstances.
-   */
-  componentRegistry: ComponentRegistry
 
   /**
    * If true, all widgets will be disabled and the app will be non-interactive.

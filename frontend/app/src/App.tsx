@@ -2033,6 +2033,7 @@ export class App extends PureComponent<Props, State> {
         formsData={this.state.formsData}
         scriptRunState={scriptRunState}
         scriptRunId={scriptRunId}
+        componentRegistry={this.componentRegistry}
       >
         <Hotkeys
           keyName="r,c,esc"
@@ -2103,7 +2104,6 @@ export class App extends PureComponent<Props, State> {
               elements={elements}
               widgetMgr={this.widgetMgr}
               uploadClient={this.uploadClient}
-              componentRegistry={this.componentRegistry}
               appLogo={elements.logo}
               multiplePages={appPages.length > 1}
               wideMode={userSettings.wideMode}
