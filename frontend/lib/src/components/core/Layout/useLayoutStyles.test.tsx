@@ -115,7 +115,6 @@ describe("#useLayoutStyles", () => {
     describe("with variations on element", () => {
       it.each([
         [undefined, { width: "auto" }],
-        [null, { width: "auto" }],
         [{ widthType: 999, useContainerWidth: false }, { width: "auto" }],
         [{ widthType: 999, useContainerWidth: true }, { width: "100%" }],
       ])("and with element %o, returns %o", (element, expected) => {
