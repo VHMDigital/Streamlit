@@ -30,10 +30,9 @@ def test_st_exception_displays_correctly(
     button.click()
     wait_for_app_run(themed_app)
 
+    exception_elements = themed_app.get_by_test_id("stException")
     for i in range(6):
-        assert_snapshot(
-            themed_app.get_by_test_id("stException").nth(i), name=f"st_exception-{i}"
-        )
+        assert_snapshot(exception_elements.nth(i), name=f"st_exception-{i}")
 
 
 def test_check_top_level_class(app: Page):
