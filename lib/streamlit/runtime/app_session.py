@@ -743,7 +743,6 @@ class AppSession:
 
         imsg.environment_info.streamlit_version = STREAMLIT_VERSION_STRING
         imsg.environment_info.python_version = ".".join(map(str, sys.version_info))
-
         imsg.environment_info.server_os = env_util.SYSTEM
         imsg.environment_info.has_display = (
             "DISPLAY" in os.environ or "WAYLAND_DISPLAY" in os.environ
