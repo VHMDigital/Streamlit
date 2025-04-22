@@ -131,11 +131,10 @@ export interface LibContextProps {
    * backend sends a new scriptRunId to the frontend. When the script run ends,
    * the frontend discards "stale" elements (that is, elements with a non-current
    * scriptRunId).
-   * Pulled from context in BlockNodeRenderer, ElementNodeRenderer, Tabs, Particles
+   * Pulled from context in BlockNodeRenderer, ElementNodeRenderer, Tabs
    * @see Block
    * @see ElementNodeRender
    * @see Tabs
-   * @see Particles
    */
   scriptRunId: string
 }

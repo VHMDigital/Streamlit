@@ -251,7 +251,12 @@ const RawElementNodeRenderer = (
       )
 
     case "balloons":
-      return hideIfStale(props.isStale, <Balloons />)
+      // Specifically use node.scriptRunId vs. scriptRunId from context
+      // See issue #01961: https://github.com/streamlit/streamlit/issues/10961
+      return hideIfStale(
+        props.isStale,
+        <Balloons scriptRunId={node.scriptRunId} />
+      )
 
     case "bokehChart":
       return (
@@ -381,7 +386,12 @@ const RawElementNodeRenderer = (
     }
 
     case "snow":
-      return hideIfStale(props.isStale, <Snow />)
+      // Specifically use node.scriptRunId vs. scriptRunId from context
+      // See issue #01961: https://github.com/streamlit/streamlit/issues/10961
+      return hideIfStale(
+        props.isStale,
+        <Snow scriptRunId={node.scriptRunId} />
+      )
 
     case "spinner":
       return (

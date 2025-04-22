@@ -18,7 +18,7 @@ import React from "react"
 
 import { screen } from "@testing-library/react"
 
-import { customRenderLibContext } from "~lib/test_util"
+import { render } from "~lib/test_util"
 
 import Balloons, { NUM_BALLOONS } from "./Balloons"
 
@@ -31,9 +31,7 @@ describe("Balloons element", () => {
   })
 
   it("renders without crashing", () => {
-    customRenderLibContext(<Balloons />, {
-      scriptRunId: "51522269",
-    })
+    render(<Balloons scriptRunId="51522269" />)
 
     const balloonElement = screen.getByTestId("stBalloons")
     expect(balloonElement).toBeInTheDocument()
@@ -48,9 +46,7 @@ describe("Balloons element", () => {
   })
 
   it("uses correct top-level class", () => {
-    customRenderLibContext(<Balloons />, {
-      scriptRunId: "51522269",
-    })
+    render(<Balloons scriptRunId="51522269" />)
 
     const balloonElement = screen.getByTestId("stBalloons")
     expect(balloonElement).toHaveClass("stBalloons")

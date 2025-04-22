@@ -18,8 +18,15 @@ import React from "react"
 
 import { screen } from "@testing-library/react"
 
-import { customRenderLibContext } from "~lib/test_util"
-import Snow, { NUM_FLAKES } from "~lib/components/elements/Snow/index"
+import { render } from "~lib/test_util"
+import Snow, {
+  NUM_FLAKES,
+  SnowProps,
+} from "~lib/components/elements/Snow/index"
+
+const getProps = (): SnowProps => ({
+  scriptRunId: "51522269",
+})
 
 describe("Snow element", () => {
   vi.useFakeTimers()
@@ -30,9 +37,8 @@ describe("Snow element", () => {
   })
 
   it("renders without crashing", () => {
-    customRenderLibContext(<Snow />, {
-      scriptRunId: "51522269",
-    })
+    const props = getProps()
+    render(<Snow {...props} />)
 
     const snowElement = screen.getByTestId("stSnow")
     expect(snowElement).toBeInTheDocument()
@@ -46,9 +52,8 @@ describe("Snow element", () => {
   })
 
   it("uses correct top-level class", () => {
-    customRenderLibContext(<Snow />, {
-      scriptRunId: "51522269",
-    })
+    const props = getProps()
+    render(<Snow {...props} />)
 
     const snowElement = screen.getByTestId("stSnow")
     expect(snowElement).toHaveClass("stSnow")
