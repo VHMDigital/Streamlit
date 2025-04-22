@@ -28,7 +28,6 @@ import {
   mockEndpoints,
   mockSessionInfo,
   render,
-  ScriptRunState,
   WidgetStateManager,
 } from "@streamlit/lib"
 import {
@@ -88,7 +87,6 @@ function getProps(props: Partial<AppViewProps> = {}): AppViewProps {
     elements: AppRoot.empty(FAKE_SCRIPT_HASH, true),
     sendMessageToHost: vi.fn(),
     scriptRunId: "script run 123",
-    scriptRunState: ScriptRunState.NOT_RUNNING,
     widgetMgr: new WidgetStateManager({
       sendRerunBackMsg: vi.fn(),
       formsDataChanged: vi.fn(),

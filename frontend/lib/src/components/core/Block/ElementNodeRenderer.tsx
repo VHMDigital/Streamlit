@@ -710,16 +710,17 @@ const RawElementNodeRenderer = (
 const ElementNodeRenderer = (
   props: ElementNodeRendererProps
 ): ReactElement => {
-  const { isFullScreen, fragmentIdsThisRun } = React.useContext(LibContext)
+  const { isFullScreen, fragmentIdsThisRun, scriptRunState } =
+    React.useContext(LibContext)
   const { node } = props
 
   const elementType = node.element.type || ""
 
-  const enable = shouldComponentBeEnabled(elementType, props.scriptRunState)
+  const enable = shouldComponentBeEnabled(elementType, scriptRunState)
   const isStale = isComponentStale(
     enable,
     node,
-    props.scriptRunState,
+    scriptRunState,
     props.scriptRunId,
     fragmentIdsThisRun
   )

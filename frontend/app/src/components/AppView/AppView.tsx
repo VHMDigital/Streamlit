@@ -33,7 +33,6 @@ import {
   IGuestToHostMessage,
   LibContext,
   Profiler,
-  ScriptRunState,
   VerticalBlock,
   WidgetStateManager,
 } from "@streamlit/lib"
@@ -72,8 +71,6 @@ export interface AppViewProps {
   // The unique ID for the most recent script run.
   scriptRunId: string
 
-  scriptRunState: ScriptRunState
-
   widgetMgr: WidgetStateManager
 
   uploadClient: FileUploadClient
@@ -104,7 +101,6 @@ function AppView(props: AppViewProps): ReactElement {
   const {
     elements,
     scriptRunId,
-    scriptRunState,
     widgetMgr,
     uploadClient,
     componentRegistry,
@@ -227,7 +223,6 @@ function AppView(props: AppViewProps): ReactElement {
       node={node}
       endpoints={endpoints}
       scriptRunId={scriptRunId}
-      scriptRunState={scriptRunState}
       widgetMgr={widgetMgr}
       widgetsDisabled={widgetsDisabled}
       uploadClient={uploadClient}

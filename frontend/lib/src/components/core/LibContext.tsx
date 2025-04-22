@@ -16,6 +16,7 @@
 
 import React from "react"
 
+import { ScriptRunState } from "~lib/ScriptRunState"
 import { baseTheme, ThemeConfig } from "~lib/theme"
 import { createFormsData, FormsData } from "~lib/WidgetStateManager"
 
@@ -112,6 +113,13 @@ export interface LibContextProps {
    * @see BlockNodeRenderer
    */
   formsData: FormsData
+
+  /**
+   * The app's current ScriptRunState. This is used in combination with
+   * scriptRunId to prune stale elements. It's also used by the app to
+   * display the "running man" indicator when the app's script is being re-run.
+   */
+  scriptRunState: ScriptRunState
 }
 
 export const LibContext = React.createContext<LibContextProps>({
@@ -129,4 +137,5 @@ export const LibContext = React.createContext<LibContextProps>({
   fragmentIdsThisRun: [],
   locale: window.navigator.language,
   formsData: createFormsData(),
+  scriptRunState: ScriptRunState.NOT_RUNNING,
 })

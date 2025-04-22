@@ -139,13 +139,6 @@ export interface BaseBlockProps {
   scriptRunId: string
 
   /**
-   * The app's current ScriptRunState. This is used in combination with
-   * scriptRunId to prune stale elements. It's also used by the app to
-   * display the "running man" indicator when the app's script is being re-run.
-   */
-  scriptRunState: ScriptRunState
-
-  /**
    * If true, all widgets will be disabled and the app will be non-interactive.
    * This is generally set when the frontend is disconnected from the backend.
    */

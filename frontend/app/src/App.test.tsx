@@ -330,7 +330,7 @@ function getStoredValue<T>(Type: any): T {
 function getMockConnectionManager(isConnected = false): ConnectionManager {
   const connectionManager =
     getStoredValue<ConnectionManager>(ConnectionManager)
-  // @ts-expect-error
+  // @ts-expect-error - connectionManager.props is private
   connectionManager.isConnected.mockImplementation(() => isConnected)
 
   return connectionManager
@@ -338,7 +338,7 @@ function getMockConnectionManager(isConnected = false): ConnectionManager {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 function getMockConnectionManagerProp(propName: string): any {
-  // @ts-expect-error
+  // @ts-expect-error - connectionManager.props is private
   return getStoredValue<ConnectionManager>(ConnectionManager).props[propName]
 }
 
@@ -1473,6 +1473,7 @@ describe("App", () => {
         connectionManager.sendMessage.mock.calls[0][0].rerunScript
           .pageScriptHash
       ).toBe("top_hash")
+
       // @ts-expect-error
       connectionManager.sendMessage.mockClear()
 
@@ -2605,7 +2606,7 @@ describe("App", () => {
       )
 
       act(() =>
-        // @ts-expect-error - connectionManager.props is private
+        // @ts-expect-error
         connectionManager.props.connectionStateChanged(
           ConnectionState.CONNECTED
         )
@@ -2618,7 +2619,7 @@ describe("App", () => {
       // ConnectionState.CONNECTED. Moving from CONNECTED to any other state
       // should cause us to send a WEBSOCKET_DISCONNECTED message.
       act(() =>
-        // @ts-expect-error - connectionManager.props is private
+        // @ts-expect-error
         connectionManager.props.connectionStateChanged(
           ConnectionState.PINGING_SERVER
         )
@@ -2640,7 +2641,7 @@ describe("App", () => {
       )
 
       act(() =>
-        // @ts-expect-error - connectionManager.props is private
+        // @ts-expect-error
         connectionManager.props.connectionStateChanged(
           ConnectionState.CONNECTED
         )
@@ -2651,7 +2652,7 @@ describe("App", () => {
       )
 
       act(() =>
-        // @ts-expect-error - connectionManager.props is private
+        // @ts-expect-error
         connectionManager.props.connectionStateChanged(
           ConnectionState.PINGING_SERVER
         )

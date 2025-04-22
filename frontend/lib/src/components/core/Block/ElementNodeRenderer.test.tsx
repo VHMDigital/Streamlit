@@ -24,9 +24,9 @@ import {
   Snow as SnowProto,
 } from "@streamlit/protobuf"
 
-import { render } from "~lib/test_util"
-import { ElementNode } from "~lib/AppNode"
+import { customRenderLibContext, render } from "~lib/test_util"
 import { ScriptRunState } from "~lib/ScriptRunState"
+import { ElementNode } from "~lib/AppNode"
 import { WidgetStateManager } from "~lib/WidgetStateManager"
 import { FileUploadClient } from "~lib/FileUploadClient"
 import { ComponentRegistry } from "~lib/components/widgets/CustomComponent"
@@ -72,7 +72,6 @@ function getProps(
   const endpoints = mockEndpoints()
   return {
     endpoints: endpoints,
-    scriptRunState: ScriptRunState.RUNNING,
     widgetMgr: new WidgetStateManager({
       sendRerunBackMsg: vi.fn(),
       formsDataChanged: vi.fn(),
@@ -97,7 +96,9 @@ describe("ElementNodeRenderer Block Component", () => {
         node: createBalloonNode(scriptRunId),
         scriptRunId: "NEW_SCRIPT_ID",
       })
-      render(<ElementNodeRenderer {...props} />)
+      customRenderLibContext(<ElementNodeRenderer {...props} />, {
+        scriptRunState: ScriptRunState.RUNNING,
+      })
 
       await waitFor(() =>
         expect(screen.queryByTestId("stSkeleton")).toBeNull()
@@ -136,7 +137,9 @@ describe("ElementNodeRenderer Block Component", () => {
         node: createSnowNode(scriptRunId),
         scriptRunId: "NEW_SCRIPT_ID",
       })
-      render(<ElementNodeRenderer {...props} />)
+      customRenderLibContext(<ElementNodeRenderer {...props} />, {
+        scriptRunState: ScriptRunState.RUNNING,
+      })
 
       await waitFor(() =>
         expect(screen.queryByTestId("stSkeleton")).toBeNull()

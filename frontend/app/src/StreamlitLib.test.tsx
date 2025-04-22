@@ -228,7 +228,6 @@ class StreamlitLibExample extends PureComponent<Props, State> {
         node={blockNode}
         endpoints={this.endpoints}
         scriptRunId={this.state.scriptRunId}
-        scriptRunState={this.state.scriptRunState}
         widgetMgr={this.widgetMgr}
         uploadClient={this.uploadClient}
         widgetsDisabled={false}

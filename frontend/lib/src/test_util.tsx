@@ -29,6 +29,7 @@ import ThemeProvider from "./components/core/ThemeProvider"
 import { baseTheme } from "./theme"
 import { mockTheme } from "./mocks/mockTheme"
 import { LibContext, LibContextProps } from "./components/core/LibContext"
+import { ScriptRunState } from "./ScriptRunState"
 import { WindowDimensionsProvider } from "./components/shared/WindowDimensions/Provider"
 import { createFormsData } from "./WidgetStateManager"
 
@@ -90,6 +91,7 @@ export const customRenderLibContext = (
     fragmentIdsThisRun: [],
     locale: "en-US",
     formsData: createFormsData(),
+    scriptRunState: ScriptRunState.NOT_RUNNING,
   }
 
   return reactTestingLibraryRender(component, {
