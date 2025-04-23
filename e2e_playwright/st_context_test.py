@@ -47,7 +47,7 @@ def test_url(app: Page, app_port):
 
 @pytest.mark.browser_context_args(timezone_id="Europe/Paris")
 def test_rerun_preserves_context(app: Page):
-    """Test that the timezone is preserved after rerun."""
+    """Test that the timezone is preserved after a rerun."""
     # Check the initial timezone
     expect_prefixed_markdown(app, "Timezone name:", "Europe/Paris")
 
@@ -59,11 +59,11 @@ def test_rerun_preserves_context(app: Page):
 
 
 def test_primary_color(themed_app: Page, request: pytest.FixtureRequest):
-    """Test that the primary color is correctly set."""
+    """Test that the theme.type is correctly set."""
     expected_value = ""
     if request.getfixturevalue("app_theme") == "light_theme":
         expected_value = "light"
     elif request.getfixturevalue("app_theme") == "dark_theme":
         expected_value = "dark"
 
-    expect_prefixed_markdown(themed_app, "Primary color:", expected_value)
+    expect_prefixed_markdown(themed_app, "Theme type:", expected_value)
