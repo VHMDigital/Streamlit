@@ -157,6 +157,8 @@ class StreamlitLibExample extends PureComponent<Props, State> {
       appId: "",
       streamlitVersion: "",
       pythonVersion: "",
+      serverOS: "",
+      hasDisplay: true,
       installationId: "",
       installationIdV3: "",
       installationIdV4: "",
