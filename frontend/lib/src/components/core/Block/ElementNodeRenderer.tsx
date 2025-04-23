@@ -252,7 +252,7 @@ const RawElementNodeRenderer = (
 
     case "balloons":
       // Specifically use node.scriptRunId vs. scriptRunId from context
-      // See issue #01961: https://github.com/streamlit/streamlit/issues/10961
+      // See issue #10961: https://github.com/streamlit/streamlit/issues/10961
       return hideIfStale(
         props.isStale,
         <Balloons scriptRunId={node.scriptRunId} />
@@ -387,7 +387,7 @@ const RawElementNodeRenderer = (
 
     case "snow":
       // Specifically use node.scriptRunId vs. scriptRunId from context
-      // See issue #01961: https://github.com/streamlit/streamlit/issues/10961
+      // See issue #10961: https://github.com/streamlit/streamlit/issues/10961
       return hideIfStale(
         props.isStale,
         <Snow scriptRunId={node.scriptRunId} />
