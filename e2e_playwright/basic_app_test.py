@@ -22,6 +22,7 @@ from e2e_playwright.conftest import wait_for_app_loaded
 
 
 def test_is_webdriver_set(app: Page):
+    """Test that verifies that the window.navigator.webdriver is set to True."""
     content = app.evaluate("window.navigator.webdriver")
     assert content, "window.navigator.webdriver is set to False"
 
