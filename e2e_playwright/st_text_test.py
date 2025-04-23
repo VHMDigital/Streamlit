@@ -72,8 +72,8 @@ def test_width_settings(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that different width settings are applied correctly."""
     # Get the last three text elements (the ones with width settings)
     text_elements = app.get_by_test_id("stText")
-    stretch_text = text_elements.nth(6)
-    fixed_text = text_elements.nth(7)
+    stretch_text = text_elements.nth(7)
+    fixed_text = text_elements.nth(8)
 
     expect(stretch_text).to_contain_text("This is a text with stretch width.")
 
