@@ -15,6 +15,8 @@
 import streamlit as st
 from streamlit.errors import StreamlitAPIException
 
+st.title("Test st.exception")
+
 # Test a basic exception
 basic_exception = RuntimeError("This exception message is awesome!")
 st.exception(basic_exception)
