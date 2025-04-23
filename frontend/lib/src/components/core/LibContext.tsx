@@ -16,6 +16,7 @@
 
 import React from "react"
 
+import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
 import { ScriptRunState } from "~lib/ScriptRunState"
 import { ComponentRegistry } from "~lib/components/widgets/CustomComponent"
 import { baseTheme, ThemeConfig } from "~lib/theme"
@@ -149,6 +150,19 @@ export interface LibContextProps {
   componentRegistry: ComponentRegistry
 }
 
+const noOpEndpoints: StreamlitEndpoints = {
+  setStaticConfigUrl: () => {},
+  sendClientErrorToHost: () => {},
+  checkSourceUrlResponse: () => Promise.resolve(),
+  buildComponentURL: () => "",
+  buildMediaURL: () => "",
+  buildFileUploadURL: () => "",
+  buildAppPageURL: () => "",
+  uploadFileUploaderFile: () =>
+    Promise.reject(new Error("unimplemented endpoint")),
+  deleteFileAtURL: () => Promise.reject(new Error("unimplemented endpoint")),
+}
+
 export const LibContext = React.createContext<LibContextProps>({
   isFullScreen: false,
   setFullScreen: () => {},
@@ -166,6 +180,6 @@ export const LibContext = React.createContext<LibContextProps>({
   formsData: createFormsData(),
   scriptRunState: ScriptRunState.NOT_RUNNING,
   scriptRunId: "",
-  // @ts-expect-error
-  componentRegistry: null,
+  // This should be overwritten
+  componentRegistry: new ComponentRegistry(noOpEndpoints),
 })
