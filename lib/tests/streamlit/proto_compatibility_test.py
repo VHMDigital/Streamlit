@@ -146,6 +146,7 @@ FD = FieldDescriptor
             {
                 ("installation_id", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
                 ("installation_id_v3", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
+                ("installation_id_v4", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
             },
         ),
         (
@@ -153,6 +154,8 @@ FD = FieldDescriptor
             {
                 ("streamlit_version", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
                 ("python_version", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
+                ("server_os", FD.LABEL_OPTIONAL, FD.TYPE_STRING),
+                ("has_display", FD.LABEL_OPTIONAL, FD.TYPE_BOOL),
             },
         ),
         (

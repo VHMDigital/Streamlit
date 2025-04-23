@@ -160,8 +160,11 @@ class StreamlitLibExample extends PureComponent<Props, State> {
       appId: "",
       streamlitVersion: "",
       pythonVersion: "",
+      serverOS: "",
+      hasDisplay: true,
       installationId: "",
       installationIdV3: "",
+      installationIdV4: "",
       commandLine: "",
       isHello: false,
       isConnected: true,
@@ -217,7 +220,7 @@ class StreamlitLibExample extends PureComponent<Props, State> {
     }))
   }
 
-  public render = (): ReactElement => {
+  public override render = (): ReactElement => {
     // This example doesn't involve a sidebar, so our only root blockNode
     // is `elements.main`.
     const blockNode = this.state.elements.main
@@ -253,6 +256,7 @@ describe("StreamlitLibExample", () => {
 
   it("handles Delta messages", async () => {
     // there's nothing within the app ui to cycle through script run messages so we need a reference
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     let streamlitLibInstance: any
     render(
       <StreamlitLibExample
