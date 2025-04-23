@@ -45,6 +45,8 @@ export interface Props {
   element: CheckboxProto
   widgetMgr: WidgetStateManager
   fragmentId?: string
+  on_label?: string
+  off_label?: string
 }
 
 function Checkbox({
@@ -52,6 +54,8 @@ function Checkbox({
   disabled,
   widgetMgr,
   fragmentId,
+  on_label,
+  off_label,
 }: Readonly<Props>): ReactElement {
   const [value, setValueWithSource] = useBasicWidgetState<
     boolean,
@@ -81,13 +85,20 @@ function Checkbox({
 
   const color = disabled ? colors.fadedText40 : colors.bodyText
 
+  const displayLabel =
+    value && element.onLabel !== undefined && element.onLabel !== ""
+      ? element.onLabel
+      : !value && element.offLabel !== undefined && element.offLabel !== ""
+      ? element.offLabel
+      : element.label
+
   return (
     <StyledCheckbox className="row-widget stCheckbox" data-testid="stCheckbox">
       <UICheckbox
         checked={value}
         disabled={disabled}
         onChange={onChange}
-        aria-label={element.label}
+        aria-label={displayLabel}
         checkmarkType={
           element.type === CheckboxProto.StyleType.TOGGLE
             ? STYLE_TYPE.toggle
@@ -213,7 +224,7 @@ function Checkbox({
           data-testid="stWidgetLabel"
         >
           <StreamlitMarkdown
-            source={element.label}
+            source={displayLabel}
             allowHTML={false}
             isLabel
             largerLabel

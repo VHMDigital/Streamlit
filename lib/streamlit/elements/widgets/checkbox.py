@@ -180,6 +180,8 @@ class CheckboxMixin:
         *,  # keyword-only arguments:
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
+        on_label: str | None = None,
+        off_label: str | None = None,
     ) -> bool:
         r"""Display a toggle widget.
 
@@ -244,6 +246,14 @@ class CheckboxMixin:
             label, which can help keep the widget alligned with other widgets.
             If this is ``"collapsed"``, Streamlit displays no label or spacer.
 
+        on_label : str
+            An optional string for what the label should display if the toggle
+            is in the on state.
+
+        off_label : str
+            An optional string for what the label should display if the toggle
+            is in the off state
+
         Returns
         -------
         bool
@@ -276,6 +286,8 @@ class CheckboxMixin:
             label_visibility=label_visibility,
             type=CheckboxProto.StyleType.TOGGLE,
             ctx=ctx,
+            on_label=on_label,
+            off_label=off_label,
         )
 
     def _checkbox(
@@ -292,6 +304,8 @@ class CheckboxMixin:
         label_visibility: LabelVisibility = "visible",
         type: CheckboxProto.StyleType.ValueType = CheckboxProto.StyleType.DEFAULT,
         ctx: ScriptRunContext | None = None,
+        on_label: str | None = None,
+        off_label: str | None = None,
     ) -> bool:
         key = to_key(key)
 
@@ -325,7 +339,10 @@ class CheckboxMixin:
 
         if help is not None:
             checkbox_proto.help = dedent(help)
-
+        if on_label is not None:
+            checkbox_proto.on_label = on_label
+        if off_label is not None:
+            checkbox_proto.off_label = off_label
         serde = CheckboxSerde(value)
 
         checkbox_state = register_widget(

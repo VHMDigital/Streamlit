@@ -37,4 +37,6 @@ message Checkbox {
   bool disabled = 8;
   LabelVisibilityMessage label_visibility = 9;
   StyleType type = 10;
+  string on_label = 11;
+  string off_label = 12;
 }
