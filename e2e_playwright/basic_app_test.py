@@ -21,6 +21,12 @@ from playwright.sync_api import Page, Response, expect
 from e2e_playwright.conftest import wait_for_app_loaded
 
 
+def test_is_webdriver_set(app: Page):
+    """Test that verifies that the window.navigator.webdriver is set to True."""
+    content = app.evaluate("window.navigator.webdriver")
+    assert content, "window.navigator.webdriver is set to False"
+
+
 def test_total_loaded_assets_size_under_threshold(page: Page, app_port: int):
     """Test that verifies the total size of loaded web assets is under a
     configured threshold.
