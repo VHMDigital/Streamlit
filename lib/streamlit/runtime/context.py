@@ -306,9 +306,9 @@ class ContextProxy:
         """The read-only URL of the app in the user's browser.
 
         ``st.context.url`` returns the URL through which the user is accessing
-        the app. This includes the scheme, domain name, port, path, and anchor.
-        If query parameters are present in the URL, they are removed and not
-        included in this value.
+        the app. This includes the scheme, domain name, port, and path. If
+        query parameters or anchors are present in the URL, they are removed
+        and not included in this value.
 
         Example
         -------
