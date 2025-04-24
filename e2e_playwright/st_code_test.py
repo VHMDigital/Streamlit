@@ -128,3 +128,13 @@ def test_height_parameter(app: Page):
     curr_block = code_blocks.nth(16)
     curr_block.scroll_into_view_if_needed()
     expect(curr_block.locator("pre")).to_have_css("height", "200px")
+
+
+def test_width_configurations(app: Page, assert_snapshot: ImageCompareFunction):
+    """Test that width configurations are displayed correctly."""
+    # Get all code elements
+    code_elements = app.get_by_test_id("stCode")
+
+    # Test longer code blocks with different widths
+    assert_snapshot(code_elements.nth(17), name="st_code-width_pixels")
+    assert_snapshot(code_elements.nth(18), name="st_code-width_stretch")
