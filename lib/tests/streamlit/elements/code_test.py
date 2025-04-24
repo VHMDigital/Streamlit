@@ -38,8 +38,8 @@ class CodeElement(DeltaGeneratorTestCase):
         self.assertEqual(element.code.wrap_lines, False)
         self.assertEqual(element.code.language, "python")
         self.assertEqual(
-            element.code.width_config.WhichOneof("width_config"),
-            WidthConfigFields.USE_STRETCH,
+            element.code.width_config.WhichOneof("width_spec"),
+            WidthConfigFields.USE_STRETCH.value,
         )
         self.assertTrue(element.code.width_config.use_stretch)
 
@@ -54,8 +54,8 @@ class CodeElement(DeltaGeneratorTestCase):
         self.assertEqual(element.code.wrap_lines, False)
         self.assertEqual(element.code.language, "python")
         self.assertEqual(
-            element.code.width_config.WhichOneof("width_config"),
-            WidthConfigFields.USE_STRETCH,
+            element.code.width_config.WhichOneof("width_spec"),
+            WidthConfigFields.USE_STRETCH.value,
         )
         self.assertTrue(element.code.width_config.use_stretch)
 
@@ -70,8 +70,8 @@ class CodeElement(DeltaGeneratorTestCase):
         self.assertEqual(element.code.wrap_lines, False)
         self.assertEqual(element.code.language, "plaintext")
         self.assertEqual(
-            element.code.width_config.WhichOneof("width_config"),
-            WidthConfigFields.USE_STRETCH,
+            element.code.width_config.WhichOneof("width_spec"),
+            WidthConfigFields.USE_STRETCH.value,
         )
         self.assertTrue(element.code.width_config.use_stretch)
 
@@ -86,8 +86,8 @@ class CodeElement(DeltaGeneratorTestCase):
         self.assertEqual(element.code.wrap_lines, False)
         self.assertEqual(element.code.language, "plaintext")
         self.assertEqual(
-            element.code.width_config.WhichOneof("width_config"),
-            WidthConfigFields.USE_STRETCH,
+            element.code.width_config.WhichOneof("width_spec"),
+            WidthConfigFields.USE_STRETCH.value,
         )
         self.assertTrue(element.code.width_config.use_stretch)
 
@@ -102,8 +102,8 @@ class CodeElement(DeltaGeneratorTestCase):
         self.assertEqual(element.code.wrap_lines, False)
         self.assertEqual(element.code.language, "python")
         self.assertEqual(
-            element.code.width_config.WhichOneof("width_config"),
-            WidthConfigFields.USE_STRETCH,
+            element.code.width_config.WhichOneof("width_spec"),
+            WidthConfigFields.USE_STRETCH.value,
         )
         self.assertTrue(element.code.width_config.use_stretch)
 
@@ -118,8 +118,8 @@ class CodeElement(DeltaGeneratorTestCase):
         self.assertEqual(element.code.wrap_lines, True)
         self.assertEqual(element.code.language, "python")
         self.assertEqual(
-            element.code.width_config.WhichOneof("width_config"),
-            WidthConfigFields.USE_STRETCH,
+            element.code.width_config.WhichOneof("width_spec"),
+            WidthConfigFields.USE_STRETCH.value,
         )
         self.assertTrue(element.code.width_config.use_stretch)
 
@@ -134,8 +134,8 @@ class CodeElement(DeltaGeneratorTestCase):
         self.assertEqual(element.code.wrap_lines, False)
         self.assertEqual(element.code.language, "python")
         self.assertEqual(
-            element.code.width_config.WhichOneof("width_config"),
-            WidthConfigFields.USE_STRETCH,
+            element.code.width_config.WhichOneof("width_spec"),
+            WidthConfigFields.USE_STRETCH.value,
         )
         self.assertTrue(element.code.width_config.use_stretch)
 
@@ -147,8 +147,8 @@ class CodeElement(DeltaGeneratorTestCase):
         element = self.get_delta_from_queue().new_element
         self.assertEqual(element.code.code_text, code)
         self.assertEqual(
-            element.code.width_config.WhichOneof("width_config"),
-            WidthConfigFields.PIXEL_WIDTH,
+            element.code.width_config.WhichOneof("width_spec"),
+            WidthConfigFields.PIXEL_WIDTH.value,
         )
         self.assertEqual(element.code.width_config.pixel_width, 500)
 
@@ -160,21 +160,21 @@ class CodeElement(DeltaGeneratorTestCase):
         element = self.get_delta_from_queue().new_element
         self.assertEqual(element.code.code_text, code)
         self.assertEqual(
-            element.code.width_config.WhichOneof("width_config"),
-            WidthConfigFields.USE_STRETCH,
+            element.code.width_config.WhichOneof("width_spec"),
+            WidthConfigFields.USE_STRETCH.value,
         )
         self.assertTrue(element.code.width_config.use_stretch)
 
     @parameterized.expand(
         [
-            ("invalid_string", "invalid"),
-            ("negative_width", -100),
-            ("zero_width", 0),
-            ("float_width", 100.5),
-            ("none_width", None),
+            "invalid",
+            -100,
+            0,
+            100.5,
+            None,
         ]
     )
-    def test_st_code_with_invalid_width(self, name: str, width: object):
+    def test_st_code_with_invalid_width(self, width):
         """Test st.code with invalid width values."""
         code = "print('My string = %d' % my_value)"
 
