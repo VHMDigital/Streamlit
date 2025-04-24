@@ -23,6 +23,7 @@ import React, {
   useState,
 } from "react"
 
+import { ErrorOutline } from "@emotion-icons/material-outlined"
 import { Minus, Plus } from "@emotion-icons/open-iconic"
 import { useTheme } from "@emotion/react"
 import { Input as UIInput } from "baseui/input"
@@ -39,7 +40,7 @@ import {
 import { useFormClearHelper } from "~lib/components/widgets/Form"
 import { Source, WidgetStateManager } from "~lib/WidgetStateManager"
 import TooltipIcon from "~lib/components/shared/TooltipIcon"
-import { Placement } from "~lib/components/shared/Tooltip"
+import Tooltip, { Placement } from "~lib/components/shared/Tooltip"
 import Icon, { DynamicIcon } from "~lib/components/shared/Icon"
 import InputInstructions from "~lib/components/shared/InputInstructions/InputInstructions"
 import {
@@ -101,6 +102,21 @@ const NumberInput: React.FC<Props> = ({
   const [isFocused, setIsFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
   const id = useRef(uniqueId("number_input_"))
+  const [error, setError] = useState<"BelowMin" | "AboveMax" | null>(null)
+
+  useEffect(() => {
+    if (value !== null) {
+      if (value < min) {
+        setError("BelowMin")
+      } else if (value > max) {
+        setError("AboveMax")
+      } else {
+        setError(null)
+      }
+    } else {
+      setError(null)
+    }
+  }, [value, min, max])
 
   const canDec = canDecrement(value, step, min)
   const canInc = canIncrement(value, step, max)
@@ -119,14 +135,12 @@ const NumberInput: React.FC<Props> = ({
     setStep(getStep({ step: element.step, dataType: element.dataType }))
   }, [element.dataType, element.step])
 
-  const [hasError, setHasError] = useState(false)
-
   const commitValue = useCallback(
     ({ value, source }: { value: number | null; source: Source }) => {
       if (notNullOrUndefined(value) && (min > value || value > max)) {
-        setHasError(true)
+        inputRef.current?.reportValidity()
+        setError(value < min ? "BelowMin" : "AboveMax")
       } else {
-        setHasError(false)
         const newValue = value ?? elementDefault ?? null
 
         switch (elementDataType) {
@@ -160,6 +174,7 @@ const NumberInput: React.FC<Props> = ({
             step,
           })
         )
+        setError(null)
       }
     },
     [
@@ -386,82 +401,47 @@ const NumberInput: React.FC<Props> = ({
           }
           id={id.current}
           overrides={{
-            ClearIconContainer: {
+            Root: {
               style: {
-                padding: 0,
-              },
-            },
-            ClearIcon: {
-              props: {
-                overrides: {
-                  Svg: {
-                    style: {
-                      color: theme.colors.darkGray,
-                      // setting this width and height makes the clear-icon align with dropdown arrows of other input fields
-                      padding: theme.spacing.threeXS,
-                      height: theme.sizes.clearIconSize,
-                      width: theme.sizes.clearIconSize,
-                      ":hover": {
-                        fill: theme.colors.bodyText,
-                      },
-                    },
-                  },
-                },
+                ...(error && {
+                  borderColor: theme.colors.danger, // Red border for error
+                  backgroundColor: theme.colors.dangerBg, // Light red background
+                  borderWidth: "2px", // Thicker border for emphasis
+                  borderStyle: "solid",
+                }),
               },
             },
             Input: {
-              props: {
-                "data-testid": "stNumberInputField",
-                step: step,
-                min: min,
-                max: max,
-                // We specify the type as "number" to have numeric keyboard on mobile devices.
-                // We also set inputMode to "" since by default BaseWeb sets "text",
-                // and for "decimal" / "numeric" IOS shows keyboard without a minus sign.
-                type: "number",
-                inputMode: "",
-              },
               style: {
-                lineHeight: theme.lineHeights.inputWidget,
-                // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
-                paddingRight: theme.spacing.sm,
-                paddingLeft: theme.spacing.md,
-                paddingBottom: theme.spacing.sm,
-                paddingTop: theme.spacing.sm,
+                ...(error && {
+                  color: theme.colors.red100, // Red text for error
+                  fontWeight: "bold", // Bold text for emphasis
+                }),
               },
             },
-            InputContainer: {
-              style: () => ({
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
-              }),
-            },
-            Root: {
+            EndEnhancer: {
               style: {
-                // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
-                borderTopLeftRadius: 0,
-                borderBottomLeftRadius: 0,
-                borderLeftWidth: 0,
-                borderRightWidth: 0,
-                borderTopWidth: 0,
-                borderBottomWidth: 0,
-                paddingRight: 0,
-                paddingLeft: icon ? theme.spacing.sm : 0,
-              },
-            },
-            StartEnhancer: {
-              style: {
-                paddingLeft: 0,
-                paddingRight: 0,
-                // Keeps emoji icons from being cut off on the right
-                minWidth: theme.iconSizes.lg,
-                // Material icons color changed as inactionable
-                color: isMaterialIcon ? theme.colors.fadedText60 : "inherit",
+                ...(error && {
+                  color: theme.colors.red100, // Red icon for error
+                }),
               },
             },
           }}
+          endEnhancer={
+            error && (
+              <Tooltip
+                content={
+                  error === "BelowMin"
+                    ? "Value is below the minimum allowed."
+                    : "Value is above the maximum allowed."
+                }
+                placement={Placement.TOP_RIGHT}
+                error
+              >
+                <Icon content={ErrorOutline} size="lg" />
+              </Tooltip>
+            )
+          }
         />
         {/* We only want to show the increment/decrement controls when there is sufficient room to display the value and these controls. */}
         {width > numberInputControlBreakpoint && (
