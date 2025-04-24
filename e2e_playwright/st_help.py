@@ -101,23 +101,6 @@ class LongDocumentationClass:
     the display of help text. The content should be long enough to wrap and show the
     difference between stretch and fixed width settings.
 
-    Here's some more content to make it longer:
-    - First point about something important
-    - Second point about something else
-    - Third point that adds more length
-    - Fourth point to ensure wrapping occurs
-    - Fifth point to make it even longer
-    - Sixth point to demonstrate width differences
-    - Seventh point to show how text wraps
-    - Eighth point to fill more space
-    - Ninth point to ensure proper demonstration
-    - Tenth point to complete the example
-
-    Additional paragraphs to make it even longer:
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-    nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-
     Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
     eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
     sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -135,5 +118,5 @@ class LongDocumentationClass:
 long_doc_instance = LongDocumentationClass()
 
 # Test different width configurations
-st.help(long_doc_instance, width=500)
+st.help(long_doc_instance, width=300)
 st.help(long_doc_instance, width="stretch")
