@@ -36,7 +36,7 @@ def test_code_blocks_render_correctly(
 ):
     """Test that the code blocks render as expected via screenshot matching."""
     code_blocks = themed_app.get_by_test_id("stCode")
-    expect(code_blocks).to_have_count(17)
+    expect(code_blocks).to_have_count(19)
     # The code blocks might require a bit more time for rendering, so wait until
     # the text is truly visible. Otherwise we might get blank code blocks in the
     # screenshots.
