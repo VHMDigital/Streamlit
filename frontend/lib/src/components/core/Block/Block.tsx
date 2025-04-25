@@ -273,7 +273,7 @@ export const ContainerContentsWrapper = (
   const defaultStyles: StyledFlexContainerBlockProps = {
     direction: Direction.VERTICAL,
     flex: 1,
-    gap: "small",
+    gap: BlockProto.FlexContainer.Gap.SMALL,
   }
 
   const userKey = getKeyFromId(props.node.deltaBlock.id)
