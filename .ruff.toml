@@ -110,13 +110,6 @@ exclude = [
 # Disallow all relative imports.
 ban-relative-imports = "all"
 
-[lint.pycodestyle]
-# E501 is currently deactivated, but suggested to be activated
-# by developers via VS Code settings.
-# Allow lines (e.g. comments) up to 120 characters ,
-# which works well with Github.
-max-line-length = 120
-
 [lint.isort]
 known-first-party = ["streamlit", "shared", "tests", "e2e_playwright"]
 
