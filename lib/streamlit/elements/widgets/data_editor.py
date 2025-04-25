@@ -287,7 +287,7 @@ def _parse_added_row(
 ) -> tuple[Any, list[Any]]:
     """Parse the added row into an optional index value and a list of row values."""
     index_value = None
-    new_row: list[Any] = [None for _ in range(len(dataframe_schema))]
+    new_row: list[Any] = [None for _ in range(df.shape[1])]
     for col_name, value in added_row.items():
         if col_name == INDEX_IDENTIFIER:
             # TODO(lukasmasuch): To support multi-index in the future:
