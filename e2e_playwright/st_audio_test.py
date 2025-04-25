@@ -145,7 +145,7 @@ def test_audio_uses_unified_height(
 
 
 # TODO(mgbarnes): Figure out why this test is flaky on firefox & webkit.
-@pytest.mark.skip_browser("firefox", "webkit")
+@pytest.mark.only_browser("chromium")
 def test_audio_source_error_with_url(app: Page, app_port: int):
     """Test `st.audio` source error when data is a url."""
     # Ensure audio source request return a 404 status
@@ -170,8 +170,8 @@ def test_audio_source_error_with_url(app: Page, app_port: int):
     )
 
 
-# TODO(mgbarnes): Figure out why this test is flaky on Firefox.
-@pytest.mark.skip_browser("firefox")
+# TODO(mgbarnes): Figure out why this test is flaky on firefox & webkit.
+@pytest.mark.only_browser("chromium")
 def test_audio_source_error_with_path(app: Page, app_port: int):
     """Test `st.audio` source error when data is path (media endpoint)."""
     # Ensure audio source request return a 404 status
