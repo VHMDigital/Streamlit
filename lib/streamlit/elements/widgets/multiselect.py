@@ -331,7 +331,7 @@ class MultiSelectMixin:
 
             When a user enters and selects a new item, it is included in the
             widget's returned list as a string. The new item is not added to
-            the widget's drop-down menu. Streamlit will use a case-insenstive
+            the widget's drop-down menu. Streamlit will use a case-insensitive
             match from ``options`` before adding a new item, and a new item
             can't be added if a case-insensitive match is already selected. The
             ``max_selections`` argument is still enforced.
