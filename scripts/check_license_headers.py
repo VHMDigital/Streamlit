@@ -63,7 +63,7 @@ IGNORE_PATTERN = re.compile(
     r"|^component-lib/\.yarn"
     r"|^lib/(\.dockerignore|MANIFEST\.in|mypy\.ini)$"
     r"|^.*-requirements\.txt$"
-    r"|^lib/min-constraints-gen\.txt"
+    r"|min-constraints-gen\.txt"
     r"|\.isort\.cfg$"
     # Exclude all .gitignore files
     r"|\.gitignore$"
