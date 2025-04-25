@@ -250,13 +250,13 @@ class VegaLiteStateSerde:
         return json.dumps(selection_state, default=str)
 
 
-def _patch_null_legend_titles(spec: VegaLiteSpec) -> None:
+def _patch_null_legend_titles(chart_dict: dict) -> None:
     """Patches null legend titles in the 'color' channel of the spec.
     This is a fix for the Vega-Lite bug where null legend titles
     cause a wrong formatting of the chart as shown on the issue #9339.
     """
 
-    encoding = spec.get("encoding")
+    encoding = chart_dict.get("encoding")
     if not isinstance(encoding, dict):
         return
 
@@ -264,12 +264,12 @@ def _patch_null_legend_titles(spec: VegaLiteSpec) -> None:
     if not isinstance(color_spec, dict):
         return
 
-    if color_spec.get("title") is None:
+    if "title" in color_spec and color_spec.get("title") is None:
         # Patch legend title given null value directly in the encoding
         color_spec["title"] = " "
 
     legend = color_spec.get("legend")
-    if isinstance(legend, dict) and legend.get("title") is None:
+    if isinstance(legend, dict) and "title" in legend and legend.get("title") is None:
         # Patch legend title given null value in the legend
         legend["title"] = " "
 
@@ -301,8 +301,6 @@ def _prepare_vega_lite_spec(
             spec["autosize"] = {"type": "fit-x", "contains": "padding"}
         else:
             spec["autosize"] = {"type": "fit", "contains": "padding"}
-
-    _patch_null_legend_titles(spec)
 
     return spec
 
@@ -397,6 +395,7 @@ def _convert_altair_to_vega_lite_spec(
 
     # Put datasets back into the chart dict:
     chart_dict["datasets"] = datasets
+    _patch_null_legend_titles(chart_dict)
     return chart_dict
 
 
