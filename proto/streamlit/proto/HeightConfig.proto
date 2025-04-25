@@ -17,14 +17,14 @@
 syntax = "proto3";
 
 option java_package = "com.snowflake.apps.streamlit";
-option java_outer_classname = "WidthConfigProto";
+option java_outer_classname = "HeightConfigProto";
 
 package streamlit;
 
-message WidthConfig {
-  oneof width_spec {
+message HeightConfig {
+  oneof height_spec {
     bool use_stretch = 1;
     bool use_content = 2;
-    uint32 pixel_width = 3;
+    uint32 pixel_height = 3;
   }
 }

@@ -28,6 +28,7 @@ from streamlit.errors import (
     StreamlitInvalidVerticalAlignmentError,
 )
 from streamlit.proto.Block_pb2 import Block as BlockProto
+from streamlit.proto.HeightConfig_pb2 import HeightConfig
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.string_util import validate_icon_or_emoji
 
@@ -154,7 +155,10 @@ class LayoutsMixin:
         if height:
             # Activate scrolling container behavior:
             block_proto.allow_empty = True
-            block_proto.flex_container.height = str(height)
+
+            height_config = HeightConfig()
+            height_config.pixel_height = height
+            block_proto.flex_container.height_config.CopyFrom(height_config)
             if border is None:
                 # If border is None, we activated the
                 # border as default setting for scrolling
@@ -349,12 +353,18 @@ class LayoutsMixin:
             )
 
         def column_gap(gap):
+            gap_mapping = {
+                "small": BlockProto.FlexContainer.Gap.SMALL,
+                "medium": BlockProto.FlexContainer.Gap.MEDIUM,
+                "large": BlockProto.FlexContainer.Gap.LARGE,
+            }
+
             if isinstance(gap, str):
                 gap_size = gap.lower()
                 valid_sizes = ["small", "medium", "large"]
 
                 if gap_size in valid_sizes:
-                    return gap_size
+                    return gap_mapping[gap_size]
 
             raise StreamlitInvalidColumnGapError(gap=gap)
 

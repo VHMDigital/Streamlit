@@ -23,11 +23,14 @@ import { Block as BlockProto } from "@streamlit/protobuf"
 import { StyledCheckbox } from "~lib/components/widgets/Checkbox/styled-components"
 import { EmotionTheme, STALE_STYLES } from "~lib/theme"
 
-function translateGapWidth(gap: string, theme: EmotionTheme): string {
+function translateGapWidth(
+  gap: BlockProto.FlexContainer.Gap,
+  theme: EmotionTheme
+): string {
   let gapWidth = theme.spacing.lg
-  if (gap === "medium") {
+  if (gap === BlockProto.FlexContainer.Gap.MEDIUM) {
     gapWidth = theme.spacing.threeXL
-  } else if (gap === "large") {
+  } else if (gap === BlockProto.FlexContainer.Gap.LARGE) {
     gapWidth = theme.spacing.fourXL
   }
   return gapWidth
@@ -86,7 +89,7 @@ export const StyledElementContainer = styled.div<StyledElementContainerProps>(
 
 interface StyledColumnProps {
   weight: number
-  gap: string
+  gap: BlockProto.FlexContainer.Gap
   showBorder: boolean
   verticalAlignment?: BlockProto.Column.VerticalAlignment
 }
@@ -137,7 +140,7 @@ export const StyledColumn = styled.div<StyledColumnProps>(
 
 export interface StyledBlockWrapperProps {
   border: boolean
-  height?: string
+  height?: number
 }
 
 export const StyledBlockWrapper = styled.div<StyledBlockWrapperProps>(
@@ -157,7 +160,7 @@ export const StyledBlockWrapper = styled.div<StyledBlockWrapperProps>(
 
 export interface StyledFlexContainerBlockProps {
   direction: React.CSSProperties["flexDirection"]
-  gap?: string | undefined
+  gap?: BlockProto.FlexContainer.Gap | undefined
   flex?: React.CSSProperties["flex"]
 }
 
@@ -165,7 +168,7 @@ export const StyledFlexContainerBlock =
   styled.div<StyledFlexContainerBlockProps>(
     ({ theme, direction, gap, flex }) => {
       let gapWidth
-      if (!!gap) {
+      if (gap !== undefined) {
         gapWidth = translateGapWidth(gap, theme)
       }
 

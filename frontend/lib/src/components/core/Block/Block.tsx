@@ -33,7 +33,7 @@ import Dialog from "~lib/components/elements/Dialog"
 import Expander from "~lib/components/elements/Expander"
 import { useRequiredContext } from "~lib/hooks/useRequiredContext"
 import { useScrollToBottom } from "~lib/hooks/useScrollToBottom"
-import { useLayoutStyles } from "~lib/components/core/Layout/useLayoutStyles"
+
 import {
   Direction,
   getDirectionOfBlock,
@@ -56,6 +56,7 @@ import {
   StyledFlexContainerBlock,
   StyledFlexContainerBlockProps,
 } from "./styled-components"
+import { ScriptRunState } from "~lib/ScriptRunState"
 
 export interface BlockPropsWithoutWidth extends BaseBlockProps {
   node: BlockNode
@@ -302,14 +303,16 @@ const FlexBoxContainer = (props: FlexBoxContainerProps): ReactElement => {
   // settings.
   const styles = {
     flex: 1,
-    gap: props.node.deltaBlock.flexContainer?.gap ?? "small",
+    gap:
+      props.node.deltaBlock.flexContainer?.gap ??
+      BlockProto.FlexContainer.Gap.SMALL,
     direction: direction,
   }
 
   // TODO: assumption is this feature is for containers only since they are
   // the only thing that can have height.
   const activateScrollToBottom =
-    !!props.node.deltaBlock.flexContainer?.height &&
+    !!props.node.deltaBlock.flexContainer?.heightConfig &&
     props.node.children.some(node => {
       return (
         node instanceof BlockNode && node.deltaBlock.type === "chatMessage"
@@ -325,7 +328,12 @@ const FlexBoxContainer = (props: FlexBoxContainerProps): ReactElement => {
 
   const blockBorderWrapperProps = {
     border: props.node.deltaBlock.flexContainer?.border ?? false,
-    height: props.node.deltaBlock.flexContainer?.height || undefined,
+    // TODO: when height and width are added for containers, this will be calculated with
+    // useLayoutStyles. Currently we are only using pixel height based on the pre-advanced layouts
+    // feature.
+    height:
+      props.node.deltaBlock.flexContainer?.heightConfig?.pixelHeight ||
+      undefined,
     dataTestId: "stVerticalBlockBorderWrapper",
     dataTestScrollBehavior: activateScrollToBottom
       ? "scroll-to-bottom"
