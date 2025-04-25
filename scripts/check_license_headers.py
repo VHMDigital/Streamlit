@@ -29,7 +29,9 @@ if __name__ not in ("__main__", "__mp_main__"):
 SCRIPT_DIR = Path(__file__).resolve().parent
 # We just check if the first line of the license is in the file. This is
 # enough to check that the file is okay.
-LICENSE_TEXT = (SCRIPT_DIR / "license-template.txt").read_text().splitlines()[0]
+LICENSE_TEXT = (
+    (SCRIPT_DIR / "assets" / "license-template.txt").read_text().splitlines()[0]
+)
 
 IGNORE_PATTERN = re.compile(
     # Exclude CI files.
