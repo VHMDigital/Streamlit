@@ -144,10 +144,7 @@ hello
             logs.records[0].msg,
         )
         # Check that the stack trace is included in the warning message:
-        self.assertIn(
-            "Stack (most recent call last)",
-            logs.records[0].msg,
-        )
+        assert logs.records[0].stack_info is not None
 
     def test_toggle_widget(self):
         """Test that the usage of `st.toggle` uses the correct checkbox proto config."""
