@@ -280,6 +280,26 @@ def _apply_cell_edits(
                 )
 
 
+def _parse_added_row(
+    df: pd.DataFrame,
+    added_row: dict[str, Any],
+    dataframe_schema: DataframeSchema,
+) -> tuple[Any, list[Any]]:
+    """Parse the added row into an optional index value and a list of row values."""
+    index_value = None
+    new_row: list[Any] = [None for _ in range(len(dataframe_schema))]
+    for col_name, value in added_row.items():
+        if col_name == INDEX_IDENTIFIER:
+            # TODO(lukasmasuch): To support multi-index in the future:
+            # use a tuple of values here instead of a single value
+            index_value = _parse_value(value, dataframe_schema[INDEX_IDENTIFIER])
+        else:
+            col_pos = cast("int", df.columns.get_loc(col_name))
+            new_row[col_pos] = _parse_value(value, dataframe_schema[col_name])
+
+    return index_value, new_row
+
+
 def _apply_row_additions(
     df: pd.DataFrame,
     added_rows: list[dict[str, Any]],
@@ -306,34 +326,26 @@ def _apply_row_additions(
     import pandas as pd
 
     index_type: Literal["range", "integer", "other"] = "other"
-
     # This is only used if the dataframe has a range or integer index that can be
     # auto incremented:
     index_stop: int | None = None
     index_step: int | None = None
+
     if isinstance(df.index, pd.RangeIndex):
+        # Extract metadata from the range index:
         index_type = "range"
         index_stop = cast("int", df.index.stop)
         index_step = cast("int", df.index.step)
     elif isinstance(df.index, pd.Index) and pd.api.types.is_integer_dtype(
         df.index.dtype
     ):
+        # Get highest integer value and increment it by 1 to get unique index value.
         index_type = "integer"
         index_stop = 0 if df.index.empty else df.index.max() + 1
         index_step = 1
 
     for added_row in added_rows:
-        index_value = None
-        new_row: list[Any] = [None for _ in range(df.shape[1])]
-        for col_name in added_row.keys():
-            value = added_row[col_name]
-            if col_name == INDEX_IDENTIFIER:
-                # TODO(lukasmasuch): To support multi-index in the future:
-                # use a tuple of values here instead of a single value
-                index_value = _parse_value(value, dataframe_schema[INDEX_IDENTIFIER])
-            else:
-                col_pos = df.columns.get_loc(col_name)
-                new_row[col_pos] = _parse_value(value, dataframe_schema[col_name])
+        index_value, new_row = _parse_added_row(df, added_row, dataframe_schema)
 
         if index_value is not None and index_type != "range":
             # Case 1: Non-range index with an explicitly provided index value
