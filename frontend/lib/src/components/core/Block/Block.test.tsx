@@ -23,7 +23,7 @@ import { Block, Block as BlockProto, streamlit } from "@streamlit/protobuf"
 import { renderWithContexts } from "~lib/test_util"
 import { BlockNode } from "~lib/AppNode"
 import { ScriptRunState } from "~lib/ScriptRunState"
-
+import VerticalBlock from "./Block"
 import FlexBoxContainer from "./Block"
 
 const FAKE_SCRIPT_HASH = "fake_script_hash"
@@ -136,5 +136,25 @@ describe("FlexBoxContainer Block Component", () => {
     expect(
       screen.getAllByTestId("stVerticalBlockBorderWrapper")[0]
     ).toHaveStyle("border: 1px solid rgba(49, 51, 63, 0.2);")
+  })
+
+  describe("VerticalBlock", () => {
+    it("should render and be visible", () => {
+      const block = new BlockNode(FAKE_SCRIPT_HASH, [], new BlockProto())
+      render(
+        <VerticalBlock
+          node={block}
+          scriptRunId={""}
+          scriptRunState={ScriptRunState.NOT_RUNNING}
+          widgetsDisabled={false}
+          // @ts-expect-error
+          widgetMgr={undefined}
+          // @ts-expect-error
+          uploadClient={undefined}
+        />
+      )
+      const verticalBlock = screen.getByTestId("stVerticalBlock")
+      expect(verticalBlock).toBeVisible()
+    })
   })
 })

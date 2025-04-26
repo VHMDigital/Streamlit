@@ -382,7 +382,7 @@ function ScrollToBottomBlockWrapper(
 }
 
 const VerticalBlock = (props: BlockPropsWithoutWidth): ReactElement => {
-  // TODO: maybe we want container contents instead of flexbox container?
+  // Deprecated. Use FlexBoxContainer instead.
   return <FlexBoxContainer {...props} />
 }
 
