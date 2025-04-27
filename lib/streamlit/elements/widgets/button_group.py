@@ -107,11 +107,7 @@ class _MultiSelectSerde(Generic[T]):
         indices = check_and_convert_to_indices(self.options, value)
         return indices if indices is not None else []
 
-    def deserialize(
-        self,
-        ui_value: list[int] | None,
-        widget_id: str = "",
-    ) -> list[T]:
+    def deserialize(self, ui_value: list[int] | None) -> list[T]:
         current_value: list[int] = (
             ui_value if ui_value is not None else self.default_value
         )

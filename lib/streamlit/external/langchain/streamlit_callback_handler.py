@@ -36,6 +36,8 @@ This module is lazy-loaded.
 # by default.
 # mypy: disable-error-code="import-not-found, unused-ignore, misc"
 
+# ruff: noqa: ARG002
+
 from __future__ import annotations
 
 import time
