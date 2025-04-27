@@ -42,6 +42,7 @@ import { Source, WidgetStateManager } from "~lib/WidgetStateManager"
 import TooltipIcon from "~lib/components/shared/TooltipIcon"
 import Tooltip, { Placement } from "~lib/components/shared/Tooltip"
 import Icon, { DynamicIcon } from "~lib/components/shared/Icon"
+import { hasLightBackgroundColor } from "~lib/theme"
 import InputInstructions from "~lib/components/shared/InputInstructions/InputInstructions"
 import {
   StyledWidgetLabelHelp,
@@ -138,7 +139,6 @@ const NumberInput: React.FC<Props> = ({
   const commitValue = useCallback(
     ({ value, source }: { value: number | null; source: Source }) => {
       if (notNullOrUndefined(value) && (min > value || value > max)) {
-        inputRef.current?.reportValidity()
         setError(value < min ? "BelowMin" : "AboveMax")
       } else {
         const newValue = value ?? elementDefault ?? null
@@ -372,9 +372,13 @@ const NumberInput: React.FC<Props> = ({
           </StyledWidgetLabelHelp>
         )}
       </WidgetLabel>
+
       <StyledInputContainer
         className={isFocused ? "focused" : ""}
         data-testid="stNumberInputContainer"
+        style={{
+          ...(error && { backgroundColor: theme.colors.dangerBg }), // Light red background when error
+        }}
       >
         <UIInput
           type="number"
@@ -400,40 +404,133 @@ const NumberInput: React.FC<Props> = ({
             )
           }
           id={id.current}
+          error={!!error}
           overrides={{
-            Root: {
+            ClearIconContainer: {
               style: {
-                ...(error && {
-                  borderColor: theme.colors.danger, // Red border for error
-                  backgroundColor: theme.colors.dangerBg, // Light red background
-                  borderWidth: "2px", // Thicker border for emphasis
-                  borderStyle: "solid",
-                }),
+                padding: 0,
+              },
+            },
+            ClearIcon: {
+              props: {
+                overrides: {
+                  Svg: {
+                    style: {
+                      color: theme.colors.darkGray,
+                      // setting this width and height makes the clear-icon align with dropdown arrows of other input fields
+                      padding: theme.spacing.threeXS,
+                      height: theme.sizes.clearIconSize,
+                      width: theme.sizes.clearIconSize,
+                      ":hover": {
+                        fill: theme.colors.bodyText,
+                      },
+                    },
+                  },
+                },
               },
             },
             Input: {
+              props: {
+                "data-testid": "stNumberInputField",
+                step: step,
+                min: min,
+                max: max,
+                // We specify the type as "number" to have numeric keyboard on mobile devices.
+                // We also set inputMode to "" since by default BaseWeb sets "text",
+                // and for "decimal" / "numeric" IOS shows keyboard without a minus sign.
+                type: "number",
+                inputMode: "",
+              },
               style: {
+                lineHeight: theme.lineHeights.inputWidget,
+                // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
+                paddingRight: theme.spacing.sm,
+                paddingLeft: theme.spacing.md,
+                paddingBottom: theme.spacing.sm,
+                paddingTop: theme.spacing.sm,
                 ...(error && {
-                  color: theme.colors.red100, // Red text for error
+                  backgroundColor: theme.colors.dangerBg, // Light red background when error
                   fontWeight: "bold", // Bold text for emphasis
+                  color: hasLightBackgroundColor(theme) // font color according to background
+                    ? theme.colors.red100
+                    : theme.colors.red20,
                 }),
               },
             },
+            InputContainer: {
+              style: () => ({
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+                ...(error && {
+                  backgroundColor: theme.colors.transparent, // Light red background when error
+                }),
+              }),
+            },
+            Root: {
+              style: {
+                // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
+                borderLeftWidth: 0,
+                borderRightWidth: 0,
+                borderTopWidth: 0,
+                borderBottomWidth: 0,
+                paddingRight: 0,
+                paddingLeft: icon ? theme.spacing.sm : 0,
+                ...(error && {
+                  backgroundColor: theme.colors.transparent, // so the red background color can be seen
+                }),
+              },
+            },
+            StartEnhancer: {
+              style: {
+                paddingLeft: 0,
+                paddingRight: 0,
+                // Keeps emoji icons from being cut off on the right
+                minWidth: theme.iconSizes.lg,
+                // Material icons color changed as inactionable
+                color: isMaterialIcon ? theme.colors.fadedText60 : "inherit",
+              },
+            },
+            // Tooltip icon space
             EndEnhancer: {
               style: {
-                ...(error && {
-                  color: theme.colors.red100, // Red icon for error
-                }),
+                color: hasLightBackgroundColor(theme) // font color according to background
+                  ? theme.colors.red100
+                  : theme.colors.red20,
+                backgroundColor: theme.colors.dangerBg,
               },
             },
           }}
+          // Tooltip icon for error message
           endEnhancer={
             error && (
               <Tooltip
                 content={
-                  error === "BelowMin"
-                    ? "Value is below the minimum allowed."
-                    : "Value is above the maximum allowed."
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      color: theme.colors.danger,
+                    }}
+                  >
+                    <span
+                      style={{
+                        marginRight: "5px", // Add space between the icon and the message
+                        color: theme.colors.danger,
+                      }}
+                    >
+                      <Icon content={ErrorOutline} size="lg" />
+                    </span>
+                    <span>
+                      <strong style={{ fontWeight: "bold" }}>Error</strong>:{" "}
+                      {error === "BelowMin"
+                        ? `Value must be greater than or equal to ${min}.`
+                        : `Value must be lower than or equal to ${max}.`}
+                    </span>
+                  </div>
                 }
                 placement={Placement.TOP_RIGHT}
                 error
@@ -451,6 +548,9 @@ const NumberInput: React.FC<Props> = ({
               onClick={decrement}
               disabled={!canDec || disabled}
               tabIndex={-1}
+              style={{
+                ...(error && { backgroundColor: theme.colors.dangerBg }), // Light red background when error
+              }}
             >
               <Icon
                 content={Minus}
@@ -463,6 +563,9 @@ const NumberInput: React.FC<Props> = ({
               onClick={increment}
               disabled={!canInc || disabled}
               tabIndex={-1}
+              style={{
+                ...(error && { backgroundColor: theme.colors.dangerBg }), // Light red background when error
+              }}
             >
               <Icon
                 content={Plus}
@@ -473,16 +576,17 @@ const NumberInput: React.FC<Props> = ({
           </StyledInputControls>
         )}
       </StyledInputContainer>
-      {shouldShowInstructions && (
-        <StyledInstructionsContainer clearable={clearable}>
-          <InputInstructions
-            dirty={dirty}
-            value={formattedValue ?? ""}
-            inForm={inForm}
-            allowEnterToSubmit={allowEnterToSubmit}
-          />
-        </StyledInstructionsContainer>
-      )}
+      {!error &&
+        shouldShowInstructions && ( // Show instructions only when focused and width is sufficient and no error
+          <StyledInstructionsContainer clearable={clearable}>
+            <InputInstructions
+              dirty={dirty}
+              value={formattedValue ?? ""}
+              inForm={inForm}
+              allowEnterToSubmit={allowEnterToSubmit}
+            />
+          </StyledInstructionsContainer>
+        )}
     </div>
   )
 }
