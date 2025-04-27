@@ -193,6 +193,8 @@ export const StyledVerticalBlockBorderWrapper =
       ...(height && {
         height: `${height}px`,
         overflow: "auto",
+      }),
+      ...(backgroundColor && {
         backgroundColor: backgroundColor,
       }),
     })
