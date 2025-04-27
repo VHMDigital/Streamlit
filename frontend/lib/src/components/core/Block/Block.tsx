@@ -50,7 +50,7 @@ import {
   StyledVerticalBlockBorderWrapperProps,
 } from "./styled-components"
 
-import { getMarkdownBgColors, EmotionTheme } from "~lib/theme"
+import { getContainerBgColors, EmotionTheme } from "~lib/theme"
 
 export interface BlockPropsWithoutWidth extends BaseBlockProps {
   node: BlockNode
@@ -287,7 +287,7 @@ const VerticalBlock = (props: BlockPropsWithoutWidth): ReactElement => {
 
   // If we get a color from the proto, we set the background color to the corresponding color using the markdown theme
   const backgroundColor = color
-    ? getMarkdownBgColors(theme)[`${color}bg`]
+    ? getContainerBgColors(theme)[`${color}bg`]
     : undefined
 
   const activateScrollToBottom =
@@ -324,6 +324,7 @@ const VerticalBlock = (props: BlockPropsWithoutWidth): ReactElement => {
           convertKeyToClassName(userKey)
         )}
         data-testid="stVerticalBlock"
+        backgroundColor={backgroundColor}
       >
         <ChildRenderer {...props} />
       </StyledVerticalBlock>
