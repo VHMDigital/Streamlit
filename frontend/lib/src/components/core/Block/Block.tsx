@@ -268,7 +268,6 @@ function ScrollToBottomVerticalBlockWrapper(
     <StyledVerticalBlockBorderWrapper
       border={border}
       height={height}
-      backgroundColor={backgroundColor}
       data-testid="stVerticalBlockBorderWrapper"
       data-test-scroll-behavior="scroll-to-bottom"
       ref={scrollContainerRef as React.RefObject<HTMLDivElement>}
@@ -284,15 +283,12 @@ const VerticalBlock = (props: BlockPropsWithoutWidth): ReactElement => {
   const theme: EmotionTheme = useTheme()
   const border = props.node.deltaBlock.vertical?.border ?? false
   const height = props.node.deltaBlock.vertical?.height || undefined
-  const containerColor = props.node.deltaBlock.vertical?.color || undefined
+  const color = props.node.deltaBlock.vertical?.color
 
-  let backgroundColor: string | undefined = undefined
-  if (containerColor) {
-    const markdownBgColors = getMarkdownBgColors(theme)
-    backgroundColor = markdownBgColors[`${containerColor}bg`]
-  } else {
-    backgroundColor = props.node.deltaBlock.vertical?.color || undefined
-  }
+  // If we get a color from the proto, we set the background color to the corresponding color using the markdown theme
+  const backgroundColor = color
+    ? getMarkdownBgColors(theme)[`${color}bg`]
+    : undefined
 
   const activateScrollToBottom =
     height &&

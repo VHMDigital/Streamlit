@@ -57,12 +57,11 @@ export interface StyledElementContainerProps {
   isStale: boolean
   width: React.CSSProperties["width"]
   elementType: string
-  backgroundColor?: string
 }
 
 const GLOBAL_ELEMENTS = ["balloons", "snow"]
 export const StyledElementContainer = styled.div<StyledElementContainerProps>(
-  ({ theme, isStale, width, elementType, backgroundColor }) => ({
+  ({ theme, isStale, width, elementType }) => ({
     width,
     maxWidth: "100%",
     // Allows to have absolutely-positioned nodes inside app elements, like
