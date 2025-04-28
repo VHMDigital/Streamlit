@@ -427,15 +427,17 @@ def marshall_images(
 
     proto_imgs.width = int(width)
     # Each image in an image list needs to be kept track of at its own coordinates.
-    for coord_suffix, (image, caption) in enumerate(zip(images, captions)):
+    for coord_suffix, (single_image, single_caption) in enumerate(
+        zip(images, captions)
+    ):
         proto_img = proto_imgs.imgs.add()
-        if caption is not None:
-            proto_img.caption = str(caption)
+        if single_caption is not None:
+            proto_img.caption = str(single_caption)
 
         # We use the index of the image in the input image list to identify this image inside
         # MediaFileManager. For this, we just add the index to the image's "coordinates".
         image_id = "%s-%i" % (coordinates, coord_suffix)
 
         proto_img.url = image_to_url(
-            image, width, clamp, channels, output_format, image_id
+            single_image, width, clamp, channels, output_format, image_id
         )
