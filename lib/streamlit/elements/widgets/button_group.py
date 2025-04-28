@@ -141,8 +141,8 @@ class _SingleSelectSerde(Generic[T]):
         _value = [value] if value is not None else []
         return self.multiselect_serde.serialize(_value)
 
-    def deserialize(self, ui_value: list[int] | None, widget_id: str = "") -> T | None:
-        deserialized = self.multiselect_serde.deserialize(ui_value, widget_id)
+    def deserialize(self, ui_value: list[int] | None) -> T | None:
+        deserialized = self.multiselect_serde.deserialize(ui_value)
 
         if len(deserialized) == 0:
             return None
@@ -178,10 +178,8 @@ class ButtonGroupSerde(Generic[T]):
     def serialize(self, value: T | list[T] | None) -> list[int]:
         return self.serde.serialize(cast("Any", value))
 
-    def deserialize(
-        self, ui_value: list[int] | None, widget_id: str = ""
-    ) -> list[T] | T | None:
-        return self.serde.deserialize(ui_value, widget_id)
+    def deserialize(self, ui_value: list[int] | None) -> list[T] | T | None:
+        return self.serde.deserialize(ui_value)
 
 
 def get_mapped_options(
