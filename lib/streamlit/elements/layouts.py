@@ -374,7 +374,7 @@ class LayoutsMixin:
         def column_proto(normalized_weight: float) -> BlockProto:
             col_proto = BlockProto()
             col_proto.column.weight = normalized_weight
-            col_proto.column.gap = gap_size
+            col_proto.column.gap_size = gap_size
             col_proto.column.vertical_alignment = vertical_alignment_mapping[
                 vertical_alignment
             ]
@@ -386,7 +386,7 @@ class LayoutsMixin:
         block_proto.flex_container.direction = (
             BlockProto.FlexContainer.Direction.HORIZONTAL
         )
-        block_proto.flex_container.gap = gap_size
+        block_proto.flex_container.gap_size = gap_size
         block_proto.flex_container.scale = 1
         row = self.dg._block(block_proto)
         total_weight = sum(weights)
