@@ -444,7 +444,7 @@ class NumberInputMixin:
                 float_value = True
 
         if format is None:
-            format = "%d" if int_value else "%0.2f"
+            format = "%d" if int_value else "%0.2f"  # noqa: A001
 
         # Warn user if they format an int type as a float or vice versa.
         if format in ["%d", "%u", "%i"] and float_value:
