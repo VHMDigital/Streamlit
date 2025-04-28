@@ -139,4 +139,5 @@ max-line-length = 120
 allow-dict-calls-with-keyword-arguments = true
 
 [lint.flake8-unused-arguments]
+# Ignore unused variadic argument, like *args and **kwargs.
 ignore-variadic-names = true
