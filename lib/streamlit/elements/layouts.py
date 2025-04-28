@@ -536,7 +536,10 @@ class LayoutsMixin:
 
         tab_container = self.dg._block(block_proto)
 
-        return tuple(tab_container._block(tab_proto(tab)) for tab in tabs)
+        default_index = tabs.index(default) if default else 0
+        block_proto.tab_container.default_tab_index = default_index
+
+        return tuple(tab_container._block(tab_proto(tab_label)) for tab_label in tabs)
 
     @gather_metrics("expander")
     def expander(
