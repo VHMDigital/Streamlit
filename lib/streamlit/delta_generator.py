@@ -434,8 +434,6 @@ class DeltaGenerator(
             The actual proto in the NewElement type e.g. Alert/Button/Slider
         add_rows_metadata : AddRowsMetadata or None
             Metadata for the add_rows method
-        user_key : str or None
-            A custom key for the element provided by the user.
 
         Returns
         -------
