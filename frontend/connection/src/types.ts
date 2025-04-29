@@ -166,10 +166,7 @@ export interface StreamlitEndpoints {
  */
 export type LibConfig = {
   /**
-   * The mapbox token that can be configured by a platform
-   * NOTE: This has been soft-deprecated (i.e. made less prominent in our
-   * Docs). The preferred way to pass an API token for Mapbox or any other
-   * provider is now via PyDeck's API itself.
+   * The mapbox token that can be configured by a platform.
    */
   mapboxToken?: string
 
