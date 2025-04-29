@@ -21,7 +21,7 @@ from e2e_playwright.shared.app_utils import check_top_level_class
 def test_st_exception_displays_correctly(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
-    expect(themed_app.get_by_test_id("stException").nth(0)).to_have_text(
+    expect(themed_app.get_by_test_id("stException").nth(0)).to_contain_text(
         "RuntimeError: This exception message is awesome!"
     )
 
@@ -30,7 +30,10 @@ def test_st_exception_displays_correctly(
     button.click()
     wait_for_app_run(themed_app)
 
-    for i in range(4):
+    # Make sure that there is not hover active on the exceptions
+    themed_app.get_by_test_id("stMarkdownContainer").first.hover()
+
+    for i in range(6):
         assert_snapshot(
             themed_app.get_by_test_id("stException").nth(i), name=f"st_exception-{i}"
         )

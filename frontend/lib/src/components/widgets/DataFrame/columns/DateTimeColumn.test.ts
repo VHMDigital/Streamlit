@@ -18,6 +18,9 @@
 
 import { GridCellKind } from "@glideapps/glide-data-grid"
 import { DatePickerType } from "@glideapps/glide-data-grid-cells"
+import { DateDay, Field, Time, Timestamp, TimeUnit } from "apache-arrow"
+
+import { DataFrameCellType } from "~lib/dataframes/arrowTypeUtils"
 
 import DateTimeColumn, { DateColumn, TimeColumn } from "./DateTimeColumn"
 import { BaseColumnProps, isErrorCell } from "./utils"
@@ -35,8 +38,19 @@ const MOCK_DATETIME_COLUMN_TEMPLATE: BaseColumnProps = {
   arrowType: {
     // The arrow type of the underlying data is
     // not used for anything inside the column.
-    pandas_type: "datetime",
-    numpy_type: "datetime64",
+    type: DataFrameCellType.DATA,
+    arrowField: new Field(
+      "datetime_column",
+      new Timestamp(TimeUnit.SECOND),
+      true
+    ),
+    pandasType: {
+      field_name: "datetime_column",
+      name: "datetime_column",
+      pandas_type: "datetime",
+      numpy_type: "datetime64",
+      metadata: null,
+    },
   },
 }
 
@@ -53,8 +67,15 @@ const MOCK_DATE_COLUMN_TEMPLATE: BaseColumnProps = {
   arrowType: {
     // The arrow type of the underlying data is
     // not used for anything inside the column.
-    pandas_type: "date",
-    numpy_type: "object",
+    type: DataFrameCellType.DATA,
+    arrowField: new Field("date_column", new DateDay(), true),
+    pandasType: {
+      field_name: "date_column",
+      name: "date_column",
+      pandas_type: "date",
+      numpy_type: "object",
+      metadata: null,
+    },
   },
 }
 
@@ -71,8 +92,15 @@ const MOCK_TIME_COLUMN_TEMPLATE: BaseColumnProps = {
   arrowType: {
     // The arrow type of the underlying data is
     // not used for anything inside the column.
-    pandas_type: "time",
-    numpy_type: "object",
+    type: DataFrameCellType.DATA,
+    arrowField: new Field("time_column", new Time(TimeUnit.SECOND, 64), true),
+    pandasType: {
+      field_name: "time_column",
+      name: "time_column",
+      pandas_type: "time",
+      numpy_type: "object",
+      metadata: null,
+    },
   },
 }
 
@@ -140,6 +168,7 @@ describe("DateTimeColumn", () => {
     ["1671951600", "2022-12-25T07:00:00.000"],
   ])(
     "supports datetime-compatible value (%p parsed as %p)",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     (input: any, value: string | null) => {
       const mockColumn = DateTimeColumn(MOCK_DATETIME_COLUMN_TEMPLATE)
       const cell = mockColumn.getCell(input)
@@ -147,6 +176,7 @@ describe("DateTimeColumn", () => {
     }
   )
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   it.each([[NaN], ["foo"]])("%p results in error cell", (input: any) => {
     const mockColumn = DateTimeColumn(MOCK_DATETIME_COLUMN_TEMPLATE)
     const cell = mockColumn.getCell(input)
@@ -246,7 +276,11 @@ describe("DateTimeColumn", () => {
       ...MOCK_DATETIME_COLUMN_TEMPLATE,
       arrowType: {
         ...MOCK_DATETIME_COLUMN_TEMPLATE.arrowType,
-        meta: { timezone: "+05:00" },
+        pandasType: {
+          ...MOCK_DATETIME_COLUMN_TEMPLATE.arrowType.pandasType,
+          metadata: { timezone: "+05:00" },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
+        } as any,
       },
     }
 
@@ -320,6 +354,7 @@ describe("DateColumn", () => {
     ["1671951600", "2022-12-25"],
   ])(
     "supports date-compatible value (%p parsed as %p)",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     (input: any, value: string | null) => {
       const mockColumn = DateColumn(MOCK_DATE_COLUMN_TEMPLATE)
       const cell = mockColumn.getCell(input)
@@ -327,6 +362,7 @@ describe("DateColumn", () => {
     }
   )
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   it.each([[NaN], ["foo"]])("%p results in error cell", (input: any) => {
     const mockColumn = DateColumn(MOCK_DATE_COLUMN_TEMPLATE)
     const cell = mockColumn.getCell(input)
@@ -470,6 +506,7 @@ describe("TimeColumn", () => {
     ["1671951600", "07:00:00.000"],
   ])(
     "supports time-compatible value (%p parsed as %p)",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     (input: any, value: string | null) => {
       const mockColumn = TimeColumn(MOCK_TIME_COLUMN_TEMPLATE)
       const cell = mockColumn.getCell(input)
@@ -477,6 +514,7 @@ describe("TimeColumn", () => {
     }
   )
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   it.each([[NaN], ["foo"]])("%p results in error cell", (input: any) => {
     const mockColumn = TimeColumn(MOCK_TIME_COLUMN_TEMPLATE)
     const cell = mockColumn.getCell(input)

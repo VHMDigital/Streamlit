@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Send slack notifications"""
+"""Send slack notifications."""
+
+from __future__ import annotations
 
 import os
 import sys
@@ -22,7 +24,7 @@ import requests
 
 
 def send_notification():
-    """Create a slack message"""
+    """Create a slack message."""
 
     webhook = os.getenv("SLACK_WEBHOOK")
 
@@ -63,6 +65,17 @@ def send_notification():
         else:
             payload = {
                 "text": f":blobonfire: Release failed - <https://github.com/streamlit/streamlit/actions/runs/{run_id}|Link to run>"
+            }
+
+    if workflow == "assets":
+        if message_key == "new_icons":
+            payload = {
+                "text": ":symbols: New Material Symbols available. Please run `make update-material-icons` to update the material icons."
+            }
+
+        if message_key == "new_emojis":
+            payload = {
+                "text": ":symbols: New emojis available. Please run `./scripts/update_emojis.py` to update the emojis."
             }
 
     if payload:

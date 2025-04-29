@@ -34,3 +34,21 @@ with st.expander("Expander", expanded=True):
 sidebar_tab1, sidebar_tab2 = st.sidebar.tabs(["Foo", "Bar"])
 sidebar_tab1.write("I am in the sidebar")
 sidebar_tab2.write("I'm also in the sidebar")
+
+st.tabs(
+    [
+        "**Bold Text**",
+        "*Italicized*",
+        "~Strikethough~",
+        "`Code Block`",
+        "🐶",
+        ":joy:",
+        ":material/check_circle: Icon",
+    ]
+)
+
+
+tabs = st.tabs(["HTML Tab 1", "HTML Tab 2", "HTML Tab 3"])
+
+for i, tab in enumerate(tabs):
+    tab.html(f"<h1>Hello</h1><p>This is HTML tab {i + 1}</p>")

@@ -15,6 +15,7 @@
  */
 
 import React, {
+  memo,
   ReactElement,
   useContext,
   useEffect,
@@ -25,12 +26,12 @@ import React, {
 import { useTheme } from "@emotion/react"
 import { Tab as UITab, Tabs as UITabs } from "baseui/tabs-motion"
 
-import { AppNode, BlockNode } from "@streamlit/lib/src/AppNode"
-import { BlockPropsWithoutWidth } from "@streamlit/lib/src/components/core/Block"
-import { isElementStale } from "@streamlit/lib/src/components/core/Block/utils"
-import { LibContext } from "@streamlit/lib/src/components/core/LibContext"
-import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
-import { STALE_STYLES } from "@streamlit/lib/src/theme"
+import { AppNode, BlockNode } from "~lib/AppNode"
+import { BlockPropsWithoutWidth } from "~lib/components/core/Block"
+import { isElementStale } from "~lib/components/core/Block/utils"
+import { LibContext } from "~lib/components/core/LibContext"
+import StreamlitMarkdown from "~lib/components/shared/StreamlitMarkdown"
+import { STALE_STYLES } from "~lib/theme"
 
 import { StyledTabContainer } from "./styled-components"
 
@@ -38,12 +39,14 @@ export interface TabProps extends BlockPropsWithoutWidth {
   widgetsDisabled: boolean
   node: BlockNode
   isStale: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   renderTabContent: (childProps: any) => ReactElement
 }
 
 function Tabs(props: Readonly<TabProps>): ReactElement {
-  const { widgetsDisabled, node, isStale, scriptRunState, scriptRunId } = props
-  const { fragmentIdsThisRun } = useContext(LibContext)
+  const { widgetsDisabled, node, isStale } = props
+  const { fragmentIdsThisRun, scriptRunState, scriptRunId } =
+    useContext(LibContext)
 
   let allTabLabels: string[] = []
   const [activeTabKey, setActiveTabKey] = useState<React.Key>(0)
@@ -110,13 +113,10 @@ function Tabs(props: Readonly<TabProps>): ReactElement {
            https://github.com/streamlit/streamlit/issues/5069
          */
         renderAll={true}
-        disabled={widgetsDisabled}
         overrides={{
           TabHighlight: {
             style: () => ({
-              backgroundColor: widgetsDisabled
-                ? theme.colors.fadedText40
-                : theme.colors.primary,
+              backgroundColor: theme.colors.primary,
               height: TAB_BORDER_HEIGHT,
             }),
           },
@@ -184,8 +184,11 @@ function Tabs(props: Readonly<TabProps>): ReactElement {
                   isLabel
                 />
               }
+              // TODO: Update to match React best practices
+              // eslint-disable-next-line @eslint-react/no-array-index-key
               key={index}
-              disabled={widgetsDisabled}
+              // Disable tab if the tab is stale but not the entire tab container:
+              disabled={!isStale && isStaleTab}
               overrides={{
                 TabPanel: {
                   style: () => ({
@@ -205,27 +208,19 @@ function Tabs(props: Readonly<TabProps>): ReactElement {
                     paddingBottom: theme.spacing.none,
                     fontSize: theme.fontSizes.sm,
                     background: "transparent",
-                    color: widgetsDisabled
-                      ? theme.colors.fadedText40
-                      : theme.colors.bodyText,
+                    color: theme.colors.bodyText,
                     ":focus": {
                       outline: "none",
-                      color: widgetsDisabled
-                        ? theme.colors.fadedText40
-                        : theme.colors.primary,
+                      color: theme.colors.primary,
                       background: "none",
                     },
                     ":hover": {
-                      color: widgetsDisabled
-                        ? theme.colors.fadedText40
-                        : theme.colors.primary,
+                      color: theme.colors.primary,
                       background: "none",
                     },
                     ...(isSelected
                       ? {
-                          color: widgetsDisabled
-                            ? theme.colors.fadedText40
-                            : theme.colors.primary,
+                          color: theme.colors.primary,
                         }
                       : {}),
                     // Add minimal required padding to hide the overscroll gradient
@@ -251,4 +246,4 @@ function Tabs(props: Readonly<TabProps>): ReactElement {
   )
 }
 
-export default Tabs
+export default memo(Tabs)

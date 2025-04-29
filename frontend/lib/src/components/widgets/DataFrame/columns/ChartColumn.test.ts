@@ -16,6 +16,9 @@
 
 import { GridCellKind } from "@glideapps/glide-data-grid"
 import { SparklineCellType } from "@glideapps/glide-data-grid-cells"
+import { Field, Float64, List } from "apache-arrow"
+
+import { DataFrameCellType } from "~lib/dataframes/arrowTypeUtils"
 
 import {
   AREA_CHART_TYPE,
@@ -39,10 +42,19 @@ const CHART_COLUMN_TEMPLATE = {
   isPinned: false,
   isStretched: false,
   arrowType: {
-    // The arrow type of the underlying data is
-    // not used for anything inside the column.
-    pandas_type: "object",
-    numpy_type: "list[float64]",
+    type: DataFrameCellType.DATA,
+    arrowField: new Field(
+      "chart_column",
+      new List(new Field("item", new Float64(), true)),
+      true
+    ),
+    pandasType: {
+      field_name: "chart_column",
+      name: "chart_column",
+      pandas_type: "object",
+      numpy_type: "list[float64]",
+      metadata: null,
+    },
   },
 } as BaseColumnProps
 
@@ -226,6 +238,7 @@ describe("ChartColumn", () => {
     [false, [0]],
   ])(
     "supports numerical array-compatible value (%p parsed as %p)",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     (input: any, value: any[] | null) => {
       const mockColumn = getBarChartColumn()
       const cell = mockColumn.getCell(input)
@@ -241,6 +254,7 @@ describe("ChartColumn", () => {
     [["foo", "bar"]],
     [[0.1, 0.4, "foo"]],
     [[0.1, 0.4, null]],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   ])("%p results in error cell", (input: any) => {
     const mockColumn = getLineChartColumn()
     const cell = mockColumn.getCell(input)

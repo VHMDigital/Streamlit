@@ -16,7 +16,11 @@
 
 import React, { MouseEvent, ReactElement } from "react"
 
-import { DynamicIcon } from "@streamlit/lib"
+import { useTheme } from "@emotion/react"
+import { transparentize } from "color2k"
+
+import { useAppContext } from "@streamlit/app/src/components/StreamlitContextProvider"
+import { DynamicIcon, EmotionTheme, isMaterialIcon } from "@streamlit/lib"
 
 import {
   StyledSidebarLinkText,
@@ -40,20 +44,42 @@ const SidebarNavLink = ({
   onClick,
   children,
 }: SidebarNavLinkProps): ReactElement => {
+  const theme: EmotionTheme = useTheme()
+  // If connection state not connected, or host has disabled inputs,
+  // disable sidebar nav links
+  const { widgetsDisabled: disableSidebarNavLinks } = useAppContext()
+
   return (
-    <StyledSidebarNavLinkContainer>
+    <StyledSidebarNavLinkContainer
+      disabled={disableSidebarNavLinks}
+      data-testid="stSidebarNavLinkContainer"
+    >
       <StyledSidebarNavLink
         data-testid="stSidebarNavLink"
         isActive={isActive}
+        disabled={disableSidebarNavLinks}
         href={pageUrl}
         onClick={onClick}
       >
-        {icon && icon.length && (
+        {icon?.length ? (
           <StyledSidebarNavIcon isActive={isActive}>
-            <DynamicIcon size="md" iconValue={icon} />
+            <DynamicIcon
+              size="md"
+              iconValue={icon}
+              color={
+                !isActive && isMaterialIcon(icon)
+                  ? // Apply color with opacity on material icons
+                    // But we don't want to apply opacity on emoji icons
+                    transparentize(theme.colors.bodyText, 0.5)
+                  : theme.colors.bodyText
+              }
+            />
           </StyledSidebarNavIcon>
-        )}
-        <StyledSidebarLinkText isActive={isActive}>
+        ) : null}
+        <StyledSidebarLinkText
+          isActive={isActive}
+          disabled={disableSidebarNavLinks}
+        >
           {children}
         </StyledSidebarLinkText>
       </StyledSidebarNavLink>

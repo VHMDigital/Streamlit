@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useCallback, useEffect } from "react"
+import React, { memo, ReactElement, useCallback, useEffect } from "react"
 
-import { BokehChart as BokehChartProto } from "@streamlit/lib/src/proto"
+import { BokehChart as BokehChartProto } from "@streamlit/protobuf"
+
 // We import Bokeh from a vendored source file, because it doesn't play well with Babel (https://github.com/bokeh/bokeh/issues/10658)
 // Importing these files will cause global Bokeh to be mutated
 // Consumers of this component will have to provide these js files
 // bokeh.esm is renamed from bokeh-2.4.3.esm.min.js because addon bokeh scripts have hardcoded path to bokeh main script ("import main from “./bokeh.esm.js")
-import Bokeh from "@streamlit/lib/src/vendor/bokeh/bokeh.esm"
-import "@streamlit/lib/src/vendor/bokeh/bokeh-api-2.4.3.esm.min"
-import "@streamlit/lib/src/vendor/bokeh/bokeh-gl-2.4.3.esm.min"
-import "@streamlit/lib/src/vendor/bokeh/bokeh-mathjax-2.4.3.esm.min"
-import "@streamlit/lib/src/vendor/bokeh/bokeh-tables-2.4.3.esm.min"
-import "@streamlit/lib/src/vendor/bokeh/bokeh-widgets-2.4.3.esm.min"
+import Bokeh from "~lib/vendor/bokeh/bokeh.esm"
+import "~lib/vendor/bokeh/bokeh-api-2.4.3.esm.min"
+import "~lib/vendor/bokeh/bokeh-gl-2.4.3.esm.min"
+import "~lib/vendor/bokeh/bokeh-mathjax-2.4.3.esm.min"
+import "~lib/vendor/bokeh/bokeh-tables-2.4.3.esm.min"
+import "~lib/vendor/bokeh/bokeh-widgets-2.4.3.esm.min"
 
 export interface BokehChartProps {
   width: number
@@ -51,6 +52,7 @@ export function BokehChart({
   }, [element])
 
   const getChartDimensions = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     (plot: any): Dimensions => {
       // Default values
       let chartWidth: number = plot.attributes.plot_width
@@ -75,6 +77,7 @@ export function BokehChart({
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const updateChart = (data: any): void => {
     const chart = document.getElementById(chartId)
 
@@ -87,7 +90,8 @@ export function BokehChart({
      */
     const plot =
       data && data.doc && data.doc.roots && data.doc.roots.references
-        ? data.doc.roots.references.find((e: any) => e.type === "Plot")
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
+          data.doc.roots.references.find((e: any) => e.type === "Plot")
         : undefined
 
     if (plot) {
@@ -129,4 +133,4 @@ export function BokehChart({
   )
 }
 
-export default BokehChart
+export default memo(BokehChart)

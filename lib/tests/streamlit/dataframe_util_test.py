@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import enum
+import os
 import unittest
 from datetime import date
 from decimal import Decimal
@@ -30,6 +31,7 @@ from parameterized import parameterized
 
 import streamlit as st
 from streamlit import dataframe_util
+from streamlit.type_util import get_fqn_type
 from tests.delta_generator_test_case import DeltaGeneratorTestCase
 from tests.streamlit.data_mocks.snowpandas_mocks import DataFrame as SnowpandasDataFrame
 from tests.streamlit.data_mocks.snowpandas_mocks import Index as SnowpandasIndex
@@ -128,6 +130,13 @@ class DataframeUtilTest(unittest.TestCase):
         converted_df["integer"] = [4, 5, 6]
         # The original dataframe should be changed here since ensure_copy is False
         self.assertEqual(orginal_df["integer"].to_list(), [4, 5, 6])
+
+    @pytest.mark.usefixtures("benchmark")
+    def test_convert_anything_to_pandas_df_ensure_copy_performance(self):
+        """Performance test for `convert_anything_to_pandas_df` with `ensure_copy`."""
+        self.benchmark(
+            DataframeUtilTest.test_convert_anything_to_pandas_df_ensure_copy, self
+        )
 
     def test_convert_anything_to_pandas_df_supports_key_value_dicts(self):
         """Test that `convert_anything_to_pandas_df` correctly converts
@@ -373,7 +382,7 @@ class DataframeUtilTest(unittest.TestCase):
     def test_is_pandas_data_object(self):
         """Test that `is_pandas_data_object` correctly detects pandas data objects."""
         assert dataframe_util.is_pandas_data_object(pd.DataFrame()) is True
-        assert dataframe_util.is_pandas_data_object(pd.Series()) is True
+        assert dataframe_util.is_pandas_data_object(pd.Series(dtype="float64")) is True
         assert dataframe_util.is_pandas_data_object(pd.Index(["a", "b"])) is True
         assert dataframe_util.is_pandas_data_object(pd.array(["a", "b"])) is True
         assert dataframe_util.is_pandas_data_object(["a", "b"]) is False
@@ -453,7 +462,7 @@ class DataframeUtilTest(unittest.TestCase):
         """Verify that sqlite3 cursor can be used as a data source."""
         import sqlite3
 
-        con = sqlite3.connect("file::memory:")
+        con = sqlite3.connect("file::memory:", uri=True)
         cur = con.cursor()
         cur.execute("CREATE TABLE movie(title, year, score)")
         cur.execute("""
@@ -527,6 +536,11 @@ class DataframeUtilTest(unittest.TestCase):
         assert converted_df.shape == items.shape
 
     @pytest.mark.require_integration
+    @pytest.mark.skipif(
+        not os.environ.get("SNOWFLAKE_ACCOUNT")
+        or not os.environ.get("SNOWFLAKE_PASSWORD"),
+        reason="SNOWFLAKE_ACCOUNT and SNOWFLAKE_PASSWORD secrets must be set for this test to run.",
+    )
     def test_verify_snowpark_integration(self):
         """Integration test snowpark object handling.
         This is in addition to the tests using the mocks to verify that
@@ -570,21 +584,27 @@ class DataframeUtilTest(unittest.TestCase):
 
         dask_df = dask.datasets.timeseries()
 
-        assert dataframe_util.is_dask_object(dask_df) is True
+        assert dataframe_util.is_dask_object(dask_df) is True, (
+            f"Failed to detect dask dataframe with type {get_fqn_type(dask_df)}"
+        )
         assert isinstance(
             dataframe_util.convert_anything_to_pandas_df(dask_df),
             pd.DataFrame,
         )
 
         dask_series = dask_df["x"]
-        assert dataframe_util.is_dask_object(dask_series) is True
+        assert dataframe_util.is_dask_object(dask_series) is True, (
+            f"Failed to detect dask series with type {get_fqn_type(dask_series)}"
+        )
         assert isinstance(
             dataframe_util.convert_anything_to_pandas_df(dask_series),
             pd.DataFrame,
         )
 
         dask_index = dask_df.index
-        assert dataframe_util.is_dask_object(dask_index) is True
+        assert dataframe_util.is_dask_object(dask_index) is True, (
+            f"Failed to detect dask index with type {get_fqn_type(dask_index)}"
+        )
         assert isinstance(
             dataframe_util.convert_anything_to_pandas_df(dask_index),
             pd.DataFrame,

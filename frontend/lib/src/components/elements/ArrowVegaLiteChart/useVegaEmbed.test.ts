@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-import { createRef } from "react"
-
-import { act, renderHook } from "@testing-library/react-hooks"
+import { act, renderHook } from "@testing-library/react"
 import { View as VegaView } from "vega"
 import embed from "vega-embed"
 import { expressionInterpreter } from "vega-interpreter"
 import { Mock, Mocked } from "vitest"
 
-import { useFormClearHelper } from "@streamlit/lib/src/components/widgets/Form"
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+import { useFormClearHelper } from "~lib/components/widgets/Form"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
 
 import { getDataArrays, getInlineData } from "./arrowUtils"
 import { useVegaEmbed } from "./useVegaEmbed"
@@ -42,7 +40,7 @@ vi.mock("./useVegaLiteSelections", () => ({
 }))
 
 // Mock "useFormClearHelper" to ensure it is called:
-vi.mock("@streamlit/lib/src/components/widgets/Form", () => ({
+vi.mock("~lib/components/widgets/Form", () => ({
   __esModule: true,
   useFormClearHelper: vi.fn(),
 }))
@@ -76,6 +74,7 @@ describe("useVegaEmbed hook", () => {
   let mockWidgetMgr: Mocked<WidgetStateManager>
   let mockVegaView: Mocked<VegaView>
   let mockEmbedReturn: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     vgSpec: any
     view: Mocked<VegaView>
     finalize: () => void
@@ -108,6 +107,7 @@ describe("useVegaEmbed hook", () => {
     ;(useVegaLiteSelections as Mock).mockReturnValue({
       maybeConfigureSelections: vi
         .fn()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
         .mockImplementation((view: any) => view),
       onFormCleared: vi.fn(),
     })
@@ -123,11 +123,12 @@ describe("useVegaEmbed hook", () => {
   })
 
   it("creates a new Vega view via embed, finalizes existing view, inserts data, and returns a VegaView", async () => {
-    const containerRef = createRef<HTMLDivElement>()
+    const containerRef = { current: null }
     const chartElement = {
       id: "chartId",
       data: null,
       datasets: [],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     } as any
 
     // mount hook
@@ -182,11 +183,12 @@ describe("useVegaEmbed hook", () => {
   })
 
   it("finalizes old view if one exists before creating a new one", async () => {
-    const containerRef = createRef<HTMLDivElement>()
+    const containerRef = { current: null }
     const chartElement = {
       id: "chartId",
       data: null,
       datasets: [],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     } as any
 
     // mount hook
@@ -226,6 +228,7 @@ describe("useVegaEmbed hook", () => {
       id: "chartId",
       data: null,
       datasets: [],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     } as any
 
     const { result } = renderHook(() =>
@@ -244,12 +247,13 @@ describe("useVegaEmbed hook", () => {
       id: "chartId",
       data: null,
       datasets: [],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     } as any
     const { result } = renderHook(() =>
       useVegaEmbed(chartElement, mockWidgetMgr)
     )
 
-    const containerRef = createRef<HTMLDivElement>()
+    const containerRef = { current: null }
     // @ts-expect-error We want the ref to be set correctly
     containerRef.current = document.createElement("div")
 
@@ -278,6 +282,7 @@ describe("useVegaEmbed hook", () => {
       id: "chartId",
       data: null,
       datasets: [],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     } as any
     const { result } = renderHook(() =>
       useVegaEmbed(chartElement, mockWidgetMgr)
@@ -295,13 +300,14 @@ describe("useVegaEmbed hook", () => {
       id: "chartId",
       data: null,
       datasets: [],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     } as any
 
     const { result } = renderHook(() =>
       useVegaEmbed(chartElement, mockWidgetMgr)
     )
 
-    const containerRef = createRef<HTMLDivElement>()
+    const containerRef = { current: null }
     // @ts-expect-error We want the ref to be set correctly
     containerRef.current = document.createElement("div")
 
@@ -315,6 +321,7 @@ describe("useVegaEmbed hook", () => {
       dimensions: { dataRows: 5, dataCols: 2 },
       isEmpty: () => false,
       columnTypes: { index: ["int"], data: ["int"] },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     } as any
 
     await act(async () => {

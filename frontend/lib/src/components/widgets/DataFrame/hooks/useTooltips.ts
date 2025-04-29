@@ -27,8 +27,8 @@ import {
   hasTooltip,
   isErrorCell,
   isMissingValueCell,
-} from "@streamlit/lib/src/components/widgets/DataFrame/columns"
-import { notNullOrUndefined } from "@streamlit/lib/src/util/utils"
+} from "~lib/components/widgets/DataFrame/columns"
+import { notNullOrUndefined } from "~lib/util/utils"
 
 // Debounce time for triggering the tooltip on hover.
 export const DEBOUNCE_TIME_MS = 600
@@ -51,16 +51,19 @@ export type TooltipsReturn = {
  *
  * @param columns columns of the datagrid
  * @param getCellContent function that returns the cell content for a given cell position
+ * @param ignoredRowIndices array of row indices to ignore when showing tooltips.
  * @returns the tooltip to show (if any), a callback to clear the tooltip, and the
  * onItemHovered callback to pass to the datagrid
  */
 function useTooltips(
   columns: BaseColumn[],
-  getCellContent: ([col, row]: readonly [number, number]) => GridCell
+  getCellContent: ([col, row]: readonly [number, number]) => GridCell,
+  ignoredRowIndices: number[] = []
 ): TooltipsReturn {
   const [tooltip, setTooltip] = React.useState<
     { content: string; left: number; top: number } | undefined
   >()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const timeoutRef = React.useRef<any>(null)
 
   const onItemHovered = React.useCallback(
@@ -81,13 +84,16 @@ function useTooltips(
           return
         }
 
+        if (ignoredRowIndices.includes(rowIdx)) {
+          // Ignore the row if it is in the configured ignoredRowIndices array.
+          return
+        }
+
         const column = columns[colIdx]
 
         if (args.kind === "header" && notNullOrUndefined(column)) {
           tooltipContent = column.help
         } else if (args.kind === "cell") {
-          // TODO(lukasmasuch): Ignore the last row if num_rows=dynamic (trailing row).
-
           const cell = getCellContent([colIdx, rowIdx])
 
           if (isErrorCell(cell)) {
@@ -117,7 +123,7 @@ function useTooltips(
         }
       }
     },
-    [columns, getCellContent, setTooltip, timeoutRef]
+    [columns, getCellContent, setTooltip, timeoutRef, ignoredRowIndices]
   )
 
   const clearTooltip = React.useCallback(() => {

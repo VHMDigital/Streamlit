@@ -43,6 +43,8 @@ Then we can go to alpha, rc1, rc2, etc. but eventually its
 0.15.3
 """
 
+from __future__ import annotations
+
 import fileinput
 import os
 import re
@@ -62,9 +64,16 @@ PYTHON = {"lib/setup.py": r"(?P<pre>.*VERSION = \").*(?P<post>\"  # PEP-440$)"}
 
 # This regex captures the "version": field in a JSON-like structure
 # allowing for any amount of whitespace before the "version": field.
-NODE_ROOT = {"frontend/package.json": r'(?P<pre>^ \s*"version": ").*(?P<post>",$)'}
-NODE_APP = {"frontend/app/package.json": r'(?P<pre>^ \s*"version": ").*(?P<post>",$)'}
-NODE_LIB = {"frontend/lib/package.json": r'(?P<pre>^ \s*"version": ").*(?P<post>",$)'}
+regex = r'(?P<pre>^ \s*"version": ").*(?P<post>",$)'
+NODE_PACKAGES = [
+    {"frontend/package.json": regex},
+    {"frontend/app/package.json": regex},
+    {"frontend/connection/package.json": regex},
+    {"frontend/lib/package.json": regex},
+    {"frontend/protobuf/package.json": regex},
+    {"frontend/typescript-config/package.json": regex},
+    {"frontend/utils/package.json": regex},
+]
 
 
 def verify_pep440(version):
@@ -99,16 +108,18 @@ def update_files(data, version):
     """Update files with new version number."""
 
     for filename, regex in data.items():
-        filename = os.path.join(BASE_DIR, filename)
+        file_path = os.path.join(BASE_DIR, filename)
         matched = False
         pattern = re.compile(regex)
-        for line in fileinput.input(filename, inplace=True):
+        for line in fileinput.input(file_path, inplace=True):
             if pattern.match(line.rstrip()):
                 matched = True
-            line = re.sub(regex, r"\g<pre>%s\g<post>" % version, line.rstrip())
-            print(line)
+            updated_line = re.sub(regex, r"\g<pre>%s\g<post>" % version, line.rstrip())
+            print(updated_line)
         if not matched:
-            raise Exception('In file "%s", did not find regex "%s"' % (filename, regex))
+            raise Exception(
+                'In file "%s", did not find regex "%s"' % (file_path, regex)
+            )
 
 
 def main():
@@ -136,9 +147,8 @@ def main():
         )
 
     update_files(PYTHON, pep440_version)
-    update_files(NODE_ROOT, semver_version)
-    update_files(NODE_APP, semver_version)
-    update_files(NODE_LIB, semver_version)
+    for package in NODE_PACKAGES:
+        update_files(package, semver_version)
 
 
 if __name__ == "__main__":

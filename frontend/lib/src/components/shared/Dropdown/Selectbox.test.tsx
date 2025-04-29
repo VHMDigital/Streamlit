@@ -16,23 +16,22 @@
 
 import React from "react"
 
-import { fireEvent, screen } from "@testing-library/react"
+import { fireEvent, screen, within } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 
-import { render } from "@streamlit/lib/src/test_util"
-import { LabelVisibilityOptions } from "@streamlit/lib/src/util/utils"
-import * as Utils from "@streamlit/lib/src/theme/utils"
-import { mockConvertRemToPx } from "@streamlit/lib/src/mocks/mocks"
+import { render } from "~lib/test_util"
+import { LabelVisibilityOptions } from "~lib/util/utils"
+import * as Utils from "~lib/theme/utils"
+import { mockConvertRemToPx } from "~lib/mocks/mocks"
 
 import Selectbox, { fuzzyFilterSelectOptions, Props } from "./Selectbox"
 
-vi.mock("@streamlit/lib/src/WidgetStateManager")
+vi.mock("~lib/WidgetStateManager")
 
 const getProps = (props: Partial<Props> = {}): Props => ({
-  value: 0,
+  value: "a",
   label: "Label",
   options: ["a", "b", "c"],
-  width: 0,
   disabled: false,
   onChange: vi.fn(),
   placeholder: "Select...",
@@ -56,11 +55,10 @@ describe("Selectbox widget", () => {
     expect(screen.getByRole("combobox")).toBeInTheDocument()
   })
 
-  it("has correct className and style", () => {
+  it("has correct className", () => {
     render(<Selectbox {...props} />)
     const selectbox = screen.getByTestId("stSelectbox")
     expect(selectbox).toHaveClass("stSelectbox")
-    expect(selectbox).toHaveStyle(`width: ${props.width}px`)
   })
 
   it("renders a label", () => {
@@ -100,11 +98,24 @@ describe("Selectbox widget", () => {
   it("renders a placeholder with empty options", () => {
     props = getProps({
       options: [],
+      value: undefined,
     })
     render(<Selectbox {...props} />)
 
-    expect(screen.getByText("No options to select.")).toBeInTheDocument()
+    expect(screen.getByText("No options to select")).toBeInTheDocument()
     expect(screen.getByRole("combobox")).toBeDisabled()
+  })
+
+  it("renders a placeholder with empty options when acceptNewOptions is true", () => {
+    props = getProps({
+      options: [],
+      acceptNewOptions: true,
+      value: undefined,
+    })
+    render(<Selectbox {...props} />)
+
+    expect(screen.getByText("Add an option")).toBeInTheDocument()
+    expect(screen.getByRole("combobox")).not.toBeDisabled()
   })
 
   it("renders options", async () => {
@@ -139,7 +150,7 @@ describe("Selectbox widget", () => {
     // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.click(options[2])
 
-    expect(props.onChange).toHaveBeenCalledWith(2)
+    expect(props.onChange).toHaveBeenCalledWith("c")
     expect(screen.getByText(props.options[2])).toBeInTheDocument()
   })
 
@@ -207,9 +218,79 @@ describe("Selectbox widget", () => {
     // Original value passed is 0
     expect(screen.getByText(props.options[0])).toBeInTheDocument()
 
-    props = getProps({ value: 1 })
+    props = getProps({ value: "b" })
     rerender(<Selectbox {...props} />)
     expect(screen.getByText(props.options[1])).toBeInTheDocument()
+  })
+
+  it("does not commit changes when clicking outside of the selectbox", async () => {
+    const user = userEvent.setup()
+    render(<Selectbox {...props} />)
+    const selectbox = screen.getByRole("combobox")
+    await user.type(selectbox, "b")
+
+    // Click outside of the selectbox
+    await user.click(document.body)
+
+    // Check that clicking outside of the selectbox does not commit the change and the default is kept
+    expect(props.onChange).toHaveBeenCalledTimes(0)
+    expect(screen.getByTestId("stSelectbox")).toHaveTextContent(
+      props.options[0]
+    )
+  })
+
+  it("does not call onChange when the user deletes characters", async () => {
+    render(<Selectbox {...props} />)
+    const selectbox = screen.getByTestId("stSelectbox")
+    expect(
+      within(selectbox).getByText(props.options[0], { exact: true })
+    ).toBeInTheDocument()
+
+    const selectboxInput = screen.getByRole("combobox")
+
+    // Simulate deleting a character
+    // we are using fireEvent here instead of userEvent because userEvent
+    // did not trigger the backspace event correctly.
+    // eslint-disable-next-line testing-library/prefer-user-event
+    fireEvent.keyDown(selectboxInput, {
+      key: "Backspace",
+      keyCode: 8,
+      code: "Backspace",
+    })
+
+    // ensure that onChange was not called for the remove
+    expect(props.onChange).toHaveBeenCalledTimes(0)
+    // ensure that the input value was updated
+    expect(
+      within(selectbox).queryAllByText(props.options[0], { exact: true })
+    ).toHaveLength(0)
+  })
+
+  it("allows new options when acceptNewOptions is true", async () => {
+    const user = userEvent.setup()
+    props = getProps({
+      acceptNewOptions: true,
+    })
+    render(<Selectbox {...props} />)
+    const selectboxInput = screen.getByRole("combobox")
+    await user.type(selectboxInput, "hello world!")
+    await user.keyboard("{enter}")
+    expect(props.onChange).toHaveBeenCalledTimes(1)
+    expect(props.onChange).toHaveBeenCalledWith("hello world!")
+    const selectbox = screen.getByTestId("stSelectbox")
+    expect(within(selectbox).getByText("hello world!")).toBeInTheDocument()
+  })
+
+  it("does not allow new options when acceptNewOptions is false", async () => {
+    const user = userEvent.setup()
+    props = getProps({
+      acceptNewOptions: false,
+    })
+    render(<Selectbox {...props} />)
+    const selectboxInput = screen.getByRole("combobox")
+    await user.type(selectboxInput, "hello world!")
+    await user.keyboard("{enter}")
+    expect(props.onChange).toHaveBeenCalledTimes(0)
   })
 })
 

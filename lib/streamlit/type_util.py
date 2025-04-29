@@ -20,21 +20,24 @@ import dataclasses
 import re
 import types
 from collections import UserList, deque
-from collections.abc import ItemsView, KeysView, ValuesView
+from collections.abc import (
+    AsyncGenerator,
+    Generator,
+    ItemsView,
+    Iterable,
+    KeysView,
+    Mapping,
+    Sequence,
+    ValuesView,
+)
 from enum import EnumMeta
 from typing import (
     TYPE_CHECKING,
     Any,
-    AsyncGenerator,
     Final,
-    Generator,
-    Iterable,
     Literal,
-    Mapping,
     NamedTuple,
     Protocol,
-    Sequence,
-    Tuple,
     TypeVar,
     Union,
     overload,
@@ -46,7 +49,7 @@ from streamlit.errors import StreamlitAPIException
 
 if TYPE_CHECKING:
     import graphviz
-    import sympy
+    import sympy  # type: ignore
     from plotly.graph_objs import Figure
     from pydeck import Deck
 
@@ -56,7 +59,7 @@ T = TypeVar("T")
 
 # we define our own type here because mypy doesn't seem to support the shape type and
 # reports unreachable code. When mypy supports it, we can remove this custom type.
-NumpyShape: TypeAlias = Tuple[int, ...]
+NumpyShape: TypeAlias = tuple[int, ...]
 
 
 class SupportsStr(Protocol):
@@ -229,10 +232,10 @@ def is_graphviz_chart(
 ) -> TypeGuard[graphviz.Graph | graphviz.Digraph]:
     """True if input looks like a GraphViz chart."""
     return (
-        # GraphViz < 0.18
+        # In GraphViz < 0.18
         is_type(obj, "graphviz.dot.Graph")
         or is_type(obj, "graphviz.dot.Digraph")
-        # GraphViz >= 0.18
+        # In GraphViz >= 0.18
         or is_type(obj, "graphviz.graphs.Graph")
         or is_type(obj, "graphviz.graphs.Digraph")
         or is_type(obj, "graphviz.sources.Source")
@@ -327,13 +330,12 @@ def is_pydantic_model(obj) -> bool:
 
 
 def _is_from_streamlit(obj: object) -> bool:
-    """True if the object is from the the streamlit package."""
+    """True if the object is from the streamlit package."""
     return obj.__class__.__module__.startswith("streamlit")
 
 
 def is_custom_dict(obj: object) -> TypeGuard[CustomDict]:
     """True if input looks like one of the Streamlit custom dictionaries."""
-
     return (
         isinstance(obj, Mapping)
         and _is_from_streamlit(obj)
@@ -383,7 +385,8 @@ def is_list_like(obj: object) -> TypeGuard[Sequence[Any]]:
 def check_python_comparable(seq: Sequence[Any]) -> None:
     """Check if the sequence elements support "python comparison".
     That means that the equality operator (==) returns a boolean value.
-    Which is not True for e.g. numpy arrays and pandas series."""
+    Which is not True for e.g. numpy arrays and pandas series.
+    """
     try:
         bool(seq[0] == seq[0])
     except LookupError:

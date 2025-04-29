@@ -239,11 +239,12 @@ class ServerTest(ServerTestCase):
             # Get the server's socket and session for this client
             session_info = self.server._runtime._session_mgr.list_active_sessions()[0]
 
-            with patch.object(
-                session_info.session, "flush_browser_queue"
-            ) as flush_browser_queue, patch.object(
-                session_info.client, "write_message"
-            ) as ws_write_message:
+            with (
+                patch.object(
+                    session_info.session, "flush_browser_queue"
+                ) as flush_browser_queue,
+                patch.object(session_info.client, "write_message") as ws_write_message,
+            ):
                 # Patch flush_browser_queue to simulate a pending message.
                 flush_browser_queue.return_value = [create_dataframe_msg([1, 2, 3])]
 
@@ -350,9 +351,11 @@ class SslServerTest(unittest.TestCase):
         The test checks the behavior whenever one of the two required configuration
         option is set.
         """
-        with patch_config_options({option_name: "/tmp/file"}), pytest.raises(
-            SystemExit
-        ), self.assertLogs("streamlit.web.server.server") as logs:
+        with (
+            patch_config_options({option_name: "/tmp/file"}),
+            pytest.raises(SystemExit),
+            self.assertLogs("streamlit.web.server.server") as logs,
+        ):
             start_listening(mock.MagicMock())
         self.assertEqual(
             logs.output,
@@ -381,7 +384,7 @@ class SslServerTest(unittest.TestCase):
             exit_stack.enter_context(patch_config_options(new_options))
 
             # Create only one file
-            Path(new_options[option_name]).write_text("TEST-CONTENT")
+            Path(new_options[option_name]).write_text("TEST-CONTENT", encoding="utf-8")
 
             exit_stack.enter_context(pytest.raises(SystemExit))
             logs = exit_stack.enter_context(
@@ -437,7 +440,9 @@ class SslServerTest(unittest.TestCase):
             exit_stack.enter_context(patch_config_options(new_options))
 
             # Overwrite file with invalid content
-            Path(new_options[option_name]).write_text("INVALID-CONTENT")
+            Path(new_options[option_name]).write_text(
+                "INVALID-CONTENT", encoding="utf-8"
+            )
 
             exit_stack.enter_context(pytest.raises(SystemExit))
             logs = exit_stack.enter_context(
@@ -480,12 +485,12 @@ class UnixSocketTest(unittest.TestCase):
         some_socket = object()
 
         mock_server = self.get_httpserver()
-        with patch(
-            "streamlit.web.server.server.HTTPServer", return_value=mock_server
-        ), patch.object(
-            tornado.netutil, "bind_unix_socket", return_value=some_socket
-        ) as bind_unix_socket, patch.dict(
-            os.environ, {"HOME": "/home/superfakehomedir"}
+        with (
+            patch("streamlit.web.server.server.HTTPServer", return_value=mock_server),
+            patch.object(
+                tornado.netutil, "bind_unix_socket", return_value=some_socket
+            ) as bind_unix_socket,
+            patch.dict(os.environ, {"HOME": "/home/superfakehomedir"}),
         ):
             start_listening(app)
 

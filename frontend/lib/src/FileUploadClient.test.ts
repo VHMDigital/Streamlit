@@ -36,13 +36,15 @@ describe("FileUploadClient Upload", () => {
     uploader = new FileUploadClient({
       sessionInfo: mockSessionInfo(),
       endpoints: {
+        setStaticConfigUrl: vi.fn(),
+        sendClientErrorToHost: vi.fn(),
+        checkSourceUrlResponse: vi.fn(),
         buildComponentURL: vi.fn(),
         buildMediaURL: vi.fn(),
         buildFileUploadURL: vi.fn(),
         buildAppPageURL: vi.fn(),
         uploadFileUploaderFile: uploadFileUploaderFile,
         deleteFileAtURL: vi.fn(),
-        fetchCachedForwardMsg: vi.fn(),
       },
       formsWithPendingRequestsChanged,
       requestFileURLs,
@@ -137,7 +139,7 @@ describe("FileUploadClient Upload", () => {
     const pendingReqs = uploader.pendingFileURLsRequests
     expect(pendingReqs.size).toBe(1)
 
-    const reqId = pendingReqs.keys().next().value
+    const reqId = pendingReqs.keys().next().value as string
 
     expect(pendingReqs.get(reqId)?.promise).toBe(fileURLsPromise)
   })
@@ -147,7 +149,7 @@ describe("FileUploadClient Upload", () => {
 
     // @ts-expect-error
     const pendingReqs = uploader.pendingFileURLsRequests
-    const reqId = pendingReqs.keys().next().value
+    const reqId = pendingReqs.keys().next().value as string
     const promise = pendingReqs.get(reqId)?.promise
 
     uploader.onFileURLsResponse({
@@ -163,7 +165,7 @@ describe("FileUploadClient Upload", () => {
 
     // @ts-expect-error
     const pendingReqs = uploader.pendingFileURLsRequests
-    const reqId = pendingReqs.keys().next().value
+    const reqId = pendingReqs.keys().next().value as string
     const promise = pendingReqs.get(reqId)?.promise
 
     uploader.onFileURLsResponse({

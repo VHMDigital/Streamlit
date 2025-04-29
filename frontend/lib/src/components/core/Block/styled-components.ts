@@ -18,9 +18,10 @@ import React from "react"
 
 import styled from "@emotion/styled"
 
-import { StyledCheckbox } from "@streamlit/lib/src/components/widgets/Checkbox/styled-components"
-import { Block as BlockProto } from "@streamlit/lib/src/proto"
-import { EmotionTheme, STALE_STYLES } from "@streamlit/lib/src/theme"
+import { Block as BlockProto } from "@streamlit/protobuf"
+
+import { StyledCheckbox } from "~lib/components/widgets/Checkbox/styled-components"
+import { EmotionTheme, STALE_STYLES } from "~lib/theme"
 
 function translateGapWidth(gap: string, theme: EmotionTheme): string {
   let gapWidth = theme.spacing.lg
@@ -54,7 +55,7 @@ export const StyledHorizontalBlock = styled.div<StyledHorizontalBlockProps>(
 
 export interface StyledElementContainerProps {
   isStale: boolean
-  width: number
+  width: React.CSSProperties["width"]
   elementType: string
 }
 
@@ -62,16 +63,13 @@ const GLOBAL_ELEMENTS = ["balloons", "snow"]
 export const StyledElementContainer = styled.div<StyledElementContainerProps>(
   ({ theme, isStale, width, elementType }) => ({
     width,
+    maxWidth: "100%",
     // Allows to have absolutely-positioned nodes inside app elements, like
     // floating buttons.
     position: "relative",
 
     "@media print": {
       overflow: "visible",
-    },
-
-    ":is(.stHtml-empty)": {
-      display: "none",
     },
 
     ":has(> .stCacheSpinner)": {
@@ -140,7 +138,7 @@ export const StyledColumn = styled.div<StyledColumnProps>(
       ...(verticalAlignment === VerticalAlignment.TOP && {
         // Add margin to the first checkbox/toggle within the column to align it
         // better with other input widgets.
-        [`& ${StyledElementContainer}:last-of-type > ${StyledCheckbox}`]: {
+        [`& ${StyledElementContainer}:first-of-type > ${StyledCheckbox}`]: {
           marginTop: theme.spacing.sm,
         },
       }),
@@ -158,27 +156,22 @@ export const StyledColumn = styled.div<StyledColumnProps>(
 )
 
 export interface StyledVerticalBlockProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   ref?: React.RefObject<any>
-  width?: number
+  width?: React.CSSProperties["width"]
+  maxWidth?: React.CSSProperties["maxWidth"]
 }
 
 export const StyledVerticalBlock = styled.div<StyledVerticalBlockProps>(
-  ({ width, theme }) => ({
-    width,
+  ({ theme }) => ({
+    width: "100%",
+    maxWidth: "100%",
     position: "relative", // Required for the automatic width computation.
     display: "flex",
     flex: 1,
     flexDirection: "column",
     gap: theme.spacing.lg,
   })
-)
-
-export const StyledVerticalBlockWrapper = styled.div<StyledVerticalBlockProps>(
-  {
-    display: "flex",
-    flexDirection: "column",
-    flex: 1,
-  }
 )
 
 export interface StyledVerticalBlockBorderWrapperProps {
@@ -189,6 +182,7 @@ export interface StyledVerticalBlockBorderWrapperProps {
 export const StyledVerticalBlockBorderWrapper =
   styled.div<StyledVerticalBlockBorderWrapperProps>(
     ({ theme, border, height }) => ({
+      display: "block",
       ...(border && {
         border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
         borderRadius: theme.radii.default,

@@ -31,12 +31,9 @@ import "moment-timezone"
 import numbro from "numbro"
 import { sprintf } from "sprintf-js"
 
-import { PandasColumnType as ArrowType } from "@streamlit/lib/src/dataframes/arrowTypeUtils"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
-import {
-  isNullOrUndefined,
-  notNullOrUndefined,
-} from "@streamlit/lib/src/util/utils"
+import { ArrowType } from "~lib/dataframes/arrowTypeUtils"
+import { EmotionTheme } from "~lib/theme"
+import { isNullOrUndefined, notNullOrUndefined } from "~lib/util/utils"
 
 /**
  * Interface used for defining the properties (configuration options) of a column.
@@ -65,11 +62,15 @@ export interface BaseColumnProps {
   readonly isStretched: boolean
   // If `True`, a value is required before the cell or row can be submitted:
   readonly isRequired?: boolean
+  // If `True`, the content of the cell is allowed to be wrapped
+  // to fill the available height of the cell.
+  readonly isWrappingAllowed?: boolean
   // The initial width of the column:
   readonly width?: number
   // A help text that is displayed on hovering the column header.
   readonly help?: string
   // Configuration options related to the column type:
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   readonly columnTypeOptions?: Record<string, any>
   // The content alignment of the column:
   readonly contentAlignment?: "left" | "center" | "right"
@@ -96,10 +97,13 @@ export interface BaseColumn extends BaseColumnProps {
   // Validate the input data for compatibility with the column type:
   // Either returns a boolean indicating if the data is valid or not, or
   // returns the corrected value.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   validateInput?(data?: any): boolean | any
   // Get a cell with the provided data for the column type:
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   getCell(data?: any, validate?: boolean): GridCell
   // Get the raw value of the given cell:
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   getCellValue(cell: GridCell): any | null
 }
 
@@ -233,12 +237,15 @@ export function toGlideColumn(column: BaseColumn): GridColumn {
     id: column.id,
     title: column.title,
     hasMenu: false,
+    menuIcon: "dots",
     themeOverride: column.themeOverride,
     icon: column.icon,
     group: column.group,
-    ...(column.isStretched && {
-      grow: column.isIndex ? 1 : 3,
-    }),
+    // Only grow non pinned columns, it looks a bit broken otherwise:
+    ...(column.isStretched &&
+      !column.isPinned && {
+        grow: 1,
+      }),
     ...(column.width && {
       width: column.width,
     }),
@@ -254,8 +261,11 @@ export function toGlideColumn(column: BaseColumn): GridColumn {
  * @returns The merged column parameters.
  */
 export function mergeColumnParameters(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   defaultParams: Record<string, any> | undefined | null,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   userParams: Record<string, any> | undefined | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 ): Record<string, any> {
   if (isNullOrUndefined(defaultParams)) {
     return userParams || {}
@@ -276,6 +286,7 @@ export function mergeColumnParameters(
  *
  * @returns The converted array or an empty array if the value cannot be interpreted as an array.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function toSafeArray(data: any): any[] {
   if (isNullOrUndefined(data)) {
     return []
@@ -316,6 +327,7 @@ export function toSafeArray(data: any): any[] {
       return [toSafeString(parsedData)]
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     return parsedData.map((value: any) =>
       ["string", "number", "boolean", "null"].includes(typeof value)
         ? value
@@ -327,6 +339,21 @@ export function toSafeArray(data: any): any[] {
 }
 
 /**
+ * Efficient check to determine if a string is looks like a JSON string.
+ *
+ * This is only a heuristic check and does not guarantee that the string is a
+ * valid JSON string.
+ *
+ * @param data - The data to check.
+ *
+ * @returns `true` if the data might be a JSON string.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
+export function isMaybeJson(data: any): boolean {
+  return data && data.startsWith("{") && data.endsWith("}")
+}
+
+/**
  * Converts the given value of unknown type to a string without
  * the risks of any exceptions.
  *
@@ -334,6 +361,7 @@ export function toSafeArray(data: any): any[] {
  *
  * @return The converted string or a string showing the type of the object as fallback.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function toSafeString(data: any): string {
   try {
     try {
@@ -359,6 +387,7 @@ export function toSafeString(data: any): string {
  * @return The converted boolean, null if the value is empty or undefined if the
  *         value cannot be interpreted as a boolean.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function toSafeBoolean(value: any): boolean | null | undefined {
   if (isNullOrUndefined(value)) {
     return null
@@ -389,6 +418,7 @@ export function toSafeBoolean(value: any): boolean | null | undefined {
  * @returns The converted number or null if the value is empty or undefined or NaN if the
  *          value cannot be interpreted as a number.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function toSafeNumber(value: any): number | null {
   // TODO(lukasmasuch): Should this return null as replacement for NaN?
 
@@ -423,6 +453,38 @@ export function toSafeNumber(value: any): number | null {
   }
 
   return Number(value)
+}
+
+/**
+ * Tries to convert a given value of unknown type to a JSON string without
+ * the risks of any exceptions.
+ *
+ * @param value - The value to convert to a JSON string.
+ *
+ * @returns The converted JSON string or a string showing the type of the object as fallback.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
+export function toJsonString(value: any): string {
+  if (isNullOrUndefined(value)) {
+    return ""
+  }
+
+  if (typeof value === "string") {
+    // If the value is already a string, return it as-is
+    return value
+  }
+
+  try {
+    // Try to convert the value to a JSON string
+    return JSON.stringify(value, (_key, val) =>
+      // BigInt are not supported by JSON.stringify
+      // so we convert them to a number as fallback
+      typeof val === "bigint" ? Number(val) : val
+    )
+  } catch (error) {
+    // If the value cannot be converted to a JSON string, return the stringified value
+    return toSafeString(value)
+  }
 }
 
 /**
@@ -471,7 +533,7 @@ export function formatNumber(
       }
 
       return numbro(value).format({
-        thousandSeparated: true,
+        thousandSeparated: false,
         mantissa: maxPrecision,
         trimMantissa: false,
       })
@@ -479,22 +541,52 @@ export function formatNumber(
 
     // Use a default format if no precision is given
     return numbro(value).format({
-      thousandSeparated: true,
+      thousandSeparated: false,
       mantissa: determineDefaultMantissa(value),
       trimMantissa: true,
     })
   }
 
-  if (format === "percent") {
+  if (format === "plain") {
+    return numbro(value).format({
+      thousandSeparated: false,
+      // Use a large mantissa to avoid cutting off decimals
+      mantissa: 20,
+      trimMantissa: true,
+    })
+  } else if (format === "localized") {
+    return new Intl.NumberFormat().format(value)
+  } else if (format === "percent") {
     return new Intl.NumberFormat(undefined, {
       style: "percent",
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(value)
+  } else if (format === "dollar") {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: "USD",
+      currencyDisplay: "narrowSymbol",
+      maximumFractionDigits: 2,
+    }).format(value)
+  } else if (format === "euro") {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: "EUR",
       maximumFractionDigits: 2,
     }).format(value)
   } else if (["compact", "scientific", "engineering"].includes(format)) {
     return new Intl.NumberFormat(undefined, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
       notation: format as any,
     }).format(value)
+  } else if (format === "accounting") {
+    return numbro(value).format({
+      thousandSeparated: true,
+      negative: "parenthesis",
+      mantissa: 2,
+      trimMantissa: false,
+    })
   }
 
   return sprintf(format, value)
@@ -505,21 +597,37 @@ export function formatNumber(
  *
  * @param momentDate The moment date to format.
  * @param format The format to use.
- *   If the format is `locale` the date will be formatted according to the user's locale.
- *   If the format is `relative` the date will be formatted as a relative time (e.g. "2 hours ago").
+ *   If the format is `localized` the date will be formatted according to the user's locale.
+ *   If the format is `distance` the date will be formatted as a relative time distance (e.g. "2 hours ago").
+ *   If the format is `calendar` the date will be formatted as a calendar date (e.g. "Tomorrow 12:00").
+ *   If the format is `iso8601` the date will be formatted according to ISO 8601 standard:
+ *     - For date: YYYY-MM-DD
+ *     - For time: HH:mm:ss.sssZ
+ *     - For datetime: YYYY-MM-DDTHH:mm:ss.sssZ
  *   Otherwise, it is interpreted as momentJS format string: https://momentjs.com/docs/#/displaying/format/
  * @returns The formatted date as a string.
  */
-export function formatMoment(momentDate: Moment, format: string): string {
-  if (format === "locale") {
+export function formatMoment(
+  momentDate: Moment,
+  format: string,
+  momentKind: "date" | "time" | "datetime" = "datetime"
+): string {
+  if (format === "localized") {
     return new Intl.DateTimeFormat(undefined, {
-      dateStyle: "medium",
-      timeStyle: "medium",
+      dateStyle: momentKind === "time" ? undefined : "medium",
+      timeStyle: momentKind === "date" ? undefined : "medium",
     }).format(momentDate.toDate())
   } else if (format === "distance") {
     return momentDate.fromNow()
-  } else if (format === "relative") {
+  } else if (format === "calendar") {
     return momentDate.calendar()
+  } else if (format === "iso8601") {
+    if (momentKind === "date") {
+      return momentDate.format("YYYY-MM-DD")
+    } else if (momentKind === "time") {
+      return momentDate.format("HH:mm:ss.SSS[Z]")
+    }
+    return momentDate.toISOString()
   }
   return momentDate.format(format)
 }
@@ -534,6 +642,7 @@ export function formatMoment(momentDate: Moment, format: string): string {
  *
  * @returns The converted date or null if the value cannot be interpreted as a date.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function toSafeDate(value: any): Date | null | undefined {
   if (isNullOrUndefined(value)) {
     return null

@@ -16,15 +16,17 @@
 
 module.exports = {
   extends: ["../.eslintrc.js"], // Extend from the root configuration
+  // Explicitly override plugins to avoid duplicate plugin loading
+  plugins: [],
   rules: {
     "no-restricted-imports": [
       "error",
       {
         patterns: [
           {
-            group: ["@streamlit/lib/src/*"],
+            group: ["~lib/*"],
             message:
-              "Direct imports from '@streamlit/lib/src/*' are not allowed. Please import from '@streamlit/lib' instead.",
+              "Direct imports from '~lib/*' are not allowed. Please import from '@streamlit/lib' instead.",
           },
         ],
       },

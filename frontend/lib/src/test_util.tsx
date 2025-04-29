@@ -29,7 +29,11 @@ import ThemeProvider from "./components/core/ThemeProvider"
 import { baseTheme } from "./theme"
 import { mockTheme } from "./mocks/mockTheme"
 import { LibContext, LibContextProps } from "./components/core/LibContext"
+import { ScriptRunState } from "./ScriptRunState"
 import { WindowDimensionsProvider } from "./components/shared/WindowDimensions/Provider"
+import { createFormsData } from "./WidgetStateManager"
+import { ComponentRegistry } from "./components/widgets/CustomComponent/ComponentRegistry"
+import { mockEndpoints } from "./mocks/mocks"
 
 export const TestAppWrapper: FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -50,9 +54,6 @@ export function render(
   return reactTestingLibraryRender(ui, {
     wrapper: ({ children }) => <TestAppWrapper>{children}</TestAppWrapper>,
     ...options,
-    // TODO: Remove this to have RTL run on React 18
-    // react-18-upgrade
-    legacyRoot: true,
   })
 }
 
@@ -91,6 +92,10 @@ export const customRenderLibContext = (
     libConfig: {},
     fragmentIdsThisRun: [],
     locale: "en-US",
+    formsData: createFormsData(),
+    scriptRunState: ScriptRunState.NOT_RUNNING,
+    scriptRunId: "script run 123",
+    componentRegistry: new ComponentRegistry(mockEndpoints()),
   }
 
   return reactTestingLibraryRender(component, {
@@ -108,6 +113,7 @@ export const customRenderLibContext = (
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function arrayFromVector(vector: any): any {
   if (Array.isArray(vector)) {
     return vector.map(arrayFromVector)

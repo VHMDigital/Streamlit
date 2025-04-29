@@ -18,11 +18,8 @@ import { GridCell, GridCellKind } from "@glideapps/glide-data-grid"
 import { DatePickerType } from "@glideapps/glide-data-grid-cells"
 import moment, { Moment } from "moment-timezone"
 
-import { getTimezone } from "@streamlit/lib/src/dataframes/arrowTypeUtils"
-import {
-  isNullOrUndefined,
-  notNullOrUndefined,
-} from "@streamlit/lib/src/util/utils"
+import { getTimezone } from "~lib/dataframes/arrowTypeUtils"
+import { isNullOrUndefined, notNullOrUndefined } from "~lib/util/utils"
 
 import {
   BaseColumn,
@@ -83,7 +80,7 @@ export interface DateTimeColumnParams {
  * @returns A BaseColumn object
  */
 function BaseDateTimeColumn(
-  kind: string,
+  kind: "date" | "time" | "datetime",
   props: BaseColumnProps,
   defaultFormat: string, // used for rendering and copy data
   defaultStep: number,
@@ -126,7 +123,7 @@ function BaseDateTimeColumn(
     maxDate = toSafeDate(parameters.max_value) || undefined
   }
 
-  const cellTemplate = {
+  const cellTemplate: DatePickerType = {
     kind: GridCellKind.Custom,
     allowOverlay: true,
     copyData: "",
@@ -143,8 +140,9 @@ function BaseDateTimeColumn(
       min: minDate,
       max: maxDate,
     },
-  } as DatePickerType
+  }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const validateInput = (data?: any): boolean | Date => {
     const cellData: Date | null | undefined = toSafeDate(data)
     if (cellData === null) {
@@ -186,6 +184,7 @@ function BaseDateTimeColumn(
     kind,
     sortMode: "default",
     validateInput,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     getCell(data?: any, validate?: boolean): GridCell {
       if (validate === true) {
         const validationResult = validateInput(data)
@@ -241,7 +240,8 @@ function BaseDateTimeColumn(
         try {
           displayDate = formatMoment(
             momentDate,
-            parameters.format || defaultFormat
+            parameters.format || defaultFormat,
+            kind
           )
         } catch (error) {
           return getErrorCell(
@@ -250,7 +250,7 @@ function BaseDateTimeColumn(
           )
         }
         // Copy data should always use the default format
-        copyData = formatMoment(momentDate, defaultFormat)
+        copyData = formatMoment(momentDate, defaultFormat, kind)
       }
 
       return {

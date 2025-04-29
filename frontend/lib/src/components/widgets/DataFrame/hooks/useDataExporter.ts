@@ -17,14 +17,14 @@
 import React from "react"
 
 import { DataEditorProps } from "@glideapps/glide-data-grid"
+import { getLogger } from "loglevel"
 
-import createDownloadLinkElement from "@streamlit/lib/src/util/createDownloadLinkElement"
+import createDownloadLinkElement from "~lib/util/createDownloadLinkElement"
 import {
   BaseColumn,
   toSafeString,
-} from "@streamlit/lib/src/components/widgets/DataFrame/columns"
-import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
-import { logError, logWarning } from "@streamlit/lib/src/util/log"
+} from "~lib/components/widgets/DataFrame/columns"
+import { isNullOrUndefined } from "~lib/util/utils"
 
 // Delimiter between cells
 const CSV_DELIMITER = ","
@@ -40,7 +40,9 @@ const CSV_UTF8_BOM = "\ufeff"
 const CSV_SPECIAL_CHARS_REGEX = new RegExp(
   `[${[CSV_DELIMITER, CSV_QUOTE_CHAR, CSV_ROW_DELIMITER].join("")}]`
 )
+const LOG = getLogger("useDataExporter")
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function toCsvRow(rowValues: any[]): string {
   return (
     rowValues.map(cell => escapeValue(cell)).join(CSV_DELIMITER) +
@@ -53,6 +55,7 @@ export function toCsvRow(rowValues: any[]): string {
  *
  * Makes sure that the value is a string, and special characters are escaped correctly.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 function escapeValue(value: any): string {
   if (isNullOrUndefined(value)) {
     return ""
@@ -106,6 +109,7 @@ async function writeCsv(
   await writable.write(textEncoder.encode(toCsvRow(headers)))
 
   for (let row = 0; row < numRows; row++) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     const rowData: any[] = []
     columns.forEach((column: BaseColumn, col: number, _map) => {
       rowData.push(column.getCellValue(getCellContent([col, row])))
@@ -159,7 +163,7 @@ function useDataExporter(
       }
 
       try {
-        logWarning(
+        LOG.warn(
           "Failed to export data as CSV with FileSystem API, trying fallback method",
           error
         )
@@ -199,7 +203,7 @@ function useDataExporter(
         document.body.removeChild(link) // Clean up
         URL.revokeObjectURL(url) // Free up memory
       } catch (error) {
-        logError("Failed to export data as CSV", error)
+        LOG.error("Failed to export data as CSV", error)
       }
     }
   }, [columns, numRows, getCellContent, enforceDownloadInNewTab])

@@ -14,7 +14,10 @@
 
 from playwright.sync_api import Page, expect
 
-from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_run
+from e2e_playwright.conftest import (
+    ImageCompareFunction,
+    wait_for_app_run,
+)
 from e2e_playwright.shared.app_utils import (
     check_top_level_class,
     expect_help_tooltip,
@@ -27,7 +30,7 @@ def test_radio_widget_rendering(
 ):
     """Test that the radio widgets are correctly rendered via screenshot matching."""
     radio_widgets = themed_app.get_by_test_id("stRadio")
-    expect(radio_widgets).to_have_count(13)
+    expect(radio_widgets).to_have_count(14)
 
     assert_snapshot(radio_widgets.nth(0), name="st_radio-default")
     assert_snapshot(radio_widgets.nth(1), name="st_radio-formatted_options")
@@ -42,6 +45,7 @@ def test_radio_widget_rendering(
     assert_snapshot(radio_widgets.nth(10), name="st_radio-horizontal_captions")
     assert_snapshot(radio_widgets.nth(11), name="st_radio-callback_help")
     assert_snapshot(radio_widgets.nth(12), name="st_radio-empty_selection")
+    assert_snapshot(radio_widgets.nth(13), name="st_radio-markdown_label")
 
 
 def test_help_tooltip_works(app: Page):
@@ -77,9 +81,12 @@ def test_radio_has_correct_default_values(app: Page):
 
 def test_set_value_correctly_when_click(app: Page):
     """Test that st.radio returns the correct values when the selection is changed."""
+    wait_for_app_run(app)
     for index, element in enumerate(app.get_by_test_id("stRadio").all()):
         if index not in [2, 3]:  # skip disabled and no-options widget
-            element.locator('label[data-baseweb="radio"]').nth(1).click(force=True)
+            element.scroll_into_view_if_needed()
+            radio_option = element.locator('label[data-baseweb="radio"]').nth(1)
+            radio_option.click(delay=50)
             wait_for_app_run(app)
 
     expected = [

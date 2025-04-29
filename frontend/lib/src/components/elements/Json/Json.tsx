@@ -14,34 +14,29 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useRef } from "react"
+import React, { memo, ReactElement, useRef } from "react"
 
 import JSON5 from "json5"
 import Clipboard from "clipboard"
 import ReactJson from "react-json-view"
 import { useTheme } from "@emotion/react"
 
-import ErrorElement from "@streamlit/lib/src/components/shared/ErrorElement"
-import { Json as JsonProto } from "@streamlit/lib/src/proto"
-import {
-  EmotionTheme,
-  hasLightBackgroundColor,
-} from "@streamlit/lib/src/theme"
-import { ensureError } from "@streamlit/lib/src/util/ErrorHandling"
+import { Json as JsonProto } from "@streamlit/protobuf"
+
+import ErrorElement from "~lib/components/shared/ErrorElement"
+import { EmotionTheme, hasLightBackgroundColor } from "~lib/theme"
+import { ensureError } from "~lib/util/ErrorHandling"
 
 import { StyledJsonWrapper } from "./styled-components"
+
 export interface JsonProps {
-  width: number
   element: JsonProto
 }
 
 /**
  * Functional element representing JSON structured text.
  */
-export default function Json({
-  width,
-  element,
-}: Readonly<JsonProps>): ReactElement {
+function Json({ element }: Readonly<JsonProps>): ReactElement {
   const theme: EmotionTheme = useTheme()
 
   const elementRef = useRef<HTMLDivElement>(null)
@@ -66,6 +61,7 @@ export default function Json({
   // theme's background is light or dark.
   const jsonTheme = hasLightBackgroundColor(theme) ? "rjv-default" : "monokai"
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const handleCopy = (copy: any): void => {
     // we use ClipboardJS to do the copying, because it allows
     // us to specify a container element. This is necessary because
@@ -79,7 +75,6 @@ export default function Json({
     <StyledJsonWrapper
       className="stJson"
       data-testid="stJson"
-      width={width}
       ref={elementRef}
     >
       <ReactJson
@@ -100,3 +95,5 @@ export default function Json({
     </StyledJsonWrapper>
   )
 }
+
+export default memo(Json)

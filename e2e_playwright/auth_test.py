@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import time
 from tempfile import NamedTemporaryFile
-from typing import Generator
+from typing import TYPE_CHECKING
 
 import pytest
 from playwright.sync_api import Page, expect
@@ -27,6 +27,9 @@ from e2e_playwright.conftest import (
     wait_for_app_run,
 )
 from e2e_playwright.shared.app_utils import get_button, get_markdown
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 AUTH_SECRETS_TEMPLATE = """
 [auth]
@@ -95,7 +98,8 @@ def app_server_extra_args(prepare_secrets_file) -> list[str]:
 
 
 @pytest.mark.parametrize("fake_oidc_server", ["success"], indirect=True)
-def test_login_successful(app: Page, fake_oidc_server, prepare_secrets_file):
+@pytest.mark.usefixtures("fake_oidc_server", "prepare_secrets_file")
+def test_login_successful(app: Page):
     """Test authentication flow with test provider."""
     button_element = get_button(app, "TEST LOGIN")
     button_element.click()
@@ -110,7 +114,8 @@ def test_login_successful(app: Page, fake_oidc_server, prepare_secrets_file):
 
 
 @pytest.mark.parametrize("fake_oidc_server", ["failure"], indirect=True)
-def test_login_failure(app: Page, fake_oidc_server, prepare_secrets_file):
+@pytest.mark.usefixtures("fake_oidc_server", "prepare_secrets_file")
+def test_login_failure(app: Page):
     """Test authentication flow with error response from oidc server."""
     button_element = get_button(app, "TEST LOGIN")
     button_element.click()

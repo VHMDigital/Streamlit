@@ -102,10 +102,14 @@ class MetricMixin:
              good, e.g. if cost decreased. If "off", delta is  shown in gray
              regardless of its value.
 
-        help : str
-            An optional tooltip that gets displayed next to the metric label.
-            Streamlit only displays the tooltip when
-            ``label_visibility="visible"``.
+        help : str or None
+            A tooltip that gets displayed next to the metric label. Streamlit
+            only displays the tooltip when ``label_visibility="visible"``. If
+            this is ``None`` (default), no tooltip is displayed.
+
+            The tooltip can optionally contain GitHub-flavored Markdown,
+            including the Markdown directives described in the ``body``
+            parameter of ``st.markdown``.
 
         label_visibility : "visible", "hidden", or "collapsed"
             The visibility of the label. The default is ``"visible"``. If this
@@ -120,7 +124,6 @@ class MetricMixin:
 
         Examples
         --------
-
         **Example 1: Show a metric**
 
         >>> import streamlit as st
@@ -193,7 +196,7 @@ class MetricMixin:
             metric_proto.help = dedent(help)
 
         color_and_direction = _determine_delta_color_and_direction(
-            cast(DeltaColor, clean_text(delta_color)), delta
+            cast("DeltaColor", clean_text(delta_color)), delta
         )
         metric_proto.color = color_and_direction.color
         metric_proto.direction = color_and_direction.direction

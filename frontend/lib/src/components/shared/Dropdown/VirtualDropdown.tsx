@@ -20,11 +20,8 @@ import { OptionListProps, StyledEmptyState, StyledList } from "baseui/menu"
 import { FixedSizeList } from "react-window"
 import { useTheme } from "@emotion/react"
 
-import {
-  OverflowTooltip,
-  Placement,
-} from "@streamlit/lib/src/components/shared/Tooltip"
-import { convertRemToPx } from "@streamlit/lib/src/theme/utils"
+import { OverflowTooltip, Placement } from "~lib/components/shared/Tooltip"
+import { convertRemToPx } from "~lib/theme/utils"
 
 import { ThemedStyledDropdownListItem } from "./styled-components"
 
@@ -43,21 +40,28 @@ function FixedSizeListItem(props: FixedSizeListItemProps): ReactElement {
   const { data, index, style } = props
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { item, overrides, ...restChildProps } = data[index].props
+
+  // isCreatable is set by baseui when the option is not in the list of options and the user is typing a new one
+  const label = item.isCreatable ? `Add: ${item.label}` : item.label
+
   return (
     <ThemedStyledDropdownListItem
       key={item.value}
       style={style}
       {...restChildProps}
     >
-      <OverflowTooltip content={item.label} placement={Placement.AUTO}>
-        {item.label}
+      <OverflowTooltip content={label} placement={Placement.AUTO}>
+        {label}
       </OverflowTooltip>
     </ThemedStyledDropdownListItem>
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 const VirtualDropdown = React.forwardRef<any, any>((props, ref) => {
   const theme = useTheme()
+  // TODO: Update to match React best practices
+  // eslint-disable-next-line @eslint-react/no-children-to-array
   const children = React.Children.toArray(props.children) as ReactElement[]
 
   if (!children[0] || !children[0].props.item) {
@@ -73,6 +77,9 @@ const VirtualDropdown = React.forwardRef<any, any>((props, ref) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          // Somehow this adds an additional shadow, even though we already have
+          // one on the popover, so we need to remove it here.
+          boxShadow: "none",
         }}
         ref={ref}
         data-testid="stSelectboxVirtualDropdownEmpty"
@@ -99,7 +106,13 @@ const VirtualDropdown = React.forwardRef<any, any>((props, ref) => {
   return (
     <StyledList
       ref={ref}
-      $style={{ paddingTop: 0, paddingBottom: 0 }}
+      $style={{
+        paddingTop: 0,
+        paddingBottom: 0,
+        // Somehow this adds an additional shadow, even though we already have
+        // one on the popover, so we need to remove it here.
+        boxShadow: "none",
+      }}
       data-testid="stSelectboxVirtualDropdown"
     >
       <FixedSizeList

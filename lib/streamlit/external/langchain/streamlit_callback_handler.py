@@ -36,6 +36,10 @@ This module is lazy-loaded.
 # by default.
 # mypy: disable-error-code="import-not-found, unused-ignore, misc"
 
+# Deactivate unused argument errors for this file since we need lots of
+# unused arguments to comply with the LangChain callback interface.
+# ruff: noqa: ARG002
+
 from __future__ import annotations
 
 import time
@@ -170,7 +174,7 @@ class LLMThought:
 
     @property
     def last_tool(self) -> ToolRecord | None:
-        """The last tool executed by this thought"""
+        """The last tool executed by this thought."""
         return self._last_tool
 
     def _reset_llm_token_stream(self) -> None:
@@ -246,9 +250,9 @@ class LLMThought:
     def complete(self, final_label: str | None = None) -> None:
         """Finish the thought."""
         if final_label is None and self._state == LLMThoughtState.RUNNING_TOOL:
-            assert (
-                self._last_tool is not None
-            ), "_last_tool should never be null when _state == RUNNING_TOOL"
+            assert self._last_tool is not None, (
+                "_last_tool should never be null when _state == RUNNING_TOOL"
+            )
             final_label = self._labeler.get_tool_label(
                 self._last_tool, is_complete=True
             )
@@ -286,7 +290,6 @@ class StreamlitCallbackHandler(BaseCallbackHandler):
 
         Parameters
         ----------
-
         parent_container
             The `st.container` that will contain all the Streamlit elements that the
             Handler creates.

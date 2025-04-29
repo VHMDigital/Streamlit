@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-import { AppNode, BlockNode } from "@streamlit/lib/src/AppNode"
-import { ComponentRegistry } from "@streamlit/lib/src/components/widgets/CustomComponent"
-import { FileUploadClient } from "@streamlit/lib/src/FileUploadClient"
-import { ScriptRunState } from "@streamlit/lib/src/ScriptRunState"
-import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
-import { EmotionTheme, getDividerColors } from "@streamlit/lib/src/theme"
-import { isValidElementId } from "@streamlit/lib/src/util/utils"
-import {
-  FormsData,
-  WidgetStateManager,
-} from "@streamlit/lib/src/WidgetStateManager"
+import { AppNode, BlockNode } from "~lib/AppNode"
+import { FileUploadClient } from "~lib/FileUploadClient"
+import { ScriptRunState } from "~lib/ScriptRunState"
+import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
+import { EmotionTheme, getDividerColors } from "~lib/theme"
+import { isValidElementId } from "~lib/util/utils"
+import { WidgetStateManager } from "~lib/WidgetStateManager"
 
 export function shouldComponentBeEnabled(
   elementType: string,
@@ -127,40 +123,10 @@ export interface BaseBlockProps {
   uploadClient: FileUploadClient
 
   /**
-   * The app's ComponentRegistry instance. Dispatches "Custom Component"
-   * iframe messages to ComponentInstances.
-   */
-  componentRegistry: ComponentRegistry
-
-  /**
-   * The ID of the current "script run". When a Streamlit script is re-run
-   * (usually as a result of the user interacting with a widget), the Streamlit
-   * backend sends a new scriptRunId to the frontend. When the script run ends,
-   * the frontend discards "stale" elements (that is, elements with a non-current
-   * scriptRunId).
-   */
-  scriptRunId: string
-
-  /**
-   * The app's current ScriptRunState. This is used in combination with
-   * scriptRunId to prune stale elements. It's also used by the app to
-   * display the "running man" indicator when the app's script is being re-run.
-   */
-  scriptRunState: ScriptRunState
-
-  /**
    * If true, all widgets will be disabled and the app will be non-interactive.
    * This is generally set when the frontend is disconnected from the backend.
    */
   widgetsDisabled: boolean
-
-  /**
-   * Data about all forms in the app. The WidgetStateManager creates its own
-   * internal FormsData instance, and calls a callback (`formsDataChanged`)
-   * when forms are updated. This FormsData instance should be updated
-   * from that callback.
-   */
-  formsData: FormsData
 
   /**
    * If true , the element should not allow going into fullscreen. Right now we plan

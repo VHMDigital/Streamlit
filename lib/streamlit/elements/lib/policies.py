@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Final, Sequence
+from typing import TYPE_CHECKING, Any, Final
 
 from streamlit import config, errors, logger, runtime
 from streamlit.elements.lib.form_utils import is_in_form
@@ -31,6 +31,8 @@ from streamlit.runtime.scriptrunner_utils.script_run_context import (
 from streamlit.runtime.state import WidgetCallback, get_session_state
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from streamlit.delta_generator import DeltaGenerator
 
 
@@ -68,7 +70,7 @@ def check_session_state_rules(
     StreamlitAPIException:
         Raised when the described rule is violated.
     """
-    global _shown_default_value_warning
+    global _shown_default_value_warning  # noqa: PLW0603
 
     if key is None or not runtime.exists():
         return
@@ -183,7 +185,8 @@ def maybe_raise_label_warnings(label: str | None, label_visibility: str | None):
             "`label` got an empty value. This is discouraged for accessibility "
             "reasons and may be disallowed in the future by raising an exception. "
             "Please provide a non-empty label and hide it with label_visibility "
-            "if needed."
+            "if needed.",
+            stack_info=True,
         )
     if label_visibility not in ("visible", "hidden", "collapsed"):
         raise errors.StreamlitAPIException(

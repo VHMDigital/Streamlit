@@ -23,7 +23,7 @@ from e2e_playwright.shared.app_utils import (
     get_expander,
 )
 
-CHECKBOX_ELEMENTS = 11
+CHECKBOX_ELEMENTS = 12
 
 
 def test_checkbox_widget_display(
@@ -41,6 +41,7 @@ def test_checkbox_widget_display(
     assert_snapshot(checkbox_elements.nth(5), name="st_checkbox-true_disabled")
     assert_snapshot(checkbox_elements.nth(6), name="st_checkbox-hidden_label")
     assert_snapshot(checkbox_elements.nth(7), name="st_checkbox-collapsed_label")
+    assert_snapshot(checkbox_elements.nth(11), name="st_checkbox-markdown_label")
 
 
 def test_help_tooltip_works(app: Page):
@@ -87,7 +88,7 @@ def test_checkbox_values_on_click(app: Page):
         # flaky with the last checkbox without it.
         # It seems that it sometimes fails to click,
         # and in these cases the checkbox was not scrolled into view.
-        # So, maybe thats the reason why it fails to click it.
+        # So, maybe that's the reason why it fails to click it.
         # But this is just a guess.
         checkbox_element.scroll_into_view_if_needed()
         checkbox_element.locator("label").first.click(delay=50, force=True)

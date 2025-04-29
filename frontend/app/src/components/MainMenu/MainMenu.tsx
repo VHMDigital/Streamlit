@@ -24,14 +24,14 @@ import { useTheme } from "@emotion/react"
 import {
   BaseButton,
   BaseButtonKind,
-  Config,
+  convertRemToPx,
   EmotionTheme,
   Icon,
   IGuestToHostMessage,
   IMenuItem,
-  notNullOrUndefined,
-  PageConfig,
 } from "@streamlit/lib"
+import { Config, PageConfig } from "@streamlit/protobuf"
+import { notNullOrUndefined } from "@streamlit/utils"
 import ScreenCastRecorder from "@streamlit/app/src/util/ScreenCastRecorder"
 import { MetricsManager } from "@streamlit/app/src/MetricsManager"
 
@@ -93,14 +93,8 @@ const getOpenInWindowCallback = (url: string) => (): void => {
   window.open(url, "_blank")
 }
 
-export const isLocalhost = (): boolean => {
-  return (
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-  )
-}
-
 export interface MenuItemProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   item: any
   "aria-selected": boolean
   onClick: (e: MouseEvent<HTMLLIElement>) => void
@@ -110,6 +104,7 @@ export interface MenuItemProps {
 }
 
 export interface SubMenuProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   menuItems: any[]
   closeMenu: () => void
   isDevMenu: boolean
@@ -131,6 +126,7 @@ export interface SubMenuProps {
 function buildMenuItemComponent(
   StyledMenuItemType: typeof StyledCoreItem | typeof StyledDevItem,
   metricsMgr: MetricsManager
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 ): any {
   const MenuItem = forwardRef<HTMLLIElement, MenuItemProps>(
     (
@@ -245,9 +241,12 @@ const SubMenu = (props: SubMenuProps): ReactElement => {
 
 function getDevMenuItems(
   theme: EmotionTheme,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   coreDevMenuItems: Record<string, any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 ): any[] {
   const devMenuItems = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const preferredDevMenuOrder: any[] = [
     coreDevMenuItems.developerOptions,
     coreDevMenuItems.clearCache,
@@ -280,9 +279,13 @@ function getDevMenuItems(
 
 function getPreferredMenuOrder(
   props: Props,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   hostMenuItems: any[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   coreMenuItems: Record<string, any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 ): any[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   let preferredMenuOrder: any[]
   if (props.toolbarMode == Config.ToolbarMode.MINIMAL) {
     // If toolbar mode == minimal then show only host menu items if any.
@@ -387,7 +390,7 @@ function MainMenu(props: Readonly<Props>): ReactElement {
       noHighlight: true,
       interactions: {},
       styleProps: {
-        fontSize: theme.fontSizes.twoSmPx,
+        fontSize: convertRemToPx(theme.fontSizes.twoSm),
         margin: `-${theme.spacing.sm} 0 0 0`,
         padding: `${theme.spacing.twoXS} ${theme.spacing.none} ${theme.spacing.twoXS} ${theme.spacing.twoXL}`,
         pointerEvents: "none",
@@ -422,6 +425,7 @@ function MainMenu(props: Readonly<Props>): ReactElement {
         }),
       label: item.label,
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   }, [] as any[])
 
   const preferredMenuOrder = getPreferredMenuOrder(
@@ -431,6 +435,7 @@ function MainMenu(props: Readonly<Props>): ReactElement {
   )
 
   // Remove empty entries, and add dividers into menu options as needed.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const menuItems: any[] = []
   let lastMenuItem = null
   for (const menuItem of preferredMenuOrder) {
@@ -447,6 +452,7 @@ function MainMenu(props: Readonly<Props>): ReactElement {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const devMenuItems: any[] = props.developmentMode
     ? getDevMenuItems(theme, coreDevMenuItems)
     : []

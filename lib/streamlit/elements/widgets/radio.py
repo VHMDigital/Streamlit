@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from textwrap import dedent
-from typing import TYPE_CHECKING, Any, Callable, Generic, Sequence, cast, overload
+from typing import TYPE_CHECKING, Any, Callable, Generic, cast, overload
 
 from streamlit.dataframe_util import OptionSequence, convert_anything_to_list
 from streamlit.elements.lib.form_utils import current_form_id
@@ -50,6 +50,8 @@ from streamlit.type_util import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from streamlit.delta_generator import DeltaGenerator
 
 
@@ -64,11 +66,7 @@ class RadioSerde(Generic[T]):
 
         return 0 if len(self.options) == 0 else index_(self.options, v)
 
-    def deserialize(
-        self,
-        ui_value: int | None,
-        widget_id: str = "",
-    ) -> T | None:
+    def deserialize(self, ui_value: int | None) -> T | None:
         idx = ui_value if ui_value is not None else self.index
 
         return (
@@ -188,10 +186,14 @@ class RadioMixin:
             If this is omitted, a key will be generated for the widget
             based on its content. No two widgets may have the same key.
 
-        help : str
-            An optional tooltip that gets displayed next to the widget label.
-            Streamlit only displays the tooltip when
-            ``label_visibility="visible"``.
+        help : str or None
+            A tooltip that gets displayed next to the widget label. Streamlit
+            only displays the tooltip when ``label_visibility="visible"``. If
+            this is ``None`` (default), no tooltip is displayed.
+
+            The tooltip can optionally contain GitHub-flavored Markdown,
+            including the Markdown directives described in the ``body``
+            parameter of ``st.markdown``.
 
         on_change : callable
             An optional callback invoked when this radio's value changes.

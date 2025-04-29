@@ -53,7 +53,7 @@ class ColorPickerSerde:
     def serialize(self, v: str) -> str:
         return str(v)
 
-    def deserialize(self, ui_value: str | None, widget_id: str = "") -> str:
+    def deserialize(self, ui_value: str | None) -> str:
         return str(ui_value if ui_value is not None else self.value)
 
 
@@ -107,10 +107,14 @@ class ColorPickerMixin:
             If this is omitted, a key will be generated for the widget
             based on its content. No two widgets may have the same key.
 
-        help : str
-            An optional tooltip that gets displayed next to the widget label.
-            Streamlit only displays the tooltip when
-            ``label_visibility="visible"``.
+        help : str or None
+            A tooltip that gets displayed next to the widget label. Streamlit
+            only displays the tooltip when ``label_visibility="visible"``. If
+            this is ``None`` (default), no tooltip is displayed.
+
+            The tooltip can optionally contain GitHub-flavored Markdown,
+            including the Markdown directives described in the ``body``
+            parameter of ``st.markdown``.
 
         on_change : callable
             An optional callback invoked when this color_picker's value

@@ -20,10 +20,7 @@ from typing import TYPE_CHECKING, Union, cast
 
 from typing_extensions import TypeAlias
 
-from streamlit.deprecation_util import (
-    make_deprecated_name_warning,
-    show_deprecation_warning,
-)
+from streamlit.elements.lib.file_uploader_utils import enforce_filename_restriction
 from streamlit.elements.lib.form_utils import current_form_id
 from streamlit.elements.lib.policies import (
     check_widget_policies,
@@ -76,13 +73,15 @@ class AudioInputSerde:
         return state_proto
 
     def deserialize(
-        self, ui_value: FileUploaderStateProto | None, widget_id: str
+        self, ui_value: FileUploaderStateProto | None
     ) -> SomeUploadedAudioFile:
         upload_files = _get_upload_files(ui_value)
         if len(upload_files) == 0:
             return_value = None
         else:
             return_value = upload_files[0]
+        if return_value is not None and not isinstance(return_value, DeletedFile):
+            enforce_filename_restriction(return_value.name, [".wav"])
         return return_value
 
 
@@ -131,10 +130,14 @@ class AudioInputMixin:
             If this is omitted, a key will be generated for the widget
             based on its content. No two widgets may have the same key.
 
-        help : str
-            An optional tooltip that gets displayed next to the widget label.
-            Streamlit only displays the tooltip when
-            ``label_visibility="visible"``.
+        help : str or None
+            A tooltip that gets displayed next to the widget label. Streamlit
+            only displays the tooltip when ``label_visibility="visible"``. If
+            this is ``None`` (default), no tooltip is displayed.
+
+            The tooltip can optionally contain GitHub-flavored Markdown,
+            including the Markdown directives described in the ``body``
+            parameter of ``st.markdown``.
 
         on_change : callable
             An optional callback invoked when this audio input's value
@@ -184,43 +187,6 @@ class AudioInputMixin:
            height: 260px
 
         """
-        ctx = get_script_run_ctx()
-        return self._audio_input(
-            label=label,
-            key=key,
-            help=help,
-            on_change=on_change,
-            args=args,
-            kwargs=kwargs,
-            disabled=disabled,
-            label_visibility=label_visibility,
-            ctx=ctx,
-        )
-
-    @gather_metrics("experimental_audio_input")
-    def experimental_audio_input(
-        self,
-        label: str,
-        *,
-        key: Key | None = None,
-        help: str | None = None,
-        on_change: WidgetCallback | None = None,
-        args: WidgetArgs | None = None,
-        kwargs: WidgetKwargs | None = None,
-        disabled: bool = False,
-        label_visibility: LabelVisibility = "visible",
-    ) -> UploadedFile | None:
-        """Deprecated alias for st.audio_input.
-        See the docstring for the widget's new name."""
-
-        show_deprecation_warning(
-            make_deprecated_name_warning(
-                "experimental_audio_input",
-                "audio_input",
-                "2025-01-01",
-            )
-        )
-
         ctx = get_script_run_ctx()
         return self._audio_input(
             label=label,

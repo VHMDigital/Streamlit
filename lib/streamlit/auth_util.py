@@ -14,8 +14,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Mapping, TypedDict, cast
+from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 from streamlit import config
 from streamlit.errors import StreamlitAuthError
@@ -39,7 +40,7 @@ class AuthCache:
 
     # for set method, we are follow the same signature used in Authlib
     # the expires_in is not used in our case
-    def set(self, key, value, expires_in):
+    def set(self, key, value, expires_in):  # noqa: ARG002
         self.cache[key] = value
 
     def get_dict(self):
@@ -78,7 +79,7 @@ def get_secrets_auth_section() -> AttrDict:
     auth_section = AttrDict({})
     """Get the 'auth' section of the secrets.toml."""
     if secrets_singleton.load_if_toml_exists():
-        auth_section = cast(AttrDict, secrets_singleton.get("auth"))
+        auth_section = cast("AttrDict", secrets_singleton.get("auth"))
 
     return auth_section
 
@@ -145,7 +146,8 @@ def generate_default_provider_section(auth_section) -> dict[str, Any]:
 
 def validate_auth_credentials(provider: str) -> None:
     """Validate the general auth credentials and auth credentials for the given
-    provider."""
+    provider.
+    """
     if not secrets_singleton.load_if_toml_exists():
         raise StreamlitAuthError(
             """To use authentication features you need to configure credentials for at
@@ -170,6 +172,14 @@ def validate_auth_credentials(provider: str) -> None:
         )
 
     provider_section = auth_section.get(provider)
+
+    # TODO(kajarenc): Revisit this check later when investigating the ability
+    # TODO(kajarenc): to add "_" to the provider name.
+    if "_" in provider:
+        raise StreamlitAuthError(
+            f'Auth provider name "{provider}" contains an underscore. '
+            f"Please use a provider name without underscores."
+        )
 
     if provider_section is None and provider == "default":
         provider_section = generate_default_provider_section(auth_section)

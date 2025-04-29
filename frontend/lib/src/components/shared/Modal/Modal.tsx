@@ -27,18 +27,20 @@ import {
 } from "baseui/modal"
 import merge from "lodash/merge"
 
-import BaseButton, {
-  BaseButtonProps,
-} from "@streamlit/lib/src/components/shared/BaseButton"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+import BaseButton, { BaseButtonProps } from "~lib/components/shared/BaseButton"
+import { EmotionTheme } from "~lib/theme"
 
 import { StyledModalButton } from "./styled-components"
 
 export interface ModalHeaderProps {
   children: ReactNode
+  overrides?: React.CSSProperties
 }
 
-function ModalHeader({ children }: Readonly<ModalHeaderProps>): ReactElement {
+function ModalHeader({
+  children,
+  overrides,
+}: Readonly<ModalHeaderProps>): ReactElement {
   const {
     genericFonts,
     fontSizes,
@@ -68,6 +70,7 @@ function ModalHeader({ children }: Readonly<ModalHeaderProps>): ReactElement {
         alignItems: "center",
         maxHeight: "80vh",
         flexDirection: "row",
+        ...overrides,
       }}
     >
       {children}
@@ -147,7 +150,7 @@ export type StreamlitModalProps = Omit<ModalProps, "size"> & {
  * @param size the StreamlitModal size to be mapped
  * @param width the width of the modal if 'full' size is selected
  * @param padding the padding added to the modal if 'full' size is selected
- * @returns the Baseweb Modal comaptible size
+ * @returns the Baseweb Modal compatible size
  */
 export function calculateModalSize(
   size: StreamlitModalProps["size"],

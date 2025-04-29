@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, ReactNode, useCallback, useContext } from "react"
+import React, { ReactElement, ReactNode, useCallback } from "react"
 
 import { StyledAction, StyledBody } from "baseui/card"
 
-import { BaseButton, BaseButtonKind, GitInfo, IGitInfo } from "@streamlit/lib"
+import { BaseButton, BaseButtonKind } from "@streamlit/lib"
+import { GitInfo, IGitInfo } from "@streamlit/protobuf"
 import { MetricsManager } from "@streamlit/app/src/MetricsManager"
-import {
-  DialogType,
-  PlainEventHandler,
-} from "@streamlit/app/src/components/StreamlitDialog/StreamlitDialog"
-import { AppContext } from "@streamlit/app/src/components/AppContext"
+import { PlainEventHandler } from "@streamlit/app/src/components/StreamlitDialog/StreamlitDialog"
+import { DialogType } from "@streamlit/app/src/components/StreamlitDialog/constants"
+import { useAppContext } from "@streamlit/app/src/components/StreamlitContextProvider"
 import StreamlitLogo from "@streamlit/app/src/assets/svg/logo.svg"
 import Rocket from "@streamlit/app/src/assets/svg/rocket.svg"
 import Snowflake from "@streamlit/app/src/assets/svg/snowflake.svg"
@@ -89,7 +88,7 @@ export function DeployDialog(
   props: Readonly<DeployDialogProps>
 ): ReactElement {
   // Get latest git info from AppContext:
-  const { gitInfo } = useContext(AppContext)
+  const { gitInfo } = useAppContext()
   const { onClose, metricsMgr } = props
   const onClickDeployApp = useCallback((): void => {
     const { showDeployError, isDeployErrorModalOpen, metricsMgr } = props

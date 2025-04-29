@@ -22,10 +22,9 @@ from pathlib import Path
 from unittest import mock
 
 import numpy as np
-import PIL.Image as Image
 import pytest
 from parameterized import parameterized
-from PIL import ImageDraw
+from PIL import Image, ImageDraw
 
 import streamlit as st
 from streamlit.elements.lib.image_utils import (
@@ -33,7 +32,7 @@ from streamlit.elements.lib.image_utils import (
     WidthBehavior,
     _image_may_have_alpha_channel,
     _np_array_to_bytes,
-    _PIL_to_bytes,
+    _pil_to_bytes,
     image_to_url,
     marshall_images,
 )
@@ -101,7 +100,7 @@ def create_gif(size):
 
     # Make ten frames with the circle of a random size and location
     random.seed(0)
-    for _ in range(0, 10):
+    for _ in range(10):
         frame = im.copy()
         draw = ImageDraw.Draw(frame)
         pos = (random.randrange(0, size), random.randrange(0, size))
@@ -282,9 +281,12 @@ class ImageProtoTest(DeltaGeneratorTestCase):
         and not image_to_url - to throw an error.)
         """
         # Mock out save_image_data to avoid polluting the cache for later tests
-        with mock.patch(
-            "streamlit.runtime.media_file_manager.MediaFileManager.add"
-        ) as mock_mfm_add, mock.patch("streamlit.runtime.caching.save_media_data"):
+        with (
+            mock.patch(
+                "streamlit.runtime.media_file_manager.MediaFileManager.add"
+            ) as mock_mfm_add,
+            mock.patch("streamlit.runtime.caching.save_media_data"),
+        ):
             mock_mfm_add.return_value = "https://mockoutputurl.com"
 
             result = image_to_url(
@@ -405,7 +407,7 @@ class ImageProtoTest(DeltaGeneratorTestCase):
         self.assertEqual(el.imgs.imgs[0].caption, "some caption")
 
         # locate resultant file in the file manager and check its metadata.
-        file_id = _calculate_file_id(_PIL_to_bytes(img, format="PNG"), "image/png")
+        file_id = _calculate_file_id(_pil_to_bytes(img, format="PNG"), "image/png")
         media_file = self.media_file_storage.get_file(file_id)
         self.assertIsNotNone(media_file)
         self.assertEqual(media_file.mimetype, "image/png")
@@ -434,7 +436,7 @@ class ImageProtoTest(DeltaGeneratorTestCase):
         # locate resultant file in the file manager and check its metadata.
         for idx in range(len(imgs)):
             file_id = _calculate_file_id(
-                _PIL_to_bytes(imgs[idx], format="PNG"), "image/png"
+                _pil_to_bytes(imgs[idx], format="PNG"), "image/png"
             )
             self.assertEqual(el.imgs.imgs[idx].caption, "some caption")
             media_file = self.media_file_storage.get_file(file_id)
