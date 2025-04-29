@@ -21,22 +21,30 @@ import pydeck as pdk
 
 import streamlit as st
 
-# Empty chart.
+"""
+## Empty chart
+"""
 
 st.pydeck_chart()
 
-# Basic chart.
+""
+""
+
+"""
+## Basic chart
+
+Should show a map with default settings and random data centered in SF, using hex and scatter plots.
+"""
 
 np.random.seed(12345)
 
-df = pd.DataFrame(
+random_scatter_sf = pd.DataFrame(
     cast("Any", np.random.randn(1000, 2) / [50, 50]) + [37.76, -122.4],
     columns=["lat", "lon"],
 )
 
 st.pydeck_chart(
     pdk.Deck(
-        map_style="mapbox://styles/mapbox/light-v9",
         initial_view_state=pdk.ViewState(
             latitude=37.76,
             longitude=-122.4,
@@ -46,7 +54,7 @@ st.pydeck_chart(
         layers=[
             pdk.Layer(
                 "HexagonLayer",
-                data=df,
+                data=random_scatter_sf,
                 get_position="[lon, lat]",
                 radius=200,
                 elevation_scale=4,
@@ -56,7 +64,7 @@ st.pydeck_chart(
             ),
             pdk.Layer(
                 "ScatterplotLayer",
-                data=df,
+                data=random_scatter_sf,
                 get_position="[lon, lat]",
                 get_color="[200, 30, 0, 160]",
                 get_radius=200,
@@ -65,28 +73,50 @@ st.pydeck_chart(
     )
 )
 
-# Chart w/ invalid JSON - issue #5799.
+""
+""
+
+"""
+## Chart with invalid property
+
+See [issue #5799.](https://github.com/streamlit/streamlit/issues/5799)
+
+You should see a map with a single datapoint. There should be no error message.
+"""
+
 data = pd.DataFrame({"lng": [-109.037673], "lat": [36.994672], "weight": [math.nan]})
+
 layer = pdk.Layer(
     "ScatterplotLayer", data=data, get_position=["lng", "lat"], radius_min_pixels=4
 )
+
 deck = pdk.Deck(
     layers=[layer],
     map_style=pdk.map_styles.CARTO_LIGHT,
     tooltip={"text": "weight: {weight}"},
 )
+
 st.pydeck_chart(deck, use_container_width=True)
+
+""
+""
+
+"""
+## Chart with "road"-style map
+
+You should see a colorful map with 3 green hex prisms.
+"""
 
 H3_HEX_DATA = [
     {"hex": "88283082b9fffff", "count": 10},
     {"hex": "88283082d7fffff", "count": 50},
     {"hex": "88283082a9fffff", "count": 100},
 ]
-df = pd.DataFrame(H3_HEX_DATA)
+hex_data = pd.DataFrame(H3_HEX_DATA)
 
 st.pydeck_chart(
     pdk.Deck(
-        map_style="mapbox://styles/mapbox/outdoors-v12",
+        map_style="road",
         tooltip={"text": "Count: {count}"},
         initial_view_state=pdk.ViewState(
             latitude=37.7749295, longitude=-122.4194155, zoom=12, bearing=0, pitch=30
@@ -94,7 +124,7 @@ st.pydeck_chart(
         layers=[
             pdk.Layer(
                 "H3HexagonLayer",
-                df,
+                hex_data,
                 pickable=True,
                 stroked=True,
                 filled=True,
@@ -107,8 +137,19 @@ st.pydeck_chart(
     )
 )
 
+
+""
+""
+
+"""
+## Basic light chart
+
+Should show a _light_ map with random data centered in SF, using hex and scatter plots.
+"""
+
 st.pydeck_chart(
     pdk.Deck(
+        map_style="light",
         initial_view_state=pdk.ViewState(
             latitude=37.76,
             longitude=-122.4,
@@ -118,7 +159,7 @@ st.pydeck_chart(
         layers=[
             pdk.Layer(
                 "HexagonLayer",
-                data=df,
+                data=random_scatter_sf,
                 get_position="[lon, lat]",
                 radius=200,
                 elevation_scale=4,
@@ -128,7 +169,7 @@ st.pydeck_chart(
             ),
             pdk.Layer(
                 "ScatterplotLayer",
-                data=df,
+                data=random_scatter_sf,
                 get_position="[lon, lat]",
                 get_color="[200, 30, 0, 160]",
                 get_radius=200,
@@ -137,23 +178,67 @@ st.pydeck_chart(
     )
 )
 
+""
+
+"""
+## Basic dark chart
+
+Should show a _dark_ map with random data centered in SF, using hex and scatter plots.
+"""
+
 st.pydeck_chart(
     pdk.Deck(
-        map_style="mapbox://styles/mapbox/outdoors-v12",
+        map_style="dark",
+        initial_view_state=pdk.ViewState(
+            latitude=37.76,
+            longitude=-122.4,
+            zoom=11,
+            pitch=50,
+        ),
+        layers=[
+            pdk.Layer(
+                "HexagonLayer",
+                data=random_scatter_sf,
+                get_position="[lon, lat]",
+                radius=200,
+                elevation_scale=4,
+                elevation_range=[0, 1000],
+                pickable=True,
+                extruded=True,
+            ),
+            pdk.Layer(
+                "ScatterplotLayer",
+                data=random_scatter_sf,
+                get_position="[lon, lat]",
+                get_color="[200, 30, 0, 160]",
+                get_radius=200,
+            ),
+        ],
+    )
+)
+
+""
+
+"""
+## Chart with width and height set
+
+Should show a "road"-style map with random data centered in SF, and small width and
+height (200x250).
+"""
+
+st.pydeck_chart(
+    pdk.Deck(
+        map_style="road",
         initial_view_state=pdk.ViewState(
             latitude=37.7749295, longitude=-122.4194155, zoom=12, bearing=0, pitch=30
         ),
         layers=[
             pdk.Layer(
-                "H3HexagonLayer",
-                df,
-                pickable=True,
-                stroked=True,
-                filled=True,
-                get_hexagon="hex",
-                get_fill_color="[0, 255, 0]",
-                get_line_color=[255, 255, 255],
-                line_width_min_pixels=2,
+                "ScatterplotLayer",
+                data=random_scatter_sf,
+                get_position="[lon, lat]",
+                get_color="[200, 30, 0, 160]",
+                get_radius=200,
             ),
         ],
     ),
