@@ -23,7 +23,7 @@ import secrets
 import threading
 from collections import OrderedDict
 from enum import Enum
-from typing import Any, Callable, Final
+from typing import Any, Callable, Final, Literal
 
 from blinker import Signal
 
