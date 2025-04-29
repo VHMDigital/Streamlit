@@ -57,6 +57,71 @@ import {
   StyledFlexContainerBlockProps,
 } from "./styled-components"
 
+const ChildRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
+  const { libConfig } = useContext(LibContext)
+
+  // Handle cycling of colors for dividers:
+  assignDividerColor(props.node, useTheme())
+
+  // Capture all the element ids to avoid rendering the same element twice
+  const elementKeySet = new Set<string>()
+
+  return (
+    <>
+      {props.node.children &&
+        props.node.children.map((node: AppNode, index: number): ReactNode => {
+          const disableFullscreenMode =
+            libConfig.disableFullscreenMode || props.disableFullscreenMode
+
+          // Base case: render a leaf node.
+          if (node instanceof ElementNode) {
+            // Put node in childProps instead of passing as a node={node} prop in React to
+            // guarantee it doesn't get overwritten by {...childProps}.
+            const childProps = {
+              ...props,
+              disableFullscreenMode,
+              node: node as ElementNode,
+            }
+
+            const key = getElementId(node.element) || index.toString()
+            // Avoid rendering the same element twice. We assume the first one is the one we want
+            // because the page is rendered top to bottom, so a valid widget would be rendered
+            // correctly and we assume the second one is therefore stale (or throw an error).
+            // Also, our setIn logic pushes stale widgets down in the list of elements, so the
+            // most recent one should always come first.
+            if (elementKeySet.has(key)) {
+              return null
+            }
+
+            elementKeySet.add(key)
+
+            return <ElementNodeRenderer key={key} {...childProps} />
+          }
+
+          // Recursive case: render a block, which can contain other blocks
+          // and elements.
+          if (node instanceof BlockNode) {
+            // Put node in childProps instead of passing as a node={node} prop in React to
+            // guarantee it doesn't get overwritten by {...childProps}.
+            const childProps = {
+              ...props,
+              disableFullscreenMode,
+              node: node as BlockNode,
+            }
+
+            // TODO: Update to match React best practices
+            // eslint-disable-next-line @eslint-react/no-array-index-key
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            return <BlockNodeRenderer key={index} {...childProps} />
+          }
+
+          // We don't have any other node types!
+          throw new Error(`Unrecognized AppNode: ${node}`)
+        })}
+    </>
+  )
+}
+
 interface ContainerContentsWrapperProps extends BaseBlockProps {
   node: BlockNode
 }
@@ -180,70 +245,6 @@ export const FlexBoxContainer = (
 
 export interface BlockPropsWithoutWidth extends BaseBlockProps {
   node: BlockNode
-}
-
-const ChildRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
-  const { libConfig } = useContext(LibContext)
-
-  // Handle cycling of colors for dividers:
-  assignDividerColor(props.node, useTheme())
-
-  // Capture all the element ids to avoid rendering the same element twice
-  const elementKeySet = new Set<string>()
-
-  return (
-    <>
-      {props.node.children &&
-        props.node.children.map((node: AppNode, index: number): ReactNode => {
-          const disableFullscreenMode =
-            libConfig.disableFullscreenMode || props.disableFullscreenMode
-
-          // Base case: render a leaf node.
-          if (node instanceof ElementNode) {
-            // Put node in childProps instead of passing as a node={node} prop in React to
-            // guarantee it doesn't get overwritten by {...childProps}.
-            const childProps = {
-              ...props,
-              disableFullscreenMode,
-              node: node as ElementNode,
-            }
-
-            const key = getElementId(node.element) || index.toString()
-            // Avoid rendering the same element twice. We assume the first one is the one we want
-            // because the page is rendered top to bottom, so a valid widget would be rendered
-            // correctly and we assume the second one is therefore stale (or throw an error).
-            // Also, our setIn logic pushes stale widgets down in the list of elements, so the
-            // most recent one should always come first.
-            if (elementKeySet.has(key)) {
-              return null
-            }
-
-            elementKeySet.add(key)
-
-            return <ElementNodeRenderer key={key} {...childProps} />
-          }
-
-          // Recursive case: render a block, which can contain other blocks
-          // and elements.
-          if (node instanceof BlockNode) {
-            // Put node in childProps instead of passing as a node={node} prop in React to
-            // guarantee it doesn't get overwritten by {...childProps}.
-            const childProps = {
-              ...props,
-              disableFullscreenMode,
-              node: node as BlockNode,
-            }
-
-            // TODO: Update to match React best practices
-            // eslint-disable-next-line @eslint-react/no-array-index-key
-            return <BlockNodeRenderer key={index} {...childProps} />
-          }
-
-          // We don't have any other node types!
-          throw new Error(`Unrecognized AppNode: ${node}`)
-        })}
-    </>
-  )
 }
 
 const BlockNodeRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
