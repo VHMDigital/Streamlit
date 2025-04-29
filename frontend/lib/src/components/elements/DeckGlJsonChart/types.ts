@@ -47,7 +47,6 @@ export interface DeckGLProps {
   element: DeckGlJsonChartProto
   fragmentId: string | undefined
   widgetMgr: WidgetStateManager
-  width: number
 }
 
 export interface DeckObject {
