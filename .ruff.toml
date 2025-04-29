@@ -118,7 +118,7 @@ ignore = [
   "N806",    # Checks for non-lowercased variable names in functions.
   "N818",    # Checks for Error suffix for exceptions.
   "A002",    # Checks if function argument shadows a Python builtin.
-  "S101",    #
+  "S101",    # Checks for usage of assert statements.
 ]
 exclude = [
   # pympler is a vendored dependency that doesn't conform to our linting rules:
