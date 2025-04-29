@@ -32,7 +32,7 @@ import {
 } from "~lib/theme"
 import { ensureError } from "~lib/util/ErrorHandling"
 
-const log = getLogger("PlotlyChart:CustomTheme")
+const LOG = getLogger("PlotlyChart:CustomTheme")
 /**
  * This applies general layout changes to things such as x axis,
  * y axis, legends, titles, grid changes, background, etc.
@@ -40,6 +40,7 @@ const log = getLogger("PlotlyChart:CustomTheme")
  * @param theme - Theme from useTheme()
  */
 export function applyStreamlitThemeTemplateLayout(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   layout: any,
   theme: EmotionTheme
 ): void {
@@ -404,12 +405,13 @@ export function replaceTemporaryColors(
  * spec.data, spec.layout.template.data, and spec.layout.template.layout
  * @param spec - spec
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function applyStreamlitTheme(spec: any, theme: EmotionTheme): void {
   try {
     applyStreamlitThemeTemplateLayout(spec.layout.template.layout, theme)
   } catch (e) {
     const err = ensureError(e)
-    log.error(err)
+    LOG.error(err)
   }
   if ("title" in spec.layout) {
     spec.layout.title = merge(spec.layout.title, {
@@ -425,8 +427,10 @@ export function applyStreamlitTheme(spec: any, theme: EmotionTheme): void {
  * @returns modified spec.layout
  */
 export function layoutWithThemeDefaults(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   layout: any,
   theme: EmotionTheme
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 ): any {
   const { colors, genericFonts } = theme
 

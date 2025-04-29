@@ -110,7 +110,7 @@ def configurator_options(func: F) -> F:
 
 
 def _download_remote(main_script_path: str, url_path: str) -> None:
-    """Fetch remote file at url_path to main_script_path"""
+    """Fetch remote file at url_path to main_script_path."""
     import requests
 
     with open(main_script_path, "wb") as fp:
@@ -133,7 +133,7 @@ def main(log_level="info"):
     Or use the line below to run your own script:
 
         $ streamlit run your_script.py
-    """
+    """  # noqa: D400
 
     if log_level:
         from streamlit.logger import get_logger
@@ -276,7 +276,7 @@ def _main_run(
     bootstrap.run(file, is_hello, args, flag_options)
 
 
-# SUBCOMMAND: cache
+# SUBCOMMAND cache
 
 
 @main.group("cache")
@@ -299,7 +299,7 @@ def cache_clear():
     caching.cache_resource.clear()
 
 
-# SUBCOMMAND: config
+# SUBCOMMAND config
 
 
 @main.group("config")
@@ -318,7 +318,7 @@ def config_show(**kwargs):
     _config.show_config()
 
 
-# SUBCOMMAND: activate
+# SUBCOMMAND activate
 
 
 @main.group("activate", invoke_without_command=True)
@@ -335,7 +335,7 @@ def activate_reset():
     Credentials.get_current().reset()
 
 
-# SUBCOMMAND: test
+# SUBCOMMAND test
 
 
 @main.group("test", hidden=True)
@@ -363,6 +363,51 @@ def test_prog_name():
 
     assert parent is not None
     assert parent.command_path == "streamlit test"
+
+
+@main.command("init")
+@click.argument("directory", required=False)
+def main_init(directory: str | None = None):
+    """Initialize a new Streamlit project.
+
+    If DIRECTORY is specified, create it and initialize the project there.
+    Otherwise use the current directory.
+    """
+    from pathlib import Path
+
+    project_dir = Path(directory) if directory else Path.cwd()
+
+    try:
+        project_dir.mkdir(exist_ok=True, parents=True)
+    except OSError as e:
+        raise click.ClickException(f"Failed to create directory: {e}")
+
+    # Create requirements.txt
+    (project_dir / "requirements.txt").write_text("streamlit\n", encoding="utf-8")
+
+    # Create streamlit_app.py
+    (project_dir / "streamlit_app.py").write_text(
+        """import streamlit as st
+
+st.title("🎈 My new app")
+st.write(
+    "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
+)
+""",
+        encoding="utf-8",
+    )
+
+    rel_path_str = str(directory) if directory else "."
+
+    click.secho("✨ Created new Streamlit app in ", nl=False)
+    click.secho(f"{rel_path_str}", fg="blue")
+    click.echo("🚀 Run it with: ", nl=False)
+    click.secho(f"streamlit run {rel_path_str}/streamlit_app.py", fg="blue")
+
+    if click.confirm("❓ Run the app now?", default=True):
+        app_path = project_dir / "streamlit_app.py"
+        click.echo("\nStarting Streamlit...")
+        _main_run(str(app_path))
 
 
 if __name__ == "__main__":

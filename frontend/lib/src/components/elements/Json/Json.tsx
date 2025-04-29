@@ -28,15 +28,15 @@ import { EmotionTheme, hasLightBackgroundColor } from "~lib/theme"
 import { ensureError } from "~lib/util/ErrorHandling"
 
 import { StyledJsonWrapper } from "./styled-components"
+
 export interface JsonProps {
-  width: number
   element: JsonProto
 }
 
 /**
  * Functional element representing JSON structured text.
  */
-function Json({ width, element }: Readonly<JsonProps>): ReactElement {
+function Json({ element }: Readonly<JsonProps>): ReactElement {
   const theme: EmotionTheme = useTheme()
 
   const elementRef = useRef<HTMLDivElement>(null)
@@ -61,6 +61,7 @@ function Json({ width, element }: Readonly<JsonProps>): ReactElement {
   // theme's background is light or dark.
   const jsonTheme = hasLightBackgroundColor(theme) ? "rjv-default" : "monokai"
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const handleCopy = (copy: any): void => {
     // we use ClipboardJS to do the copying, because it allows
     // us to specify a container element. This is necessary because
@@ -74,7 +75,6 @@ function Json({ width, element }: Readonly<JsonProps>): ReactElement {
     <StyledJsonWrapper
       className="stJson"
       data-testid="stJson"
-      width={width}
       ref={elementRef}
     >
       <ReactJson

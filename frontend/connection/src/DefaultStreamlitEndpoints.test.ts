@@ -17,7 +17,6 @@
 import axios from "axios"
 import MockAdapter from "axios-mock-adapter"
 
-import { ForwardMsg } from "@streamlit/protobuf"
 import { buildHttpUri } from "@streamlit/utils"
 
 import { DefaultStreamlitEndpoints } from "./DefaultStreamlitEndpoints"
@@ -27,13 +26,6 @@ const MOCK_SERVER_URI = {
   port: "80",
   pathname: "/mock/base/path",
 } as URL
-
-function createMockForwardMsg(hash: string, cacheable = true): ForwardMsg {
-  return ForwardMsg.fromObject({
-    hash,
-    metadata: { cacheable, deltaId: 0 },
-  })
-}
 
 afterEach(() => {
   vi.clearAllMocks()
@@ -59,6 +51,7 @@ describe("DefaultStreamlitEndpoints", () => {
       const endpoint = new DefaultStreamlitEndpoints({
         getServerUri: () => serverURI,
         csrfEnabled: true,
+        sendClientError: vi.fn(),
       })
       expect(() => endpoint.buildComponentURL("foo", "index.html")).toThrow()
     })
@@ -68,6 +61,7 @@ describe("DefaultStreamlitEndpoints", () => {
       const endpoint = new DefaultStreamlitEndpoints({
         getServerUri: () => serverURI,
         csrfEnabled: true,
+        sendClientError: vi.fn(),
       })
 
       // "Connect" to the server. `buildComponentURL` will succeed.
@@ -89,6 +83,7 @@ describe("DefaultStreamlitEndpoints", () => {
     const endpoints = new DefaultStreamlitEndpoints({
       getServerUri: () => MOCK_SERVER_URI,
       csrfEnabled: false,
+      sendClientError: vi.fn(),
     })
 
     afterEach(() => {
@@ -121,6 +116,7 @@ describe("DefaultStreamlitEndpoints", () => {
     const endpoints = new DefaultStreamlitEndpoints({
       getServerUri: () => MOCK_SERVER_URI,
       csrfEnabled: false,
+      sendClientError: vi.fn(),
     })
 
     it("builds URL correctly for files being uploaded to the tornado server", () => {
@@ -152,6 +148,7 @@ describe("DefaultStreamlitEndpoints", () => {
     const endpoints = new DefaultStreamlitEndpoints({
       getServerUri: () => MOCK_SERVER_URI,
       csrfEnabled: false,
+      sendClientError: vi.fn(),
     })
 
     const appPages = [
@@ -202,6 +199,7 @@ describe("DefaultStreamlitEndpoints", () => {
       endpoints = new DefaultStreamlitEndpoints({
         getServerUri: () => MOCK_SERVER_URI,
         csrfEnabled: false,
+        sendClientError: vi.fn(),
       })
     })
 
@@ -216,6 +214,7 @@ describe("DefaultStreamlitEndpoints", () => {
         )
         .reply(() => [200, 1])
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
       const mockOnUploadProgress = (_: any): void => {}
       const mockCancelToken = axios.CancelToken.source().token
 
@@ -248,6 +247,7 @@ describe("DefaultStreamlitEndpoints", () => {
         .onPut("http://example.com/upload_file/file_2")
         .reply(() => [200, 1])
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
       const mockOnUploadProgress = (_: any): void => {}
       const mockCancelToken = axios.CancelToken.source().token
 
@@ -280,6 +280,7 @@ describe("DefaultStreamlitEndpoints", () => {
         .onPut("http://example.com/someprefix/upload_file/file_2")
         .reply(() => [200, 1])
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
       const mockOnUploadProgress = (_: any): void => {}
       const mockCancelToken = axios.CancelToken.source().token
 
@@ -323,13 +324,25 @@ describe("DefaultStreamlitEndpoints", () => {
         .onPut("http://streamlit.mock:80/mock/base/path/_stcore/upload_file")
         .reply(() => [400])
 
+      const sendClientErrorToHostSpy = vi.spyOn(
+        endpoints,
+        "sendClientErrorToHost"
+      )
+
       await expect(
         endpoints.uploadFileUploaderFile(
           "/_stcore/upload_file",
           MOCK_FILE,
           "mockSessionId"
         )
-      ).rejects.toEqual(new Error("Request failed with status code 400"))
+      ).rejects.toThrow("Request failed with status code 400")
+
+      expect(sendClientErrorToHostSpy).toHaveBeenCalledWith(
+        "File Uploader",
+        "Error uploading file",
+        "Request failed with status code 400",
+        "http://streamlit.mock:80/mock/base/path/_stcore/upload_file"
+      )
     })
   })
 
@@ -343,6 +356,7 @@ describe("DefaultStreamlitEndpoints", () => {
       endpoints = new DefaultStreamlitEndpoints({
         getServerUri: () => MOCK_SERVER_URI,
         csrfEnabled: false,
+        sendClientError: vi.fn(),
       })
     })
 
@@ -399,52 +413,32 @@ describe("DefaultStreamlitEndpoints", () => {
         data: { sessionId: "mockSessionId" },
       })
     })
-  })
-
-  describe("fetchCachedForwardMsg()", () => {
-    let axiosMock: MockAdapter
-    let endpoints: DefaultStreamlitEndpoints
-
-    beforeEach(() => {
-      axiosMock = new MockAdapter(axios)
-      endpoints = new DefaultStreamlitEndpoints({
-        getServerUri: () => MOCK_SERVER_URI,
-        csrfEnabled: false,
-      })
-    })
-
-    afterEach(() => {
-      axiosMock.restore()
-    })
-
-    it("calls the appropriate endpoint", async () => {
-      const mockForwardMsgBytes = ForwardMsg.encode(
-        createMockForwardMsg("mockHash")
-      ).finish()
-
-      axiosMock
-        .onGet(
-          "http://streamlit.mock:80/mock/base/path/_stcore/message?hash=mockHash"
-        )
-        .reply(() => {
-          return [200, mockForwardMsgBytes]
-        })
-
-      await expect(
-        endpoints.fetchCachedForwardMsg("mockHash")
-      ).resolves.toEqual(new Uint8Array(mockForwardMsgBytes))
-    })
 
     it("errors on bad status", async () => {
       axiosMock
-        .onGet(
-          "http://streamlit.mock:80/mock/base/path/_stcore/message?hash=mockHash"
+        .onDelete(
+          "http://streamlit.mock:80/mock/base/path/_stcore/upload_file/file_1"
         )
         .reply(() => [400])
 
+      const sendClientErrorToHostSpy = vi.spyOn(
+        endpoints,
+        "sendClientErrorToHost"
+      )
+
       await expect(
-        endpoints.fetchCachedForwardMsg("mockHash")
-      ).rejects.toEqual(new Error("Request failed with status code 400"))
+        endpoints.deleteFileAtURL(
+          "/_stcore/upload_file/file_1",
+          "mockSessionId"
+        )
+      ).rejects.toThrow("Request failed with status code 400")
+
+      expect(sendClientErrorToHostSpy).toHaveBeenCalledWith(
+        "File Uploader",
+        "Error deleting file",
+        "Request failed with status code 400",
+        "http://streamlit.mock:80/mock/base/path/_stcore/upload_file/file_1"
+      )
     })
   })
 
@@ -467,6 +461,7 @@ describe("DefaultStreamlitEndpoints", () => {
       const endpoints = new DefaultStreamlitEndpoints({
         getServerUri: () => MOCK_SERVER_URI,
         csrfEnabled: true,
+        sendClientError: vi.fn(),
       })
 
       const url = buildHttpUri(MOCK_SERVER_URI, "mockUrl")
@@ -484,6 +479,7 @@ describe("DefaultStreamlitEndpoints", () => {
       const endpoints = new DefaultStreamlitEndpoints({
         getServerUri: () => MOCK_SERVER_URI,
         csrfEnabled: false,
+        sendClientError: vi.fn(),
       })
 
       const url = buildHttpUri(MOCK_SERVER_URI, "mockUrl")
@@ -493,6 +489,77 @@ describe("DefaultStreamlitEndpoints", () => {
       expect(spyRequest).toHaveBeenCalledWith({
         url,
       })
+    })
+  })
+
+  describe("checkSourceUrlResponse", () => {
+    it("sends error to host if error on response", async () => {
+      // Mock fetch for checkSourceUrlResponse - response is not ok
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 404,
+          statusText: "Not Found",
+        } as Response)
+      )
+      const endpoints = new DefaultStreamlitEndpoints({
+        getServerUri: () => MOCK_SERVER_URI,
+        csrfEnabled: false,
+        sendClientError: vi.fn(),
+      })
+
+      const url = buildHttpUri(MOCK_SERVER_URI, "mockUrl")
+      const sendClientErrorToHostSpy = vi.spyOn(
+        endpoints,
+        "sendClientErrorToHost"
+      )
+      await endpoints.checkSourceUrlResponse(
+        url,
+        "Custom Component",
+        "mockComponent"
+      )
+
+      expect(fetch).toHaveBeenCalledWith(url)
+
+      expect(sendClientErrorToHostSpy).toHaveBeenCalledWith(
+        "Custom Component",
+        404,
+        "Not Found",
+        url,
+        "mockComponent"
+      )
+    })
+
+    it("sends error to host if fetch fails", async () => {
+      const endpoints = new DefaultStreamlitEndpoints({
+        getServerUri: () => MOCK_SERVER_URI,
+        csrfEnabled: false,
+        sendClientError: vi.fn(),
+      })
+
+      // Mock fetch for checkSourceUrlResponse - fetch fails
+      global.fetch = vi.fn(() => Promise.reject(new Error("mockError")))
+
+      const sendClientErrorToHostSpy = vi.spyOn(
+        endpoints,
+        "sendClientErrorToHost"
+      )
+      const url = buildHttpUri(MOCK_SERVER_URI, "mockUrl")
+      await endpoints.checkSourceUrlResponse(
+        url,
+        "Custom Component",
+        "mockComponent"
+      )
+
+      expect(fetch).toHaveBeenCalledWith(url)
+
+      expect(sendClientErrorToHostSpy).toHaveBeenCalledWith(
+        "Custom Component",
+        "Error fetching source",
+        "mockError",
+        url,
+        "mockComponent"
+      )
     })
   })
 })

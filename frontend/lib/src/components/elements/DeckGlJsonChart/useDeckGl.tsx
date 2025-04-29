@@ -59,7 +59,7 @@ type UseDeckGlShape = {
   setSelection: React.Dispatch<
     React.SetStateAction<ValueWithSource<DeckGlElementState> | null>
   >
-  viewState: Record<string, unknown>
+  viewState: Record<string, unknown> | null
   width: number | string
 }
 
@@ -180,11 +180,9 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
     fragmentId,
   })
 
-  const [viewState, setViewState] = useState<Record<string, unknown>>({
-    bearing: 0,
-    pitch: 0,
-    zoom: 11,
-  })
+  const [viewState, setViewState] = useState<Record<string, unknown> | null>(
+    null
+  )
 
   const { height, width } = useStWidthHeight({
     element,
@@ -192,13 +190,14 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
     shouldUseContainerWidth,
     container: { height: propsHeight, width: propsWidth },
     heightFallback:
-      (viewState.initialViewState as { height: number } | undefined)?.height ||
-      theme.sizes.defaultMapHeight,
+      (viewState?.initialViewState as { height: number } | undefined)
+        ?.height || theme.sizes.defaultMapHeight,
   })
 
-  const [initialViewState, setInitialViewState] = useState<
-    Record<string, unknown>
-  >({})
+  const [initialViewState, setInitialViewState] = useState<Record<
+    string,
+    unknown
+  > | null>(null)
 
   /**
    * Our proto for selectionMode is an array in order to support future-looking
@@ -237,12 +236,11 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
       (copy?.mapStyle && copy.mapStyle?.indexOf("cartocdn") >= 0)
 
     if (isUsingCarto && !copy.cartoKey) {
-      // This key is just used for telemetry on the Carto side. The Carto folks
-      // would like to be able to separate Streamlit usage from other types in
-      // their stats.
-      // In particular, note that this key is NOT connected to any paid accounts,
-      // or secure API access, or any of the sort.
-      copy.cartoKey = "TODO XXX DO NOT MERGE: NEED THE KEY!"
+      // This key was manually created by Carto just for Streamlit. It is NOT
+      // connected to any paid accounts, or secure API access, or anything of
+      // the sort. It's is just used for Carto to be able to separate Streamlit
+      // usage from other types in their own internal stats.
+      copy.cartoKey = "x7g2plm9yq8vfrc"
     }
 
     if (copy.layers) {
@@ -359,9 +357,10 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
     // If the ViewState on the server has changed, apply the diff to the current state
     if (!isEqual(deck.initialViewState, initialViewState)) {
       const diff = Object.keys(deck.initialViewState).reduce(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
         (diff, key): any => {
           // @ts-expect-error
-          if (deck.initialViewState[key] === initialViewState[key]) {
+          if (deck.initialViewState[key] === initialViewState?.[key]) {
             return diff
           }
 
@@ -374,7 +373,7 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
         {}
       )
 
-      setViewState({ ...viewState, ...diff })
+      setViewState(existing => ({ ...existing, ...diff }))
       setInitialViewState(deck.initialViewState)
     }
   }, [deck.initialViewState, initialViewState, viewState])

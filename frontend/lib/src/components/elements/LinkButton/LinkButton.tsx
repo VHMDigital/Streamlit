@@ -24,18 +24,16 @@ import {
   BaseButtonTooltip,
   DynamicButtonLabel,
 } from "~lib/components/shared/BaseButton"
+import { Box } from "~lib/components/shared/Base/styled-components"
 
 import BaseLinkButton from "./BaseLinkButton"
 
 export interface Props {
-  disabled: boolean
   element: LinkButtonProto
-  width: number
 }
 
 function LinkButton(props: Readonly<Props>): ReactElement {
-  const { disabled, element, width } = props
-  const style = { width }
+  const { element } = props
 
   let kind = BaseButtonKind.SECONDARY
   if (element.type === "primary") {
@@ -44,37 +42,36 @@ function LinkButton(props: Readonly<Props>): ReactElement {
     kind = BaseButtonKind.TERTIARY
   }
 
-  // When useContainerWidth true & has help tooltip,
-  // we need to pass the container width down to the button
-  const fluidWidth = element.help ? width : true
-
   const handleClick = (e: MouseEvent<HTMLAnchorElement>): void => {
     // Prevent the link from being followed if the button is disabled.
-    if (props.disabled) {
+    if (element.disabled) {
       e.preventDefault()
     }
   }
 
   return (
-    <div className="stLinkButton" data-testid="stLinkButton" style={style}>
-      <BaseButtonTooltip help={element.help}>
+    <Box className="stLinkButton" data-testid="stLinkButton">
+      <BaseButtonTooltip
+        help={element.help}
+        containerWidth={element.useContainerWidth}
+      >
         {/* We use separate BaseLinkButton instead of BaseButton here, because
         link behavior requires tag <a> instead of <button>.*/}
         <BaseLinkButton
           kind={kind}
           size={BaseButtonSize.SMALL}
-          disabled={disabled}
+          disabled={element.disabled}
           onClick={handleClick}
-          fluidWidth={element.useContainerWidth ? fluidWidth : false}
+          containerWidth={element.useContainerWidth}
           href={element.url}
           target="_blank"
           rel="noreferrer"
-          aria-disabled={disabled}
+          aria-disabled={element.disabled}
         >
           <DynamicButtonLabel icon={element.icon} label={element.label} />
         </BaseLinkButton>
       </BaseButtonTooltip>
-    </div>
+    </Box>
   )
 }
 

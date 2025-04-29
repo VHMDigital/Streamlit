@@ -33,10 +33,9 @@ import { StyledGraphVizChart } from "./styled-components"
 
 export interface GraphVizChartProps {
   element: GraphVizChartProto
-  width: number
   disableFullscreenMode?: boolean
 }
-export const log = getLogger("GraphVizChart")
+export const LOG = getLogger("GraphVizChart")
 
 function GraphVizChart({
   element,
@@ -69,7 +68,7 @@ function GraphVizChart({
         node.removeAttribute("height")
       }
     } catch (error) {
-      log.error(error)
+      LOG.error(error)
     }
   }, [
     chartId,
@@ -81,7 +80,7 @@ function GraphVizChart({
 
   return (
     <StyledToolbarElementContainer
-      width={width}
+      width={width ?? 0}
       height={height}
       useContainerWidth={isFullScreen || element.useContainerWidth}
     >
@@ -103,4 +102,5 @@ function GraphVizChart({
   )
 }
 
-export default memo(withFullScreenWrapper(GraphVizChart))
+const GraphVizChartWithFullScreen = withFullScreenWrapper(GraphVizChart)
+export default memo(GraphVizChartWithFullScreen)

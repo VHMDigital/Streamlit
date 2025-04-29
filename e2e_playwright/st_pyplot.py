@@ -17,7 +17,6 @@ import textwrap
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from matplotlib import pyplot
 
 import streamlit as st
 
@@ -44,14 +43,14 @@ st.pyplot(fig, use_container_width=False)
 st.write("Advanced Seaborn figure:")
 # Generate data
 data_points = 100
-xData: "np.typing.NDArray[np.float64]" = (np.random.randn(data_points, 1) * 30) + 30
-yData: "np.typing.NDArray[np.float64]" = np.random.randn(data_points, 1) * 30
+x_data: "np.typing.NDArray[np.float64]" = (np.random.randn(data_points, 1) * 30) + 30
+y_data: "np.typing.NDArray[np.float64]" = np.random.randn(data_points, 1) * 30
 data: "np.typing.NDArray[np.float64]" = np.random.randn(data_points, 2)
 
 # Generate plot
 fig, ax = plt.subplots(figsize=(4.5, 4.5))
 sns.set_context(rc={"font.size": 10})
-p = sns.regplot(x=xData, y=yData, data=data, ci=None, ax=ax, color="grey")
+p = sns.regplot(x=x_data, y=y_data, data=data, ci=None, ax=ax, color="grey")
 
 p.set_title("An Extremely and Really Really Long Long Long Title", fontweight="bold")
 p.set_xlabel("Very long long x label")
@@ -84,9 +83,9 @@ kwargs = {
 st.pyplot(fig, clear_figure=True, **kwargs)
 
 st.write("Figure using deprecated global object:")
-plot = pyplot.plot(data)
+plot = plt.plot(data)
 st.pyplot()
-pyplot.clf()
+plt.clf()
 
 fig, ax = plt.subplots()
 st.pyplot(fig)

@@ -39,7 +39,6 @@ const getProps = (
     label: "Label",
     ...elementProps,
   }),
-  width: 250,
   disabled: false,
   // @ts-expect-error
   widgetMgr: new WidgetStateManager(sendBackMsg),
@@ -62,7 +61,6 @@ describe("Button widget", () => {
     const stButtonDiv = screen.getByTestId("stButton")
 
     expect(stButtonDiv).toHaveClass("stButton")
-    expect(stButtonDiv).toHaveStyle(`width: ${props.width}px`)
   })
 
   it("should render a label within the button", () => {
@@ -126,6 +124,24 @@ describe("Button widget", () => {
     expect(buttonWidget).toHaveStyle("width: auto")
   })
 
+  it("renders with help properly", async () => {
+    const user = userEvent.setup()
+    // Hover to see tooltip content
+    render(<Button {...getProps({ help: "mockHelpText" })} />)
+
+    // Ensure both the button and the tooltip target have the correct width
+    const buttonWidget = screen.getByRole("button")
+    expect(buttonWidget).toHaveStyle("width: auto")
+    const tooltipTarget = screen.getByTestId("stTooltipHoverTarget")
+    expect(tooltipTarget).toHaveStyle("width: auto")
+
+    // Ensure the tooltip content is visible and has the correct text
+    await user.hover(tooltipTarget)
+
+    const tooltipContent = await screen.findByTestId("stTooltipContent")
+    expect(tooltipContent).toHaveTextContent("mockHelpText")
+  })
+
   it("passes useContainerWidth property without help correctly", () => {
     render(<Button {...getProps({ useContainerWidth: true })}>Hello</Button>)
 
@@ -141,6 +157,6 @@ describe("Button widget", () => {
     )
 
     const buttonWidget = screen.getByRole("button")
-    expect(buttonWidget).toHaveStyle(`width: ${250}px`)
+    expect(buttonWidget).toHaveStyle(`width: 100%`)
   })
 })

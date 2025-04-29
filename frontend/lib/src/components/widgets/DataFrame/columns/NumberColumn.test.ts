@@ -156,7 +156,9 @@ describe("NumberColumn", () => {
 
     const mockCell = mockColumn.getCell("104")
     expect(mockCell.kind).toEqual(GridCellKind.Number)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     expect((mockCell as any).fixedDecimals).toEqual(0)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     expect((mockCell as any).allowNegative).toEqual(false)
   })
 
@@ -249,6 +251,7 @@ describe("NumberColumn", () => {
     ["--123"],
     ["2,,2"],
     ["12345678987654321"],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   ])("%p results in error cell", (input: any) => {
     const mockColumn = getNumberColumn(MOCK_FLOAT_ARROW_TYPE)
     const cell = mockColumn.getCell(input)
@@ -289,8 +292,15 @@ describe("NumberColumn", () => {
     [1234567898765432, "%d ⭐", "1234567898765432 ⭐"],
     [72.3, "%.1f%%", "72.3%"],
     [-5.678, "%.1f", "-5.7"],
-    [0.12, "percent", "12.00%"],
+    [0.12, "percent", "12%"],
     [1100, "compact", "1.1K"],
+    [-1234.567, "accounting", "(1,234.57)"],
+    [-1234.567, "dollar", "-$1,234.57"],
+    [-1234.567, "euro", "-€1,234.57"],
+    [-1234.567, "localized", "-1,234.567"],
+    [-1234.567, "plain", "-1234.567"],
+    [-1234.567, "scientific", "-1.235E3"],
+    [-1234.567, "engineering", "-1.235E3"],
   ])(
     "formats %p with sprintf format %p to %p",
     (input: number, format: string, displayValue: string) => {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { renderHook } from "@testing-library/react-hooks"
+import { renderHook } from "@testing-library/react"
 import { Field, Int64, Utf8 } from "apache-arrow"
 import { showSaveFilePicker } from "native-file-system-adapter"
 
@@ -32,6 +32,7 @@ const mockClose = vi.fn()
 
 // The native-file-system-adapter is not available in tests, so we need to mock it.
 vi.mock("native-file-system-adapter", () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   showSaveFilePicker: vi.fn().mockImplementation((_object: any) => {
     return {
       createWritable: vi.fn().mockImplementation(() => {

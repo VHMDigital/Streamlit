@@ -71,6 +71,7 @@ export interface BaseColorPickerProps {
   showValue?: boolean
   label: string
   labelVisibility?: LabelVisibilityOptions
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   onChange: (value: string) => any
   help?: string
 }
@@ -78,7 +79,6 @@ export interface BaseColorPickerProps {
 const BaseColorPicker = (props: BaseColorPickerProps): React.ReactElement => {
   const {
     disabled,
-    width,
     value: propValue,
     showValue,
     label,
@@ -133,7 +133,6 @@ const BaseColorPicker = (props: BaseColorPickerProps): React.ReactElement => {
     <StyledColorPicker
       className="stColorPicker"
       data-testid="stColorPicker"
-      width={width}
       disabled={disabled}
     >
       <WidgetLabel

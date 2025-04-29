@@ -33,42 +33,36 @@ export const StyledDocType = styled.span(({ theme }) => ({
 
 export const StyledDocValue = styled.span()
 
-export interface StyledDocContainerProps {
-  width: number
-}
-
-export const StyledDocContainer = styled.span<StyledDocContainerProps>(
-  ({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    borderRadius: theme.radii.default,
-    border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
-    fontFamily: theme.genericFonts.codeFont,
-    fontSize: theme.fontSizes.sm,
-  })
-)
+export const StyledDocContainer = styled.span(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  borderRadius: theme.radii.default,
+  border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+  fontFamily: theme.genericFonts.codeFont,
+  fontSize: theme.fontSizes.sm,
+}))
 
 export const StyledDocHeader = styled.div(({ theme }) => ({
   padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
   backgroundColor: transparentize(theme.colors.secondaryBg, 0.6),
-  borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
+  borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
   // Add rounded corners to the top of the container to prevent the background
   // color from bleeding into the surrounding area.
   borderTopLeftRadius: theme.radii.default,
   borderTopRightRadius: theme.radii.default,
   fontSize: theme.fontSizes.sm,
-  overflow: ["auto", "overlay"],
+  overflow: "auto",
 }))
 
 export const StyledDocString = styled.div(({ theme }) => ({
   whiteSpace: "pre",
-  overflow: ["auto", "overlay"],
+  overflow: "auto",
   maxHeight: "30.5rem", // The extra 0.5rem is to show a little of the overflowing line.
   padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
   fontSize: theme.fontSizes.sm,
 
   "&:not(:last-child)": {
-    borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
+    borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
   },
 }))
 
@@ -82,13 +76,13 @@ export const StyledMembersTable = styled.table(({ theme }) => ({
 
 export const StyledMembersRow = styled.tr(({ theme }) => ({
   "&:not(:last-child)": {
-    borderBottom: `${theme.sizes.borderWidth} dotted ${theme.colors.borderColorLight}`,
+    borderBottom: `${theme.sizes.borderWidth} dotted ${theme.colors.borderColor}`,
   },
 }))
 
 export const StyledMembersSummaryCell = styled.td(({ theme }) => ({
   width: "30%",
-  overflow: ["auto", "overlay"],
+  overflow: "auto",
   padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
 
   "& > *": {
@@ -98,6 +92,6 @@ export const StyledMembersSummaryCell = styled.td(({ theme }) => ({
 
 export const StyledMembersDetailsCell = styled.td(({ theme }) => ({
   width: "70%",
-  overflow: ["auto", "overlay"],
+  overflow: "auto",
   padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
 }))

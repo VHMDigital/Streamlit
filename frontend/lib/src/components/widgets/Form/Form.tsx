@@ -24,7 +24,6 @@ import React, {
 
 import AlertElement from "~lib/components/elements/AlertElement"
 import { Kind } from "~lib/components/shared/AlertContainer"
-import { ScriptRunState } from "~lib/ScriptRunState"
 import { WidgetStateManager } from "~lib/WidgetStateManager"
 
 import { StyledErrorContainer, StyledForm } from "./styled-components"
@@ -33,9 +32,8 @@ export interface Props {
   formId: string
   clearOnSubmit: boolean
   enterToSubmit: boolean
-  width: number
   hasSubmitButton: boolean
-  scriptRunState: ScriptRunState
+  scriptNotRunning: boolean
   children?: ReactNode
   widgetMgr: WidgetStateManager
   border: boolean
@@ -55,8 +53,7 @@ function Form(props: Props): ReactElement {
     widgetMgr,
     hasSubmitButton,
     children,
-    width,
-    scriptRunState,
+    scriptNotRunning,
     clearOnSubmit,
     enterToSubmit,
     border,
@@ -77,11 +74,7 @@ function Form(props: Props): ReactElement {
 
   if (hasSubmitButton && showWarning) {
     setShowWarning(false)
-  } else if (
-    !hasSubmitButton &&
-    !showWarning &&
-    scriptRunState === ScriptRunState.NOT_RUNNING
-  ) {
+  } else if (!hasSubmitButton && !showWarning && scriptNotRunning) {
     setShowWarning(true)
   }
 
@@ -89,11 +82,7 @@ function Form(props: Props): ReactElement {
   if (showWarning) {
     submitWarning = (
       <StyledErrorContainer>
-        <AlertElement
-          body={MISSING_SUBMIT_BUTTON_WARNING}
-          kind={Kind.ERROR}
-          width={width}
-        />
+        <AlertElement body={MISSING_SUBMIT_BUTTON_WARNING} kind={Kind.ERROR} />
       </StyledErrorContainer>
     )
   }

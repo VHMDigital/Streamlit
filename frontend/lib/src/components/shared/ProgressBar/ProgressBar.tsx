@@ -35,15 +35,14 @@ export enum Size {
 }
 
 export interface ProgressBarProps {
-  width?: number
   value: number
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   overrides?: Overrides<any>
   size?: Size
 }
 
 function ProgressBar({
   value,
-  width,
   size = Size.SMALL,
   overrides,
 }: ProgressBarProps): ReactElement {
@@ -65,8 +64,8 @@ function ProgressBar({
       },
     },
     Bar: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
       style: ({ $theme }: { $theme: any }) => ({
-        width: width ? width.toString() : undefined,
         marginTop: theme.spacing.none,
         marginBottom: theme.spacing.none,
         marginRight: theme.spacing.none,

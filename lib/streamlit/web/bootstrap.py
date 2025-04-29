@@ -39,7 +39,7 @@ MAX_APP_STATIC_FOLDER_SIZE = 1 * 1024 * 1024 * 1024  # 1 GB
 def _set_up_signal_handler(server: Server) -> None:
     _LOGGER.debug("Setting up signal handler")
 
-    def signal_handler(signal_number, stack_frame):
+    def signal_handler(signal_number, stack_frame):  # noqa: ARG001
         # The server will shut down its threads and exit its loop.
         server.stop()
 
@@ -137,7 +137,9 @@ def _on_server_start(server: Server) -> None:
 
 
 def _fix_pydeck_mapbox_api_warning() -> None:
-    """Sets MAPBOX_API_KEY environment variable needed for PyDeck otherwise it will throw an exception"""
+    """Sets MAPBOX_API_KEY environment variable needed for PyDeck otherwise it
+    will throw an exception.
+    """
 
     os.environ["MAPBOX_API_KEY"] = config.get_option("mapbox.token")
 
@@ -333,17 +335,21 @@ def run(
         await server.stopped
 
     # Run the server. This function will not return until the server is shut down.
-    # FIX RuntimeError: asyncio.run() cannot be called from a running event loop on Python 3.10.16
-    # asyncio.run(run_server())
+    # FIX RuntimeError: asyncio.run() cannot be called from a running event loop
+    # asyncio.run(run_server())  # noqa: ERA001
 
     # Define a main function to handle the event loop logic
     async def main():
         await run_server()
 
-    # Check if we're already in an event loop
-    if asyncio.get_event_loop().is_running():
-        # Use `asyncio.create_task` if we're in an async context
-        asyncio.create_task(main())
-    else:
-        # Otherwise, use `asyncio.run`
+    try:
+        # Check if we're already in an event loop
+        if asyncio.get_running_loop().is_running():
+            # Use `asyncio.create_task` if we're in an async context
+            asyncio.create_task(main())
+        else:
+            # Otherwise, use `asyncio.run`
+            asyncio.run(main())
+    except RuntimeError:
+        # get_running_loop throws RuntimeError if no running event loop
         asyncio.run(main())

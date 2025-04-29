@@ -88,6 +88,7 @@ import { FormSubmitContent } from "~lib/components/widgets/Form"
 import Heading from "~lib/components/shared/StreamlitMarkdown/Heading"
 import { LibContext } from "~lib/components/core/LibContext"
 import { getElementId } from "~lib/util/utils"
+import { withCalculatedWidth } from "~lib/components/core/Layout/withCalculatedWidth"
 
 import {
   BaseBlockProps,
@@ -96,7 +97,7 @@ import {
   isComponentStale,
   shouldComponentBeEnabled,
 } from "./utils"
-import { StyledElementContainer } from "./styled-components"
+import { StyledElementContainerLayoutWrapper } from "./StyledElementContainerLayoutWrapper"
 
 // Lazy-load elements.
 const Audio = React.lazy(() => import("~lib/components/elements/Audio"))
@@ -119,7 +120,9 @@ const BokehChart = React.lazy(
 
 // RTL ESLint triggers a false positive on this render function
 // eslint-disable-next-line testing-library/render-result-naming-convention
-const DebouncedBokehChart = debounceRender(BokehChart, 100)
+const DebouncedBokehChart = withCalculatedWidth(
+  debounceRender(BokehChart, 100)
+)
 
 const DeckGlJsonChart = React.lazy(
   () => import("~lib/components/elements/DeckGlJsonChart")
@@ -188,7 +191,6 @@ const StreamlitSyntaxHighlighter = React.lazy(
 
 export interface ElementNodeRendererProps extends BaseBlockProps {
   node: ElementNode
-  width: number
 }
 
 interface RawElementNodeRendererProps extends ElementNodeRendererProps {
@@ -210,7 +212,6 @@ const RawElementNodeRenderer = (
   }
 
   const elementProps = {
-    width: props.width,
     disableFullscreenMode: props.disableFullscreenMode,
   }
 
@@ -250,9 +251,11 @@ const RawElementNodeRenderer = (
       )
 
     case "balloons":
+      // Specifically use node.scriptRunId vs. scriptRunId from context
+      // See issue #10961: https://github.com/streamlit/streamlit/issues/10961
       return hideIfStale(
         props.isStale,
-        <Balloons scriptRunId={props.scriptRunId} />
+        <Balloons scriptRunId={node.scriptRunId} />
       )
 
     case "bokehChart":
@@ -383,9 +386,11 @@ const RawElementNodeRenderer = (
     }
 
     case "snow":
+      // Specifically use node.scriptRunId vs. scriptRunId from context
+      // See issue #10961: https://github.com/streamlit/streamlit/issues/10961
       return hideIfStale(
         props.isStale,
-        <Snow scriptRunId={props.scriptRunId} />
+        <Snow scriptRunId={node.scriptRunId} />
       )
 
     case "spinner":
@@ -434,21 +439,19 @@ const RawElementNodeRenderer = (
       widgetProps.disabled = widgetProps.disabled || arrowProto.disabled
       return (
         <ArrowDataFrame
-          element={arrowProto}
-          data={node.quiverElement as Quiver}
           // Arrow dataframe can be used as a widget (data_editor) or
           // an element (dataframe). We only want to set the key in case of
           // it being used as a widget. For the non-widget usage, the id will
           // be undefined.
-          {...(arrowProto.id && {
-            key: arrowProto.id,
-          })}
+          key={arrowProto.id || undefined}
+          element={arrowProto}
+          data={node.quiverElement as Quiver}
           {...widgetProps}
         />
       )
     }
 
-    case "arrowVegaLiteChart":
+    case "arrowVegaLiteChart": {
       const vegaLiteElement = node.vegaLiteChartElement as VegaLiteChartElement
       return (
         <ArrowVegaLiteChart
@@ -461,6 +464,7 @@ const RawElementNodeRenderer = (
           {...widgetProps}
         />
       )
+    }
 
     case "audioInput": {
       const audioInputProto = node.element.audioInput as AudioInputProto
@@ -480,16 +484,7 @@ const RawElementNodeRenderer = (
       const buttonProto = node.element.button as ButtonProto
       widgetProps.disabled = widgetProps.disabled || buttonProto.disabled
       if (buttonProto.isFormSubmitter) {
-        const { formId } = buttonProto
-        const hasInProgressUpload =
-          props.formsData.formsWithUploads.has(formId)
-        return (
-          <FormSubmitContent
-            element={buttonProto}
-            hasInProgressUpload={hasInProgressUpload}
-            {...widgetProps}
-          />
-        )
+        return <FormSubmitContent element={buttonProto} {...widgetProps} />
       }
       return <Button element={buttonProto} {...widgetProps} />
     }
@@ -574,7 +569,6 @@ const RawElementNodeRenderer = (
     case "componentInstance":
       return (
         <ComponentInstance
-          registry={props.componentRegistry}
           element={node.element.componentInstance as ComponentInstanceProto}
           {...widgetProps}
         />
@@ -607,8 +601,7 @@ const RawElementNodeRenderer = (
 
     case "linkButton": {
       const linkButtonProto = node.element.linkButton as LinkButtonProto
-      widgetProps.disabled = widgetProps.disabled || linkButtonProto.disabled
-      return <LinkButton element={linkButtonProto} {...widgetProps} />
+      return <LinkButton element={linkButtonProto} {...elementProps} />
     }
 
     case "multiselect": {
@@ -720,16 +713,18 @@ const RawElementNodeRenderer = (
 const ElementNodeRenderer = (
   props: ElementNodeRendererProps
 ): ReactElement => {
-  const { isFullScreen, fragmentIdsThisRun } = React.useContext(LibContext)
-  const { node, width } = props
+  const { isFullScreen, fragmentIdsThisRun, scriptRunState, scriptRunId } =
+    React.useContext(LibContext)
+  const { node } = props
 
   const elementType = node.element.type || ""
-  const enable = shouldComponentBeEnabled(elementType, props.scriptRunState)
+
+  const enable = shouldComponentBeEnabled(elementType, scriptRunState)
   const isStale = isComponentStale(
     enable,
     node,
-    props.scriptRunState,
-    props.scriptRunId,
+    scriptRunState,
+    scriptRunId,
     fragmentIdsThisRun
   )
 
@@ -743,7 +738,7 @@ const ElementNodeRenderer = (
 
   return (
     <Maybe enable={enable}>
-      <StyledElementContainer
+      <StyledElementContainerLayoutWrapper
         className={classNames(
           "stElementContainer",
           "element-container",
@@ -754,10 +749,10 @@ const ElementNodeRenderer = (
         // Applying stale opacity in fullscreen mode
         // causes the fullscreen overlay to be transparent.
         isStale={isStale && !isFullScreen}
-        width={width}
         elementType={elementType}
+        node={node}
       >
-        <ErrorBoundary width={width}>
+        <ErrorBoundary>
           <Suspense
             fallback={
               <Skeleton
@@ -770,7 +765,7 @@ const ElementNodeRenderer = (
             <RawElementNodeRenderer {...props} isStale={isStale} />
           </Suspense>
         </ErrorBoundary>
-      </StyledElementContainer>
+      </StyledElementContainerLayoutWrapper>
     </Maybe>
   )
 }

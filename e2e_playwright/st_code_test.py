@@ -36,7 +36,7 @@ def test_code_blocks_render_correctly(
 ):
     """Test that the code blocks render as expected via screenshot matching."""
     code_blocks = themed_app.get_by_test_id("stCode")
-    expect(code_blocks).to_have_count(17)
+    expect(code_blocks).to_have_count(19)
     # The code blocks might require a bit more time for rendering, so wait until
     # the text is truly visible. Otherwise we might get blank code blocks in the
     # screenshots.
@@ -44,6 +44,8 @@ def test_code_blocks_render_correctly(
     themed_app.wait_for_function(
         f"()=>document.body.textContent.split('def foo()').length === {foo_func_count}"
     )
+    # Check that there are 15 code blocks with the class "language-python"
+    expect(themed_app.locator("code.language-python")).to_have_count(17)
 
     assert_snapshot(code_blocks.nth(0), name="st_code-auto_lang")
     assert_snapshot(code_blocks.nth(1), name="st_code-empty")
@@ -54,6 +56,9 @@ def test_code_blocks_render_correctly(
     assert_snapshot(code_blocks.nth(6), name="st_code-diff_lang")
 
     # Test long lines draw as expected.
+    # The screenshot for long-no_wrap seems to be a bit flaky, scrolling
+    # it into view seems to help fix this (but not sure why).
+    code_blocks.nth(11).scroll_into_view_if_needed()
     assert_snapshot(code_blocks.nth(11), name="st_code-long-no_wrap")
     assert_snapshot(code_blocks.nth(12), name="st_code-long-numbers-no_wrap")
     assert_snapshot(code_blocks.nth(13), name="st_code-long-wrap")
@@ -123,3 +128,13 @@ def test_height_parameter(app: Page):
     curr_block = code_blocks.nth(16)
     curr_block.scroll_into_view_if_needed()
     expect(curr_block.locator("pre")).to_have_css("height", "200px")
+
+
+def test_width_configurations(app: Page, assert_snapshot: ImageCompareFunction):
+    """Test that width configurations are displayed correctly."""
+    # Get all code elements
+    code_elements = app.get_by_test_id("stCode")
+
+    # Test longer code blocks with different widths
+    assert_snapshot(code_elements.nth(17), name="st_code-width_pixels")
+    assert_snapshot(code_elements.nth(18), name="st_code-width_stretch")

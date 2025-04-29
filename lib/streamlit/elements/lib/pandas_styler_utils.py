@@ -139,7 +139,7 @@ def _marshall_styles(
         cellstyle = styles["cellstyle"]
         cellstyle = _trim_pandas_styles(cellstyle)
         for style in cellstyle:
-            rule = _pandas_style_to_css("cell_style", style, styler.uuid)
+            rule = _pandas_style_to_css("cell_style", style, styler.uuid, separator="_")
             css_rules.append(rule)
 
     if len(css_rules) > 0:
@@ -168,7 +168,7 @@ def _pandas_style_to_css(
     style_type: str,
     style: Mapping[str, Any],
     uuid: str,
-    separator: str = "",
+    separator: str = "_",
 ) -> str:
     """Convert pandas.Styler translated style to CSS.
 
@@ -189,28 +189,28 @@ def _pandas_style_to_css(
     """
     declarations = []
     for css_property, css_value in style["props"]:
-        declaration = css_property.strip() + ": " + css_value.strip()
+        declaration = str(css_property).strip() + ": " + str(css_value).strip()
         declarations.append(declaration)
 
     table_selector = f"#T_{uuid}"
 
     # In pandas >= 1.1.0
     # translated_style["cellstyle"] has the following shape:
-    # [
-    #   {
-    #       "props": [("color", " black"), ("background-color", "orange"), ("", "")],
-    #       "selectors": ["row0_col0"]
-    #   }
-    #   ...
-    # ]
+    # > [
+    # >   {
+    # >       "props": [("color", " black"), ("background-color", "orange"), ("", "")],
+    # >       "selectors": ["row0_col0"]
+    # >   }
+    # >   ...
+    # > ]
     if style_type == "table_styles":
         cell_selectors = [style["selector"]]
     else:
         cell_selectors = style["selectors"]
 
-    selectors = []
-    for cell_selector in cell_selectors:
-        selectors.append(table_selector + separator + cell_selector)
+    selectors = [
+        table_selector + separator + cell_selector for cell_selector in cell_selectors
+    ]
     selector = ", ".join(selectors)
 
     declaration_block = "; ".join(declarations)
@@ -269,6 +269,6 @@ def _use_display_values(df: DataFrame, styles: Mapping[str, Any]) -> DataFrame:
                 if "id" in cell:
                     if match := cell_selector_regex.match(cell["id"]):
                         r, c = map(int, match.groups())
-                        new_df.iat[r, c] = str(cell["display_value"])
+                        new_df.iloc[r, c] = str(cell["display_value"])
 
     return new_df

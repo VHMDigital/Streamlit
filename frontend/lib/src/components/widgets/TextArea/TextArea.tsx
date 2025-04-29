@@ -39,12 +39,12 @@ import {
   useBasicWidgetState,
   ValueWithSource,
 } from "~lib/hooks/useBasicWidgetState"
+import { useCalculatedWidth } from "~lib/hooks/useCalculatedWidth"
 
 export interface Props {
   disabled: boolean
   element: TextAreaProto
   widgetMgr: WidgetStateManager
-  width: number
   fragmentId?: string
 }
 
@@ -79,16 +79,12 @@ const updateWidgetMgrState = (
   )
 }
 
-const TextArea: FC<Props> = ({
-  disabled,
-  element,
-  widgetMgr,
-  fragmentId,
-  width,
-}) => {
+const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
   // TODO: Update to match React best practices
   // eslint-disable-next-line react-compiler/react-compiler
   const id = useRef(uniqueId("text_area_")).current
+
+  const [width, elementRef] = useCalculatedWidth()
 
   /**
    * True if the user-specified state.value has not yet been synced to the WidgetStateManager.
@@ -97,6 +93,7 @@ const TextArea: FC<Props> = ({
   /**
    * Whether the area is currently focused.
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [focused, setFocused] = useState(false)
 
   /**
@@ -104,7 +101,7 @@ const TextArea: FC<Props> = ({
    * widget's UI, the default value is used.
    */
   const [uiValue, setUiValue] = useState<string | null>(
-    getStateFromWidgetMgr(widgetMgr, element) ?? null
+    () => getStateFromWidgetMgr(widgetMgr, element) ?? null
   )
 
   const onFormCleared = useCallback(() => {
@@ -163,7 +160,6 @@ const TextArea: FC<Props> = ({
     true
   )
 
-  const style = { width }
   const { height, placeholder, formId } = element
 
   // Show "Please enter" instructions if in a form & allowed, or not in form and state is dirty.
@@ -176,7 +172,7 @@ const TextArea: FC<Props> = ({
     focused && width > theme.breakpoints.hideWidgetDetails
 
   return (
-    <div className="stTextArea" data-testid="stTextArea" style={style}>
+    <div className="stTextArea" data-testid="stTextArea" ref={elementRef}>
       <WidgetLabel
         label={element.label}
         disabled={disabled}
@@ -217,10 +213,10 @@ const TextArea: FC<Props> = ({
                 opacity: "0.7",
               },
               // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
-              paddingRight: theme.spacing.lg,
-              paddingLeft: theme.spacing.lg,
-              paddingBottom: theme.spacing.lg,
-              paddingTop: theme.spacing.lg,
+              paddingRight: theme.spacing.md,
+              paddingLeft: theme.spacing.md,
+              paddingBottom: theme.spacing.md,
+              paddingTop: theme.spacing.md,
             },
           },
           Root: {

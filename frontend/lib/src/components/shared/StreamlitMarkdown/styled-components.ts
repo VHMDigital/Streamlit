@@ -30,6 +30,7 @@ function convertRemToEm(s: string): string {
   return s.replace(/rem$/, "em")
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 function sharedMarkdownStyle(theme: Theme): any {
   return {
     a: {
@@ -47,22 +48,23 @@ function sharedMarkdownStyle(theme: Theme): any {
 function convertFontSizes(
   fontSize: string,
   smallFontSize: string,
-  captionFontSize: string,
-  smallCaptionFontSize: string,
   useSmallerHeadings: boolean,
   isCaption: boolean
 ): string {
   if (useSmallerHeadings) {
-    return isCaption ? convertRemToEm(smallCaptionFontSize) : smallFontSize
+    // For headers in `st.caption`, we use `em` values, so the headers automatically
+    // become a bit smaller by adapting to the font size of the caption.
+    return isCaption ? convertRemToEm(smallFontSize) : smallFontSize
   }
 
-  return isCaption ? convertRemToEm(captionFontSize) : fontSize
+  return isCaption ? convertRemToEm(fontSize) : fontSize
 }
 
 function getMarkdownHeadingDefinitions(
   theme: Theme,
   useSmallerHeadings: boolean,
   isCaption: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 ): any {
   return {
     "h1, h2, h3, h4, h5, h6": {
@@ -75,8 +77,6 @@ function getMarkdownHeadingDefinitions(
     h1: {
       fontSize: convertFontSizes(
         theme.fontSizes.fourXL,
-        theme.fontSizes.xl,
-        theme.fontSizes.threeXL,
         theme.fontSizes.xl,
         useSmallerHeadings,
         isCaption
@@ -96,8 +96,6 @@ function getMarkdownHeadingDefinitions(
       fontSize: convertFontSizes(
         theme.fontSizes.threeXL,
         theme.fontSizes.lg,
-        theme.fontSizes.twoXL,
-        theme.fontSizes.lg,
         useSmallerHeadings,
         isCaption
       ),
@@ -107,45 +105,37 @@ function getMarkdownHeadingDefinitions(
       fontSize: convertFontSizes(
         theme.fontSizes.twoXL,
         theme.fontSizes.mdLg,
-        theme.fontSizes.lg,
-        theme.fontSizes.mdLg,
-        useSmallerHeadings,
-        isCaption
-      ),
-      padding: `${theme.spacing.sm} 0 ${theme.spacing.lg} 0`,
-    },
-    h4: {
-      fontSize: convertFontSizes(
-        theme.fontSizes.xl,
-        theme.fontSizes.md,
-        theme.fontSizes.md,
-        theme.fontSizes.md,
         useSmallerHeadings,
         isCaption
       ),
       padding: `${theme.spacing.md} 0 ${theme.spacing.lg} 0`,
     },
-    h5: {
+    h4: {
       fontSize: convertFontSizes(
-        theme.fontSizes.lg,
-        theme.fontSizes.sm,
-        theme.fontSizes.md,
+        theme.fontSizes.xl,
         theme.fontSizes.md,
         useSmallerHeadings,
         isCaption
       ),
-      padding: `0 0 ${theme.spacing.lg} 0`,
+      padding: `${theme.spacing.sm} 0 ${theme.spacing.lg} 0`,
+    },
+    h5: {
+      fontSize: convertFontSizes(
+        theme.fontSizes.lg,
+        theme.fontSizes.sm,
+        useSmallerHeadings,
+        isCaption
+      ),
+      padding: `${theme.spacing.xs} 0 ${theme.spacing.lg} 0`,
     },
     h6: {
       fontSize: convertFontSizes(
         theme.fontSizes.md,
         theme.fontSizes.twoSm,
-        theme.fontSizes.md,
-        theme.fontSizes.md,
         useSmallerHeadings,
         isCaption
       ),
-      padding: `0 0 ${theme.spacing.lg} 0`,
+      padding: `${theme.spacing.twoXS} 0 ${theme.spacing.lg} 0`,
     },
   }
 }
@@ -253,9 +243,27 @@ export const StyledStreamlitMarkdown =
         },
 
         "span.has-background-color": {
+          borderRadius: theme.radii.md,
           padding: `${theme.spacing.threeXS} ${theme.spacing.twoXS}`,
           margin: theme.spacing.none,
+        },
+
+        "span.is-badge": {
           borderRadius: theme.radii.md,
+          // Since we're using inline-block below, we're not using vertical padding here,
+          // because inline-block already makes the element look a bit taller.
+          padding: `0 ${theme.spacing.twoXS}`,
+          // Add a small margin to separate it a bit from other text.
+          margin: `0 ${theme.spacing.px}`,
+
+          // Make badges not wrap and ellipsize them if they are too long for the
+          // parent container.
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          maxWidth: "100%",
+          display: "inline-block",
+          verticalAlign: "middle",
         },
 
         "p, ol, ul, dl, li": {
@@ -295,12 +303,14 @@ export const StyledHeadingWithActionElements = styled.div(({ theme }) => ({
   textWrap: "pretty",
 
   // show link-icon when hovering somewhere over the heading
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   [StyledLinkIcon as any]: {
     visibility: "hidden",
   },
 
   // we have to set the hover here so that the link icon becomes visible when hovering anywhere over the heading
   "&:hover": {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     [StyledLinkIcon as any]: {
       visibility: "visible",
     },

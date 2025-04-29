@@ -27,7 +27,6 @@ from typing_extensions import TypeAlias
 from streamlit import runtime, url_util
 from streamlit.errors import StreamlitAPIException
 from streamlit.runtime import caching
-from streamlit.type_util import NumpyShape
 
 if TYPE_CHECKING:
     from typing import Any
@@ -36,6 +35,7 @@ if TYPE_CHECKING:
     from PIL import GifImagePlugin, Image, ImageFile
 
     from streamlit.proto.Image_pb2 import ImageList as ImageListProto
+    from streamlit.type_util import NumpyShape
 
 PILImage: TypeAlias = Union[
     "ImageFile.ImageFile", "Image.Image", "GifImagePlugin.GifImageFile"
@@ -99,7 +99,7 @@ def _validate_image_format_string(
     """
     format = format.upper()
     if format in {"JPEG", "PNG"}:
-        return cast(ImageFormat, format)
+        return cast("ImageFormat", format)
 
     # We are forgiving on the spelling of JPEG
     if format == "JPG":
@@ -122,7 +122,7 @@ def _validate_image_format_string(
     return "JPEG"
 
 
-def _PIL_to_bytes(
+def _pil_to_bytes(
     image: PILImage,
     format: ImageFormat = "JPEG",
     quality: int = 100,
@@ -139,7 +139,7 @@ def _PIL_to_bytes(
     return tmp.getvalue()
 
 
-def _BytesIO_to_bytes(data: io.BytesIO) -> bytes:
+def _bytesio_to_bytes(data: io.BytesIO) -> bytes:
     data.seek(0)
     return data.getvalue()
 
@@ -151,7 +151,7 @@ def _np_array_to_bytes(array: npt.NDArray[Any], output_format: str = "JPEG") -> 
     img = Image.fromarray(array.astype(np.uint8))
     format = _validate_image_format_string(img, output_format)
 
-    return _PIL_to_bytes(img, format)
+    return _pil_to_bytes(img, format)
 
 
 def _verify_np_shape(array: npt.NDArray[Any]) -> npt.NDArray[Any]:
@@ -199,11 +199,11 @@ def _ensure_image_size_and_format(
         # versions. The types don't seem to reflect this, though, hence the type: ignore
         # below.
         pil_image = pil_image.resize((width, new_height), resample=Image.BILINEAR)  # type: ignore[attr-defined]
-        return _PIL_to_bytes(pil_image, format=image_format, quality=90)
+        return _pil_to_bytes(pil_image, format=image_format, quality=90)
 
     if pil_image.format != image_format:
         # We need to reformat the image.
-        return _PIL_to_bytes(pil_image, format=image_format, quality=90)
+        return _pil_to_bytes(pil_image, format=image_format, quality=90)
 
     # No resizing or reformatting necessary - return the original bytes.
     return image_data
@@ -241,7 +241,7 @@ def image_to_url(
     If `image` is already a URL, return it unmodified.
     Otherwise, add the image to the MediaFileManager and return the URL.
     (When running in "raw" mode, we won't actually load data into the
-    MediaFileManager, and we'll return an empty URL.)
+    MediaFileManager, and we'll return an empty URL).
     """
     import numpy as np
     from PIL import Image, ImageFile
@@ -302,20 +302,20 @@ def image_to_url(
     # PIL Images
     elif isinstance(image, (ImageFile.ImageFile, Image.Image)):
         format = _validate_image_format_string(image, output_format)
-        image_data = _PIL_to_bytes(image, format)
+        image_data = _pil_to_bytes(image, format)
 
     # BytesIO
     # Note: This doesn't support SVG. We could convert to png (cairosvg.svg2png)
     # or just decode BytesIO to string and handle that way.
     elif isinstance(image, io.BytesIO):
-        image_data = _BytesIO_to_bytes(image)
+        image_data = _bytesio_to_bytes(image)
 
     # Numpy Arrays (ie opencv)
     elif isinstance(image, np.ndarray):
         image = _clip_image(_verify_np_shape(image), clamp)
 
         if channels == "BGR":
-            if len(cast(NumpyShape, image.shape)) == 3:
+            if len(cast("NumpyShape", image.shape)) == 3:
                 image = image[:, :, [2, 1, 0]]
             else:
                 raise StreamlitAPIException(
@@ -344,7 +344,7 @@ def image_to_url(
 
 
 def _4d_to_list_3d(array: npt.NDArray[Any]) -> list[npt.NDArray[Any]]:
-    return [array[i, :, :, :] for i in range(0, array.shape[0])]
+    return [array[i, :, :, :] for i in range(array.shape[0])]
 
 
 def marshall_images(
@@ -359,6 +359,7 @@ def marshall_images(
 ) -> None:
     """Fill an ImageListProto with a list of images and their captions.
     The images will be resized and reformatted as necessary.
+
     Parameters
     ----------
     coordinates
@@ -395,22 +396,24 @@ def marshall_images(
     """
     import numpy as np
 
-    channels = cast(Channels, channels.upper())
+    channels = cast("Channels", channels.upper())
 
     # Turn single image and caption into one element list.
     images: Sequence[AtomicImage]
     if isinstance(image, (list, set, tuple)):
         images = list(image)
-    elif isinstance(image, np.ndarray) and len(cast(NumpyShape, image.shape)) == 4:
+    elif isinstance(image, np.ndarray) and len(cast("NumpyShape", image.shape)) == 4:
         images = _4d_to_list_3d(image)
     else:
-        images = [image]  # type: ignore
+        images = cast("Sequence[AtomicImage]", [image])
 
     if isinstance(caption, list):
         captions: Sequence[str | None] = caption
     elif isinstance(caption, str):
         captions = [caption]
-    elif isinstance(caption, np.ndarray) and len(cast(NumpyShape, caption.shape)) == 1:
+    elif (
+        isinstance(caption, np.ndarray) and len(cast("NumpyShape", caption.shape)) == 1
+    ):
         captions = caption.tolist()
     elif caption is None:
         captions = [None] * len(images)
