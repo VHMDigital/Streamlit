@@ -1241,8 +1241,9 @@ _create_theme_options(
         Sets the root font size (in pixels) for the app.
 
         This determines the overall scale of text and UI elements.
+
+        When unset, the font size will be 16px.
     """,
-    default_val=16,
     type_=int,
 )
 
