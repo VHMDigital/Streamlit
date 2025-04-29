@@ -68,6 +68,7 @@ select = [
   "Q",      # Linting rules for quotes.
   "RUF100", # Unused noqa directive
   "S324",   # Check usage of insecure hashlib functions.
+  "RUF",
   "SLOT",   # Enforces usage of slots.
   "T10",    # Check for debugger statements.
   "T20",    # Check for Print statements in python files.
