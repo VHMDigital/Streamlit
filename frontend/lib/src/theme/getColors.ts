@@ -183,6 +183,7 @@ export function getMarkdownBgColors(theme: EmotionTheme): any {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function getContainerBgColors(theme: EmotionTheme): any {
   const lightTheme = hasLightBackgroundColor(theme)
 

@@ -32,7 +32,7 @@ import Dialog from "~lib/components/elements/Dialog"
 import Expander from "~lib/components/elements/Expander"
 import { useScrollToBottom } from "~lib/hooks/useScrollToBottom"
 import { ScriptRunState } from "~lib/ScriptRunState"
-
+import { getContainerBgColors, EmotionTheme } from "~lib/theme"
 import {
   assignDividerColor,
   BaseBlockProps,
@@ -49,8 +49,6 @@ import {
   StyledVerticalBlockBorderWrapper,
   StyledVerticalBlockBorderWrapperProps,
 } from "./styled-components"
-
-import { getContainerBgColors, EmotionTheme } from "~lib/theme"
 
 export interface BlockPropsWithoutWidth extends BaseBlockProps {
   node: BlockNode
@@ -261,7 +259,7 @@ export interface ScrollToBottomVerticalBlockWrapperProps
 function ScrollToBottomVerticalBlockWrapper(
   props: ScrollToBottomVerticalBlockWrapperProps
 ): ReactElement {
-  const { border, height, children, backgroundColor } = props
+  const { border, height, children } = props
   const scrollContainerRef = useScrollToBottom()
 
   return (
