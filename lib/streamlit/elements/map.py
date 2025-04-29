@@ -95,13 +95,16 @@ class MapMixin:
         scatterplot charts on top of a map, with auto-centering and auto-zoom.
 
         When using this command, a service called Carto_ provides the map tiles to render
-        map content.
+        map content. If you're using advanced PyDeck features you may need to obtain
+        an API key from Carto first. You can do that as
+        ``pydeck.Deck(api_keys={"carto": YOUR_KEY})`` or by setting the CARTO_API_KEY
+        environment variable. See `PyDeck's documentation`_ for more information.
 
         Another common provider for map tiles is Mapbox_. If you prefer to use that,
         you'll need to create an account at https://mapbox.com and specify your Mapbox
         key when creating the ``pydeck.Deck`` object. You can do that as
         ``pydeck.Deck(api_keys={"mapbox": YOUR_KEY})`` or by setting the MAPBOX_API_KEY
-        environment variable. See `PyDeck's documentation`_ for more information.
+        environment variable.
 
         .. _Carto: https://carto.com
         .. _Mapbox: https://mapbox.com
