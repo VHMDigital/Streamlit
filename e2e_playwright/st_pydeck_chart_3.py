@@ -28,7 +28,7 @@ random_scatter_sf = pd.DataFrame(
 )
 
 """
-## Basic light chart
+## Test light style
 
 Should show a _light_ map with random data centered in SF, using hex and scatter plots.
 """
@@ -67,7 +67,7 @@ st.pydeck_chart(
 ""
 
 """
-## Basic dark chart
+## Test dark style
 
 Should show a _dark_ map with random data centered in SF, using hex and scatter plots.
 """

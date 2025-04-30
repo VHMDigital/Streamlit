@@ -20,7 +20,7 @@ import pydeck as pdk
 import streamlit as st
 
 """
-## Chart with invalid property
+## Test invalid property
 
 See [issue #5799.](https://github.com/streamlit/streamlit/issues/5799)
 
@@ -45,9 +45,9 @@ st.pydeck_chart(deck, use_container_width=True)
 ""
 
 """
-## Chart with "road"-style map
+## Test map styles
 
-You should see a colorful map with 3 green hex prisms.
+You should see a colorful "road"-style map with 3 green hex prisms.
 """
 
 H3_HEX_DATA = [

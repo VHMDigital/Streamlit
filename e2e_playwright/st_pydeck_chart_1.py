@@ -21,7 +21,7 @@ import pydeck as pdk
 import streamlit as st
 
 """
-## Empty chart
+## Test empty chart
 """
 
 st.pydeck_chart()
@@ -30,7 +30,7 @@ st.pydeck_chart()
 ""
 
 """
-## Basic chart
+## Test basic chart
 
 Should show a map with default settings and random data centered in SF, using
 hex and scatter plots.

@@ -28,7 +28,7 @@ random_scatter_sf = pd.DataFrame(
 )
 
 """
-## Chart with width and height set
+## Test with width and height set
 
 Should show a "road"-style map with random data centered in SF, and small width and
 height (200x250).
@@ -58,7 +58,7 @@ st.pydeck_chart(
 ""
 
 """
-## Mapbox chart
+## Test with Mapbox provider
 
 You should see a "satellite"-style map served by Mapbox with random data centered in SF.
 This test requires an API key to be set. See MAPBOX_API_KEY in our Github automation.
