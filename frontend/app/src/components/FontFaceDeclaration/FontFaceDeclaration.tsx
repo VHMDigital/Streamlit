@@ -30,6 +30,7 @@ const FontFaceDeclaration = ({
     const {
       family,
       weight,
+      stringWeight,
       url,
       style = "normal",
       unicodeRange = "U+0-10FFFF",
@@ -38,7 +39,7 @@ const FontFaceDeclaration = ({
     return `
       @font-face {
         font-family: ${family};
-        font-weight: ${weight};
+        font-weight: ${stringWeight || weight};
         font-style: ${style};
         font-display: swap;
         unicode-range: ${unicodeRange};

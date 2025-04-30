@@ -181,6 +181,7 @@ message FontFace {
   string url = 1;
   string family = 2;
   int32 weight = 3;
+  string string_weight = 6;
   string style = 4;
   string unicodeRange = 5;
 }
