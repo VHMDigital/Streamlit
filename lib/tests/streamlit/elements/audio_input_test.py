@@ -19,7 +19,7 @@ from unittest.mock import patch
 from parameterized import parameterized
 
 import streamlit as st
-from streamlit.errors import StreamlitAPIException
+from streamlit.errors import StreamlitAPIException, StreamlitInvalidWidthError
 from streamlit.proto.Common_pb2 import FileURLs as FileURLsProto
 from streamlit.proto.LabelVisibilityMessage_pb2 import LabelVisibilityMessage
 from streamlit.runtime.uploaded_file_manager import UploadedFile, UploadedFileRec
@@ -61,6 +61,43 @@ class AudioInputTest(DeltaGeneratorTestCase):
             "Unsupported label_visibility option 'wrong_value'. Valid values are "
             "'visible', 'hidden' or 'collapsed'.",
         )
+
+    def test_width_config_stretch(self):
+        """Test width config with 'stretch' value."""
+        st.audio_input("the label", width="stretch")
+
+        c = self.get_delta_from_queue().new_element.audio_input
+        self.assertEqual(c.width_config.WhichOneof("width_spec"), "use_stretch")
+        self.assertTrue(c.width_config.use_stretch)
+
+    def test_width_config_pixel(self):
+        """Test width config with pixel value."""
+        st.audio_input("the label", width=100)
+
+        c = self.get_delta_from_queue().new_element.audio_input
+        self.assertEqual(c.width_config.WhichOneof("width_spec"), "pixel_width")
+        self.assertEqual(c.width_config.pixel_width, 100)
+
+    def test_width_config_default(self):
+        """Test width config with default value."""
+        st.audio_input("the label")
+
+        c = self.get_delta_from_queue().new_element.audio_input
+        self.assertEqual(c.width_config.WhichOneof("width_spec"), "use_stretch")
+        self.assertTrue(c.width_config.use_stretch)
+
+    @parameterized.expand(
+        [
+            ("invalid_string", "invalid"),
+            ("negative", -1),
+            ("zero", 0),
+            ("float", 100.5),
+        ]
+    )
+    def test_width_config_invalid(self, name, invalid_width):
+        """Test width config with various invalid values."""
+        with self.assertRaises(StreamlitInvalidWidthError):
+            st.audio_input("the label", width=invalid_width)
 
     @patch("streamlit.elements.widgets.audio_input._get_upload_files")
     def test_not_allowed_file_extension_raise_an_exception_for_camera_input(
