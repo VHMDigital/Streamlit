@@ -618,7 +618,7 @@ class LayoutsMixin:
         See examples below.
 
         .. warning::
-            We strongly discourage nesting popovers.
+            We strongly advise against nesting popovers.
 
         Parameters
         ----------
