@@ -18,7 +18,11 @@ import pytest
 from parameterized import parameterized
 
 import streamlit as st
-from streamlit.errors import FragmentHandledException, StreamlitAPIException
+from streamlit.errors import (
+    FragmentHandledException,
+    StreamlitAPIException,
+    StreamlitInvalidContainerBackgroundColorError,
+)
 from streamlit.proto.Block_pb2 import Block as BlockProto
 from tests.delta_generator_test_case import DeltaGeneratorTestCase
 
@@ -307,13 +311,9 @@ class ContainerTest(DeltaGeneratorTestCase):
         self.assertEqual(container_block.add_block.vertical.color, "red")
 
     def test_unknown_color_parameter(self):
-        """Test that container allows passing any string as color parameter."""
-
-        # Random color that is not in the current theme we have in the frontend
-        st.container(color="unknown_color")
-
-        container_block = self.get_delta_from_queue()
-        self.assertEqual(container_block.add_block.vertical.color, "unknown_color")
+        """Test that container raises an error on unknown color."""
+        with self.assertRaises(StreamlitInvalidContainerBackgroundColorError):
+            st.container(background_color="unknown")
 
 
 class PopoverContainerTest(DeltaGeneratorTestCase):
