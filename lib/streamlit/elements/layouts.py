@@ -91,7 +91,8 @@ class LayoutsMixin:
             border is shown if the container is set to a fixed height and not
             shown otherwise.
 
-        background_color: Literal["red", "orange", "yellow", "green", "blue", "violet", "purple", "gray", "primary"] or None
+        background_color: Literal["red", "orange", "yellow", "green", "blue", "violet",
+            "purple", "gray", "primary"] or None
             The background color for the container. If ``None`` (default), the
             container will have the background color from the theme. If set to one
             of the valid string values, the container will have that color as its
@@ -165,7 +166,7 @@ class LayoutsMixin:
             https://doc-container4.streamlit.app/
             height: 400px
 
-        Using ``color`` to set the background color of the container:
+        Using ``background_color`` to set the background color of the container:
 
         >>> import streamlit as st
         >>>
