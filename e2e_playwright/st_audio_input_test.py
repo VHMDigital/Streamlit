@@ -61,7 +61,7 @@ def ensure_waveform_rendered(audio_input: Locator):
 def test_audio_input_renders(app: Page):
     """Test that the audio input component is rendered the correct number of times."""
     audio_input_elements = app.get_by_test_id("stAudioInput")
-    count = 7  # Expected number of audio input elements
+    count = 9  # Expected number of audio input elements
 
     # Verify that the expected number of elements is rendered
     expect(audio_input_elements).to_have_count(count)
