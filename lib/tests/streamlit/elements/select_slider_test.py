@@ -24,8 +24,8 @@ from parameterized import parameterized
 
 import streamlit as st
 from streamlit.errors import StreamlitAPIException, StreamlitInvalidWidthError
+from streamlit.lib.tests.streamlit.elements.layout_test_utils import WidthConfigFields
 from streamlit.proto.LabelVisibilityMessage_pb2 import LabelVisibilityMessage
-from streamlit.proto.WidthConfig_pb2 import WidthConfigFields
 from streamlit.testing.v1.app_test import AppTest
 from streamlit.testing.v1.util import patch_config_options
 from tests.delta_generator_test_case import DeltaGeneratorTestCase
