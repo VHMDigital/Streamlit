@@ -34,14 +34,14 @@ def test_pydeck_chart_has_consistent_visuals(
 
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
-        pydeck_charts.nth(2).locator("canvas").nth(1),
+        pydeck_charts.nth(0).locator("canvas").nth(1),
         name="st_pydeck_chart-invalid_prop",
         pixel_threshold=1.0,
     )
 
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
-        pydeck_charts.nth(3).locator("canvas").nth(1),
+        pydeck_charts.nth(1).locator("canvas").nth(1),
         name="st_pydeck_chart-style",
         pixel_threshold=1.0,
     )
