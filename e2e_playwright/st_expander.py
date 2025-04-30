@@ -79,3 +79,11 @@ expander_emoji_icon = st.expander("Expander with emoji icon!", icon="🎈").writ
 st.expander(
     "-> :material/check: :rainbow[Fancy] _**markdown** `label` _support_"
 ).write("Content")
+
+
+level1 = st.expander("See explanation")
+level1.write("First level expander")
+level1.image("https://static.streamlit.io/examples/dice.jpg")
+
+level2 = level1.expander("Nested expander")
+level2.write("Second level expander")
