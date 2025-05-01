@@ -147,7 +147,7 @@ def _maybe_print_use_warning() -> None:
             )
 
 
-def _maybe_print_fragment_callback_warning(delta_type: str) -> None:
+def _maybe_print_fragment_callback_warning() -> None:
     """Print a warning if elements are being modified during a fragment callback."""
     ctx = get_script_run_ctx()
     if ctx and getattr(ctx, "in_fragment_callback", False):
