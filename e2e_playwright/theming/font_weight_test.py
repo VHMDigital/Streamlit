@@ -78,6 +78,7 @@ def configure_sour_gummy_font():
     yield
     del os.environ["STREAMLIT_THEME_FONT_FACES"]
     del os.environ["STREAMLIT_THEME_FONT"]
+    del os.environ["STREAMLIT_THEME_SIDEBAR_FONT"]
     del os.environ["STREAMLIT_THEME_BASE_FONT_SIZE"]
     del os.environ["STREAMLIT_CLIENT_TOOLBAR_MODE"]
 
