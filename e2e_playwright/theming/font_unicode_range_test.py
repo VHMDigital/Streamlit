@@ -49,7 +49,7 @@ def configure_tagesschrift_font():
                 "unicodeRange": "U+0000-0040",
             },
             {
-                "fanuk": "Chimera",
+                "family": "Chimera",
                 "url": "./app/static/SourGummy-Normal-Variable.ttf",
                 "unicodeRange": "U+0041-10FFFF",
             },
