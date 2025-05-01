@@ -471,7 +471,7 @@ class DeltaGenerator(
         # Warn if an element is being changed but the user isn't running the streamlit server.
         _maybe_print_use_warning()
         # Warn if an element is being changed during a fragment callback.
-        _maybe_print_fragment_callback_warning(delta_type)
+        _maybe_print_fragment_callback_warning()
 
         # Copy the marshalled proto into the overall msg proto
         msg = ForwardMsg_pb2.ForwardMsg()
