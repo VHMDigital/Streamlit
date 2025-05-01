@@ -82,8 +82,7 @@ message Block {
     VerticalAlignment vertical_alignment = 3;
     bool show_border = 4;
 
-    streamlit.GapSize gap_size = 5;
-
+    optional streamlit.GapSize gap_size = 5;
   }
 
   message Expandable {
