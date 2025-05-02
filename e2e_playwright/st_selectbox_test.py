@@ -23,7 +23,7 @@ def test_selectbox_widget_rendering(
 ):
     """Test that the selectbox widgets are correctly rendered via screenshot matching."""
     selectbox_widgets = themed_app.get_by_test_id("stSelectbox")
-    expect(selectbox_widgets).to_have_count(17)
+    expect(selectbox_widgets).to_have_count(19)
 
     assert_snapshot(selectbox_widgets.nth(0), name="st_selectbox-default")
     assert_snapshot(selectbox_widgets.nth(1), name="st_selectbox-formatted_options")
@@ -40,12 +40,14 @@ def test_selectbox_widget_rendering(
     assert_snapshot(selectbox_widgets.nth(10), name="st_selectbox-dataframe_options")
     assert_snapshot(selectbox_widgets.nth(11), name="st_selectbox-value_from_state")
     assert_snapshot(selectbox_widgets.nth(12), name="st_selectbox-markdown_label")
+    assert_snapshot(selectbox_widgets.nth(17), name="st_selectbox-width_200px")
+    assert_snapshot(selectbox_widgets.nth(18), name="st_selectbox-width_stretch")
 
 
 def test_selectbox_has_correct_initial_values(app: Page):
     """Test that st.selectbox returns the correct initial values."""
     markdown_elements = app.get_by_test_id("stMarkdown")
-    expect(markdown_elements).to_have_count(18)
+    expect(markdown_elements).to_have_count(20)
 
     expected = [
         "value 1: male",
@@ -66,6 +68,8 @@ def test_selectbox_has_correct_initial_values(app: Page):
         "value 15 (session_state): male",
         "value 16: female",
         "value 17: None",
+        "value 18: male",
+        "value 19: male",
     ]
 
     for markdown_element, expected_text in zip(markdown_elements.all(), expected):
