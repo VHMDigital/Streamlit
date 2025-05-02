@@ -22,7 +22,7 @@ from e2e_playwright.shared.app_utils import (
     get_element_by_key,
 )
 
-TEXT_INPUT_ELEMENTS = 16
+TEXT_INPUT_ELEMENTS = 18
 
 
 def test_text_input_widget_rendering(
@@ -46,12 +46,14 @@ def test_text_input_widget_rendering(
     assert_snapshot(text_input_widgets.nth(13), name="st_text_input-markdown_label")
     assert_snapshot(text_input_widgets.nth(14), name="st_text_input-emoji_icon")
     assert_snapshot(text_input_widgets.nth(15), name="st_text_input-material_icon")
+    assert_snapshot(text_input_widgets.nth(16), name="st_text_input-width_100px")
+    assert_snapshot(text_input_widgets.nth(17), name="st_text_input-width_stretch")
 
 
 def test_text_input_has_correct_initial_values(app: Page):
     """Test that st.text_input has the correct initial values."""
     markdown_elements = app.get_by_test_id("stMarkdown")
-    # 1 st.write for each text input value (1-13)
+    # 1 st.write for each text input value (1-13, 17-18)
     # + 1 extra st.write for input 9 ("text input changed")
     # + 1 st.write for "Rerun counter"
     expect(markdown_elements).to_have_count(TEXT_INPUT_ELEMENTS - 1)
@@ -72,6 +74,8 @@ def test_text_input_has_correct_initial_values(app: Page):
         "text input 12 (value from state) - value: xyz",
         "text input 13 (value from form) - value:",
         "Rerun counter: 1",
+        "value 17: width 100px",
+        "value 18: width stretch",
     ]
 
     for markdown_element, expected_text in zip(markdown_elements.all(), expected):

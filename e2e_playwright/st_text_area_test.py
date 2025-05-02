@@ -29,7 +29,7 @@ def test_text_area_widget_rendering(
 ):
     """Test that the st.text_area widgets are correctly rendered via screenshot matching."""
     text_area_widgets = themed_app.get_by_test_id("stTextArea")
-    expect(text_area_widgets).to_have_count(15)
+    expect(text_area_widgets).to_have_count(17)
 
     assert_snapshot(text_area_widgets.nth(0), name="st_text_area-default")
     assert_snapshot(text_area_widgets.nth(1), name="st_text_area-value_some_text")
@@ -44,6 +44,8 @@ def test_text_area_widget_rendering(
     assert_snapshot(text_area_widgets.nth(10), name="st_text_area-height_250")
     assert_snapshot(text_area_widgets.nth(11), name="st_text_area-height_75")
     assert_snapshot(text_area_widgets.nth(14), name="st_text_area-markdown_label")
+    assert_snapshot(text_area_widgets.nth(15), name="st_text_area-width_100px")
+    assert_snapshot(text_area_widgets.nth(16), name="st_text_area-width_stretch")
 
 
 def test_help_tooltip_works(app: Page):
@@ -54,7 +56,7 @@ def test_help_tooltip_works(app: Page):
 def test_text_area_has_correct_initial_values(app: Page):
     """Test that st.text_area has the correct initial values."""
     markdown_elements = app.get_by_test_id("stMarkdown")
-    expect(markdown_elements).to_have_count(15)
+    expect(markdown_elements).to_have_count(17)
 
     expected = [
         "value 1: ",
@@ -72,6 +74,8 @@ def test_text_area_has_correct_initial_values(app: Page):
         "value 12: default text",
         "text area 13 (value from state) - value: xyz",
         "text area 14 (value from form) - value: ",
+        "value 16: width 100px",
+        "value 17: width stretch",
     ]
 
     for markdown_element, expected_text in zip(markdown_elements.all(), expected):
