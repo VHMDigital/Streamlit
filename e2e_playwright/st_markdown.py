@@ -171,7 +171,8 @@ with st.container(key="latex_elements"):
 
     st.latex(
         "this is a very long formula this is a very long formula this is a very long "
-        "formula this is a very long formula this is a very long formula"
+        "formula this is a very long formula this is a very long formula",
+        help="foo",
     )
 
     try:
@@ -197,12 +198,6 @@ with st.container(key="badge_elements"):
     )
     st.markdown(
         ":blue-badge[Blue markdown badge] :green-badge[🌱 Green markdown badge]"
-    )
-
-    st.latex(
-        "this is a very long formula this is a very long formula this is a very long "
-        "formula this is a very long formula this is a very long formula",
-        help="foo",
     )
 
 
