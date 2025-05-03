@@ -58,6 +58,8 @@ def enforce_filename_restriction(filename: str, allowed_types: Sequence[str]) ->
     types set by the app developer. In theory, this should never happen, since we
     enforce file type check by extension on the frontend, but we check it on backend
     before returning file to the user to protect ourselves.
+
+    NOTE: allowed_types should be a list of lowercase strings.
     """
     normalized_filename = filename.lower()
     base_name, extension = os.path.splitext(normalized_filename)
