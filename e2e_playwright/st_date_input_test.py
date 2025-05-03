@@ -60,7 +60,7 @@ def test_help_tooltip_works(app: Page):
 def test_date_input_has_correct_initial_values(app: Page):
     """Test that st.date_input has the correct initial values."""
     markdown_elements = app.get_by_test_id("stMarkdown")
-    expect(markdown_elements).to_have_count(17)
+    expect(markdown_elements).to_have_count(15)
 
     expected = [
         "Value 1: 1970-01-01",
@@ -78,8 +78,6 @@ def test_date_input_has_correct_initial_values(app: Page):
         "Date Input Changed: False",
         "Value 13: None",
         "Value 14: 1970-02-03",
-        "Value 16: 1970-01-01",
-        "Value 17: 1970-01-01",
     ]
 
     for markdown_element, expected_text in zip(markdown_elements.all(), expected):

@@ -50,7 +50,7 @@ def test_help_tooltip_works(app: Page):
 def test_time_input_has_correct_initial_values(app: Page):
     """Test that st.time_input returns the correct initial values."""
     markdown_elements = app.get_by_test_id("stMarkdown")
-    expect(markdown_elements).to_have_count(12)
+    expect(markdown_elements).to_have_count(10)
 
     expected = [
         "Value 1: 08:45:00",
@@ -63,8 +63,6 @@ def test_time_input_has_correct_initial_values(app: Page):
         "Value 7: 08:45:00",
         "Value 8: None",
         "Value 9: 08:50:00",
-        "Value 11: 08:45:00",
-        "Value 12: 08:45:00",
     ]
     for markdown_element, expected_text in zip(markdown_elements.all(), expected):
         expect(markdown_element).to_have_text(expected_text, use_inner_text=True)

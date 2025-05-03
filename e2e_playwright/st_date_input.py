@@ -107,9 +107,5 @@ st.date_input(
     date(1970, 1, 1),
 )
 
-# Add width configuration examples
 st.date_input("Date input 16 (width=200px)", date(1970, 1, 1), width=200)
-st.write("Value 16:", date(1970, 1, 1))
-
 st.date_input("Date input 17 (width='stretch')", date(1970, 1, 1), width="stretch")
-st.write("Value 17:", date(1970, 1, 1))
