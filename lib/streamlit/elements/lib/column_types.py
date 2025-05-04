@@ -60,6 +60,7 @@ ColumnType: TypeAlias = Literal[
     "image",
     "progress",
     "json",
+    "file",
 ]
 
 
@@ -157,6 +158,10 @@ class JsonColumnConfig(TypedDict):
     type: Literal["json"]
 
 
+class FileColumnConfig(TypedDict):
+    type: Literal["file"]
+
+
 class ColumnConfig(TypedDict, total=False):
     """Configuration options for columns in ``st.dataframe`` and ``st.data_editor``.
 
@@ -240,6 +245,7 @@ class ColumnConfig(TypedDict, total=False):
         | AreaChartColumnConfig
         | ImageColumnConfig
         | JsonColumnConfig
+        | FileColumnConfig
         | None
     )
 
@@ -2155,4 +2161,98 @@ def JsonColumn(
         help=help,
         pinned=pinned,
         type_config=JsonColumnConfig(type="json"),
+    )
+
+
+@gather_metrics("column_config.FileColumn")
+def FileColumn(
+    label: str | None = None,
+    *,
+    width: ColumnWidth | None = None,
+    help: str | None = None,
+    pinned: bool | None = None,
+) -> ColumnConfig:
+    """Configure a file column in ``st.dataframe`` or ``st.data_editor``.
+
+    Cells need to contain a dictionary with the following keys:
+    - ``contentType``: The content type of the file (e.g., "image/png")
+    - ``modality``: The modality of the file (e.g., "image")
+    - ``url``: The URL to the file
+    - ``fileName``: The name of the file
+
+    For image files, a thumbnail will be displayed. For other file types, a generic
+    file icon will be shown. This command needs to be used in the ``column_config``
+    parameter of ``st.dataframe`` or ``st.data_editor``.
+
+    Parameters
+    ----------
+    label: str or None
+        The label shown at the top of the column. If this is ``None``
+        (default), the column name is used.
+
+    width: "small", "medium", "large", or None
+        The display width of the column. If this is ``None`` (default), the
+        column will be sized to fit the cell contents. Otherwise, this can be
+        one of the following:
+
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
+
+    help: str or None
+        A tooltip that gets displayed when hovering over the column label. If
+        this is ``None`` (default), no tooltip is displayed.
+
+        The tooltip can optionally contain GitHub-flavored Markdown, including
+        the Markdown directives described in the ``body`` parameter of
+        ``st.markdown``.
+
+    pinned: bool or None
+        Whether the column is pinned. A pinned column will stay visible on the
+        left side no matter where the user scrolls. If this is ``None``
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import streamlit as st
+    >>>
+    >>> data_df = pd.DataFrame(
+    >>>     {
+    >>>         "files": [
+    >>>             {
+    >>>                 "contentType": "image/png",
+    >>>                 "modality": "image",
+    >>>                 "url": "https://example.com/image.png",
+    >>>                 "fileName": "image.png"
+    >>>             },
+    >>>             {
+    >>>                 "contentType": "application/pdf",
+    >>>                 "modality": "document",
+    >>>                 "url": "https://example.com/document.pdf",
+    >>>                 "fileName": "document.pdf"
+    >>>             },
+    >>>         ],
+    >>>     }
+    >>> )
+    >>>
+    >>> st.dataframe(
+    >>>     data_df,
+    >>>     column_config={
+    >>>         "files": st.column_config.FileColumn(
+    >>>             "File Data",
+    >>>             help="Files with thumbnails for images",
+    >>>             width="medium",
+    >>>         ),
+    >>>     },
+    >>>     hide_index=True,
+    >>> )
+    """
+    return ColumnConfig(
+        label=label,
+        width=width,
+        help=help,
+        pinned=pinned,
+        type_config=FileColumnConfig(type="file"),
     )

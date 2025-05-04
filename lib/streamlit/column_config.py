@@ -33,6 +33,7 @@ __all__ = [
     "DateColumn",
     "TimeColumn",
     "JsonColumn",
+    "FileColumn",
 ]
 
 
@@ -43,6 +44,7 @@ from streamlit.elements.lib.column_types import (
     Column,
     DateColumn,
     DatetimeColumn,
+    FileColumn,
     ImageColumn,
     JsonColumn,
     LineChartColumn,

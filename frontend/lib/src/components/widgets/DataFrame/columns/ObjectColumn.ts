@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { GridCell, GridCellKind, TextCell } from "@glideapps/glide-data-grid"
+import {
+  GridCell,
+  GridCellKind,
+  ImageCell,
+  TextCell,
+} from "@glideapps/glide-data-grid"
 
 import { isNullOrUndefined, notNullOrUndefined } from "~lib/util/utils"
 
@@ -22,6 +27,7 @@ import {
   BaseColumn,
   BaseColumnProps,
   getErrorCell,
+  isMaybeFile,
   removeLineBreaks,
   toSafeString,
 } from "./utils"
@@ -54,6 +60,33 @@ function ObjectColumn(props: BaseColumnProps): BaseColumn {
         const displayData = notNullOrUndefined(cellData)
           ? removeLineBreaks(cellData) // Remove line breaks to show all content in the cell
           : ""
+
+        if (notNullOrUndefined(cellData) && isMaybeFile(cellData)) {
+          const parseData = JSON.parse(cellData)
+          // The native image cell implementation in glide-data-grid expects an array
+          // of image URLs. For our usecase, we only support single images. We
+          // need to wrap the image URL in an array to have it compatible with the
+          // implementation in glide-data-grid.
+          const imageUrls =
+            notNullOrUndefined(parseData.presigned_url) &&
+            notNullOrUndefined(parseData.modality) &&
+            parseData.modality === "image"
+              ? [toSafeString(parseData.presigned_url)]
+              : [
+                  "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/description/default/24px.svg",
+                ]
+
+          return {
+            kind: GridCellKind.Image,
+            readonly: true,
+            allowOverlay: true,
+            contentAlign: props.contentAlignment || "center",
+            style: "normal",
+            data: imageUrls,
+            isMissingValue: false,
+            displayData: imageUrls,
+          } as ImageCell
+        }
         return {
           ...cellTemplate,
           data: cellData,
