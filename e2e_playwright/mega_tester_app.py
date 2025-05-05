@@ -27,7 +27,7 @@ import pydeck as pdk
 import streamlit as st
 
 TEST_ASSETS_DIR = Path(__file__).parent / "test_assets"
-MP4_VIDEO_PATH = TEST_ASSETS_DIR / "sintel-short.mp4"
+MP4_VIDEO_PATH = TEST_ASSETS_DIR / "flower.webm"
 CAT_AUDIO_PATH = TEST_ASSETS_DIR / "cat-purr.mp3"
 STREAMLIT_LOGO_PATH = TEST_ASSETS_DIR / "streamlit-logo.png"
 STREAMLIT_LOGO_SMALL_PATH = TEST_ASSETS_DIR / "streamlit-logo-small.png"
