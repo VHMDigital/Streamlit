@@ -32,7 +32,8 @@ def is_expected_error(msg: ConsoleMessage, browser_name: str):
     ):
         return True
 
-    # There is an expected error with pydeck and firefox related to WebGL rendering:
+    # There is an expected error with pydeck and firefox related to WebGL rendering
+    # This seems to be an issue with firefox used with playwright:
     if msg.text == "deck: o is null undefined" and browser_name == "firefox":
         return True
 
