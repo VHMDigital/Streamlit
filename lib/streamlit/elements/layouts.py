@@ -530,12 +530,13 @@ class LayoutsMixin:
 
         validate_width(width)
         block_proto.width_config.CopyFrom(get_width_config(width))
-        tab_container = self.dg._block(block_proto)
 
-        default_index = tabs.index(default) if default else 0
+        default_index = tabs.index(default) if default else 1
         block_proto.tab_container.default_tab_index = default_index
 
-        return tuple(tab_container._block(tab_proto(tab_label)) for tab_label in tabs)
+        tab_container = self.dg._block(block_proto)
+
+        return tuple(tab_container._block(tab_proto(tab)) for tab in tabs)
 
     @gather_metrics("expander")
     def expander(
