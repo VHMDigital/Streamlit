@@ -407,11 +407,12 @@ connect-src ws://localhost:{app_port}/_stcore/stream
     data: blob:;
 style-src 'unsafe-inline'
     https://api.mapbox.com/mapbox-gl-js/
-    {app_url}/static/css/;
-script-src 'unsafe-inline' 'wasm-unsafe-eval'
+    {app_url}/static/css/
+    blob:;
+script-src 'unsafe-inline' 'wasm-unsafe-eval' blob:
     https://api.mapbox.com/mapbox-gl-js/
     {app_url}/static/js/;
-font-src {app_url}/static/fonts/ {app_url}/static/media/ https: data:;
+font-src {app_url}/static/fonts/ {app_url}/static/media/ https: data: blob:;
 """.replace("\n", " ").strip()
 
     def _open_app(iframe_element_attrs: IframedPageAttrs | None = None) -> FrameLocator:
