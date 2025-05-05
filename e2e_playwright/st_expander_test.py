@@ -28,7 +28,7 @@ def test_expander_displays_correctly(
     expect(expander_elements).to_have_count(11)
 
     for expander in expander_elements.all():
-        expect(expander.locator(EXPANDER_HEADER_IDENTIFIER)).to_be_visible()
+        expect(expander.locator(EXPANDER_HEADER_IDENTIFIER).first).to_be_visible()
 
     assert_snapshot(expander_elements.nth(0), name="st_expander-sidebar_collapsed")
     assert_snapshot(expander_elements.nth(1), name="st_expander-normal_expanded")
@@ -46,7 +46,7 @@ def test_expander_collapses_and_expands(app: Page):
     """Test that an expander collapses and expands."""
     main_container = app.get_by_test_id("stMain")
     main_expanders = main_container.get_by_test_id("stExpander")
-    expect(main_expanders).to_have_count(8)
+    expect(main_expanders).to_have_count(10)
 
     expanders = main_expanders.all()
     # Starts expanded
