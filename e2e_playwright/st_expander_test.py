@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Final
+
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_run
@@ -19,13 +21,15 @@ from e2e_playwright.shared.app_utils import check_top_level_class, get_expander
 
 EXPANDER_HEADER_IDENTIFIER = "summary"
 
+NUMBER_OF_EXPANDERS: Final = 11
+
 
 def test_expander_displays_correctly(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
     """Test that all expanders are displayed correctly via screenshot testing."""
     expander_elements = themed_app.get_by_test_id("stExpander")
-    expect(expander_elements).to_have_count(11)
+    expect(expander_elements).to_have_count(NUMBER_OF_EXPANDERS)
 
     for expander in expander_elements.all():
         expect(expander.locator(EXPANDER_HEADER_IDENTIFIER).first).to_be_visible()
@@ -46,7 +50,9 @@ def test_expander_collapses_and_expands(app: Page):
     """Test that an expander collapses and expands."""
     main_container = app.get_by_test_id("stMain")
     main_expanders = main_container.get_by_test_id("stExpander")
-    expect(main_expanders).to_have_count(10)
+    expect(main_expanders).to_have_count(
+        NUMBER_OF_EXPANDERS - 1
+    )  # -1 to substract sidebar
 
     expanders = main_expanders.all()
     # Starts expanded
@@ -77,7 +83,7 @@ def test_expander_session_state_set(app: Page):
     """Test that session state updates are propagated to expander content."""
     main_container = app.get_by_test_id("stMain")
     main_expanders = main_container.get_by_test_id("stExpander")
-    expect(main_expanders).to_have_count(8)
+    expect(main_expanders).to_have_count(NUMBER_OF_EXPANDERS - 1)
 
     # Show the Number Input
     num_input = main_expanders.nth(2).get_by_test_id("stNumberInput").locator("input")
