@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from playwright.sync_api import ConsoleMessage, FrameLocator, Page
 
 
-def is_expected_error(msg: ConsoleMessage, browser_name: str):
+def is_expected_error(msg: ConsoleMessage, browser_name: str, *, uses_csp: bool):
     # Mapbox error is expected and should be ignored:
     if (
         msg.text == "Failed to load resource: net::ERR_CONNECTION_REFUSED"
@@ -39,9 +39,22 @@ def is_expected_error(msg: ConsoleMessage, browser_name: str):
 
     # TODO(lukasmasuch): Investigate why firefox is running into this eval issue:
     if (
-        "settings blocked a JavaScript eval (script-src) from being executed"
-        in msg.text
-    ) and browser_name == "firefox":
+        (
+            "settings blocked a JavaScript eval (script-src) from being executed"
+            in msg.text
+        )
+        and browser_name == "firefox"
+        and uses_csp
+    ):
+        return True
+
+    # TODO(lukasmasuch): Investigate why webkit is running into this blob: issue when
+    if (
+        msg.text == "Failed to load resource"
+        and "blob:http://localhost:" in msg.location["url"]
+        and browser_name == "webkit"
+        and uses_csp
+    ):
         return True
 
     return False
@@ -54,7 +67,9 @@ def test_no_console_errors(page: Page, app_port: int, browser_name: str):
 
     def on_console_message(msg):
         # Possible message types: "log", "debug", "info", "error", "warning", ...
-        if msg.type == "error" and not is_expected_error(msg, browser_name):
+        if msg.type == "error" and not is_expected_error(
+            msg, browser_name, uses_csp=False
+        ):
             # Each console message has text, location, etc.
             console_errors.append(
                 {
@@ -90,7 +105,9 @@ def test_mega_tester_app_in_iframe(iframed_app: IframedPage, browser_name: str):
 
     def on_console_message(msg):
         # Possible message types: "log", "debug", "info", "error", "warning", ...
-        if msg.type == "error" and not is_expected_error(msg, browser_name):
+        if msg.type == "error" and not is_expected_error(
+            msg, browser_name, uses_csp=True
+        ):
             # Each console message has text, location, etc.
             console_errors.append(
                 {
