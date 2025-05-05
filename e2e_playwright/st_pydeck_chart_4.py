@@ -23,7 +23,7 @@ import streamlit as st
 np.random.seed(12345)
 
 random_scatter_sf = pd.DataFrame(
-    cast("Any", np.random.randn(1000, 2) / [50, 50]) + [37.76, -122.4],
+    cast("Any", np.random.randn(1000, 2) / [50, 50]) + [37.76, -122.4],  # noqa: RUF005
     columns=["lat", "lon"],
 )
 
