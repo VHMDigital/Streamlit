@@ -20,7 +20,7 @@ import { screen } from "@testing-library/react"
 
 import { Block as BlockProto } from "@streamlit/protobuf"
 
-import { render } from "~lib/test_util"
+import { customRenderLibContext } from "~lib/test_util"
 import { BlockNode } from "~lib/AppNode"
 import { ScriptRunState } from "~lib/ScriptRunState"
 
@@ -83,7 +83,7 @@ describe("Vertical Block Component", () => {
   window.ResizeObserver = ResizeObserver
   it("should render a horizontal block with empty columns", () => {
     const block: BlockNode = makeVerticalBlock([makeHorizontalBlock(4)])
-    render(makeVerticalBlockComponent(block))
+    customRenderLibContext(makeVerticalBlockComponent(block))
 
     expect(screen.getAllByTestId("stColumn")).toHaveLength(4)
     expect(
@@ -95,7 +95,7 @@ describe("Vertical Block Component", () => {
     const block: BlockNode = makeVerticalBlock([], {
       id: "$$ID-899e9b72e1539f21f8e82565d36609d0-first container",
     })
-    render(makeVerticalBlockComponent(block))
+    customRenderLibContext(makeVerticalBlockComponent(block))
 
     expect(screen.getByTestId("stVerticalBlock")).toBeVisible()
     expect(screen.getByTestId("stVerticalBlock")).toHaveClass(
@@ -108,7 +108,7 @@ describe("Vertical Block Component", () => {
       vertical: { height: 100 },
     })
 
-    render(makeVerticalBlockComponent(block))
+    customRenderLibContext(makeVerticalBlockComponent(block))
 
     expect(
       screen.getAllByTestId("stVerticalBlockBorderWrapper")[0]
@@ -120,7 +120,7 @@ describe("Vertical Block Component", () => {
       vertical: { border: true },
     })
 
-    render(makeVerticalBlockComponent(block))
+    customRenderLibContext(makeVerticalBlockComponent(block))
 
     expect(
       screen.getAllByTestId("stVerticalBlockBorderWrapper")[0]
