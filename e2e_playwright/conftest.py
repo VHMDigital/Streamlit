@@ -291,7 +291,7 @@ def app(page: Page, app_port: int) -> Page:
 
     if response is None:
         raise RuntimeError("Unable to load page")
-    elif response.status != 200:
+    if response.status != 200:
         print(f"Unsuccessful in loading page. Status: {response.status}", flush=True)
         if response.status == 404:
             print(
@@ -299,8 +299,7 @@ def app(page: Page, app_port: int) -> Page:
                 flush=True,
             )
         raise RuntimeError("Unable to load page")
-    else:
-        print("Successfully loaded page", flush=True)
+    print("Successfully loaded page", flush=True)
 
     start_capture_traces(page)
     wait_for_app_loaded(page)
@@ -399,6 +398,11 @@ connect-src ws://localhost:{app_port}/_stcore/stream
     https://api.mapbox.com/models/v1/mapbox/
     https://api.mapbox.com/map-sessions/v1
     https://data.streamlit.io/tokens.json
+    https://basemaps.cartocdn.com
+    https://tiles.basemaps.cartocdn.com
+    https://tiles-b.basemaps.cartocdn.com
+    https://tiles-c.basemaps.cartocdn.com
+    https://tiles-d.basemaps.cartocdn.com
     data: blob:;
 style-src 'unsafe-inline'
     https://api.mapbox.com/mapbox-gl-js/
@@ -406,7 +410,7 @@ style-src 'unsafe-inline'
 script-src 'unsafe-inline' 'wasm-unsafe-eval'
     https://api.mapbox.com/mapbox-gl-js/
     {app_url}/static/js/;
-font-src {app_url}/static/fonts/ {app_url}/static/media/ data:;
+font-src {app_url}/static/fonts/ {app_url}/static/media/ https: data:;
 """.replace("\n", " ").strip()
 
     def _open_app(iframe_element_attrs: IframedPageAttrs | None = None) -> FrameLocator:
