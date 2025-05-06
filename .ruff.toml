@@ -35,6 +35,7 @@ line-ending = "lf"
 [lint]
 select = [
   "A",     # Check for python builtins being shadowed.
+  "ANN",   #
   "ARG",   # Checks for unused arguments.
   "ASYNC", # Opinionated linting for asyncio.
   "B",     # flake8-bugbear
@@ -120,6 +121,10 @@ ignore = [
   "S101",    # Checks for usage of assert statements.
   "TRY003",  # Checks for exception messages that are not defined in the exception class itself.
   "TRY300",  # Checks for return statements in try blocks.
+  "ANN401",  #
+  "ANN003",  #
+  "ANN002",  #
+  "ANN001",  #
 ]
 exclude = [
   # pympler is a vendored dependency that doesn't conform to our linting rules:
@@ -130,7 +135,18 @@ exclude = [
 "e2e_playwright/**" = ["T20", "B018", "PD", "PERF", "N999", "S", "TRY"]
 "lib/streamlit/__init__.py" = ["E402", "PLC0414", "A001"]
 "lib/setup.py" = ["INP"]
-"lib/tests/**" = ["PD", "D", "INP", "PERF", "N", "ARG", "S", "TRY", "E501"]
+"lib/tests/**" = [
+  "PD",
+  "D",
+  "INP",
+  "PERF",
+  "N",
+  "ARG",
+  "S",
+  "TRY",
+  "E501",
+  "ANN",
+]
 "scripts/**" = ["T20", "INP", "PERF", "S", "TRY002"]
 
 [lint.flake8-tidy-imports]
@@ -155,3 +171,10 @@ allow-dict-calls-with-keyword-arguments = true
 [lint.flake8-unused-arguments]
 # Ignore unused variadic argument, like *args and **kwargs.
 ignore-variadic-names = true
+
+[lint.flake8-annotations]
+# Surpresses errors for *args and **kwargs parameters:
+allow-star-arg-any = true
+# Surpresses errors for fully untyped functions:
+ignore-fully-untyped = true
+suppress-none-returning = true

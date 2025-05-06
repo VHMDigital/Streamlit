@@ -291,7 +291,7 @@ def app(page: Page, app_port: int) -> Page:
 
     if response is None:
         raise RuntimeError("Unable to load page")
-    elif response.status != 200:
+    if response.status != 200:
         print(f"Unsuccessful in loading page. Status: {response.status}", flush=True)
         if response.status == 404:
             print(
@@ -299,8 +299,7 @@ def app(page: Page, app_port: int) -> Page:
                 flush=True,
             )
         raise RuntimeError("Unable to load page")
-    else:
-        print("Successfully loaded page", flush=True)
+    print("Successfully loaded page", flush=True)
 
     start_capture_traces(page)
     wait_for_app_loaded(page)
@@ -499,7 +498,7 @@ def iframed_app(page: Page, app_port: int) -> IframedPage:
 @pytest.fixture(scope="session")
 def browser_type_launch_args(
     browser_type_launch_args: dict[str, Any], browser_name: str
-):
+) -> dict[str, Any]:
     """Fixture that adds the fake device and ui args to the browser type launch args."""
     # The browser context fixture in pytest-playwright is defined in session scope, and
     # depends on the browser_type_launch_args fixture. This means that we can't

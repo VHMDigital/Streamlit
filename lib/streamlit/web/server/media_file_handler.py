@@ -112,7 +112,7 @@ class MediaFileHandler(tornado.web.StaticFileHandler):
         return path
 
     @classmethod
-    def get_content(
+    def get_content(  # noqa: ANN206
         cls, abspath: str, start: int | None = None, end: int | None = None
     ):
         _LOGGER.debug("MediaFileHandler: GET %s", abspath)

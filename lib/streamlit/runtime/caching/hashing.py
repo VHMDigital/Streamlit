@@ -188,7 +188,7 @@ class _HashStack:
     def pop(self):
         self._stack.popitem()
 
-    def __contains__(self, val: Any):
+    def __contains__(self, val: Any) -> bool:
         return id(val) in self._stack
 
     def pretty_print(self) -> str:

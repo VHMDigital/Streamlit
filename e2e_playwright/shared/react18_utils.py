@@ -85,7 +85,7 @@ def take_stable_snapshot(
     assert_snapshot,
     name: str,
     pixel_threshold: float = 0.05,
-):
+) -> None:
     """
     Take a stable snapshot after waiting for React rendering to complete.
 
@@ -103,4 +103,4 @@ def take_stable_snapshot(
         Threshold for pixel differences
     """
     wait_for_react_stability(page)
-    return assert_snapshot(locator, name=name, pixel_threshold=pixel_threshold)
+    assert_snapshot(locator, name=name, pixel_threshold=pixel_threshold)

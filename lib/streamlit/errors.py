@@ -15,9 +15,12 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from streamlit import util
+
+if TYPE_CHECKING:
+    from datetime import date, time
 
 
 class Error(Exception):
@@ -328,7 +331,11 @@ class StreamlitMixedNumericTypesError(LocalizableStreamlitException):
 class StreamlitValueBelowMinError(LocalizableStreamlitException):
     """Exception raised when the `min_value` is greater than the `value`."""
 
-    def __init__(self, value: int | float, min_value: int | float):
+    def __init__(
+        self,
+        value: int | float | date | time,
+        min_value: int | float | date | time,
+    ):
         super().__init__(
             "The `value` {value} is less than the `min_value` {min_value}.",
             value=value,
@@ -339,7 +346,11 @@ class StreamlitValueBelowMinError(LocalizableStreamlitException):
 class StreamlitValueAboveMaxError(LocalizableStreamlitException):
     """Exception raised when the `max_value` is less than the `value`."""
 
-    def __init__(self, value: int | float, max_value: int | float):
+    def __init__(
+        self,
+        value: int | float | date | time,
+        max_value: int | float | date | time,
+    ):
         super().__init__(
             "The `value` {value} is greater than the `max_value` {max_value}.",
             value=value,

@@ -29,7 +29,7 @@ from typing import (
     overload,
 )
 
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 from streamlit import dataframe_util, util
 from streamlit.elements.heading import HeadingProtoTag
@@ -190,7 +190,7 @@ class Widget(Element, ABC):
         self.key = user_key_from_element_id(self.id)
         self._value = None
 
-    def set_value(self, v: Any):
+    def set_value(self, v: Any) -> Self:
         """Set the value of the widget."""
         self._value = v
         return self
@@ -223,8 +223,7 @@ class ElementList(Generic[El_co]):
     def __getitem__(self, idx: int | slice) -> El_co | ElementList[El_co]:
         if isinstance(idx, slice):
             return ElementList(self._list[idx])
-        else:
-            return self._list[idx]
+        return self._list[idx]
 
     def __iter__(self):
         yield from self._list
@@ -235,8 +234,7 @@ class ElementList(Generic[El_co]):
     def __eq__(self, other: ElementList[El_co] | object) -> bool:
         if isinstance(other, ElementList):
             return self._list == other._list
-        else:
-            return self._list == other
+        return self._list == other
 
     @property
     def values(self) -> Sequence[Any]:
@@ -326,10 +324,9 @@ class Button(Widget):
         """The value of the button. (bool)"""  # noqa: D400
         if self._value:
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            return cast("bool", state[TESTING_KEY][self.id])
+        state = self.root.session_state
+        assert state
+        return cast("bool", state[TESTING_KEY][self.id])
 
     def set_value(self, v: bool) -> Button:
         """Set the value of the button."""
@@ -371,10 +368,9 @@ class ChatInput(Widget):
         """The value of the widget. (str)"""  # noqa: D400
         if self._value:
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            return state[TESTING_KEY][self.id]  # type: ignore
+        state = self.root.session_state
+        assert state
+        return state[TESTING_KEY][self.id]  # type: ignore
 
 
 @dataclass(repr=False)
@@ -404,10 +400,9 @@ class Checkbox(Widget):
         """The value of the widget. (bool)"""  # noqa: D400
         if self._value is not None:
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            return cast("bool", state[self.id])
+        state = self.root.session_state
+        assert state
+        return cast("bool", state[self.id])
 
     def set_value(self, v: bool) -> Checkbox:
         """Set the value of the widget."""
@@ -465,10 +460,9 @@ class ColorPicker(Widget):
         """The currently selected value as a hex string. (str)"""  # noqa: D400
         if self._value is not None:
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            return cast("str", state[self.id])
+        state = self.root.session_state
+        assert state
+        return cast("str", state[self.id])
 
     @property
     def _widget_state(self) -> WidgetState:
@@ -552,10 +546,9 @@ class DateInput(Widget):
         if not isinstance(self._value, InitialValue):
             parsed, _ = _parse_date_value(self._value)
             return tuple(parsed) if parsed is not None else None  # type: ignore
-        else:
-            state = self.root.session_state
-            assert state
-            return state[self.id]  # type: ignore
+        state = self.root.session_state
+        assert state
+        return state[self.id]  # type: ignore
 
 
 @dataclass(repr=False)
@@ -724,10 +717,9 @@ class ButtonGroup(Widget, Generic[T]):
         """The currently selected values from the options. (list)"""  # noqa: D400
         if self._value is not None:
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            return cast("list[T]", state[self.id])
+        state = self.root.session_state
+        assert state
+        return cast("list[T]", state[self.id])
 
     @property
     def indices(self) -> Sequence[int]:
@@ -755,11 +747,10 @@ class ButtonGroup(Widget, Generic[T]):
         current = self.value
         if v in current:
             return self
-        else:
-            new = current.copy()
-            new.append(v)
-            self.set_value(new)
-            return self
+        new = current.copy()
+        new.append(v)
+        self.set_value(new)
+        return self
 
     def unselect(self, v: T) -> ButtonGroup[T]:
         """
@@ -770,12 +761,11 @@ class ButtonGroup(Widget, Generic[T]):
         current = self.value
         if v not in current:
             return self
-        else:
-            new = current.copy()
-            while v in new:
-                new.remove(v)
-            self.set_value(new)
-            return self
+        new = current.copy()
+        while v in new:
+            new.remove(v)
+        self.set_value(new)
+        return self
 
 
 @dataclass(repr=False)
@@ -812,10 +802,9 @@ class Multiselect(Widget, Generic[T]):
         """The currently selected values from the options. (list)"""  # noqa: D400
         if self._value is not None:
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            return cast("list[T]", state[self.id])
+        state = self.root.session_state
+        assert state
+        return cast("list[T]", state[self.id])
 
     @property
     def indices(self) -> Sequence[int]:
@@ -848,11 +837,10 @@ class Multiselect(Widget, Generic[T]):
         current = self.value
         if v in current:
             return self
-        else:
-            new = current.copy()
-            new.append(v)
-            self.set_value(new)
-            return self
+        new = current.copy()
+        new.append(v)
+        self.set_value(new)
+        return self
 
     def unselect(self, v: T) -> Multiselect[T]:
         """
@@ -863,12 +851,11 @@ class Multiselect(Widget, Generic[T]):
         current = self.value
         if v not in current:
             return self
-        else:
-            new = current.copy()
-            while v in new:
-                new.remove(v)
-            self.set_value(new)
-            return self
+        new = current.copy()
+        while v in new:
+            new.remove(v)
+        self.set_value(new)
+        return self
 
 
 Number = Union[int, float]
@@ -912,12 +899,11 @@ class NumberInput(Widget):
         """Get the current value of the ``st.number_input`` widget."""
         if not isinstance(self._value, InitialValue):
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
+        state = self.root.session_state
+        assert state
 
-            # Awkward to do this with `cast`
-            return state[self.id]  # type: ignore
+        # Awkward to do this with `cast`
+        return state[self.id]  # type: ignore
 
     def increment(self) -> NumberInput:
         """Increment the ``st.number_input`` widget as if the user clicked "+"."""
@@ -967,10 +953,9 @@ class Radio(Widget, Generic[T]):
         """The currently selected value from the options. (Any)"""  # noqa: D400
         if not isinstance(self._value, InitialValue):
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            return cast("T", state[self.id])
+        state = self.root.session_state
+        assert state
+        return cast("T", state[self.id])
 
     @property
     def format_func(self) -> Callable[[Any], Any]:
@@ -1029,10 +1014,9 @@ class Selectbox(Widget, Generic[T]):
         """The currently selected value from the options. (Any)"""  # noqa: D400
         if not isinstance(self._value, InitialValue):
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            return cast("T", state[self.id])
+        state = self.root.session_state
+        assert state
+        return cast("T", state[self.id])
 
     @property
     def format_func(self) -> Callable[[Any], Any]:
@@ -1112,11 +1096,10 @@ class SelectSlider(Widget, Generic[T]):
         """The currently selected value or range. (Any or Sequence of Any)"""  # noqa: D400
         if self._value is not None:
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            # Awkward to do this with `cast`
-            return state[self.id]  # type: ignore
+        state = self.root.session_state
+        assert state
+        # Awkward to do this with `cast`
+        return state[self.id]  # type: ignore
 
     @property
     def format_func(self) -> Callable[[Any], Any]:
@@ -1171,11 +1154,10 @@ class Slider(Widget, Generic[SliderValueT]):
         """The currently selected value or range. (Any or Sequence of Any)"""  # noqa: D400
         if self._value is not None:
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            # Awkward to do this with `cast`
-            return state[self.id]  # type: ignore
+        state = self.root.session_state
+        assert state
+        # Awkward to do this with `cast`
+        return state[self.id]  # type: ignore
 
     def set_range(
         self, lower: SliderValueT, upper: SliderValueT
@@ -1252,11 +1234,10 @@ class TextArea(Widget):
         """The current value of the widget. (str)"""  # noqa: D400
         if not isinstance(self._value, InitialValue):
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            # Awkward to do this with `cast`
-            return state[self.id]  # type: ignore
+        state = self.root.session_state
+        assert state
+        # Awkward to do this with `cast`
+        return state[self.id]  # type: ignore
 
     def input(self, v: str) -> TextArea:
         """
@@ -1305,11 +1286,10 @@ class TextInput(Widget):
         """The current value of the widget. (str)"""  # noqa: D400
         if not isinstance(self._value, InitialValue):
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            # Awkward to do this with `cast`
-            return state[self.id]  # type: ignore
+        state = self.root.session_state
+        assert state
+        # Awkward to do this with `cast`
+        return state[self.id]  # type: ignore
 
     def input(self, v: str) -> TextInput:
         """
@@ -1364,10 +1344,9 @@ class TimeInput(Widget):
             v = self._value
             v = v.time() if isinstance(v, datetime) else v
             return v
-        else:
-            state = self.root.session_state
-            assert state
-            return state[self.id]  # type: ignore
+        state = self.root.session_state
+        assert state
+        return state[self.id]  # type: ignore
 
     def increment(self) -> TimeInput:
         """Select the next available time."""
@@ -1428,10 +1407,9 @@ class Toggle(Widget):
         """The current value of the widget. (bool)"""  # noqa: D400
         if self._value is not None:
             return self._value
-        else:
-            state = self.root.session_state
-            assert state
-            return cast("bool", state[self.id])
+        state = self.root.session_state
+        assert state
+        return cast("bool", state[self.id])
 
     def set_value(self, v: bool) -> Toggle:
         """Set the value of the widget."""
@@ -1703,7 +1681,7 @@ def repr_(self) -> str:
     return f"{classname}({field_reprs}\n)"
 
 
-def format_dict(d: dict[Any, Any]):
+def format_dict(d: dict[Any, Any]) -> str:
     lines = []
     for k, v in d.items():
         line = f"{k}: {v!r}"
@@ -1818,12 +1796,11 @@ class Status(Block):
     def state(self):
         if self.icon == "spinner":
             return "running"
-        elif self.icon == ":material/check:":
+        if self.icon == ":material/check:":
             return "complete"
-        elif self.icon == ":material/error:":
+        if self.icon == ":material/error:":
             return "error"
-        else:
-            raise ValueError("Unknown Status state")
+        raise ValueError("Unknown Status state")
 
 
 @dataclass(repr=False)
@@ -1852,8 +1829,7 @@ Node: TypeAlias = Union[Element, Block]
 def get_widget_state(node: Node) -> WidgetState | None:
     if isinstance(node, Widget):
         return node._widget_state
-    else:
-        return None
+    return None
 
 
 @dataclass(repr=False)

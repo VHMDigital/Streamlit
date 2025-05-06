@@ -63,10 +63,12 @@ def _convert_config_option_to_click_option(
     }
 
 
-def _make_sensitive_option_callback(config_option: ConfigOption):
-    def callback(_ctx: click.Context, _param: click.Parameter, cli_value) -> None:
+def _make_sensitive_option_callback(  # noqa: ANN202
+    config_option: ConfigOption,
+):
+    def callback(_ctx: click.Context, _param: click.Parameter, cli_value: Any) -> None:
         if cli_value is None:
-            return None
+            return
         raise SystemExit(
             f"Setting {config_option.key!r} option using the CLI flag is not allowed. "
             f"Set this option in the configuration file or environment "
@@ -216,10 +218,9 @@ def main_run(target: str, args=None, **kwargs):
                 "Streamlit requires raw Python (.py) files, but the provided file has no extension.\n"
                 "For more information, please see https://docs.streamlit.io"
             )
-        else:
-            raise click.BadArgumentUsage(
-                f"Streamlit requires raw Python (.py) files, not {extension}.\nFor more information, please see https://docs.streamlit.io"
-            )
+        raise click.BadArgumentUsage(
+            f"Streamlit requires raw Python (.py) files, not {extension}.\nFor more information, please see https://docs.streamlit.io"
+        )
 
     if url_util.is_url(target):
         from streamlit.temporary_directory import TemporaryDirectory

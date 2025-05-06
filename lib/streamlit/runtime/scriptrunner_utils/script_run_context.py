@@ -239,7 +239,7 @@ SCRIPT_RUN_CONTEXT_ATTR_NAME: Final = "streamlit_script_run_ctx"
 
 def add_script_run_ctx(
     thread: threading.Thread | None = None, ctx: ScriptRunContext | None = None
-):
+) -> threading.Thread:
     """Adds the current ScriptRunContext to a newly-created thread.
 
     This should be called from this thread's parent thread,

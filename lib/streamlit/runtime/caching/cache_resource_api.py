@@ -245,7 +245,7 @@ class CacheResourceAPI:
             hash_funcs=hash_funcs,
         )
 
-    def _decorator(
+    def _decorator(  # noqa: ANN202
         self,
         func: F | None,
         *,

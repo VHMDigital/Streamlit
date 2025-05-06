@@ -26,7 +26,7 @@ if __name__ not in ("__main__", "__mp_main__"):
     )
 
 
-def is_relative_to(path: Path, *other):
+def is_relative_to(path: Path, *other) -> bool:
     """Return True if the path is relative to another path or False.
 
     This function is backported from Python 3.9 - Path.relativeto.

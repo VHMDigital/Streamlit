@@ -51,7 +51,7 @@ class TornadoOAuth2App(OAuth2Mixin, OpenIDMixin, BaseApp):  # type: ignore[misc]
         self._save_authorize_data(redirect_uri=redirect_uri, **auth_context)
         request_handler.redirect(auth_context["url"], status=302)
 
-    def authorize_access_token(
+    def authorize_access_token(  # noqa: ANN201
         self, request_handler: tornado.web.RequestHandler, **kwargs
     ):
         """
