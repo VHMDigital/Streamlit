@@ -56,7 +56,8 @@ class ComponentRequestHandler(tornado.web.RequestHandler):
             with open(abspath, "rb") as file:
                 contents = file.read()
         except OSError:
-            _LOGGER.exception("ComponentRequestHandler: GET %s read error", abspath)
+            sanitized_abspath = abspath.replace("\n", "").replace("\r", "")
+            _LOGGER.exception("ComponentRequestHandler: GET %s read error", sanitized_abspath)
             self.write("read error")
             self.set_status(404)
             return
