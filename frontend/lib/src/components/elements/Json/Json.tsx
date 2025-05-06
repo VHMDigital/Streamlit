@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default-member */
 /**
  * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
@@ -16,7 +17,7 @@
 
 import React, { memo, ReactElement, useRef } from "react"
 
-import { parse } from "json5"
+import JSON5 from "json5"
 import Clipboard from "clipboard"
 import ReactJson from "react-json-view"
 import { useTheme } from "@emotion/react"
@@ -47,7 +48,7 @@ function Json({ element }: Readonly<JsonProps>): ReactElement {
   } catch (e) {
     const error = ensureError(e)
     try {
-      bodyObject = parse(element.body)
+      bodyObject = JSON5.parse(element.body)
     } catch (json5Error) {
       // If content fails to parse as Json, rebuild the error message
       // to show where the problem occurred.

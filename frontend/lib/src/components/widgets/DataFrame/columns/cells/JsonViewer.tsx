@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default-member */
 /**
  * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
@@ -16,7 +17,7 @@
 
 import React, { memo } from "react"
 
-import { parse, stringify } from "json5"
+import JSON5 from "json5"
 import { getLuminance } from "color2k"
 import { TextCellEntry } from "@glideapps/glide-data-grid"
 import ReactJson from "react-json-view"
@@ -61,8 +62,8 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
     try {
       parsedJson =
         typeof jsonValue === "string"
-          ? parse(jsonValue)
-          : parse(stringify(jsonValue))
+          ? JSON5.parse(jsonValue)
+          : JSON5.parse(JSON5.stringify(jsonValue))
     } catch (error) {
       // Keep the parsed JSON as undefined.
       parsedJson = undefined

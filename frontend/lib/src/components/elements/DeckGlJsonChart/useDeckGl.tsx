@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default-member */
 /**
  * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
@@ -16,7 +17,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 
-import { parse } from "json5"
+import JSON5 from "json5"
 import { PickingInfo, ViewStateChangeParameters } from "@deck.gl/core"
 import { TooltipContent } from "@deck.gl/core/dist/lib/tooltip"
 import isEqual from "lodash/isEqual"
@@ -129,7 +130,7 @@ function getStateFromWidgetMgr(
 
   const stringValue = widgetMgr.getStringValue(element)
   const currState: DeckGlElementState | null = stringValue
-    ? parse(stringValue)
+    ? JSON5.parse(stringValue)
     : null
 
   return currState ?? EMPTY_STATE
@@ -214,7 +215,7 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
     isSelectionModeActivated && Object.keys(data.selection.indices).length > 0
 
   const parsedPydeckJson = useMemo(() => {
-    return Object.freeze(parse<ParsedDeckGlConfig>(element.json))
+    return Object.freeze(JSON5.parse<ParsedDeckGlConfig>(element.json))
     // Only parse JSON when transitioning to/from fullscreen, the json changes, or theme changes
     // TODO: Update to match React best practices
     // eslint-disable-next-line react-compiler/react-compiler
@@ -384,7 +385,7 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
         return null
       }
 
-      const parsedTooltip = parse(tooltip)
+      const parsedTooltip = JSON5.parse(tooltip)
 
       if (parsedTooltip.html) {
         parsedTooltip.html = interpolate(info, parsedTooltip.html)
