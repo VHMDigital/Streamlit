@@ -48,7 +48,7 @@ def is_expected_error(msg: ConsoleMessage, browser_name: str, *, uses_csp: bool)
     ):
         return True
 
-    # TODO(lukasmasuch): Investigate why webkit is running into this blob: issue when
+    # TODO(lukasmasuch): Investigate why webkit is running into this blob: issue:
     if (
         msg.text == "Failed to load resource"
         and "blob:http://localhost:" in msg.location["url"]
