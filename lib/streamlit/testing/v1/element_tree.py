@@ -150,7 +150,7 @@ class Element(ABC):
         """
         return self.root.run(timeout=timeout)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return util.repr_(self)
 
 
@@ -228,7 +228,7 @@ class ElementList(Generic[El_co]):
     def __iter__(self):
         yield from self._list
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return util.repr_(self)
 
     def __eq__(self, other: ElementList[El_co] | object) -> bool:
@@ -1793,7 +1793,7 @@ class Status(Block):
         self.label = proto.label
 
     @property
-    def state(self):
+    def state(self) -> str:
         if self.icon == "spinner":
             return "running"
         if self.icon == ":material/check:":
@@ -1904,7 +1904,7 @@ class ElementTree(Block):
         widget_states = self.get_widget_states()
         return self._runner._run(widget_states, timeout=timeout)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return format_dict(self.children)
 
 

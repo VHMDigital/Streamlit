@@ -417,7 +417,7 @@ def _get_first_line(text):
     return left
 
 
-def _get_weight(value):
+def _get_weight(value) -> int:
     if inspect.ismodule(value):
         return 3
     if inspect.isclass(value):
@@ -490,7 +490,7 @@ def _shorten(s, length=300):
     return s[:length] + "..." if len(s) > length else s
 
 
-def _is_computed_property(obj, attr_name):
+def _is_computed_property(obj, attr_name) -> bool:
     obj_class = getattr(obj, "__class__", None)
 
     if not obj_class:

@@ -49,7 +49,7 @@ def style_negative(v: float, props: str = "") -> str | None:
     return props if v < 0 else None
 
 
-def highlight_max(s, props: str = ""):
+def highlight_max(s, props=""):
     return np.where(s == np.nanmax(s.values), props, "")
 
 

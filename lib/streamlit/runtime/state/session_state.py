@@ -364,7 +364,7 @@ class SessionState:
     # widget state at one point.
     query_params: QueryParams = field(default_factory=QueryParams)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return util.repr_(self)
 
     # is it possible for a value to get through this without being deserialized?
@@ -602,10 +602,10 @@ class SessionState:
             if metadata is not None:
                 if metadata.value_type == "trigger_value":
                     self._new_widget_state[state_id] = Value(False)
-                elif (
-                    metadata.value_type == "string_trigger_value"
-                    or metadata.value_type == "chat_input_value"
-                ):
+                elif metadata.value_type in {
+                    "string_trigger_value",
+                    "chat_input_value",
+                }:
                     self._new_widget_state[state_id] = Value(None)
 
         for state_id in self._old_state:
@@ -613,10 +613,10 @@ class SessionState:
             if metadata is not None:
                 if metadata.value_type == "trigger_value":
                     self._old_state[state_id] = False
-                elif (
-                    metadata.value_type == "string_trigger_value"
-                    or metadata.value_type == "chat_input_value"
-                ):
+                elif metadata.value_type in {
+                    "string_trigger_value",
+                    "chat_input_value",
+                }:
                     self._old_state[state_id] = None
 
     def _remove_stale_widgets(self, active_widget_ids: set[str]) -> None:

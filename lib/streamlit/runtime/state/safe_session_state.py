@@ -125,7 +125,7 @@ class SafeSessionState:
         except KeyError:
             raise AttributeError(f"{key} not found in session_state.")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Presents itself as a simple dict of the underlying SessionState instance."""
         kv = ((k, self._state[k]) for k in self._state._keys())
         s = ", ".join(f"{k}: {v!r}" for k, v in kv)

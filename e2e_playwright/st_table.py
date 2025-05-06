@@ -118,7 +118,7 @@ st.table(df.style.format({"test": "{:.2f}"}))
 st.subheader("Pandas Styler: Background color")
 
 
-def highlight_first(value):
+def highlight_first(value: float) -> str:
     return "background-color: yellow" if value == 0 else ""
 
 
@@ -162,10 +162,10 @@ weather_df = pd.DataFrame(
 )
 
 
-def rain_condition(v):
+def rain_condition(v) -> str:
     if v < 1.75:
         return "Dry"
-    elif v < 2.75:
+    if v < 2.75:
         return "Rain"
     return "Heavy Rain"
 

@@ -177,4 +177,5 @@ ignore-variadic-names = true
 allow-star-arg-any = true
 # Surpresses errors for fully untyped functions:
 ignore-fully-untyped = true
+# Allow missing annotations on functions that return None:
 suppress-none-returning = true
