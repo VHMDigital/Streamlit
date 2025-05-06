@@ -30,7 +30,7 @@ import React, {
   useState,
 } from "react"
 
-import { h32 } from "xxhashjs"
+import xxhash from "xxhashjs"
 import slugify from "@sindresorhus/slugify"
 import { visit } from "unist-util-visit"
 import { useTheme } from "@emotion/react"
@@ -152,7 +152,8 @@ export function createAnchorFromText(text: string | null): string {
   }
 
   // If slugify is not able to create a slug, fallback to hash
-  return h32(text, 0xabcd).toString(16)
+  // eslint-disable-next-line import/no-named-as-default-member
+  return xxhash.h32(text, 0xabcd).toString(16)
 }
 
 // Note: React markdown limits hrefs to specific protocols ('http', 'https',
