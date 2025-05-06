@@ -243,6 +243,7 @@ def set_page_config(
     elif layout == "wide":
         pb_layout = PageConfigProto.WIDE
     else:
+        # Note: Pylance incorrectly notes this error as unreachable
         raise StreamlitInvalidPageLayoutError(layout=layout)
 
     msg.page_config_changed.layout = pb_layout
@@ -255,6 +256,7 @@ def set_page_config(
     elif initial_sidebar_state == "collapsed":
         pb_sidebar_state = PageConfigProto.COLLAPSED
     else:
+        # Note: Pylance incorrectly notes this error as unreachable
         raise StreamlitInvalidSidebarStateError(
             initial_sidebar_state=initial_sidebar_state
         )
