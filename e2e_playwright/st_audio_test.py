@@ -105,7 +105,7 @@ def test_audio_width_configurations(app: Page, assert_snapshot: ImageCompareFunc
     # Additional wait to ensure that the audio element is fully loaded
     # and that its not causing flakiness in screenshots.
     # This might not be 100% necessary.
-    app.wait_for_timeout(1000)
+    app.wait_for_timeout(3000)
     assert_snapshot(audio_pixel_width, name="st_audio-width_300px")
 
     audio_stretch_width = app.get_by_test_id("stAudio").nth(7)
@@ -117,7 +117,7 @@ def test_audio_width_configurations(app: Page, assert_snapshot: ImageCompareFunc
     # Additional wait to ensure that the audio element is fully loaded
     # and that its not causing flakiness in screenshots.
     # This might not be 100% necessary.
-    app.wait_for_timeout(1000)
+    app.wait_for_timeout(3000)
     assert_snapshot(audio_stretch_width, name="st_audio-width_stretch")
 
 

@@ -57,12 +57,12 @@ def test_video_width_configurations(app: Page, assert_snapshot: ImageCompareFunc
     """Test that `st.video` width configurations are applied correctly."""
     video_element = _select_video_to_show(app, "webm video with pixel width")
     _wait_until_video_has_data(app, video_element)
-
+    app.wait_for_timeout(3000)
     assert_snapshot(video_element, name="st_video-width_400px", image_threshold=0.1)
 
     video_element = _select_video_to_show(app, "webm video with stretch width")
     _wait_until_video_has_data(app, video_element)
-
+    app.wait_for_timeout(3000)
     assert_snapshot(video_element, name="st_video-width_stretch", image_threshold=0.1)
 
 
@@ -74,6 +74,7 @@ def test_video_rendering(app: Page, assert_snapshot: ImageCompareFunction):
 
     video_element = _select_video_to_show(app, "mp4 video")
     _wait_until_video_has_data(app, video_element)
+    app.wait_for_timeout(3000)
     assert_snapshot(
         video_element,
         name="video_element_first",
@@ -82,7 +83,7 @@ def test_video_rendering(app: Page, assert_snapshot: ImageCompareFunction):
 
     video_element = _select_video_to_show(app, "mp4 video with subtitles")
     _wait_until_video_has_data(app, video_element)
-
+    app.wait_for_timeout(3000)
     assert_snapshot(
         video_element,
         name="video_element_with_subtitles",
