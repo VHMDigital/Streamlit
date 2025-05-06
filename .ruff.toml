@@ -85,7 +85,6 @@ ignore = [
   "B904",    # Checks for raise statements in exception handlers that lack a from clause.
   "ISC001",  # Checks for implicitly concatenated strings on a single line.
   "NPY002",  # Checks for the use of legacy np.random function calls.
-  "PYI036",  # Checks for incorrect function signatures on __exit__ and __aexit__ methods.
   "PYI041",  # Checks for parameter annotations that contain redundant unions between builtin numeric types (e.g., int | float).
   "PYI051",  # Checks for redundant unions between a Literal and a builtin supertype of that Literal.
   "UP031",   # Checks for printf-style string formatting, and offers to replace it with str.format calls.

@@ -100,6 +100,8 @@ from streamlit.runtime.scriptrunner import enqueue_message as _enqueue_message
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 if TYPE_CHECKING:
+    from types import TracebackType
+
     from google.protobuf.message import Message
 
     from streamlit.cursor import Cursor
@@ -301,9 +303,9 @@ class DeltaGenerator(
 
     def __exit__(
         self,
-        type: Any,
-        value: Any,
-        traceback: Any,
+        typ: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
     ) -> Literal[False]:
         # with block ended
 
