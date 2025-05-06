@@ -325,6 +325,7 @@ export class App extends PureComponent<Props, State> {
     this.widgetMgr = new WidgetStateManager({
       sendRerunBackMsg: this.sendRerunBackMsg,
       formsDataChanged: formsData => this.setState({ formsData }),
+      sendFetchDataChunkMsg: this.sendFetchDataChunkMsg,
     })
 
     this.hostCommunicationMgr = new HostCommunicationManager({
@@ -1562,6 +1563,17 @@ export class App extends PureComponent<Props, State> {
       this.state.scriptRunState === ScriptRunState.NOT_RUNNING &&
       prevState.scriptRunState === ScriptRunState.RUNNING &&
       prevState.connectionState === ConnectionState.CONNECTED
+    )
+  }
+
+  sendFetchDataChunkMsg = (actionId: string, chunkIndex: number): void => {
+    this.sendBackMsg(
+      new BackMsg({
+        fetchDataChunk: {
+          actionId,
+          chunkIndex,
+        },
+      })
     )
   }
 

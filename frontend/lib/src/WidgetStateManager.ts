@@ -166,6 +166,11 @@ interface Props {
   ) => void
 
   /**
+   * Callback to fetch a chunk of data for a DataFrame widget.
+   */
+  sendFetchDataChunkMsg?: (actionId: string, chunkIndex: number) => void
+
+  /**
    * Callback invoked whenever our FormsData changed. (Because FormsData
    * is immutable, any changes to it result in a new instance being created.)
    */
@@ -618,6 +623,10 @@ export class WidgetStateManager {
       undefined,
       isAutoRerun
     )
+  }
+
+  public requestDataChunk(actionId: string, chunkIndex: number): void {
+    this.props.sendFetchDataChunkMsg?.(actionId, chunkIndex)
   }
 
   public getActiveWidgetStates(activeIds: Set<string>): WidgetStates {

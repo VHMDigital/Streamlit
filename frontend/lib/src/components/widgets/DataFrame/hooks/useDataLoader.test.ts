@@ -117,7 +117,7 @@ describe("useDataLoader hook", () => {
       const editingState = React.useRef<EditingState>(
         new EditingState(numRows)
       )
-      return useDataLoader(data, MOCK_COLUMNS, numRows, editingState)
+      return useDataLoader(data, MOCK_COLUMNS, numRows, editingState, () => {})
     })
 
     // Row 1
@@ -160,7 +160,7 @@ describe("useDataLoader hook", () => {
       const editingState = React.useRef<EditingState>(
         new EditingState(numRows)
       )
-      return useDataLoader(data, MOCK_COLUMNS, numRows, editingState)
+      return useDataLoader(data, MOCK_COLUMNS, numRows, editingState, () => {})
     })
 
     // Check that row 0 is returning the correct cell value:
@@ -188,7 +188,7 @@ describe("useDataLoader hook", () => {
         data: "edited",
         allowOverlay: true,
       })
-      return useDataLoader(data, MOCK_COLUMNS, numRows, editingState)
+      return useDataLoader(data, MOCK_COLUMNS, numRows, editingState, () => {})
     })
 
     // Check if value got edited
@@ -211,7 +211,7 @@ describe("useDataLoader hook", () => {
         new EditingState(numRows)
       )
       editingState.current.deleteRow(0)
-      return useDataLoader(data, MOCK_COLUMNS, numRows, editingState)
+      return useDataLoader(data, MOCK_COLUMNS, numRows, editingState, () => {})
     })
 
     // Should return value of second row
@@ -240,7 +240,13 @@ describe("useDataLoader hook", () => {
       const editingState = React.useRef<EditingState>(
         new EditingState(numRows)
       )
-      return useDataLoader(errorData, MOCK_COLUMNS, numRows, editingState)
+      return useDataLoader(
+        errorData,
+        MOCK_COLUMNS,
+        numRows,
+        editingState,
+        () => {}
+      )
     })
 
     // We should get an error cell since an error is thrown in the try/catch block
@@ -264,7 +270,13 @@ describe("useDataLoader hook", () => {
       editingState.current.isAddedRow = () => {
         return true
       }
-      return useDataLoader(realData, MOCK_COLUMNS, numRows, editingState)
+      return useDataLoader(
+        realData,
+        MOCK_COLUMNS,
+        numRows,
+        editingState,
+        () => {}
+      )
     })
 
     // We should get an error cell since an error is thrown in the try/catch block

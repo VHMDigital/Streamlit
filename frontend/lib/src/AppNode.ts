@@ -21,6 +21,7 @@ import {
   Arrow as ArrowProto,
   ArrowVegaLiteChart as ArrowVegaLiteChartProto,
   Block as BlockProto,
+  DataChunk,
   Delta,
   Element,
   ForwardMsgMetadata,
@@ -328,6 +329,34 @@ export class ElementNode implements AppNode {
         // This should never happen!
         throw new Error(
           `elementType '${this.element.type}' is not a valid arrowAddRows target!`
+        )
+      }
+    }
+
+    return newNode
+  }
+
+  public addChunk(dataChunk: DataChunk, scriptRunId: string): ElementNode {
+    const elementType = this.element.type
+    const newNode = new ElementNode(
+      this.element,
+      this.metadata,
+      scriptRunId,
+      this.activeScriptHash,
+      this.fragmentId
+    )
+
+    switch (elementType) {
+      case "arrowDataFrame": {
+        const newQuiver = new Quiver(dataChunk.data as IArrow)
+        this.quiverElement.addChunk(newQuiver, dataChunk.chunkIndex)
+        newNode.lazyQuiverElement = this.quiverElement
+        break
+      }
+      default: {
+        // This should never happen!
+        throw new Error(
+          `elementType '${this.element.type}' is not a valid addChunk target!`
         )
       }
     }
@@ -768,6 +797,27 @@ export class AppRoot {
         }
       }
 
+      case "addChunk": {
+        try {
+          return this.addChunk(
+            deltaPath,
+            delta.addChunk as DataChunk,
+            scriptRunId
+          )
+        } catch (error) {
+          const errorElement = makeElementWithErrorText(
+            ensureError(error).message
+          )
+          return this.addElement(
+            deltaPath,
+            scriptRunId,
+            errorElement,
+            metadata,
+            activeScriptHash
+          )
+        }
+      }
+
       default: {
         throw new Error(`Unrecognized deltaType: '${delta.type}'`)
       }
@@ -921,6 +971,24 @@ export class AppRoot {
     }
 
     const elementNode = existingNode.arrowAddRows(namedDataSet, scriptRunId)
+    return new AppRoot(
+      this.mainScriptHash,
+      this.root.setIn(deltaPath, elementNode, scriptRunId),
+      this.appLogo
+    )
+  }
+
+  private addChunk(
+    deltaPath: number[],
+    dataChunk: DataChunk,
+    scriptRunId: string
+  ): AppRoot {
+    const existingNode = this.root.getIn(deltaPath) as ElementNode
+    if (isNullOrUndefined(existingNode)) {
+      throw new Error(`Can't addChunk: invalid deltaPath: ${deltaPath}`)
+    }
+
+    const elementNode = existingNode.addChunk(dataChunk, scriptRunId)
     return new AppRoot(
       this.mainScriptHash,
       this.root.setIn(deltaPath, elementNode, scriptRunId),

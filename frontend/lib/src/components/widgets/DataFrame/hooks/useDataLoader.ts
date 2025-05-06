@@ -16,7 +16,12 @@
 
 import React from "react"
 
-import { DataEditorProps, GridCell } from "@glideapps/glide-data-grid"
+import {
+  DataEditorProps,
+  GridCell,
+  GridCellKind,
+  LoadingCell,
+} from "@glideapps/glide-data-grid"
 
 import { getCellFromArrow } from "~lib/components/widgets/DataFrame/arrowUtils"
 import {
@@ -44,7 +49,8 @@ function useDataLoader(
   data: Quiver,
   columns: BaseColumn[],
   numRows: number,
-  editingState: React.MutableRefObject<EditingState>
+  editingState: React.MutableRefObject<EditingState>,
+  requestDataChunk: (chunkIndex: number) => void
 ): DataLoaderReturn {
   const getCellContent = React.useCallback(
     ([col, row]: readonly [number, number]): GridCell => {
@@ -99,6 +105,37 @@ function useDataLoader(
           }
         }
 
+        if (notNullOrUndefined(data.chunkSize)) {
+          if (originalRow < data.chunkSize) {
+            // Use the initial chunk
+            const arrowCell = data.getCell(originalRow, originalCol)
+            return getCellFromArrow(column, arrowCell, undefined)
+          }
+
+          const chunkIndex = Math.floor(originalRow / data.chunkSize)
+          if (data.hasChunk(chunkIndex)) {
+            const chunk = data.getChunk(chunkIndex)
+            if (notNullOrUndefined(chunk)) {
+              const arrowCell = chunk.getCell(
+                originalRow - chunkIndex * data.chunkSize,
+                originalCol
+              )
+              return getCellFromArrow(column, arrowCell, undefined)
+            }
+          } else {
+            // Request the data chunk from the backend and return a loading cell.
+            requestDataChunk(chunkIndex)
+          }
+          // Show a loading cell
+          return {
+            kind: GridCellKind.Loading,
+            allowOverlay: false,
+            skeletonHeight: 20,
+            skeletonWidth: 100,
+            skeletonWidthVariability: 30,
+          } as LoadingCell
+        }
+
         // We skip all header rows to get to to the actual data rows.
         // in th Arrow data.
         const arrowCell = data.getCell(originalRow, originalCol)
@@ -117,7 +154,7 @@ function useDataLoader(
         )
       }
     },
-    [columns, numRows, data, editingState]
+    [columns, numRows, data, editingState, requestDataChunk]
   )
 
   return {

@@ -22,7 +22,7 @@ import { immerable, produce } from "immer"
 
 import { IArrow, Styler as StylerProto } from "@streamlit/protobuf"
 
-import { hashString } from "~lib/util/utils"
+import { hashString, notNullOrUndefined } from "~lib/util/utils"
 
 import { concat } from "./arrowConcatUtils"
 import {
@@ -113,6 +113,12 @@ export class Quiver {
    */
   [immerable] = true
 
+  // Chunks are stored in a map, with the chunk index as the key.
+  // This allows us to add chunks at arbitrary indices.
+  private _chunks: Record<number, Quiver | undefined> = {}
+
+  private _chunkSize: number | undefined
+
   /** Index & data column names (matrix of column names to support multi-level headers). */
   private _columnNames: ColumnNames
 
@@ -174,6 +180,12 @@ export class Quiver {
     this._columnTypes = this._pandasIndexColumnTypes.concat(
       this._dataColumnTypes
     )
+
+    if (notNullOrUndefined(element.chunkingMetadata)) {
+      // Set the chunk size to the number of data rows of the
+      // chunk in the initial Arrow message.
+      this._chunkSize = this.dimensions.numDataRows
+    }
   }
 
   /** Matrix of column names of the index- & data-columns.
@@ -298,6 +310,22 @@ export class Quiver {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   private getDataValue(rowIndex: number, columnIndex: number): any {
     return this._data.getChildAt(columnIndex)?.get(rowIndex)
+  }
+
+  public get chunkSize(): number | undefined {
+    return this._chunkSize
+  }
+
+  public addChunk(chunk: Quiver | undefined, chunk_index: number): void {
+    this._chunks[chunk_index] = chunk
+  }
+
+  public hasChunk(chunk_index: number): boolean {
+    return chunk_index in this._chunks
+  }
+
+  public getChunk(chunk_index: number): Quiver | undefined {
+    return this._chunks[chunk_index]
   }
 
   /**

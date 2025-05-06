@@ -44,7 +44,11 @@ import { useFormClearHelper } from "~lib/components/widgets/Form"
 import { withFullScreenWrapper } from "~lib/components/shared/FullScreenWrapper"
 import { Quiver } from "~lib/dataframes/Quiver"
 import { WidgetInfo, WidgetStateManager } from "~lib/WidgetStateManager"
-import { isNullOrUndefined } from "~lib/util/utils"
+import {
+  debounce,
+  isNullOrUndefined,
+  notNullOrUndefined,
+} from "~lib/util/utils"
 import Toolbar, { ToolbarAction } from "~lib/components/shared/Toolbar"
 import { LibContext } from "~lib/components/core/LibContext"
 import { ElementFullscreenContext } from "~lib/components/shared/ElementFullscreen/ElementFullscreenContext"
@@ -192,7 +196,10 @@ function DataFrame({
 
   // Number of rows of the table minus 1 for the header row:
   const dataDimensions = data.dimensions
-  const originalNumRows = Math.max(0, dataDimensions.numDataRows)
+  const originalNumRows = Math.max(
+    0,
+    element.chunkingMetadata?.totalRows ?? dataDimensions.numDataRows
+  )
 
   // For empty tables, we show an extra row that
   // contains "empty" as a way to indicate that the table is empty.
@@ -283,11 +290,69 @@ function DataFrame({
     []
   )
 
+  // This callback is used to refresh the rendering of specified cells
+  const refreshCells = React.useCallback(
+    (
+      cells: {
+        cell: GridCellPosition
+      }[]
+    ) => {
+      dataEditorRef.current?.updateCells(cells)
+    },
+    []
+  )
+
+  // The debounce method doesn't allow dependency inspection. Therefore, we
+  // need to disable the eslint rule for exhaustive-deps.
+  // eslint-disable-next-line react-compiler/react-compiler
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const requestDataChunk = React.useCallback(
+    debounce(DEBOUNCE_TIME_MS, (chunkIndex: number) => {
+      if (
+        notNullOrUndefined(element.chunkingMetadata) &&
+        notNullOrUndefined(element.chunkingMetadata.actionId)
+      ) {
+        data.addChunk(undefined, chunkIndex)
+        widgetMgr.requestDataChunk(
+          element.chunkingMetadata.actionId,
+          chunkIndex
+        )
+        // Poll every second to check if the chunk is loaded
+        const intervalId = setInterval(() => {
+          if (
+            data.hasChunk(chunkIndex) &&
+            notNullOrUndefined(data.getChunk(chunkIndex))
+          ) {
+            const chunkSize = data.chunkSize as number
+            const cellsToUpdate: { cell: GridCellPosition }[] = []
+            for (let row = 0; row < chunkSize; row++) {
+              for (let col = 0; col < originalColumns.length; col++) {
+                cellsToUpdate.push({
+                  cell: [col, row + chunkIndex * chunkSize],
+                })
+              }
+            }
+            refreshCells(cellsToUpdate)
+            clearInterval(intervalId)
+          }
+        }, 500)
+      }
+    }),
+    [
+      refreshCells,
+      widgetMgr,
+      element.chunkingMetadata,
+      element.chunkingMetadata?.actionId,
+      data,
+    ]
+  )
+
   const { getCellContent: getOriginalCellContent } = useDataLoader(
     data,
     originalColumns,
     numRows,
-    editingState
+    editingState,
+    requestDataChunk
   )
 
   const { columns, sortColumn, getOriginalIndex, getCellContent } =
@@ -395,18 +460,6 @@ function DataFrame({
     // eslint-disable-next-line react-compiler/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFullScreen])
-
-  // This callback is used to refresh the rendering of specified cells
-  const refreshCells = React.useCallback(
-    (
-      cells: {
-        cell: GridCellPosition
-      }[]
-    ) => {
-      dataEditorRef.current?.updateCells(cells)
-    },
-    []
-  )
 
   /**
    * On the first rendering, try to load initial selection state
