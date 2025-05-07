@@ -281,8 +281,8 @@ class SnowflakeConnection(BaseConnection["InternalSnowflakeConnection"]):
         *,  # keyword-only arguments:
         ttl: float | int | timedelta | None = None,
         show_spinner: bool | str = "Running `snowflake.query(...)`.",
-        params=None,
-        **kwargs,
+        params: Any = None,
+        **kwargs: Any,
     ) -> DataFrame:
         """Run a read-only SQL query.
 

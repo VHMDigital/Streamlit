@@ -43,8 +43,8 @@ class LocalScriptRunner(ScriptRunner):
         script_path: str,
         session_state: SafeSessionState,
         pages_manager: PagesManager,
-        args=None,
-        kwargs=None,
+        args: Any = None,
+        kwargs: Any = None,
     ):
         """Initializes the ScriptRunner for the given script_path."""
 

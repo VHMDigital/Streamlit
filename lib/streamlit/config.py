@@ -1491,7 +1491,7 @@ CONFIG_FILENAMES = [
 
 
 def get_config_options(
-    force_reparse=False, options_from_flags: dict[str, Any] | None = None
+    force_reparse: bool = False, options_from_flags: dict[str, Any] | None = None
 ) -> dict[str, ConfigOption]:
     """Create and return a dict mapping config option names to their values,
     returning a cached dict if possible.

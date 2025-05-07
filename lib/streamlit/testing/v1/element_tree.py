@@ -1647,7 +1647,7 @@ class Block:
         return repr_(self)
 
 
-def repr_(self) -> str:
+def repr_(self: object) -> str:
     """A custom repr similar to `streamlit.util.repr_` but that shows tree
     structure using indentation.
     """

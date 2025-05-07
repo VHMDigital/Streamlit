@@ -180,10 +180,10 @@ class AttrDict(Mapping[str, Any]):
     def __repr__(self) -> str:
         return repr(self.__nested_secrets__)
 
-    def __setitem__(self, key, value) -> NoReturn:
+    def __setitem__(self, key: str, value: Any) -> NoReturn:
         raise TypeError("Secrets does not support item assignment.")
 
-    def __setattr__(self, key, value) -> NoReturn:
+    def __setattr__(self, key: str, value: Any) -> NoReturn:
         raise TypeError("Secrets does not support attribute assignment.")
 
     def to_dict(self) -> dict[str, Any]:
