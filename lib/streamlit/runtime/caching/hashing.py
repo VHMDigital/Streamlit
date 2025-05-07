@@ -186,10 +186,10 @@ class _HashStack:
     def __repr__(self) -> str:
         return util.repr_(self)
 
-    def push(self, val: Any):
+    def push(self, val: Any) -> None:
         self._stack[id(val)] = val
 
-    def pop(self):
+    def pop(self) -> None:
         self._stack.popitem()
 
     def __contains__(self, val: Any) -> bool:

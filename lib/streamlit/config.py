@@ -1344,7 +1344,9 @@ def _set_option(key: str, value: Any, where_defined: str) -> None:
         _config_options[key].set_value(value, where_defined)
 
 
-def _update_config_with_sensitive_env_var(config_options: dict[str, ConfigOption]):
+def _update_config_with_sensitive_env_var(
+    config_options: dict[str, ConfigOption],
+) -> None:
     """Update the config system by parsing the environment variable.
 
     This should only be called from get_config_options.

@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+from typing import Any
 from urllib.parse import quote
 
 import tornado.web
@@ -112,9 +113,9 @@ class MediaFileHandler(tornado.web.StaticFileHandler):
         return path
 
     @classmethod
-    def get_content(  # noqa: ANN206
+    def get_content(
         cls, abspath: str, start: int | None = None, end: int | None = None
-    ):
+    ) -> Any:
         _LOGGER.debug("MediaFileHandler: GET %s", abspath)
 
         try:

@@ -15,13 +15,18 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
 from streamlit import config
 
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
 
 @contextmanager
-def patch_config_options(config_overrides: dict[str, Any]):
+def patch_config_options(
+    config_overrides: dict[str, Any],
+) -> Generator[None, None, None]:
     """A context manager that overrides config options. It can
     also be used as a function decorator.
 

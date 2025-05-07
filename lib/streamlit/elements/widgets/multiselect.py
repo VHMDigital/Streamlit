@@ -140,7 +140,7 @@ def _get_default_count(default: Sequence[Any] | Any | None) -> int:
 
 def _check_max_selections(
     selections: Sequence[Any] | Any | None, max_selections: int | None
-):
+) -> None:
     if max_selections is None:
         return
 

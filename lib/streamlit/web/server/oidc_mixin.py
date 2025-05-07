@@ -14,7 +14,7 @@
 
 # ruff: noqa: ANN201
 
-from typing import Any
+from typing import Any, cast
 
 import tornado.web
 from authlib.integrations.base_client import (  # type: ignore[import-untyped]
@@ -60,7 +60,7 @@ class TornadoOAuth2App(OAuth2Mixin, OpenIDMixin, BaseApp):  # type: ignore[misc]
 
     def authorize_access_token(
         self, request_handler: tornado.web.RequestHandler, **kwargs: Any
-    ):
+    ) -> dict[str, Any]:
         """
         :param request_handler: HTTP request instance from Tornado.
         :return: A token dict.
@@ -89,7 +89,7 @@ class TornadoOAuth2App(OAuth2Mixin, OpenIDMixin, BaseApp):  # type: ignore[misc]
                 token, nonce=state_data["nonce"], claims_options=claims_options
             )
             token = {**token, "userinfo": userinfo}
-        return token
+        return cast("dict[str, Any]", token)
 
     def _save_authorize_data(self, **kwargs: Any) -> None:
         """Authlib underlying uses the concept of "session" to store state data.

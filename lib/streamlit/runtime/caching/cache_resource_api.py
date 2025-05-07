@@ -234,7 +234,7 @@ class CacheResourceAPI:
         validate: ValidateFunc | None = None,
         experimental_allow_widgets: bool = False,
         hash_funcs: HashFuncsDict | None = None,
-    ):
+    ) -> F | Callable[[F], F]:
         return self._decorator(
             func,
             ttl=ttl,
@@ -245,7 +245,7 @@ class CacheResourceAPI:
             hash_funcs=hash_funcs,
         )
 
-    def _decorator(  # noqa: ANN202
+    def _decorator(
         self,
         func: F | None,
         *,
@@ -255,7 +255,7 @@ class CacheResourceAPI:
         validate: ValidateFunc | None,
         experimental_allow_widgets: bool,
         hash_funcs: HashFuncsDict | None = None,
-    ):
+    ) -> F | Callable[[F], F]:
         """Decorator to cache functions that return global resources (e.g. database connections, ML models).
 
         Cached objects are shared across all users, sessions, and reruns. They
@@ -417,9 +417,9 @@ class CacheResourceAPI:
         # Support passing the params via function decorator, e.g.
         # @st.cache_resource(show_spinner=False)
         if func is None:
-            return lambda f: make_cached_func_wrapper(
+            return lambda f: make_cached_func_wrapper(  # type: ignore
                 CachedResourceFuncInfo(
-                    func=f,
+                    func=f,  # type: ignore
                     show_spinner=show_spinner,
                     max_entries=max_entries,
                     ttl=ttl,

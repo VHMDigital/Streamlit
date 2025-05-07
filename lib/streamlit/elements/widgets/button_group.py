@@ -250,7 +250,7 @@ def _build_proto(
     return proto
 
 
-def _maybe_raise_selection_mode_warning(selection_mode: SelectionMode):
+def _maybe_raise_selection_mode_warning(selection_mode: SelectionMode) -> None:
     """Check if the selection_mode value is valid or raise exception otherwise."""
     if selection_mode not in ["single", "multi"]:
         raise StreamlitAPIException(

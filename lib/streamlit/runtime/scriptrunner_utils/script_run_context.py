@@ -42,6 +42,7 @@ from streamlit.runtime.forward_msg_cache import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
     from pathlib import Path
 
     from streamlit.cursor import RunningCursor
@@ -129,7 +130,7 @@ class ScriptRunContext:
         return self.pages_manager.main_script_parent
 
     @contextlib.contextmanager
-    def run_with_active_hash(self, page_hash: str):
+    def run_with_active_hash(self, page_hash: str) -> Generator[None, None, None]:
         original_page_hash = self._active_script_hash
         self._active_script_hash = page_hash
         try:
@@ -138,7 +139,7 @@ class ScriptRunContext:
             # in the event of any exception, ensure we set the active hash back
             self._active_script_hash = original_page_hash
 
-    def set_mpa_v2_page(self, page_script_hash: str):
+    def set_mpa_v2_page(self, page_script_hash: str) -> None:
         self._active_script_hash = self.pages_manager.main_script_hash
         self.pages_manager.set_current_page_script_hash(page_script_hash)
 

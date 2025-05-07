@@ -330,7 +330,7 @@ class KeyIdMapper:
         self._key_id_mapping.clear()
         self._id_key_mapping.clear()
 
-    def delete(self, key: str):
+    def delete(self, key: str) -> None:
         widget_id = self._key_id_mapping[key]
         del self._key_id_mapping[key]
         del self._id_key_mapping[widget_id]

@@ -83,6 +83,10 @@ CachePersistType: TypeAlias = Union[Literal["disk"], None]
 class CachedDataFuncInfo(CachedFuncInfo):
     """Implements the CachedFuncInfo interface for @st.cache_data."""
 
+    persist: CachePersistType
+    max_entries: int | None
+    ttl: float | timedelta | str | None
+
     def __init__(
         self,
         func: types.FunctionType,
@@ -363,7 +367,7 @@ class CacheDataAPI:
         persist: CachePersistType | bool = None,
         experimental_allow_widgets: bool = False,
         hash_funcs: HashFuncsDict | None = None,
-    ):
+    ) -> F | Callable[[F], F]:
         return self._decorator(
             func,
             ttl=ttl,
@@ -374,7 +378,7 @@ class CacheDataAPI:
             hash_funcs=hash_funcs,
         )
 
-    def _decorator(  # noqa: ANN202
+    def _decorator(
         self,
         func: F | None = None,
         *,
@@ -384,7 +388,7 @@ class CacheDataAPI:
         persist: CachePersistType | bool,
         experimental_allow_widgets: bool,
         hash_funcs: HashFuncsDict | None = None,
-    ):
+    ) -> F | Callable[[F], F]:
         """Decorator to cache functions that return data (e.g. dataframe transforms, database queries, ML inference).
 
         Cached objects are stored in "pickled" form, which means that the return

@@ -63,9 +63,9 @@ def _convert_config_option_to_click_option(
     }
 
 
-def _make_sensitive_option_callback(  # noqa: ANN202
+def _make_sensitive_option_callback(
     config_option: ConfigOption,
-):
+) -> Callable[[click.Context, click.Parameter, Any], None]:
     def callback(_ctx: click.Context, _param: click.Parameter, cli_value: Any) -> None:
         if cli_value is None:
             return
@@ -106,7 +106,7 @@ def configurator_options(func: F) -> F:
             type=parsed_parameter["type"],
             multiple=parsed_parameter["multiple"],
             **click_option_kwargs,
-        )
+        )  # type: ignore
         func = config_option(func)
     return func
 
