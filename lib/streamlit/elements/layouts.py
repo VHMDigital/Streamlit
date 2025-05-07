@@ -348,7 +348,7 @@ class LayoutsMixin:
                 vertical_alignment=vertical_alignment
             )
 
-        def column_gap(gap):
+        def column_gap(gap: str) -> str:
             if isinstance(gap, str):
                 gap_size = gap.lower()
                 valid_sizes = ["small", "medium", "large"]
