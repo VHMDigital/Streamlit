@@ -46,6 +46,8 @@ if TYPE_CHECKING:
     from builtins import ellipsis
     from collections.abc import Iterable
 
+    from streamlit.delta_generator import DeltaGenerator
+
 
 Key: TypeAlias = Union[str, int]
 
@@ -183,7 +185,7 @@ def compute_and_register_element_id(
     *,
     user_key: str | None,
     form_id: str | None,
-    active_dg_root_container: int | None = None,
+    dg: DeltaGenerator | None = None,
     **kwargs: SAFE_VALUES | Iterable[SAFE_VALUES],
 ) -> str:
     """Compute and register the ID for the given element.
@@ -214,10 +216,8 @@ def compute_and_register_element_id(
         The ID of the form that the element belongs to. `None` or empty string
         if the element doesn't belong to a form or doesn't support forms.
 
-    active_dg_root_container : int | None
-        The root container of the DeltaGenerator that's currently 'active'. `None` if the element
-        is not a widget since won't be re-evaluated to allow the same
-        widget to be both in main and sidebar area.
+    dg : DeltaGenerator | None
+        The DeltaGenerator of each element. `None` if the element is not a widget.
 
     kwargs : SAFE_VALUES | Iterable[SAFE_VALUES]
         The arguments to use to compute the element ID.
@@ -236,10 +236,11 @@ def compute_and_register_element_id(
         # pages unique IDs.
         kwargs_to_use["active_script_hash"] = ctx.active_script_hash
 
-    if active_dg_root_container:
+    if dg:
         # If no key is provided and the widget element is inside the sidebar area
         # add it to the kwargs
         # allowing the same widget to be both in main area and sidebar.
+        active_dg_root_container = dg._active_dg._root_container
         if active_dg_root_container == RootContainer.SIDEBAR and user_key is None:
             kwargs_to_use["active_dg_root_container"] = str(active_dg_root_container)
 

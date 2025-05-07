@@ -351,7 +351,7 @@ class ComputeElementIdTests(DeltaGeneratorTestCase):
 
         # Add some kwargs that are passed to compute element ID
         # but don't appear in widget signatures.
-        for kwarg in ["form_id", "user_key", "active_dg_root_container"]:
+        for kwarg in ["form_id", "user_key", "dg"]:
             kwargs[kwarg] = ANY
 
         return kwargs
@@ -430,16 +430,10 @@ class ComputeElementIdTests(DeltaGeneratorTestCase):
         Test that duplicate ID error is not raised if the same widget is
         both in the main and sidebar area.
         """
-        try:
-            with st.container():
-                widget_func()
-            with st.sidebar:
-                widget_func()
-        except errors.StreamlitDuplicateElementKey:
-            # hybrid-widget `pydeck_chart` has a key configured and will throw
-            # a `StreamlitDuplicateElementKey` exception when using
-            # this test for all `WIDGET_ELEMENTS`
-            pass
+        with st.container():
+            widget_func()
+        with st.sidebar:
+            widget_func()
 
     @parameterized.expand(
         [

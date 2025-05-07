@@ -392,7 +392,7 @@ class NumberInputMixin:
             "number_input",
             user_key=key,
             form_id=current_form_id(self.dg),
-            active_dg_root_container=self.dg._active_dg._root_container,
+            dg=self.dg,
             label=label,
             min_value=min_value,
             max_value=max_value,

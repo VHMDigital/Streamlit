@@ -449,7 +449,7 @@ class MultiSelectMixin:
             widget_name,
             user_key=key,
             form_id=form_id,
-            active_dg_root_container=self.dg._active_dg._root_container,
+            dg=self.dg,
             label=label,
             options=formatted_options,
             default=default_values,
