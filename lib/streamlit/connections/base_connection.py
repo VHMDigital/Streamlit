@@ -87,7 +87,7 @@ class BaseConnection(ABC, Generic[RawConnectionT]):
 
     # Methods with default implementations that we don't expect subclasses to want or
     # need to overwrite.
-    def _on_secrets_changed(self, _) -> None:
+    def _on_secrets_changed(self, _: str) -> None:
         """Reset the raw connection object when this connection's secrets change.
 
         We don't expect either user scripts or connection authors to have to use or

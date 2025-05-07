@@ -66,9 +66,9 @@ _CYCLE_PLACEHOLDER: Final = (
 class UserHashError(StreamlitAPIException):
     def __init__(
         self,
-        orig_exc,
-        object_to_hash,
-        hash_func,
+        orig_exc: BaseException,
+        object_to_hash: Any,
+        hash_func: Callable[[Any], Any],
         cache_type: CacheType | None = None,
     ):
         self.alternate_name = type(orig_exc).__name__
@@ -80,7 +80,11 @@ class UserHashError(StreamlitAPIException):
         super().__init__(msg)
         self.with_traceback(orig_exc.__traceback__)
 
-    def _get_message_from_func(self, orig_exc, cached_func) -> str:
+    def _get_message_from_func(
+        self,
+        orig_exc: BaseException,
+        cached_func: Any,
+    ) -> str:
         args = self._get_error_message_args(orig_exc, cached_func)
 
         return (

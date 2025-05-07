@@ -243,7 +243,7 @@ And if you're using Streamlit Cloud, add "pyarrow" to your requirements.txt."""
         dg._enqueue("component_instance", element.component_instance)
         return return_value
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Equality operator."""
         return (
             isinstance(other, CustomComponent)
@@ -253,7 +253,7 @@ And if you're using Streamlit Cloud, add "pyarrow" to your requirements.txt."""
             and self.module_name == other.module_name
         )
 
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Inequality operator."""
 
         # we have to use "not X == Y"" here because if we use "X != Y"

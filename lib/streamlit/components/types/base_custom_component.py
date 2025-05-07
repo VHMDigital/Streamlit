@@ -99,12 +99,12 @@ class BaseCustomComponent(ABC):
         return f"'{self.name}': {self.path if self.path is not None else self.url}"
 
     @abstractmethod
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Equality operator."""
         return NotImplemented
 
     @abstractmethod
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Inequality operator."""
         return NotImplemented
 

@@ -35,7 +35,7 @@ line-ending = "lf"
 [lint]
 select = [
   "A",     # Check for python builtins being shadowed.
-  "ANN",   #
+  "ANN",   # Enforces usage of type annotations.
   "ARG",   # Checks for unused arguments.
   "ASYNC", # Opinionated linting for asyncio.
   "B",     # flake8-bugbear
@@ -120,10 +120,10 @@ ignore = [
   "S101",    # Checks for usage of assert statements.
   "TRY003",  # Checks for exception messages that are not defined in the exception class itself.
   "TRY300",  # Checks for return statements in try blocks.
-  "ANN401",  #
-  "ANN003",  #
-  "ANN002",  #
-  "ANN001",  #
+  "ANN001",  # Checks that function arguments have type annotations.
+  "ANN002",  # Checks that function *args arguments have type annotations.
+  "ANN003",  # Checks that function **kwargs arguments have type annotations.
+  "ANN401",  # Checks that `any` is not used as an annotation.
 ]
 exclude = [
   # pympler is a vendored dependency that doesn't conform to our linting rules:

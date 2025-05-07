@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from collections import ChainMap
 from copy import deepcopy
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from streamlit.connections import BaseConnection
 from streamlit.connections.util import extract_from_dict
@@ -217,8 +217,7 @@ class SQLConnection(BaseConnection["Engine"]):
 
         if autocommit:
             return cast("Engine", eng.execution_options(isolation_level="AUTOCOMMIT"))
-        else:
-            return cast("Engine", eng)
+        return cast("Engine", eng)
 
     def query(
         self,
@@ -228,7 +227,7 @@ class SQLConnection(BaseConnection["Engine"]):
         ttl: float | int | timedelta | None = None,
         index_col: str | list[str] | None = None,
         chunksize: int | None = None,
-        params=None,
+        params: Any | None = None,
         **kwargs,
     ) -> DataFrame:
         """Run a read-only query.

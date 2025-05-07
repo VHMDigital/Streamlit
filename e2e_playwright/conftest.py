@@ -308,7 +308,11 @@ def app(page: Page, app_port: int) -> Page:
 
 
 @pytest.fixture(scope="function")
-def static_app(page: Page, app_port: int, request) -> Page:
+def static_app(
+    page: Page,
+    app_port: int,
+    request: FixtureRequest,
+) -> Page:
     """Fixture that opens the app."""
     query_param = request.node.get_closest_marker("query_param")
     query_string = query_param.args[0] if query_param else ""
@@ -534,7 +538,7 @@ def browser_type_launch_args(
 
 
 @pytest.fixture(scope="function", params=["light_theme", "dark_theme"])
-def app_theme(request) -> str:
+def app_theme(request: FixtureRequest) -> str:
     """Fixture that returns the theme name."""
     return str(request.param)
 
@@ -830,7 +834,7 @@ def assert_snapshot(
 
 
 @pytest.fixture(scope="function", autouse=True)
-def playwright_profiling(request, page: Page):
+def playwright_profiling(request: FixtureRequest, page: Page):
     if request.node.get_closest_marker("no_perf") or not is_supported_browser(page):
         yield
         return
@@ -848,7 +852,7 @@ def playwright_profiling(request, page: Page):
 def wait_for_app_run(
     page_or_locator: Page | Locator | FrameLocator,
     wait_delay: int = 100,
-):
+) -> None:
     """Wait for the given page to finish running."""
     # Add a little timeout to wait for eventual debounce timeouts used in some widgets.
 

@@ -30,7 +30,10 @@ information.
 
 
 @pytest.fixture(scope="function", params=["en-US", "de-DE", "ja-JP", "ar-EG"])
-def browser_context_args(request, browser_context_args) -> dict[str, Any]:
+def browser_context_args(
+    request: pytest.FixtureRequest,
+    browser_context_args: dict[str, Any],
+) -> dict[str, Any]:
     """
     Parameterized fixture that runs for every test function in this module.
     Tests against 4 different locales.

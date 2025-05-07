@@ -152,7 +152,7 @@ class AttrDict(Mapping[str, Any]):
         self.__dict__["__nested_secrets__"] = dict(value)
 
     @staticmethod
-    def _maybe_wrap_in_attr_dict(value) -> Any:
+    def _maybe_wrap_in_attr_dict(value: Any) -> Any:
         if not isinstance(value, Mapping):
             return value
         return AttrDict(value)
@@ -438,7 +438,7 @@ class Secrets(Mapping[str, Any]):
             # failed to avoid repeatedly trying to install it.
             self._file_watchers_installed = True
 
-    def _on_secrets_changed(self, changed_file_path) -> None:
+    def _on_secrets_changed(self, changed_file_path: str) -> None:
         with self._lock:
             _LOGGER.debug("Secret path %s changed, reloading", changed_file_path)
             self._reset()

@@ -39,8 +39,12 @@ def page_heading(app: Page) -> Locator:
 
 
 def check_field(
-    app: Page, *, hide_sidebarnav=False, dynamic_pages=False, add_sidebar_elements=False
-):
+    app: Page,
+    *,
+    hide_sidebarnav: bool = False,
+    dynamic_pages: bool = False,
+    add_sidebar_elements: bool = False,
+) -> None:
     if hide_sidebarnav:
         click_checkbox(app, "Hide sidebar")
 
