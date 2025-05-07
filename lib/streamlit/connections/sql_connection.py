@@ -311,10 +311,10 @@ class SQLConnection(BaseConnection["Engine"]):
         )
         def _query(
             sql: str,
-            index_col=None,
-            chunksize=None,
-            params=None,
-            **kwargs,
+            index_col: str | list[str] | None = None,
+            chunksize: int | None = None,
+            params: Any | None = None,
+            **kwargs: Any,
         ) -> DataFrame:
             import pandas as pd
 

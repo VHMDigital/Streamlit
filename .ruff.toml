@@ -120,7 +120,6 @@ ignore = [
   "S101",    # Checks for usage of assert statements.
   "TRY003",  # Checks for exception messages that are not defined in the exception class itself.
   "TRY300",  # Checks for return statements in try blocks.
-  "ANN001",  # Checks that function arguments have type annotations.
   "ANN002",  # Checks that function *args arguments have type annotations.
   "ANN003",  # Checks that function **kwargs arguments have type annotations.
   "ANN401",  # Checks that `any` is not used as an annotation.
@@ -172,8 +171,6 @@ allow-dict-calls-with-keyword-arguments = true
 ignore-variadic-names = true
 
 [lint.flake8-annotations]
-# Surpresses errors for *args and **kwargs parameters:
-allow-star-arg-any = true
 # Surpresses errors for fully untyped functions:
 ignore-fully-untyped = true
 # Allow missing annotations on functions that return None:

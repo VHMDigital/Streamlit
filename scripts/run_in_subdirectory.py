@@ -86,7 +86,7 @@ def fix_arg(subdirectory: str, arg: str) -> str:
     return str(arg_path.relative_to(subdirectory))
 
 
-def try_as_shell(fixed_args: list[str], subdirectory: str):
+def try_as_shell(fixed_args: list[str], subdirectory: str) -> None:
     # Windows doesn't know how to run "yarn" using the CreateProcess
     # WINAPI because it's looking for an executable, and yarn is a node script.
     # Yarn happens to be the only thing currently run with this patching script,

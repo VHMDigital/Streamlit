@@ -44,7 +44,7 @@ class TornadoOAuth2App(OAuth2Mixin, OpenIDMixin, BaseApp):  # type: ignore[misc]
     def authorize_redirect(
         self,
         request_handler: tornado.web.RequestHandler,
-        redirect_uri=None,
+        redirect_uri: Any = None,
         **kwargs: Any,
     ) -> None:
         """Create a HTTP Redirect for Authorization Endpoint.
@@ -91,7 +91,7 @@ class TornadoOAuth2App(OAuth2Mixin, OpenIDMixin, BaseApp):  # type: ignore[misc]
             token = {**token, "userinfo": userinfo}
         return token
 
-    def _save_authorize_data(self, **kwargs):
+    def _save_authorize_data(self, **kwargs: Any) -> None:
         """Authlib underlying uses the concept of "session" to store state data.
         In Tornado, we don't have a session, so we use the framework's cache option.
         """

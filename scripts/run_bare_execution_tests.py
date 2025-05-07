@@ -83,7 +83,7 @@ def run_commands(section_header: str, commands: list[str]) -> list[str]:
     lock = Lock()
     failed_commands = []
 
-    def process_command(arg):
+    def process_command(arg: tuple[int, str]) -> None:
         i, command = arg
 
         # Display the status.

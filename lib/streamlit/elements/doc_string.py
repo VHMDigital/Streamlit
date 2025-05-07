@@ -323,7 +323,7 @@ def _get_variable_name_from_code_str(code: str) -> str | None:
         first_line = code_lines[0]
         end_offset = getattr(arg_node, "end_col_offset", -1)
 
-    return cast("str", first_line[start_offset:end_offset])
+    return first_line[start_offset:end_offset]
 
 
 _NEWLINES = re.compile(r"[\n\r]+")
@@ -391,13 +391,13 @@ def _is_stcommand(tree: Any, command_name: str) -> bool:
     )
 
 
-def _get_stcommand_arg(tree: Any):
+def _get_stcommand_arg(tree: ast.Module) -> ast.expr | None:
     """Gets the argument node for the st command in tree (AST)."""
 
-    root_node = tree.body[0].value
+    root_node = tree.body[0].value  # type: ignore
 
     if root_node.args:
-        return root_node.args[0]
+        return cast("ast.expr", root_node.args[0])
 
     return None
 
