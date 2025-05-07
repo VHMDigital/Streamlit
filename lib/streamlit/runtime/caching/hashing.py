@@ -149,7 +149,7 @@ If you think this is actually a Streamlit bug, please
 
 def update_hash(
     val: Any,
-    hasher,
+    hasher: Any,
     cache_type: CacheType,
     hash_source: Callable[..., Any] | None = None,
     hash_funcs: HashFuncsDict | None = None,

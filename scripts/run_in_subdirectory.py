@@ -26,7 +26,7 @@ if __name__ not in ("__main__", "__mp_main__"):
     )
 
 
-def is_relative_to(path: Path, *other) -> bool:
+def is_relative_to(path: Path, *other: str) -> bool:
     """Return True if the path is relative to another path or False.
 
     This function is backported from Python 3.9 - Path.relativeto.
@@ -38,7 +38,7 @@ def is_relative_to(path: Path, *other) -> bool:
         return False
 
 
-def display_usage():
+def display_usage() -> None:
     prog = Path(__file__).name
     print(
         textwrap.dedent(

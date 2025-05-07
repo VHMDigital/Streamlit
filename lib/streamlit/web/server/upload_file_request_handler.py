@@ -49,7 +49,7 @@ class UploadFileRequestHandler(tornado.web.RequestHandler):
         self._file_mgr = file_mgr
         self._is_active_session = is_active_session
 
-    def set_default_headers(self):
+    def set_default_headers(self) -> None:
         self.set_header("Access-Control-Allow-Methods", "PUT, OPTIONS, DELETE")
         self.set_header("Access-Control-Allow-Headers", "Content-Type")
         if is_xsrf_enabled():

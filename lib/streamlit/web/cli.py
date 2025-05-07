@@ -369,7 +369,7 @@ def test_prog_name():
 
 @main.command("init")
 @click.argument("directory", required=False)
-def main_init(directory: str | None = None):
+def main_init(directory: str | None = None) -> None:
     """Initialize a new Streamlit project.
 
     If DIRECTORY is specified, create it and initialize the project there.

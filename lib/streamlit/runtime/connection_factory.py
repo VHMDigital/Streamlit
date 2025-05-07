@@ -65,7 +65,7 @@ def _create_connection(
     connection_class: type[ConnectionClass],
     max_entries: int | None = None,
     ttl: float | timedelta | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> ConnectionClass:
     """Create an instance of connection_class with the given name and kwargs.
 
@@ -119,7 +119,7 @@ def connection_factory(
     max_entries: int | None = None,
     ttl: float | timedelta | None = None,
     autocommit: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> SQLConnection:
     pass
 
@@ -131,7 +131,7 @@ def connection_factory(
     max_entries: int | None = None,
     ttl: float | timedelta | None = None,
     autocommit: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> SQLConnection:
     pass
 
@@ -142,7 +142,7 @@ def connection_factory(
     max_entries: int | None = None,
     ttl: float | timedelta | None = None,
     autocommit: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> SnowflakeConnection:
     pass
 
@@ -154,7 +154,7 @@ def connection_factory(
     max_entries: int | None = None,
     ttl: float | timedelta | None = None,
     autocommit: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> SnowflakeConnection:
     pass
 
@@ -164,7 +164,7 @@ def connection_factory(
     name: Literal["snowpark"],
     max_entries: int | None = None,
     ttl: float | timedelta | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> SnowparkConnection:
     pass
 
@@ -175,7 +175,7 @@ def connection_factory(
     type: Literal["snowpark"],
     max_entries: int | None = None,
     ttl: float | timedelta | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> SnowparkConnection:
     pass
 
@@ -186,7 +186,7 @@ def connection_factory(
     type: type[ConnectionClass],
     max_entries: int | None = None,
     ttl: float | timedelta | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> ConnectionClass:
     pass
 
@@ -197,7 +197,7 @@ def connection_factory(
     type: str | None = None,
     max_entries: int | None = None,
     ttl: float | timedelta | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> BaseConnection[Any]:
     pass
 

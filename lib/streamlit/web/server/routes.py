@@ -48,7 +48,7 @@ class StaticFileHandler(tornado.web.StaticFileHandler):
         path: str,
         default_filename: str | None = None,
         reserved_paths: Sequence[str] = (),
-    ):
+    ) -> None:
         self._reserved_paths = reserved_paths
 
         super().initialize(path, default_filename)

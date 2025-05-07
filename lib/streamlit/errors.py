@@ -165,7 +165,7 @@ class StreamlitModuleNotFoundError(StreamlitAPIWarning):
 
 
 class LocalizableStreamlitException(StreamlitAPIException):
-    def __init__(self, message: str, **kwargs):
+    def __init__(self, message: str, **kwargs: Any):
         super().__init__((message).format(**kwargs))
         self._exec_kwargs = kwargs
 
