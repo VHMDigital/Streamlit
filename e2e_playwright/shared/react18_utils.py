@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from playwright.sync_api import Locator, Page
 
+    from e2e_playwright.conftest import ImageCompareFunction
+
 
 def wait_for_react_stability(page: Page, timeout_ms: int = 1000):
     """
@@ -82,7 +84,7 @@ def wait_for_react_stability(page: Page, timeout_ms: int = 1000):
 def take_stable_snapshot(
     page: Page,
     locator: Locator | Page,
-    assert_snapshot,
+    assert_snapshot: ImageCompareFunction,
     name: str,
     pixel_threshold: float = 0.05,
 ) -> None:
