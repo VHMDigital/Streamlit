@@ -200,6 +200,7 @@ with st.container(key="badge_elements"):
         ":blue-badge[Blue markdown badge] :green-badge[🌱 Green markdown badge]"
     )
 
+"---"
 
 st.markdown(
     "Images in markdown should stay inside the container width:\n\n![image](./app/static/streamlit-logo.png)"
