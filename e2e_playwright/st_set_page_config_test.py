@@ -208,3 +208,38 @@ def test_set_page_config_menu_items_additive(app: Page):
     # These options should now be present in the main menu:
     expect(main_menu_items.nth(4)).to_have_text("Report a bug")
     expect(main_menu_items.nth(5)).to_have_text("Get help")
+
+
+@pytest.mark.skip_browser("webkit")
+def test_set_page_config_menu_items_overwrites(app: Page):
+    # Set the initial menu items:
+    click_button(app, "Set Initial Menu Items")
+    expect_no_exception(app)
+    # Open the main menu:
+    app.get_by_test_id("stMainMenu").click()
+    # First main menu list includes "Get help" (second is developer menu)
+    main_menu_items = app.get_by_test_id("stMainMenuList").first.get_by_role("option")
+    # Get help should be present
+    expect(main_menu_items.nth(4)).to_have_text("Get help")
+    # Open the about dialog:
+    main_menu_items.nth(5).click()
+    about_dialog = app.get_by_role("dialog")
+    expect(about_dialog).to_be_visible()
+    # The about section markdown should contain the updated text:
+    expect(about_dialog).to_contain_text("UPDATED")
+
+    # Close the dialog:
+    about_dialog.get_by_role("button", name="Close").click()
+
+    # Now overwrite the menu items:
+    click_button(app, "Menu Items Overwrite")
+    expect_no_exception(app)
+    app.get_by_test_id("stMainMenu").click()
+    main_menu_items = app.get_by_test_id("stMainMenuList").first.get_by_role("option")
+    # Get help should still be present in the main menu from the 1st call:
+    expect(main_menu_items.nth(4)).to_have_text("Get help")
+    main_menu_items.nth(5).click()
+    about_dialog = app.get_by_role("dialog")
+    expect(about_dialog).to_be_visible()
+    # The about section markdown should not contain the updated text:
+    expect(about_dialog).not_to_contain_text("UPDATED")

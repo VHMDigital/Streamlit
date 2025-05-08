@@ -152,3 +152,20 @@ def set_page_config_menu_items_additive():
 st.button(
     "Set Page Config Menu Items Additive", on_click=set_page_config_menu_items_additive
 )
+
+
+def set_initial_menu_items():
+    st.set_page_config(
+        menu_items={
+            "About": "### :red[UPDATED]",
+            "Get help": "https://www.streamlit.io",
+        }
+    )
+
+
+def set_page_config_menu_items_overwrite():
+    st.set_page_config(menu_items={"About": None})
+
+
+st.button("Set Initial Menu Items", on_click=set_initial_menu_items)
+st.button("Menu Items Overwrite", on_click=set_page_config_menu_items_overwrite)
