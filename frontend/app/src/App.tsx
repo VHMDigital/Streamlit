@@ -201,6 +201,11 @@ interface State {
   appConfig: AppConfig
   autoReruns: NodeJS.Timeout[]
   inputsDisabled: boolean
+  // Whether we have received a NewSession message after the latest rerun request.
+  // This is used to ensure that we only increment the message cache run count after
+  // we have received a NewSession message after the latest rerun request.
+  // This will allow us to ignore finished messages from previous script runs.
+  hasReceivedNewSession: boolean
 }
 
 const INITIAL_SCRIPT_RUN_ID = "<null>"
@@ -318,6 +323,7 @@ export class App extends PureComponent<Props, State> {
       appConfig: {},
       autoReruns: [],
       inputsDisabled: false,
+      hasReceivedNewSession: false,
     }
 
     this.connectionManager = null
@@ -791,7 +797,6 @@ export class App extends PureComponent<Props, State> {
       }
       throw new Error(`Cannot handle ${name} "${whichOne}".`)
     }
-
     try {
       dispatchProto(msgProto, "type", {
         newSession: (newSessionMsg: NewSession) =>
@@ -1089,6 +1094,10 @@ export class App extends PureComponent<Props, State> {
       return
     }
 
+    // Set this flag to indicate that we have received a NewSession message
+    // after the latest rerun request:
+    this.setState({ hasReceivedNewSession: true })
+
     // First, handle initialization logic. Each NewSession message has
     // initialization data. If this is the _first_ time we're receiving
     // the NewSession message (or the first time since disconnect), we
@@ -1333,7 +1342,13 @@ export class App extends PureComponent<Props, State> {
       if (
         this.connectionManager !== null &&
         status !== ForwardMsg.ScriptFinishedStatus.FINISHED_EARLY_FOR_RERUN &&
-        this.sessionInfo.isSet
+        this.sessionInfo.isSet &&
+        // We only increment the message cache run count if we have received
+        // a NewSession message after the latest rerun request. This is done
+        // to ignore finished messages from previous script runs, which would
+        // cause issues with deleting cached messages that are needed for the
+        // current script run.
+        this.state.hasReceivedNewSession
       ) {
         this.connectionManager.incrementMessageCacheRunCount(
           this.sessionInfo.current.maxCachedMessageAge,
@@ -1640,6 +1655,9 @@ export class App extends PureComponent<Props, State> {
         },
       })
     )
+    // Reset hasReceivedNewSession to false to ensure that we are aware
+    // if a finished message is from a previous script run.
+    this.setState({ hasReceivedNewSession: false })
   }
 
   /** Requests that the server stop running the script */
