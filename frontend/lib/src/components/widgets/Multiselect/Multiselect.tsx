@@ -209,12 +209,15 @@ const Multiselect: FC<Props> = props => {
       placeholder = "Add options"
     }
   }
-  const selectOptions: MultiselectOption[] = options.map((option: string) => {
-    return {
-      label: option,
-      value: option,
+  const selectOptions: MultiselectOption[] = options.map(
+    (option: string, index: number) => {
+      return {
+        label: option,
+        value: option,
+        id: `${option}_${index}`,
+      }
     }
-  })
+  )
 
   // Check if we have more than 10 options in the selectbox.
   // If that's true, we show the keyboard on mobile. If not, we hide it.

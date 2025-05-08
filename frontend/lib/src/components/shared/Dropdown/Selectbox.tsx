@@ -154,10 +154,13 @@ const Selectbox: React.FC<Props> = ({
     }
   }
 
-  const selectOptions: SelectOption[] = opts.map((option: string) => ({
-    label: option,
-    value: option,
-  }))
+  const selectOptions: SelectOption[] = opts.map(
+    (option: string, index: number) => ({
+      label: option,
+      value: option,
+      id: `${option}_${index}`,
+    })
+  )
 
   // Check if we have more than 10 options in the selectbox.
   // If that's true, we show the keyboard on mobile. If not, we hide it.
