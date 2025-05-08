@@ -158,6 +158,8 @@ const Selectbox: React.FC<Props> = ({
     (option: string, index: number) => ({
       label: option,
       value: option,
+      // We are using an id because if multiple options are equal,
+      // we have observed weird UI glitches
       id: `${option}_${index}`,
     })
   )

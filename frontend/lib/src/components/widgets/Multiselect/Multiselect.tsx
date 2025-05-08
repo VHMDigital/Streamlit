@@ -214,6 +214,8 @@ const Multiselect: FC<Props> = props => {
       return {
         label: option,
         value: option,
+        // We are using an id because if multiple options are equal,
+        // we have observed weird UI glitches
         id: `${option}_${index}`,
       }
     }
