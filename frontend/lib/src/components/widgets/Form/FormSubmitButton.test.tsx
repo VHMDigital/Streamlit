@@ -21,7 +21,7 @@ import { enableAllPlugins } from "immer"
 
 import { Button as ButtonProto } from "@streamlit/protobuf"
 
-import { customRenderLibContext } from "~lib/test_util"
+import { renderWithContexts } from "~lib/test_util"
 import {
   createFormsData,
   FormsData,
@@ -67,15 +67,15 @@ describe("FormSubmitButton", () => {
   }
 
   it("renders without crashing", () => {
-    // render with customRenderLibContext necessary as FormsContext required
+    // render with renderWithContexts necessary as FormsContext required
     // second arg is empty object as overrides for LibContextProps are not needed
-    customRenderLibContext(<FormSubmitButton {...getProps()} />, {})
+    renderWithContexts(<FormSubmitButton {...getProps()} />, {})
     expect(screen.getByRole("button")).toBeInTheDocument()
   })
 
   it("has correct className", () => {
     const props = getProps()
-    customRenderLibContext(<FormSubmitButton {...props} />, {})
+    renderWithContexts(<FormSubmitButton {...props} />, {})
 
     const formSubmitButton = screen.getByTestId("stFormSubmitButton")
 
@@ -84,7 +84,7 @@ describe("FormSubmitButton", () => {
 
   it("renders a label within the button", () => {
     const props = getProps()
-    customRenderLibContext(<FormSubmitButton {...props} />, {})
+    renderWithContexts(<FormSubmitButton {...props} />, {})
 
     const formSubmitButton = screen.getByRole("button", {
       name: `${props.element.label}`,
@@ -95,7 +95,7 @@ describe("FormSubmitButton", () => {
 
   it("renders with help properly", async () => {
     const user = userEvent.setup()
-    customRenderLibContext(
+    renderWithContexts(
       <FormSubmitButton {...getProps({}, { help: "mockHelpText" })} />,
       {}
     )
@@ -115,7 +115,7 @@ describe("FormSubmitButton", () => {
     const user = userEvent.setup()
     const props = getProps()
     vi.spyOn(props.widgetMgr, "submitForm")
-    customRenderLibContext(<FormSubmitButton {...props} />, {})
+    renderWithContexts(<FormSubmitButton {...props} />, {})
 
     const formSubmitButton = screen.getByRole("button")
 
@@ -131,7 +131,7 @@ describe("FormSubmitButton", () => {
     const user = userEvent.setup()
     const props = getProps({ fragmentId: "myFragmentId" })
     vi.spyOn(props.widgetMgr, "submitForm")
-    customRenderLibContext(<FormSubmitButton {...props} />, {})
+    renderWithContexts(<FormSubmitButton {...props} />, {})
 
     const formSubmitButton = screen.getByRole("button")
 
@@ -150,7 +150,7 @@ describe("FormSubmitButton", () => {
       formsWithUploads: new Set(["mockFormId"]),
     }
 
-    customRenderLibContext(
+    renderWithContexts(
       <FormSubmitButton {...getProps()} />,
       {},
       {
@@ -175,7 +175,7 @@ describe("FormSubmitButton", () => {
       }),
     })
 
-    const { unmount: unmountView1 } = customRenderLibContext(
+    const { unmount: unmountView1 } = renderWithContexts(
       <FormSubmitButton {...props} />,
       {}
     )
@@ -184,7 +184,7 @@ describe("FormSubmitButton", () => {
     // @ts-expect-error
     expect(formsData.submitButtons.get("mockFormId")[0]).toEqual(props.element)
 
-    const { unmount: unmountView2 } = customRenderLibContext(
+    const { unmount: unmountView2 } = renderWithContexts(
       <FormSubmitButton {...props2} />,
       {}
     )

@@ -78,7 +78,7 @@ export function mockWindowLocation(hostname: string): void {
  * Use react-testing-library to render a ReactElement. The element will be
  * wrapped in our LibContext.Provider and FormsContext.Provider.
  */
-export const customRenderLibContext = (
+export const renderWithContexts = (
   component: ReactElement,
   overrideLibContextProps: Partial<LibContextProps>,
   overrideFormsContextProps?: Partial<FormsContextProps>
