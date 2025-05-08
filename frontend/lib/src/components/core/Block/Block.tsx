@@ -283,9 +283,6 @@ const VerticalBlock = (props: BlockPropsWithoutWidth): ReactElement => {
   const height = props.node.deltaBlock.vertical?.height || undefined
   const color = props.node.deltaBlock.vertical?.backgroundColor || undefined
 
-  // If we get a color from the proto, we set the background color to the corresponding color from the existing theme.
-  const backgroundColor = color ? getContainerBgColor(theme, color) : undefined
-
   const activateScrollToBottom =
     height &&
     props.node.children.some(node => {
@@ -310,7 +307,7 @@ const VerticalBlock = (props: BlockPropsWithoutWidth): ReactElement => {
     <VerticalBlockBorderWrapper
       border={border}
       height={height}
-      backgroundColor={backgroundColor}
+      color={color}
       data-testid="stVerticalBlockBorderWrapper"
       data-test-scroll-behavior="normal"
     >
