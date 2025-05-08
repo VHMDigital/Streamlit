@@ -189,13 +189,11 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
     ]
   )
 
-  // Memoized object for FormsContext values
-  const formsContextProps = useMemo<FormsContextProps>(
-    () => ({
-      formsData,
-    }),
-    [formsData]
-  )
+  // formsData is not a stable reference, so memoization does not help
+  // eslint-disable-next-line @eslint-react/no-unstable-context-value
+  const formsContextProps: FormsContextProps = {
+    formsData,
+  }
 
   return (
     <AppContext.Provider value={appContextProps}>
