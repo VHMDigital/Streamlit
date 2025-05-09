@@ -729,19 +729,19 @@ class SessionState:
         We use pickleability as the metric for serializability, and test for
         pickleability by just trying it.
         """
-        try:
-            for k in self:
+        for k in self:
+            try:
                 pickle.dumps(self[k])
-        except Exception as e:
-            err_msg = (
-                f"Cannot serialize the value (of type `{type(self[k])}`) of '{k}' in "
-                "st.session_state. Streamlit has been configured to use "
-                "[pickle](https://docs.python.org/3/library/pickle.html) to "
-                "serialize session_state values. Please convert the value to a "
-                "pickle-serializable type. To learn more about this behavior, "
-                "see [our docs](https://docs.streamlit.io/knowledge-base/using-streamlit/serializable-session-state)."
-            )
-            raise UnserializableSessionStateError(err_msg) from e
+            except Exception as e:  # noqa: PERF203
+                err_msg = (
+                    f"Cannot serialize the value (of type `{type(self[k])}`) of '{k}' in "
+                    "st.session_state. Streamlit has been configured to use "
+                    "[pickle](https://docs.python.org/3/library/pickle.html) to "
+                    "serialize session_state values. Please convert the value to a "
+                    "pickle-serializable type. To learn more about this behavior, "
+                    "see [our docs](https://docs.streamlit.io/knowledge-base/using-streamlit/serializable-session-state)."
+                )
+                raise UnserializableSessionStateError(err_msg) from e
 
     def maybe_check_serializable(self) -> None:
         """Verify that session state can be serialized, if the relevant config
