@@ -249,7 +249,7 @@ class WStates(MutableMapping[str, Any]):
         """Return a list of serialized widget values for each widget with a value."""
         states = [
             self.get_serialized(widget_id)
-            for widget_id in self.states.keys()
+            for widget_id in self.states
             if self.get_serialized(widget_id)
         ]
         states = cast("list[WidgetStateProto]", states)
@@ -429,10 +429,10 @@ class SessionState:
         for widgets that don't have user_keys defined, and which aren't
         exposed to user code).
         """
-        old_keys = {self._get_widget_id(k) for k in self._old_state.keys()}
+        old_keys = {self._get_widget_id(k) for k in self._old_state}
         new_widget_keys = set(self._new_widget_state.keys())
         new_session_state_keys = {
-            self._get_widget_id(k) for k in self._new_session_state.keys()
+            self._get_widget_id(k) for k in self._new_session_state
         }
         return old_keys | new_widget_keys | new_session_state_keys
 
