@@ -406,6 +406,7 @@ connect-src ws://localhost:{app_port}/_stcore/stream
     https://data.streamlit.io/tokens.json
     https://basemaps.cartocdn.com
     https://tiles.basemaps.cartocdn.com
+    https://tiles-a.basemaps.cartocdn.com
     https://tiles-b.basemaps.cartocdn.com
     https://tiles-c.basemaps.cartocdn.com
     https://tiles-d.basemaps.cartocdn.com
