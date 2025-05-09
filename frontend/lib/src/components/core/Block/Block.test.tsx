@@ -45,7 +45,9 @@ function makeHorizontalBlockWithColumns(numColumns: number): BlockNode {
     new BlockProto({
       allowEmpty: true,
       flexContainer: {
-        gapSize: streamlit.GapSize.SMALL,
+        gapConfig: {
+          gapSize: streamlit.GapSize.SMALL,
+        },
         direction: BlockProto.FlexContainer.Direction.HORIZONTAL,
       },
     })
