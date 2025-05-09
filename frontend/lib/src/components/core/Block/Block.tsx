@@ -38,6 +38,7 @@ import Dialog from "~lib/components/elements/Dialog"
 import Expander from "~lib/components/elements/Expander"
 import { useRequiredContext } from "~lib/hooks/useRequiredContext"
 import { useScrollToBottom } from "~lib/hooks/useScrollToBottom"
+import { useLayoutStyles } from "src/components/core/Layout/useLayoutStyles"
 
 import {
   assignDividerColor,
@@ -62,7 +63,6 @@ import {
   StyledFlexContainerBlockProps,
   StyledLayoutStylesWrapper,
 } from "./styled-components"
-import { useLayoutStyles } from "../Layout/useLayoutStyles"
 
 const ChildRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
   const { libConfig } = useContext(LibContext)
@@ -253,6 +253,12 @@ const BlockNodeRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
     useContext(LibContext)
   const { formsData } = useRequiredContext(FormsContext)
 
+  const styles = useLayoutStyles({
+    element:
+      (node.deltaBlock.type && node.deltaBlock[node.deltaBlock.type]) ||
+      undefined,
+  })
+
   if (node.isEmpty && !node.deltaBlock.allowEmpty) {
     return <></>
   }
@@ -381,12 +387,6 @@ const BlockNodeRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
     const tabsProps: TabProps = { ...childProps, isStale, renderTabContent }
     return <Tabs {...tabsProps} />
   }
-
-  const styles = useLayoutStyles({
-    element:
-      (node.deltaBlock.type && node.deltaBlock[node.deltaBlock.type]) ||
-      undefined,
-  })
 
   if (containerElement) {
     return (
