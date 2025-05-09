@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+// Thank you to fzy.js for the original implementation
+// https://github.com/jhawthorn/fzy.js (MIT License)
+
 import * as fzy from "./fuzzySearch"
 
 const score = fzy.score
@@ -33,14 +36,15 @@ const SCORE_MATCH_DOT = fzy.SCORE_MATCH_DOT
 /* score(needle, haystack) */
 describe("score", () => {
   it("should prefer starts of words", function () {
-    /* App/Models/Order is better than App/MOdels/zRder  */
+    /* app/models/order is better than app/models/zrder
+     * because 'o' in order comes before 'z' in zrder */
     expect(score("amor", "app/models/order")).toBeGreaterThan(
       score("amor", "app/models/zrder")
     )
   })
 
   it("should prefer consecutive letters", function () {
-    /* App/MOdels/foo is better than App/M/fOo  */
+    /* app/models/foo is better than app/m/foo  */
     expect(score("amo", "app/m/foo")).toBeLessThan(
       score("amo", "app/models/foo")
     )

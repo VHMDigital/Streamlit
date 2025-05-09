@@ -15,7 +15,8 @@
  */
 
 // Thank you to fzy.js for the original implementation
-// https://github.com/jhawthorn/fzy.js
+// https://github.com/jhawthorn/fzy.js (MIT License)
+
 const SCORE_MIN = -Infinity
 const SCORE_MAX = Infinity
 const SCORE_GAP_LEADING = -0.005

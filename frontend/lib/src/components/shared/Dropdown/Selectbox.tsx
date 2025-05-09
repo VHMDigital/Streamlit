@@ -24,7 +24,7 @@ import sortBy from "lodash/sortBy"
 
 import VirtualDropdown from "~lib/components/shared/Dropdown/VirtualDropdown"
 import { isNullOrUndefined, LabelVisibilityOptions } from "~lib/util/utils"
-import { hasMatch, score } from "~lib/util/fuzzySearch"
+import { hasMatch, score } from "~lib/vendor/fzy.js/fuzzySearch"
 import { Placement } from "~lib/components/shared/Tooltip"
 import TooltipIcon from "~lib/components/shared/TooltipIcon"
 import {
@@ -69,6 +69,8 @@ export function fuzzyFilterSelectOptions(
   )
   return sortBy(
     filteredOptions,
+    // Use the negative score to sort the list in a stable manner
+    // This ensures highest score is first
     (opt: SelectOption) => -score(pattern, opt.label, true)
   )
 }
