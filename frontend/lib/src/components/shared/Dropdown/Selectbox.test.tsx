@@ -215,10 +215,10 @@ describe("Selectbox widget", () => {
 
   it("predictably produces case sensitive matches", async () => {
     const user = userEvent.setup()
-    const props = getProps({
+    const currProps = getProps({
       options: ["aa", "Aa", "aA"],
     })
-    render(<Selectbox {...props} />)
+    render(<Selectbox {...currProps} />)
     const selectboxInput = screen.getByRole("combobox")
 
     await user.type(selectboxInput, "aa")
