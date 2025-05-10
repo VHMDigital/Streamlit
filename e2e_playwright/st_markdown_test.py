@@ -277,3 +277,27 @@ def test_large_image_in_markdown(app: Page, assert_snapshot: ImageCompareFunctio
 def test_check_top_level_class(app: Page):
     """Check that the top level class is correctly set."""
     check_top_level_class(app, "stMarkdown")
+
+
+def test_width_configurations(app: Page, assert_snapshot: ImageCompareFunction):
+    """Test that width configurations are displayed correctly."""
+    markdown_elements = app.get_by_test_id("stMarkdown")
+
+    dividers = markdown_elements.filter(has_text="---")
+    expect(dividers).to_have_count(12)
+    assert_snapshot(dividers.nth(10), name="st_divider-width_pixels")
+    assert_snapshot(dividers.nth(11), name="st_divider-width_stretch")
+
+    # Test LaTeX width configurations
+    # The width test LaTeX elements are the last three LaTeX elements in the app
+    latex_elements = markdown_elements.filter(has_text="$$")
+    expect(latex_elements).to_have_count(6)
+    assert_snapshot(
+        latex_elements.nth(3), name="st_latex-width_pixels"
+    )  # Fourth LaTeX element
+    assert_snapshot(
+        latex_elements.nth(4), name="st_latex-width_stretch"
+    )  # Fifth LaTeX element
+    assert_snapshot(
+        latex_elements.nth(5), name="st_latex-width_content"
+    )  # Last LaTeX element
