@@ -32,6 +32,8 @@ function translateGapWidth(
     gapWidth = theme.spacing.threeXL
   } else if (gap === streamlit.GapSize.LARGE) {
     gapWidth = theme.spacing.fourXL
+  } else if (gap === streamlit.GapSize.NONE) {
+    gapWidth = theme.spacing.none
   }
   return gapWidth
 }
