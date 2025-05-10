@@ -102,11 +102,11 @@ def test_audio_width_configurations(app: Page, assert_snapshot: ImageCompareFunc
         lambda: audio_pixel_width.evaluate("el => el.readyState") == 4,
         timeout=15000,
     )
-    # Additional wait to ensure that the audio element is fully loaded
-    # and that its not causing flakiness in screenshots.
-    # This might not be 100% necessary.
-    app.wait_for_timeout(3000)
-    assert_snapshot(audio_pixel_width, name="st_audio-width_300px")
+    # Hide the timeline to prevent flakiness in screenshots
+    hide_timeline_style = "audio::-webkit-media-controls-timeline { display: none; }"
+    assert_snapshot(
+        audio_pixel_width, name="st_audio-width_300px", style=hide_timeline_style
+    )
 
     audio_stretch_width = app.get_by_test_id("stAudio").nth(7)
     wait_until(
@@ -114,11 +114,10 @@ def test_audio_width_configurations(app: Page, assert_snapshot: ImageCompareFunc
         lambda: audio_stretch_width.evaluate("el => el.readyState") == 4,
         timeout=15000,
     )
-    # Additional wait to ensure that the audio element is fully loaded
-    # and that its not causing flakiness in screenshots.
-    # This might not be 100% necessary.
-    app.wait_for_timeout(3000)
-    assert_snapshot(audio_stretch_width, name="st_audio-width_stretch")
+
+    assert_snapshot(
+        audio_stretch_width, name="st_audio-width_stretch", style=hide_timeline_style
+    )
 
 
 def test_audio_remount_no_autoplay(app: Page):
