@@ -27,23 +27,16 @@ const FontFaceDeclaration = ({
 }: FontFaceDeclarationProps): ReactElement => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const fontMarkup = fontFaces.map((font: any) => {
-    const {
-      family,
-      weight,
-      stringWeight,
-      url,
-      style = "normal",
-      unicodeRange = "U+0-10FFFF",
-    } = font
+    const { family, stringWeight, url, style, unicodeRange } = font
 
     return `
       @font-face {
         font-family: ${family};
-        font-weight: ${stringWeight || weight};
-        font-style: ${style};
-        font-display: swap;
-        unicode-range: ${unicodeRange};
         src: url(${url}) format("woff2");
+        font-display: swap;
+        ${style ? `font-style: ${style};` : ""}
+        ${stringWeight ? `font-weight: ${stringWeight};` : ""}
+        ${unicodeRange ? `unicode-range: ${unicodeRange};` : ""}
       }
     `
   })
