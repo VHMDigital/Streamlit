@@ -264,7 +264,7 @@ class SliderMixin:
     # If value is provided and a sequence of numeric type,
     #   return a tuple of the same numeric type.
     @overload
-    def slider(  # type: ignore[overload-overlap]
+    def slider(
         self,
         label: str,
         min_value: SliderNumericT | None = None,
@@ -374,7 +374,9 @@ class SliderMixin:
         min_value: SliderDatelikeT | None = None,
         max_value: SliderDatelikeT | None = None,
         *,
-        value: SliderDatelikeSpanT[SliderDatelikeT],
+        value: list[SliderDatelikeT]
+        | tuple[SliderDatelikeT]
+        | tuple[SliderDatelikeT, SliderDatelikeT],
         step: StepDatelikeT | None = None,
         format: str | None = None,
         key: Key | None = None,
