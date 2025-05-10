@@ -100,6 +100,8 @@ from streamlit.runtime.scriptrunner import enqueue_message as _enqueue_message
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 if TYPE_CHECKING:
+    from types import TracebackType
+
     from google.protobuf.message import Message
 
     from streamlit.cursor import Cursor
@@ -145,6 +147,19 @@ def _maybe_print_use_warning() -> None:
                 f"the following\n  command:\n\n    streamlit run {script_name} "
                 "[ARGUMENTS]"
             )
+
+
+def _maybe_print_fragment_callback_warning() -> None:
+    """Print a warning if elements are being modified during a fragment callback."""
+    ctx = get_script_run_ctx()
+    if ctx and getattr(ctx, "in_fragment_callback", False):
+        warning = cli_util.style_for_cli("Warning:", bold=True, fg="yellow")
+
+        logger.get_logger("root").warning(
+            f"\n  {warning} A fragment rerun was triggered with a callback that displays one or more elements. "
+            "During a fragment rerun, within a callback, displaying elements is not officially supported because "
+            "those elements will replace the existing elements at the top of your app."
+        )
 
 
 class DeltaGenerator(
@@ -288,9 +303,9 @@ class DeltaGenerator(
 
     def __exit__(
         self,
-        type: Any,
-        value: Any,
-        traceback: Any,
+        typ: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
     ) -> Literal[False]:
         # with block ended
 
@@ -352,7 +367,7 @@ class DeltaGenerator(
 
         return wrapper
 
-    def __deepcopy__(self, _memo):
+    def __deepcopy__(self, _memo: Any) -> DeltaGenerator:
         dg = DeltaGenerator(
             root_container=self._root_container,
             cursor=deepcopy(self._cursor),
@@ -393,8 +408,7 @@ class DeltaGenerator(
         """
         if self._provided_cursor is None:
             return cursor.get_container_cursor(self._root_container)
-        else:
-            return self._provided_cursor
+        return self._provided_cursor
 
     @property
     def _is_top_level(self) -> bool:
@@ -454,6 +468,8 @@ class DeltaGenerator(
 
         # Warn if an element is being changed but the user isn't running the streamlit server.
         _maybe_print_use_warning()
+        # Warn if an element is being changed during a fragment callback.
+        _maybe_print_fragment_callback_warning()
 
         # Copy the marshalled proto into the overall msg proto
         msg = ForwardMsg_pb2.ForwardMsg()
