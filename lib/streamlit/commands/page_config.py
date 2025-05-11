@@ -273,6 +273,7 @@ def set_menu_items_proto(lowercase_menu_items, menu_items_proto) -> None:
         if lowercase_menu_items[ABOUT_KEY] is not None:
             menu_items_proto.about_section_md = dedent(lowercase_menu_items[ABOUT_KEY])
         else:
+            # For multiple calls to set_page_config, clears previously set about markdown
             menu_items_proto.clear_about_md = True
 
 
