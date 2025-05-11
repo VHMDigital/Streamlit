@@ -103,7 +103,10 @@ def test_audio_width_configurations(app: Page, assert_snapshot: ImageCompareFunc
         timeout=15000,
     )
     # Hide the timeline to prevent flakiness in screenshots
-    hide_timeline_style = "audio::-webkit-media-controls-timeline { display: none; }"
+    hide_timeline_style = """
+    audio::-webkit-media-controls-timeline { display: none; },
+    audio::-moz-progress-bar { display: none; }
+    """
     assert_snapshot(
         audio_pixel_width, name="st_audio-width_300px", style=hide_timeline_style
     )
