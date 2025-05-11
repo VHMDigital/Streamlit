@@ -16,7 +16,7 @@
 
 export const spacing = {
   px: "1px",
-  none: "0rem",
+  none: "0",
   threeXS: "0.125rem",
   twoXS: "0.25rem",
   xs: "0.375rem",
