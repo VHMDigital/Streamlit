@@ -686,6 +686,24 @@ function DataFrame({
     }
   }, [allColumns.length, columns.length])
 
+  const getColumnDataForMenu = useCallback(() => {
+    if (!showMenu || isEmptyTable) {
+      return undefined
+    }
+
+    const columnData: GridCell[] = []
+    for (let i = 0; i < numRows; i++) {
+      columnData.push(getCellContent([showMenu.columnIdx, i]))
+    }
+    return columnData
+  }, [
+    showMenu,
+    isEmptyTable,
+    numRows,
+    getCellContent,
+    columns /* Added columns to dependencies */,
+  ])
+
   return (
     <StyledResizableContainer
       className="stDataFrame"
@@ -1111,8 +1129,9 @@ function DataFrame({
           <ColumnMenu
             top={showMenu.headerBounds.y + showMenu.headerBounds.height}
             left={showMenu.headerBounds.x + showMenu.headerBounds.width}
-            columnName={originalColumns[showMenu.columnIdx].title}
-            columnKind={originalColumns[showMenu.columnIdx].kind}
+            columnName={columns[showMenu.columnIdx].title}
+            columnKind={columns[showMenu.columnIdx].kind}
+            getColumnData={getColumnDataForMenu}
             onCloseMenu={() => setShowMenu(undefined)}
             onSortColumn={
               isSortingEnabled
@@ -1124,21 +1143,18 @@ function DataFrame({
                   }
                 : undefined
             }
-            isColumnPinned={originalColumns[showMenu.columnIdx].isPinned}
+            isColumnPinned={columns[showMenu.columnIdx].isPinned}
             onUnpinColumn={() => {
-              unpinColumn(originalColumns[showMenu.columnIdx].id)
+              unpinColumn(columns[showMenu.columnIdx].id)
             }}
             onPinColumn={() => {
-              pinColumn(originalColumns[showMenu.columnIdx].id)
+              pinColumn(columns[showMenu.columnIdx].id)
             }}
             onHideColumn={() => {
-              hideColumn(originalColumns[showMenu.columnIdx].id)
+              hideColumn(columns[showMenu.columnIdx].id)
             }}
             onChangeFormat={(format: string) => {
-              changeColumnFormat(
-                originalColumns[showMenu.columnIdx].id,
-                format
-              )
+              changeColumnFormat(columns[showMenu.columnIdx].id, format)
               // After changing the format, remeasure the column to ensure that
               // the column width is updated to the new format.
               // We need to apply a short timeout here to ensure that

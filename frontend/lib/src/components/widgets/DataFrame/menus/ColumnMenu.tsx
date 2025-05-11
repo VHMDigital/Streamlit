@@ -18,6 +18,7 @@ import React, { memo, ReactElement, useEffect, useState } from "react"
 
 import { useTheme } from "@emotion/react"
 import { ACCESSIBILITY_TYPE, PLACEMENT, Popover } from "baseui/popover"
+import { GridCell } from "@glideapps/glide-data-grid"
 
 import {
   convertRemToPx,
@@ -37,6 +38,7 @@ import {
   StyledTypeIconContainer,
 } from "./styled-components"
 import FormattingMenu from "./FormattingMenu"
+import ColumnValuesHistogram from "./ColumnValuesHistogram"
 
 export interface ColumnMenuProps {
   // The top position of the menu
@@ -64,6 +66,8 @@ export interface ColumnMenuProps {
   onChangeFormat?: (format: string) => void
   // Callback to autosize the column
   onAutosize?: () => void
+  // Callback to get all cell data for the current column
+  getColumnData?: () => GridCell[] | undefined
 }
 
 /**
@@ -82,10 +86,21 @@ function ColumnMenu({
   columnName,
   onChangeFormat,
   onAutosize,
+  getColumnData,
 }: ColumnMenuProps): ReactElement {
   const theme: EmotionTheme = useTheme()
   const [formatMenuOpen, setFormatMenuOpen] = useState(false)
-  const { colors, fontSizes, radii, fontWeights } = theme
+  const { colors, fontSizes, radii, fontWeights } = theme // Re-enabled: Unused, can be removed if not needed elsewhere later
+
+  const histogramData = getColumnData ? getColumnData() : undefined
+  // Attempt to render the histogram. It will be null if it cannot render.
+  const histogramElement =
+    histogramData && histogramData.length > 0 ? (
+      <ColumnValuesHistogram
+        columnData={histogramData}
+        columnKind={columnKind}
+      />
+    ) : null
 
   // Disable page scrolling while the menu is open to keep the menu und
   // column header aligned.
@@ -111,9 +126,7 @@ function ColumnMenu({
   const handleCopyNameToClipboard = React.useCallback((): void => {
     navigator.clipboard
       .writeText(columnName)
-      .then(() => {
-        // Maybe show a small "Copied!" confirmation if desired in the future
-      })
+      .then(() => {})
       .catch(err => {
         // eslint-disable-next-line no-console
         console.error("Failed to copy column name: ", err)
@@ -188,6 +201,16 @@ function ColumnMenu({
               </StyledIconButton>
             </StyledColumnNameWithIcon>
           </StyledColumnHeaderRow>
+
+          {/* Conditionally render histogram section only if histogramElement is not null */}
+          {histogramElement && (
+            <>
+              <div style={{ padding: theme.spacing.md }}>
+                {histogramElement}
+              </div>
+              <StyledMenuDivider />
+            </>
+          )}
 
           {onSortColumn && (
             <>
