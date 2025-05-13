@@ -55,6 +55,7 @@ export const StyledOpenSidebarButton = styled.div(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  marginLeft: "1rem",
   [`@media print`]: {
     display: "none",
   },

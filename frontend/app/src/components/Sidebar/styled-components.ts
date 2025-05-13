@@ -343,7 +343,6 @@ export const StyledLogo = styled.img<StyledLogoProps>(
     // Extra margin to align small logo with sidebar collapse arrow
     marginTop: size == "small" ? theme.spacing.xs : theme.spacing.twoXS,
     marginBottom: size == "small" ? theme.spacing.xs : theme.spacing.twoXS,
-    marginRight: theme.spacing.sm,
     marginLeft: theme.spacing.none,
     zIndex: theme.zIndices.header,
     objectFit: "contain",
