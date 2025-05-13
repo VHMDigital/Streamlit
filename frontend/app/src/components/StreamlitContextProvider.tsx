@@ -48,6 +48,7 @@ type AppContextValues = {
   hideSidebarNav: boolean
   widgetsDisabled: boolean
   gitInfo: IGitInfo | null
+  showToolbar: boolean
 }
 
 // Type for LibContext props
@@ -94,6 +95,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
   hideSidebarNav,
   widgetsDisabled,
   gitInfo,
+  showToolbar,
   // LibContext
   isFullScreen,
   setFullScreen,
@@ -132,6 +134,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       hideSidebarNav,
       widgetsDisabled,
       gitInfo,
+      showToolbar,
     }),
     [
       initialSidebarState,
@@ -146,6 +149,7 @@ const StreamlitContextProvider: React.FC<StreamlitContextProviderProps> = ({
       hideSidebarNav,
       widgetsDisabled,
       gitInfo,
+      showToolbar,
     ]
   )
 

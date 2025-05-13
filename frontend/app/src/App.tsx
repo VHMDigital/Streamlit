@@ -2076,6 +2076,7 @@ export class App extends PureComponent<Props, State> {
         scriptRunState={scriptRunState}
         scriptRunId={scriptRunId}
         componentRegistry={this.componentRegistry}
+        showToolbar={showToolbar}
       >
         <Hotkeys
           keyName="r,c,esc"

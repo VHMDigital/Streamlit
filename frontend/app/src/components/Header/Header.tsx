@@ -32,6 +32,7 @@ import {
   StyledLogoContainer,
 } from "./styled-components"
 import { useAppContext } from "@streamlit/app/src/components/StreamlitContextProvider"
+
 export interface HeaderProps {
   isStale?: boolean
   hasSidebar: boolean
@@ -51,21 +52,13 @@ const Header = ({
   rightContent,
   logoComponent,
 }: HeaderProps): ReactElement => {
-  const { wideMode, embedded, showColoredLine } = useAppContext()
+  const { showToolbar } = useAppContext()
   const { activeTheme } = useContext(LibContext)
 
-  // const showHeader = !embedded || showToolbar || showColoredLine
-  const showHeader = true
-  // const hasContent = navigation || rightContent
-  const hasContent = true
-  const showToolbar = true
-
-  console.log({ isSidebarOpen, navigation, rightContent })
+  const hasContent = navigation || rightContent
 
   return (
     <StyledHeader
-      showHeader={showHeader}
-      isWideMode={wideMode}
       tabIndex={-1} // required for testing
       isStale={isStale}
       className="stAppHeader"
