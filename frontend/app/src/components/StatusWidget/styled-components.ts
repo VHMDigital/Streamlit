@@ -83,7 +83,7 @@ export interface StyledAppButtonContainerProps {}
 
 export const StyledAppButtonContainer =
   styled.span<StyledAppButtonContainerProps>(({ theme }) => ({
-    marginLeft: theme.spacing.xs,
+    marginLeft: theme.spacing.md,
     whiteSpace: "nowrap",
   }))
 
