@@ -33,6 +33,7 @@ export const StyledHeader = styled.header<StyledHeaderProps>(({ theme }) => ({
   zIndex: theme.zIndices.header,
   pointerEvents: "auto",
   fontSize: theme.fontSizes.sm,
+  position: "fixed",
   "@media print": {
     display: "none",
   },

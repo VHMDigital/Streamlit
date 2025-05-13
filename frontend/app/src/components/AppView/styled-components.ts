@@ -49,7 +49,7 @@ export const StyledAppViewMain = styled.section<StyledAppViewMainProps>(
     width: theme.sizes.full,
     overflow: disableScrolling ? "hidden" : "auto",
     alignItems: "center",
-    height: `calc(100vh - 3.25rem)`,
+    height: "100vh",
 
     "&:focus": {
       outline: "none",
