@@ -427,6 +427,7 @@ describe("getLoadingScreenType", () => {
       Object.defineProperty(window, "location", {
         value: prevWindowLocation,
         writable: true,
+        configurable: true,
       })
     })
 
@@ -437,6 +438,7 @@ describe("getLoadingScreenType", () => {
           search: "foo=bar",
         },
         writable: true,
+        configurable: true,
       })
       expect(preserveEmbedQueryParams()).toBe("")
     })
@@ -448,6 +450,7 @@ describe("getLoadingScreenType", () => {
           search: "embed=true&foo=bar",
         },
         writable: true,
+        configurable: true,
       })
       expect(preserveEmbedQueryParams()).toBe("embed=true")
     })
@@ -460,6 +463,7 @@ describe("getLoadingScreenType", () => {
             "embed=true&embed_options=option1&embed_options=option2&foo=bar",
         },
         writable: true,
+        configurable: true,
       })
       expect(preserveEmbedQueryParams()).toBe(
         "embed=true&embed_options=option1&embed_options=option2"

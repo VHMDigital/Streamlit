@@ -100,6 +100,7 @@ describe("SidebarNav", () => {
       Object.defineProperty(window, "location", {
         value: originalLocation,
         writable: true,
+        configurable: true,
       })
     })
 
@@ -107,6 +108,7 @@ describe("SidebarNav", () => {
       Object.defineProperty(window, "location", {
         value: originalLocation,
         writable: true,
+        configurable: true,
       })
     })
 

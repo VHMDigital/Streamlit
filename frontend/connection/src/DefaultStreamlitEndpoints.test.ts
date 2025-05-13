@@ -39,12 +39,14 @@ describe("DefaultStreamlitEndpoints", () => {
     Object.defineProperty(window, "location", {
       value: { ...originalLocation },
       writable: true,
+      configurable: true,
     })
   })
   afterEach(() => {
     Object.defineProperty(window, "location", {
       value: originalLocation,
       writable: true,
+      configurable: true,
     })
   })
 

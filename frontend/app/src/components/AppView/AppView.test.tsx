@@ -465,6 +465,7 @@ describe("AppView element", () => {
       Object.defineProperty(window, "location", {
         value: originalLocation,
         writable: true,
+        configurable: true,
       })
     })
 

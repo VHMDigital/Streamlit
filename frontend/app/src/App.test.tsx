@@ -473,6 +473,7 @@ describe("App", () => {
       Object.defineProperty(window, "location", {
         value: prevWindowLocation,
         writable: true,
+        configurable: true,
       })
     })
 
@@ -558,6 +559,7 @@ describe("App", () => {
       Object.defineProperty(window, "location", {
         value: prevWindowLocation,
         writable: true,
+        configurable: true,
       })
 
       window.__streamlit = undefined
@@ -2079,6 +2081,7 @@ describe("App", () => {
       Object.defineProperty(window, "location", {
         value: prevWindowLocation,
         writable: true,
+        configurable: true,
       })
       window.parent = prevWindowParent
     })
@@ -2559,6 +2562,7 @@ describe("App", () => {
       Object.defineProperty(window, "location", {
         value: prevWindowLocation,
         writable: true,
+        configurable: true,
       })
     })
 
@@ -3311,6 +3315,7 @@ describe("App", () => {
         Object.defineProperty(window, "location", {
           value: prevWindowLocation,
           writable: true,
+          configurable: true,
         })
       })
 
