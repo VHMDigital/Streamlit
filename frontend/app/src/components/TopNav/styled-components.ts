@@ -34,8 +34,8 @@ interface StyledNavSectionProps {
 
 export const StyledNavSection = styled.div<StyledNavSectionProps>(
   ({ theme, isOpen }) => ({
-    marginLeft: theme.spacing.sm,
-    marginRight: theme.spacing.sm,
+    marginLeft: theme.spacing.twoXS,
+    marginRight: theme.spacing.twoXS,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -54,7 +54,8 @@ export const StyledNavSection = styled.div<StyledNavSectionProps>(
 )
 
 export const StyledTopNavLinkContainer = styled.div(({ theme }) => ({
-  margin: `${theme.spacing.sm} ${theme.spacing.sm}`,
+  marginLeft: theme.spacing.twoXS,
+  marginRight: theme.spacing.twoXS,
 }))
 
 export const StyledNavSectionText = styled.span(({ theme }) => ({
