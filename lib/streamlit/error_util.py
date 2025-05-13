@@ -39,7 +39,9 @@ def _print_rich_exception(e: BaseException) -> None:
         ):
             super().__init__(
                 renderable,
-                box or Box("────\n    \n────\n    \n────\n────\n    \n────\n"),
+                box
+                if box is not None
+                else Box("────\n    \n────\n    \n────\n────\n    \n────\n"),
                 **kwargs,
             )
 
