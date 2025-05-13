@@ -23,6 +23,7 @@ import {
   AppRoot,
   BlockNode,
   ComponentRegistry,
+  ContainerContentsWrapper,
   FileUploadClient,
   FormsData,
   IGuestToHostMessage,
@@ -244,7 +245,7 @@ function AppView(props: AppViewProps): ReactElement {
     : StyledAppViewMain
 
   const renderBlock = (node: BlockNode): ReactElement => (
-    <VerticalBlock
+    <ContainerContentsWrapper
       node={node}
       endpoints={endpoints}
       scriptRunId={scriptRunId}
