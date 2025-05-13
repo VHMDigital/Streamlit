@@ -12,14 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Literal, Union
+from typing import Literal, NotRequired, Union
 
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, TypedDict
 
-from streamlit.errors import StreamlitInvalidWidthError
+from streamlit.errors import StreamlitInvalidHeightError, StreamlitInvalidWidthError
 
 WidthWithoutContent: TypeAlias = Union[int, Literal["stretch"]]
 Width: TypeAlias = Union[int, Literal["stretch", "content"]]
+HeightWithoutContent: TypeAlias = Union[int, Literal["stretch"]]
+Height: TypeAlias = Union[int, Literal["stretch", "content"]]
+
+
+class LayoutConfig(TypedDict):
+    width: NotRequired[Width]
+    height: NotRequired[Height]
 
 
 def validate_width(width: Width, allow_content: bool = False) -> None:
@@ -49,3 +56,33 @@ def validate_width(width: Width, allow_content: bool = False) -> None:
             raise StreamlitInvalidWidthError(width, allow_content)
     elif width <= 0:
         raise StreamlitInvalidWidthError(width, allow_content)
+
+
+def validate_height(height: Height, allow_content: bool = False) -> None:
+    """Validate the height parameter.
+
+    Parameters
+    ----------
+    height : Any
+        The height value to validate.
+    allow_content : bool
+        Whether to allow "content" as a valid height value.
+
+    Raises
+    ------
+    StreamlitInvalidHeightError
+        If the height value is invalid.
+    """
+    if not isinstance(height, (int, str)):
+        raise StreamlitInvalidHeightError(height, allow_content)
+
+    if isinstance(height, str):
+        valid_strings = ["stretch"]
+        if allow_content:
+            valid_strings.append("content")
+
+        if height not in valid_strings:
+            raise StreamlitInvalidHeightError(height, allow_content)
+
+    elif height <= 0:
+        raise StreamlitInvalidHeightError(height, allow_content)

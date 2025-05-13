@@ -16,72 +16,109 @@
 
 import { useMemo } from "react"
 
-import { streamlit } from "@streamlit/protobuf"
+import { Element, streamlit } from "@streamlit/protobuf"
 
-type LayoutElement = {
-  width?: number
-  widthConfig?: streamlit.WidthConfig
+type SubElement = {
   useContainerWidth?: boolean | null
+  height?: number
+  width?: number
 }
 
 export type UseLayoutStylesArgs<T> = {
-  element: (T & LayoutElement) | undefined
+  element: Element
+  subElement?: SubElement
 }
 
 const isNonZeroPositiveNumber = (value: unknown): value is number =>
   typeof value === "number" && value > 0 && !isNaN(value)
 
-enum WidthType {
+enum DimensionType {
   PIXEL = "pixel",
   STRETCH = "stretch",
   CONTENT = "content",
 }
 
-type LayoutWidthConfig = {
-  widthType: WidthType | undefined
+type LayoutDimensionConfig = {
+  type: DimensionType | undefined
   pixels?: number | undefined
 }
 
-const getWidth = (element: LayoutElement): LayoutWidthConfig => {
+const getWidth = (
+  element: Element,
+  subElement?: SubElement
+): LayoutDimensionConfig => {
   // This can be simplified once all elements have been updated to use the
   // new width_config message and useContainerWidth is deprecated.
   let pixels: number | undefined
-  let type: WidthType | undefined
+  let type: DimensionType | undefined
 
-  const isStretch =
-    element.widthConfig && element.widthConfig.widthSpec === "useStretch"
-  const isContent =
-    element.widthConfig && element.widthConfig.widthSpec === "useContent"
-  const isPixel =
-    element.widthConfig && element.widthConfig.widthSpec === "pixelWidth"
+  const isStretch = element.widthConfig && element.widthConfig.useStretch
+  const isContent = element.widthConfig && element.widthConfig.useContent
+  const isPixel = element.widthConfig && element.widthConfig.pixelWidth
 
   if (isStretch) {
-    type = WidthType.STRETCH
+    type = DimensionType.STRETCH
   } else if (isContent) {
-    type = WidthType.CONTENT
+    type = DimensionType.CONTENT
   } else if (
     isPixel &&
     isNonZeroPositiveNumber(element.widthConfig?.pixelWidth)
   ) {
-    type = WidthType.PIXEL
+    type = DimensionType.PIXEL
     pixels = element.widthConfig?.pixelWidth
   } else if (
-    isNonZeroPositiveNumber(element.width) &&
+    isNonZeroPositiveNumber(subElement?.width) &&
     element.widthConfig === undefined
   ) {
-    pixels = element.width
-    type = WidthType.PIXEL
+    pixels = subElement?.width
+    type = DimensionType.PIXEL
   }
   // The current behaviour is for useContainerWidth to take precedence over
   // width, see arrow.py for reference.
-  if (element.useContainerWidth) {
-    type = WidthType.STRETCH
+  if (subElement?.useContainerWidth) {
+    type = DimensionType.STRETCH
   }
-  return { pixels, widthType: type }
+  return { pixels, type }
+}
+
+const getHeight = (
+  element: Element,
+  subElement?: SubElement
+): LayoutDimensionConfig => {
+  let pixels: number | undefined
+  let type: DimensionType | undefined
+
+  const isStretch =
+    element.heightConfig && element.heightConfig.useStretch ? true : false
+  const isContent =
+    element.heightConfig && element.heightConfig.useContent ? true : false
+  const isPixel =
+    element.heightConfig && element.heightConfig.pixelHeight ? true : false
+
+  if (isStretch) {
+    type = DimensionType.STRETCH
+  } else if (isContent) {
+    type = DimensionType.CONTENT
+  } else if (
+    isPixel &&
+    isNonZeroPositiveNumber(element.heightConfig?.pixelHeight)
+  ) {
+    type = DimensionType.PIXEL
+    pixels = element.heightConfig?.pixelHeight
+  } else if (
+    isNonZeroPositiveNumber(subElement?.height) &&
+    element.heightConfig === undefined
+  ) {
+    pixels = subElement?.height
+    type = DimensionType.PIXEL
+  }
+
+  return { pixels, type }
 }
 
 export type UseLayoutStylesShape = {
   width: React.CSSProperties["width"]
+  height: React.CSSProperties["height"]
 }
 
 /**
@@ -89,6 +126,7 @@ export type UseLayoutStylesShape = {
  */
 export const useLayoutStyles = <T>({
   element,
+  subElement,
 }: UseLayoutStylesArgs<T>): UseLayoutStylesShape => {
   // Note: Consider rounding the width to the nearest pixel so we don't have
   // subpixel widths, which leads to blurriness on screen
@@ -96,30 +134,46 @@ export const useLayoutStyles = <T>({
     if (!element) {
       return {
         width: "auto",
+        height: "auto",
       }
     }
 
-    const { pixels: commandWidth, widthType } = getWidth(element)
     // The st.image element is potentially a list of images, so we always want
     // the enclosing container to be full width. The size of individual
     // images is managed in the ImageList component.
-    const isImgList = element && "imgs" in element
+    const isImgList = element.type === "imgs"
 
-    if (widthType === WidthType.STRETCH || isImgList) {
-      return {
-        width: "100%",
-      }
-    } else if (widthType === WidthType.PIXEL) {
-      return {
-        width: commandWidth,
-      }
-    } else if (widthType === WidthType.CONTENT) {
-      return {
-        width: "fit-content",
-      }
+    const { pixels: commandWidth, type: widthType } = getWidth(
+      element,
+      subElement
+    )
+    let width: React.CSSProperties["width"] = "auto"
+
+    if (widthType === DimensionType.STRETCH || isImgList) {
+      width = "100%"
+    } else if (widthType === DimensionType.PIXEL) {
+      width = commandWidth
+    } else if (widthType === DimensionType.CONTENT) {
+      width = "fit-content"
     }
+
+    const { pixels: commandHeight, type: heightType } = getHeight(
+      element,
+      subElement
+    )
+    let height: React.CSSProperties["height"] = "auto"
+
+    if (heightType === DimensionType.STRETCH) {
+      height = "100%"
+    } else if (heightType === DimensionType.PIXEL) {
+      height = commandHeight
+    } else if (heightType === DimensionType.CONTENT) {
+      height = "auto"
+    }
+
     return {
-      width: "auto",
+      width,
+      height,
     }
   }, [element])
 

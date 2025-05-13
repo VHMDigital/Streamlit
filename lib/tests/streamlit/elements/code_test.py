@@ -18,9 +18,12 @@ import pytest
 from parameterized import parameterized
 
 import streamlit as st
-from streamlit.errors import StreamlitInvalidWidthError
+from streamlit.errors import StreamlitInvalidHeightError, StreamlitInvalidWidthError
 from tests.delta_generator_test_case import DeltaGeneratorTestCase
-from tests.streamlit.elements.layout_test_utils import WidthConfigFields
+from tests.streamlit.elements.layout_test_utils import (
+    HeightConfigFields,
+    WidthConfigFields,
+)
 
 
 class CodeElement(DeltaGeneratorTestCase):
@@ -181,3 +184,60 @@ class CodeElement(DeltaGeneratorTestCase):
         with pytest.raises(StreamlitInvalidWidthError) as e:
             st.code(code, width=width)
         assert "Invalid width" in str(e.value)
+
+    # Height configuration tests
+    def test_st_code_with_height_pixels(self):
+        """Test st.code with height in pixels."""
+        code = "print('My string = %d' % my_value)"
+        st.code(code, height=300)
+
+        element = self.get_delta_from_queue().new_element
+        self.assertEqual(element.code.code_text, code)
+        self.assertEqual(
+            element.height_config.WhichOneof("height_spec"),
+            HeightConfigFields.PIXEL_HEIGHT.value,
+        )
+        self.assertEqual(element.height_config.pixel_height, 300)
+
+    def test_st_code_with_height_content(self):
+        """Test st.code with content height."""
+        code = "print('My string = %d' % my_value)"
+        st.code(code, height="content")
+
+        element = self.get_delta_from_queue().new_element
+        self.assertEqual(element.code.code_text, code)
+        self.assertEqual(
+            element.height_config.WhichOneof("height_spec"),
+            HeightConfigFields.USE_CONTENT.value,
+        )
+        self.assertTrue(element.height_config.use_content)
+
+    def test_st_code_with_height_stretch(self):
+        """Test st.code with stretch height."""
+        code = "print('My string = %d' % my_value)"
+        st.code(code, height="stretch")
+
+        element = self.get_delta_from_queue().new_element
+        self.assertEqual(element.code.code_text, code)
+        self.assertEqual(
+            element.height_config.WhichOneof("height_spec"),
+            HeightConfigFields.USE_STRETCH.value,
+        )
+        self.assertTrue(element.height_config.use_stretch)
+
+    @parameterized.expand(
+        [
+            "invalid",
+            -100,
+            0,
+            100.5,
+            None,
+        ]
+    )
+    def test_st_code_with_invalid_height(self, height):
+        """Test st.code with invalid height values."""
+        code = "print('My string = %d' % my_value)"
+
+        with pytest.raises(StreamlitInvalidHeightError) as e:
+            st.code(code, height=height)
+        assert "Invalid height" in str(e.value)
