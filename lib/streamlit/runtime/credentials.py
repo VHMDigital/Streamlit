@@ -131,8 +131,8 @@ class Credentials:
                 "Credentials already initialized. Use .get_current() instead"
             )
 
-        self.activation = None
-        self._conf_file = _get_credential_file_path()
+        self.activation: _Activation | None = None
+        self._conf_file: str = _get_credential_file_path()
 
         Credentials._singleton = self
 
