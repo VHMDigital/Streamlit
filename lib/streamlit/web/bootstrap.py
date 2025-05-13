@@ -340,7 +340,7 @@ def run(
     # asyncio.run(run_server())  # noqa: ERA001
 
     # Define a main function to handle the event loop logic
-    async def main():
+    async def main() -> None:
         await run_server()
 
     try:

@@ -148,7 +148,7 @@ def main(log_level: str = "info") -> None:
 
 
 @main.command("help")
-def help():  # noqa: A001
+def help() -> None:  # noqa: A001
     """Print this help message."""
     # We use _get_command_line_as_string to run some error checks but don't do
     # anything with its return value.
@@ -162,7 +162,7 @@ def help():  # noqa: A001
 
 
 @main.command("version")
-def main_version():
+def main_version() -> None:
     """Print Streamlit's version number."""
     # Pretend user typed 'streamlit --version' instead of 'streamlit version'
     import sys

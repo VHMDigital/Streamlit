@@ -155,7 +155,7 @@ class TestCLIRegressions:
         os.environ.get("SKIP_VERSION_CHECK", "false").lower() == "true",
         reason="Skip version verification when `SKIP_VERSION_CHECK` env var is set",
     )
-    def test_streamlit_version(self):
+    def test_streamlit_version(self) -> None:
         assert (
             STREAMLIT_RELEASE_VERSION is not None and STREAMLIT_RELEASE_VERSION != ""
         ), "You must set the $STREAMLIT_RELEASE_VERSION env variable"
@@ -163,7 +163,7 @@ class TestCLIRegressions:
             f"Package version does not match the desired version of {STREAMLIT_RELEASE_VERSION}"
         )
 
-    def test_streamlit_activate(self):
+    def test_streamlit_activate(self) -> None:
         process = subprocess.Popen(
             "streamlit activate", stdin=subprocess.PIPE, shell=True
         )
@@ -176,7 +176,7 @@ class TestCLIRegressions:
                 "Email address was not found in the credentials file"
             )
 
-    def test_port_reassigned(self):
+    def test_port_reassigned(self) -> None:
         """When starting a new Streamlit session, it will run on port 8501 by default. If 8501 is
         not available, it will use the next available port.
         """
@@ -189,7 +189,7 @@ class TestCLIRegressions:
         assert ":8501" in out_one, f"Incorrect port. See output:\n{out_one}"
         assert ":8502" in out_two, f"Incorrect port. See output:\n{out_two}"
 
-    def test_conflicting_port(self):
+    def test_conflicting_port(self) -> None:
         out_one, out_two = self.run_double_proc(
             f"streamlit run --server.headless=true {REPO_ROOT}/e2e_playwright/st_file_uploader.py",
             f"streamlit run --server.headless=true --server.port=8501 {REPO_ROOT}/e2e_playwright/st_file_uploader.py",
@@ -200,14 +200,14 @@ class TestCLIRegressions:
             f"Incorrect conflict. See output:\n{out_one}"
         )
 
-    def test_cli_defined_port(self):
+    def test_cli_defined_port(self) -> None:
         out = self.run_single_proc(
             f"streamlit run --server.headless=true --server.port=9999 {REPO_ROOT}/e2e_playwright/st_file_uploader.py",
         )
 
         assert ":9999" in out, f"Incorrect port. See output:\n{out}"
 
-    def test_config_toml_defined_port(self):
+    def test_config_toml_defined_port(self) -> None:
         with open(CONFIG_FILE_PATH, "w") as file:
             file.write("[server]\n  port=8888")
 

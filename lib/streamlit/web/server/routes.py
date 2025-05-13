@@ -96,13 +96,13 @@ class StaticFileHandler(tornado.web.StaticFileHandler):
 
 class AddSlashHandler(tornado.web.RequestHandler):
     @tornado.web.addslash
-    def get(self):
+    def get(self) -> None:
         pass
 
 
 class RemoveSlashHandler(tornado.web.RequestHandler):
     @tornado.web.removeslash
-    def get(self):
+    def get(self) -> None:
         pass
 
 
@@ -114,7 +114,7 @@ class _SpecialRequestHandler(tornado.web.RequestHandler):
         if allow_cross_origin_requests():
             self.set_header("Access-Control-Allow-Origin", "*")
 
-    def options(self):
+    def options(self) -> None:
         """/OPTIONS handler for preflight CORS checks.
 
         When a browser is making a CORS request, it may sometimes first
@@ -147,12 +147,12 @@ class HealthHandler(_SpecialRequestHandler):
         """
         self._callback = callback
 
-    async def get(self):
+    async def get(self) -> None:
         await self.handle_request()
 
     # Some monitoring services only support the HTTP HEAD method for requests to
     # healthcheck endpoints, so we support HEAD as well to play nicely with them.
-    async def head(self):
+    async def head(self) -> None:
         await self.handle_request()
 
     async def handle_request(self) -> None:

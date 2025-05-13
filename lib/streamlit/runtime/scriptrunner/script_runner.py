@@ -18,6 +18,7 @@ import gc
 import sys
 import threading
 import types
+from collections.abc import Generator
 from contextlib import contextmanager
 from enum import Enum
 from timeit import default_timer as timer
@@ -437,7 +438,7 @@ class ScriptRunner:
         raise StopException()
 
     @contextmanager
-    def _set_execing_flag(self):
+    def _set_execing_flag(self) -> Generator[None, None, None]:
         """A context for setting the ScriptRunner._execing flag.
 
         Used by _maybe_handle_execution_control_request to ensure that
