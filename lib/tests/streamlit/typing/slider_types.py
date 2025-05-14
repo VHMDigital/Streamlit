@@ -37,7 +37,6 @@ if TYPE_CHECKING:
     assert_type(slider("foo", 5.0, 10.0), float)
     assert_type(slider("foo", 5.0, 10.0, 6.0), float)
     assert_type(slider("foo", 5.0, 10.0, 6.0, 1.0), float)
-
     assert_type(slider("foo", 5, 10, [5, 8]), tuple[int, int])
     assert_type(slider("foo", 5, 10, [5, 8], 1), tuple[int, int])
 
