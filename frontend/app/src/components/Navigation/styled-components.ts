@@ -218,8 +218,8 @@ export const StyledOverflowContainer = styled.div(({ theme }) => ({
   width: "100%",
   flexShrink: 1,
   overflow: "hidden",
-  marginLeft: theme.spacing.lg,
-  marginRight: theme.spacing.lg,
+  padding: `0 ${theme.spacing.lg}`,
+  gap: theme.spacing.twoXS,
 }))
 
 interface StyledNavSectionProps {
@@ -228,8 +228,6 @@ interface StyledNavSectionProps {
 
 export const StyledNavSection = styled.div<StyledNavSectionProps>(
   ({ theme, isOpen }) => ({
-    marginLeft: theme.spacing.twoXS,
-    marginRight: theme.spacing.twoXS,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -247,9 +245,8 @@ export const StyledNavSection = styled.div<StyledNavSectionProps>(
   })
 )
 
-export const StyledTopNavLinkContainer = styled.div(({ theme }) => ({
-  marginLeft: theme.spacing.twoXS,
-  marginRight: theme.spacing.twoXS,
+export const StyledTopNavLinkContainer = styled.div(() => ({
+  // Removed individual margins since we're using gap on the parent container
 }))
 
 // This is specifically for use in TopNavSection's popover menu
