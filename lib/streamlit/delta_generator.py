@@ -479,22 +479,20 @@ class DeltaGenerator(
         msg_el_proto.CopyFrom(element_proto)
 
         if layout_config:
-            if "height" in layout_config:
-                if isinstance(layout_config["height"], int):
-                    msg.delta.new_element.height_config.pixel_height = layout_config[
-                        "height"
-                    ]
-                elif layout_config["height"] == "content":
+            if layout_config.height:
+                if isinstance(layout_config.height, int):
+                    msg.delta.new_element.height_config.pixel_height = (
+                        layout_config.height
+                    )
+                elif layout_config.height == "content":
                     msg.delta.new_element.height_config.use_content = True
                 else:
                     msg.delta.new_element.height_config.use_stretch = True
 
-            if "width" in layout_config:
-                if isinstance(layout_config["width"], int):
-                    msg.delta.new_element.width_config.pixel_width = layout_config[
-                        "width"
-                    ]
-                elif layout_config["width"] == "content":
+            if layout_config.width:
+                if isinstance(layout_config.width, int):
+                    msg.delta.new_element.width_config.pixel_width = layout_config.width
+                elif layout_config.width == "content":
                     msg.delta.new_element.width_config.use_content = True
                 else:
                     msg.delta.new_element.width_config.use_stretch = True

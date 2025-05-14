@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Literal, NotRequired, Union
+from dataclasses import dataclass
+from typing import Literal, Union
 
-from typing_extensions import TypeAlias, TypedDict
+from typing_extensions import TypeAlias
 
 from streamlit.errors import StreamlitInvalidHeightError, StreamlitInvalidWidthError
 
@@ -24,9 +25,10 @@ HeightWithoutContent: TypeAlias = Union[int, Literal["stretch"]]
 Height: TypeAlias = Union[int, Literal["stretch", "content"]]
 
 
-class LayoutConfig(TypedDict):
-    width: NotRequired[Width]
-    height: NotRequired[Height]
+@dataclass
+class LayoutConfig:
+    width: Width
+    height: Height
 
 
 def validate_width(width: Width, allow_content: bool = False) -> None:
