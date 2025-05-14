@@ -16,6 +16,8 @@
 
 import React, { Fragment, ReactElement, useContext } from "react"
 
+import type { Components } from "react-markdown/lib/ast-to-react"
+
 import { Heading as HeadingProto } from "@streamlit/protobuf"
 
 import IsSidebarContext from "~lib/components/core/IsSidebarContext"
@@ -53,7 +55,7 @@ function makeMarkdownHeading(tag: string, markdown: string): string {
   }
 }
 
-const OVERRIDE_COMPONENTS = {
+const OVERRIDE_COMPONENTS: Components = {
   p: Fragment,
   h1: Fragment,
   h2: Fragment,

@@ -365,7 +365,7 @@ export const CustomPreTag: FunctionComponent<
 }
 
 // These are common renderers that don't depend on props or context
-const baseRenderers: Components = {
+const BASE_RENDERERS: Components = {
   pre: CustomPreTag,
   code: CustomCodeTag,
   h1: CustomHeading,
@@ -733,7 +733,7 @@ export const RenderedMarkdown = memo(function RenderedMarkdown({
 
   const renderers = useMemo(
     () => ({
-      ...baseRenderers,
+      ...BASE_RENDERERS,
       a: LinkWithTargetBlank,
       ...(overrideComponents || {}),
     }),
