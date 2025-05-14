@@ -491,7 +491,7 @@ class StreamlitInvalidHeightError(LocalizableStreamlitException):
             valid_values = "an integer (pixels), 'stretch', or 'content'"
 
         super().__init__(
-            "Invalid width value: {height}. Height must be either {valid_values}.",
-            width=repr(height),
+            "Invalid height value: {height}. Height must be either {valid_values}.",
+            height=repr(height),
             valid_values=valid_values,
         )
