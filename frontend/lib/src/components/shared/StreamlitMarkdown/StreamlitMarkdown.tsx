@@ -65,6 +65,8 @@ import {
 } from "~lib/theme"
 import { LibContext } from "~lib/components/core/LibContext"
 import streamlitLogo from "~lib/assets/img/streamlit-logo/streamlit-mark-color.svg"
+import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives"
+import AlertContainer, { Kind } from "~lib/components/shared/AlertContainer"
 
 import {
   StyledHeadingActionElements,
@@ -363,6 +365,78 @@ export const CustomPreTag: FunctionComponent<
   )
 }
 
+/**
+ * Maps directive names to AlertContainer kinds
+ */
+function getAlertKindFromDirective(directiveName: string): Kind {
+  // Map common directive names to AlertContainer kinds
+  switch (directiveName.toLowerCase()) {
+    case "note":
+    case "info":
+      return Kind.INFO
+    case "tip":
+    case "hint":
+    case "success":
+      return Kind.SUCCESS
+    case "warning":
+    case "caution":
+      return Kind.WARNING
+    case "danger":
+    case "error":
+      return Kind.ERROR
+    default:
+      // Default to info for unknown directive types
+      return Kind.INFO
+  }
+}
+
+/**
+ * Custom component to render alerts
+ */
+export const CustomAlert: FunctionComponent<
+  React.PropsWithChildren<{
+    className?: string
+    "data-kind"?: string
+    "data-label"?: string
+  }>
+> = ({
+  className,
+  "data-kind": dataKind,
+  "data-label": dataLabel,
+  children,
+}) => {
+  // Extract the kind from the data-kind attribute or className
+  const kindStr = dataKind || (className && className.split(" ")[0]) || "info"
+  const kind = getAlertKindFromDirective(kindStr)
+
+  return <AlertContainer kind={kind}>{children}</AlertContainer>
+}
+
+/**
+ * Transform directives into custom elements that can be rendered by ReactMarkdown
+ */
+function remarkTransformDirectives() {
+  return (tree: any) => {
+    visit(tree, ["containerDirective", "leafDirective"], node => {
+      const data = node.data || (node.data = {})
+      const directiveName = node.name || "note"
+
+      // Transform the directive into a div with appropriate attributes
+      data.hName = "div"
+      data.hProperties = data.hProperties || {}
+      data.hProperties.className = `alert-${directiveName}`
+      data.hProperties["data-kind"] = directiveName
+
+      // Extract label from attributes if available
+      if (node.attributes && node.attributes.label) {
+        data.hProperties["data-label"] = node.attributes.label
+      }
+    })
+
+    return tree
+  }
+}
+
 export function RenderedMarkdown({
   allowHTML,
   source,
@@ -380,8 +454,21 @@ export function RenderedMarkdown({
     h4: CustomHeading,
     h5: CustomHeading,
     h6: CustomHeading,
+    // Add custom component for alerts
+    div: props => {
+      const { className, ...rest } = props
+
+      // Check if this is an alert div
+      if (className && className.startsWith("alert-")) {
+        return <CustomAlert {...rest} className={className} />
+      }
+
+      // Otherwise, render a regular div
+      return <div {...omit(rest, "node")} className={className} />
+    },
     ...(overrideComponents || {}),
   }
+
   const theme: EmotionTheme = useTheme()
   const { red, orange, yellow, green, blue, violet, purple, gray, primary } =
     getMarkdownTextColors(theme)
@@ -621,8 +708,10 @@ export function RenderedMarkdown({
   const plugins = [
     remarkMathPlugin,
     remarkEmoji,
+    remarkGithubAdmonitionsToDirectives,
     remarkGfm,
     remarkDirective,
+    remarkTransformDirectives,
     remarkColoringAndSmall,
     remarkMaterialIcons,
     remarkStreamlitLogo,

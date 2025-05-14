@@ -40,6 +40,10 @@ export const StyledAlertContent = styled.div(({ theme }) => ({
     color: "inherit",
   },
 
+  "& > p": {
+    margin: theme.spacing.none,
+  },
+
   a: {
     color: "inherit",
     textDecoration: "underline",

@@ -3400,6 +3400,7 @@ __metadata:
     remark-directive: "npm:^4.0.0"
     remark-emoji: "npm:^3.1.2"
     remark-gfm: "npm:^3.0.1"
+    remark-github-admonitions-to-directives: "npm:^2.1.0"
     remark-math: "npm:^5.1.1"
     sprintf-js: "npm:^1.1.3"
     styletron-react: "npm:^6.1.0"
@@ -17135,6 +17136,18 @@ __metadata:
     micromark-extension-gfm: "npm:^2.0.0"
     unified: "npm:^10.0.0"
   checksum: 10c0/53c4e82204f82f81949a170efdeb49d3c45137b7bca06a7ff857a483aac1a44b55ef0de8fb1bbe4f1292f2a378058e2e42e644f2c61f3e0cdc3e56afa4ec2a2c
+  languageName: node
+  linkType: hard
+
+"remark-github-admonitions-to-directives@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "remark-github-admonitions-to-directives@npm:2.1.0"
+  dependencies:
+    "@types/mdast": "npm:^4.0.0"
+    mdast-util-directive: "npm:^3.0.0"
+    unified: "npm:^11.0.0"
+    unist-util-visit: "npm:^5.0.0"
+  checksum: 10c0/63f82349eff26d28228f0d19af6bcb423fe95e71959f0485ace882cd9e3d6c645ae4a2dab093877339885da5934baf1d658653fe8aba44f65156c3ef94524a45
   languageName: node
   linkType: hard
 

@@ -235,6 +235,11 @@ export const StyledStreamlitMarkdown =
           borderCollapse: "collapse",
         },
 
+        [`.stAlertContainer`]: {
+          // Add some space below alert blocks:
+          marginBottom: theme.spacing.lg,
+        },
+
         tr: {
           borderTop: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
         },
