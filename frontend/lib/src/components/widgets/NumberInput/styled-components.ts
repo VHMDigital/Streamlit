@@ -52,36 +52,43 @@ export const StyledInputControls = styled.div({
   alignSelf: "stretch",
 })
 
-export const StyledInputControl = styled.button(({ theme }) => ({
-  margin: theme.spacing.none,
-  border: "none",
-  height: theme.sizes.full,
-  display: "flex",
-  alignItems: "center",
-  width: theme.sizes.numberInputControlsWidth,
-  justifyContent: "center",
-  color: theme.colors.bodyText,
-  transition: "color 300ms, backgroundColor 300ms",
-  backgroundColor: theme.colors.secondaryBg,
-  "&:hover:enabled, &:focus:enabled": {
-    color: theme.colors.white,
-    backgroundColor: theme.colors.primary,
-    transition: "none",
-    outline: "none",
-  },
-  "&:active": {
-    outline: "none",
+interface StyledInputControlProps {
+  hasError?: boolean
+}
+
+export const StyledInputControl = styled.button<StyledInputControlProps>(
+  ({ theme, hasError }) => ({
     border: "none",
-  },
-  "&:last-of-type": {
-    borderTopRightRadius: theme.radii.default,
-    borderBottomRightRadius: theme.radii.default,
-  },
-  "&:disabled": {
-    cursor: "not-allowed",
-    color: theme.colors.fadedText40,
-  },
-}))
+    height: theme.sizes.full,
+    display: "flex",
+    alignItems: "center",
+    width: theme.sizes.numberInputControlsWidth,
+    justifyContent: "center",
+    color: hasError ? theme.colors.danger : theme.colors.bodyText,
+    backgroundColor: hasError
+      ? theme.colors.dangerBg
+      : theme.colors.secondaryBg,
+    transition: "color 300ms, backgroundColor 300ms",
+    "&:hover:enabled, &:focus:enabled": {
+      color: theme.colors.white,
+      backgroundColor: theme.colors.primary,
+      transition: "none",
+      outline: "none",
+    },
+    "&:active": {
+      outline: "none",
+      border: "none",
+    },
+    "&:last-of-type": {
+      borderTopRightRadius: theme.radii.default,
+      borderBottomRightRadius: theme.radii.default,
+    },
+    "&:disabled": {
+      cursor: "not-allowed",
+      color: theme.colors.fadedText40,
+    },
+  })
+)
 
 export interface StyledInstructionsContainerProps {
   // If widget is clearable, the instruction needs to be moved a couple

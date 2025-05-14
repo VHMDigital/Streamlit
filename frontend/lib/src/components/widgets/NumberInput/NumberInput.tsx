@@ -374,6 +374,7 @@ const NumberInput: React.FC<Props> = ({
       </WidgetLabel>
 
       <StyledInputContainer
+        hasError={!!error}
         className={isFocused ? "focused" : ""}
         data-testid="stNumberInputContainer"
         style={{
@@ -492,6 +493,9 @@ const NumberInput: React.FC<Props> = ({
                 minWidth: theme.iconSizes.lg,
                 // Material icons color changed as inactionable
                 color: isMaterialIcon ? theme.colors.fadedText60 : "inherit",
+                ...(error && {
+                  backgroundColor: theme.colors.dangerBg,
+                }),
               },
             },
             // Tooltip icon space
@@ -544,6 +548,7 @@ const NumberInput: React.FC<Props> = ({
         {width > numberInputControlBreakpoint && (
           <StyledInputControls>
             <StyledInputControl
+              hasError={!!error}
               data-testid="stNumberInputStepDown"
               onClick={decrement}
               disabled={!canDec || disabled}
@@ -559,6 +564,7 @@ const NumberInput: React.FC<Props> = ({
               />
             </StyledInputControl>
             <StyledInputControl
+              hasError={!!error}
               data-testid="stNumberInputStepUp"
               onClick={increment}
               disabled={!canInc || disabled}
