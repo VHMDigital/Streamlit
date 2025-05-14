@@ -253,3 +253,12 @@ $$
 This is a repeating multiline string that wraps within purple background.]
 """
 )
+
+st.markdown(
+    """
+<details>
+<summary>Click me</summary>
+Hello **world**.
+</details>
+"""
+)

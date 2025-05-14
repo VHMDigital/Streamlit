@@ -65,13 +65,16 @@ import {
 } from "~lib/theme"
 import { LibContext } from "~lib/components/core/LibContext"
 import streamlitLogo from "~lib/assets/img/streamlit-logo/streamlit-mark-color.svg"
+import { fromMarkdown } from "mdast-util-from-markdown"
 
 import {
+  StyledDetails,
   StyledHeadingActionElements,
   StyledHeadingWithActionElements,
   StyledLinkIcon,
   StyledPreWrapper,
   StyledStreamlitMarkdown,
+  StyledSummary,
 } from "./styled-components"
 
 import "katex/dist/katex.min.css"
@@ -363,6 +366,24 @@ export const CustomPreTag: FunctionComponent<
   )
 }
 
+/**
+ * Custom component for rendering <details> elements
+ */
+export const CustomDetailsTag: FunctionComponent<
+  React.PropsWithChildren<ReactMarkdownProps>
+> = ({ children }) => {
+  return <StyledDetails>{children}</StyledDetails>
+}
+
+/**
+ * Custom component for rendering <summary> elements
+ */
+export const CustomSummaryTag: FunctionComponent<
+  React.PropsWithChildren<ReactMarkdownProps>
+> = ({ children }) => {
+  return <StyledSummary>{children}</StyledSummary>
+}
+
 export function RenderedMarkdown({
   allowHTML,
   source,
@@ -380,6 +401,8 @@ export function RenderedMarkdown({
     h4: CustomHeading,
     h5: CustomHeading,
     h6: CustomHeading,
+    details: CustomDetailsTag,
+    summary: CustomSummaryTag,
     ...(overrideComponents || {}),
   }
   const theme: EmotionTheme = useTheme()
@@ -618,6 +641,78 @@ export function RenderedMarkdown({
     }
   }
 
+  function remarkDetails() {
+    return function transformer(tree: any) {
+      visit(tree, "html", (node, index, parent) => {
+        const { value } = node
+
+        // 1. Check if this "html" node is a details block with closing tag
+        // Use a more flexible regex that can handle multi-line content
+        if (!/^<details>[\s\S]*?<\/details>$/m.test(value.trim())) {
+          // Not a match: skip it
+          return
+        }
+
+        // Extract the contents inside <details> ... </details>
+        const inner = value
+          .trim()
+          .slice("<details>".length, -"</details>".length)
+          .trim()
+
+        // 2. See if there's a <summary> block inside
+        // Make the regex more robust to handle multi-line summaries
+        const summaryMatch = /<summary>([\s\S]*?)<\/summary>/m.exec(inner)
+        let summaryContent = ""
+        let afterSummaryContent = inner
+
+        if (summaryMatch) {
+          summaryContent = summaryMatch[1].trim()
+          // Remove the entire <summary>...</summary> from the string
+          // Use the actual matched string to ensure we remove exactly what was matched
+          afterSummaryContent = afterSummaryContent
+            .replace(summaryMatch[0], "")
+            .trim()
+        }
+
+        // 3. Build custom children: possibly a summary node, plus the rest as content
+        const children = []
+
+        // 3a. If we found a summary, parse it as markdown and convert to hChildren
+        if (summaryMatch) {
+          const summaryTree = fromMarkdown(summaryContent)
+          const summaryNode = {
+            type: "element",
+            data: {
+              hName: "summary",
+              hProperties: {},
+            },
+            children: summaryTree.children,
+          }
+          children.push(summaryNode)
+        }
+
+        // 3b. Parse the rest of the content as markdown
+        // Make sure we're properly handling the content even if it spans multiple lines
+        if (afterSummaryContent) {
+          const contentTree = fromMarkdown(afterSummaryContent)
+          // Add the content children directly
+          children.push(...contentTree.children)
+        }
+
+        // 4. Replace the HTML node with a details node using hName/hProperties
+        node.type = "element"
+        node.data = {
+          hName: "details",
+          hProperties: {
+            className: "details",
+          },
+        }
+        node.children = children
+        delete node.value
+      })
+    }
+  }
+
   const plugins = [
     remarkMathPlugin,
     remarkEmoji,
@@ -627,10 +722,12 @@ export function RenderedMarkdown({
     remarkMaterialIcons,
     remarkStreamlitLogo,
     remarkTypographicalSymbols,
+    remarkDetails,
   ]
 
   const rehypePlugins: PluggableList = [
     rehypeKatex,
+    // Only include rehypeRaw when allowHTML is explicitly enabled
     ...(allowHTML ? [rehypeRaw] : []),
   ]
 
@@ -661,6 +758,8 @@ export function RenderedMarkdown({
     "input",
     "hr",
     "blockquote",
+    "details",
+    "summary",
     // additionally restrict links
     ...(disableLinks ? ["a"] : []),
   ]

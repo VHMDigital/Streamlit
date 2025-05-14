@@ -366,3 +366,19 @@ export const StyledPreWrapper = styled.div(({ theme }) => ({
   // Set spacing between pre-elements inside of markdown similar to our gap spacing between elements
   marginBottom: theme.spacing.lg,
 }))
+
+export const StyledDetails = styled.details(({ theme }) => ({
+  marginBottom: theme.spacing.lg,
+}))
+
+export const StyledSummary = styled.summary(({ theme }) => ({
+  cursor: "pointer",
+
+  // Add a subtle hover effect
+  "&:hover": {
+    color: theme.colors.primary,
+  },
+  "& > p": {
+    display: "inline-block",
+  },
+}))
