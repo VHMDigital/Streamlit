@@ -712,7 +712,7 @@ class SliderMixin:
         if single_value:
             value = [value]
 
-        def value_to_generic_type(v):
+        def value_to_generic_type(v: Any) -> SliderProto.DataType.ValueType:
             if isinstance(v, Integral):
                 return SUPPORTED_TYPES[Integral]
             if isinstance(v, Real):
@@ -728,10 +728,9 @@ class SliderMixin:
                 f"But were: {list(map(type, value))}"
             )
 
-        if len(value) == 0:
-            data_type = SliderProto.INT
-        else:
-            data_type = value_to_generic_type(value[0])
+        data_type = (
+            SliderProto.INT if len(value) == 0 else value_to_generic_type(value[0])
+        )
 
         # Determine the data type and initial datetime boundaries
         # These will be refined later based on actual values

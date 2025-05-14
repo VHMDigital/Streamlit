@@ -151,7 +151,7 @@ class AppSession:
         self._client_state = ClientState()
 
         self._local_sources_watcher: LocalSourcesWatcher | None = None
-        self._stop_config_listener: Callable[[], bool] | None = None
+        self._stop_config_listener: Callable[[], None] | None = None
         self._stop_pages_listener: Callable[[], None] | None = None
 
         if config.get_option("server.fileWatcherType") != "none":
@@ -792,12 +792,12 @@ class AppSession:
             msg.git_info_changed.branch = branch
             msg.git_info_changed.module = module
 
-            msg.git_info_changed.untracked_files[:] = repo.untracked_files
-            msg.git_info_changed.uncommitted_files[:] = repo.uncommitted_files
+            msg.git_info_changed.untracked_files[:] = repo.untracked_files or []
+            msg.git_info_changed.uncommitted_files[:] = repo.uncommitted_files or []
 
             if repo.is_head_detached:
                 msg.git_info_changed.state = GitInfo.GitStates.HEAD_DETACHED
-            elif len(repo.ahead_commits) > 0:
+            elif repo.ahead_commits and len(repo.ahead_commits) > 0:
                 msg.git_info_changed.state = GitInfo.GitStates.AHEAD_OF_REMOTE
             else:
                 msg.git_info_changed.state = GitInfo.GitStates.DEFAULT
@@ -905,7 +905,7 @@ def _get_toolbar_mode() -> Config.ToolbarMode.ValueType:
         Config.ToolbarMode, config_value.upper()
     )
     if enum_value is None:
-        allowed_values = ", ".join(k.lower() for k in Config.ToolbarMode.keys())
+        allowed_values = ", ".join(k.lower() for k in Config.ToolbarMode.keys())  # noqa: SIM118
         raise ValueError(
             f"Config {config_key!r} expects to have one of "
             f"the following values: {allowed_values}. "

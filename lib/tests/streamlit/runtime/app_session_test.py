@@ -131,13 +131,13 @@ class AppSessionTest(unittest.TestCase):
         session._uploaded_file_mgr = mock_file_mgr
 
         session.shutdown()
-        assert AppSessionState.SHUTDOWN_REQUESTED == session._state
+        assert session._state == AppSessionState.SHUTDOWN_REQUESTED
         mock_file_mgr.remove_session_files.assert_called_once_with(session.id)
         patched_disconnect.assert_called_once_with(session._on_secrets_file_changed)
 
         # A 2nd shutdown call should have no effect.
         session.shutdown()
-        assert AppSessionState.SHUTDOWN_REQUESTED == session._state
+        assert session._state == AppSessionState.SHUTDOWN_REQUESTED
 
         mock_file_mgr.remove_session_files.assert_called_once_with(session.id)
 
@@ -626,7 +626,9 @@ class AppSessionTest(unittest.TestCase):
         mock_enqueue.assert_called_once_with(expected_msg)
 
 
-def _mock_get_options_for_section(overrides=None) -> Callable[..., Any]:
+def _mock_get_options_for_section(
+    overrides: dict[str, Any] | None = None,
+) -> Callable[..., Any]:
     if not overrides:
         overrides = {}
 
@@ -690,7 +692,7 @@ def _mock_get_options_for_section(overrides=None) -> Callable[..., Any]:
     def get_options_for_section(section):
         if section == "theme":
             return theme_opts
-        elif section == "theme.sidebar":
+        if section == "theme.sidebar":
             return sidebar_theme_opts
         return config.get_options_for_section(section)
 
@@ -895,14 +897,16 @@ class AppSessionScriptEventTest(IsolatedAsyncioTestCase):
         session = _create_test_session(event_loop)
 
         # Pretend we're calling this function from a thread with another event_loop.
-        with patch(
-            "streamlit.runtime.app_session.asyncio.get_running_loop",
-            return_value=MagicMock(),
+        with (
+            patch(
+                "streamlit.runtime.app_session.asyncio.get_running_loop",
+                return_value=MagicMock(),
+            ),
+            pytest.raises(AssertionError),
         ):
-            with pytest.raises(AssertionError):
-                session._handle_scriptrunner_event_on_event_loop(
-                    sender=MagicMock(), event=ScriptRunnerEvent.SCRIPT_STARTED
-                )
+            session._handle_scriptrunner_event_on_event_loop(
+                sender=MagicMock(), event=ScriptRunnerEvent.SCRIPT_STARTED
+            )
 
     @patch(
         "streamlit.runtime.app_session.config.get_options_for_section",

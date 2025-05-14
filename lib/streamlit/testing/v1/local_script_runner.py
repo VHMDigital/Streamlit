@@ -127,14 +127,10 @@ class LocalScriptRunner(ScriptRunner):
             self.start()
         require_widgets_deltas(self, timeout)
 
-        tree = parse_tree_from_messages(self.forward_msgs())
-        return tree
+        return parse_tree_from_messages(self.forward_msgs())
 
     def script_stopped(self) -> bool:
-        for e in self.events:
-            if e == ScriptRunnerEvent.SHUTDOWN:
-                return True
-        return False
+        return any(e == ScriptRunnerEvent.SHUTDOWN for e in self.events)
 
     def _on_script_finished(
         self, ctx: ScriptRunContext, event: ScriptRunnerEvent, premature_stop: bool
