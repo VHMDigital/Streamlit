@@ -113,15 +113,11 @@ class UploadFileRequestHandlerTest(tornado.testing.AsyncHTTPTestCase):
             params, session_id="test_session_id", file_id=file.name
         )
 
-        self.assertEqual(204, response.code, response.reason)
-
-        self.assertEqual(
-            [(file.name, file.name, file.data)],
-            [
-                (rec.file_id, rec.name, rec.data)
-                for rec in self.file_mgr.get_files("test_session_id", [file.name])
-            ],
-        )
+        assert response.code == 204, response.reason
+        assert [(file.name, file.name, file.data)] == [
+            (rec.file_id, rec.name, rec.data)
+            for rec in self.file_mgr.get_files("test_session_id", [file.name])
+        ]
         assert response.headers["Access-Control-Allow-Origin"] == "*"
 
     @patch(
@@ -144,15 +140,11 @@ class UploadFileRequestHandlerTest(tornado.testing.AsyncHTTPTestCase):
             headers={"Origin": "http://example.com"},
         )
 
-        self.assertEqual(204, response.code, response.reason)
-
-        self.assertEqual(
-            [(file.name, file.name, file.data)],
-            [
-                (rec.file_id, rec.name, rec.data)
-                for rec in self.file_mgr.get_files("test_session_id", [file.name])
-            ],
-        )
+        assert response.code == 204, response.reason
+        assert [(file.name, file.name, file.data)] == [
+            (rec.file_id, rec.name, rec.data)
+            for rec in self.file_mgr.get_files("test_session_id", [file.name])
+        ]
         assert response.headers["Access-Control-Allow-Origin"] == "http://example.com"
 
     def test_upload_multiple_files_error(self):

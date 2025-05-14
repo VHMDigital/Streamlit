@@ -87,7 +87,11 @@ class ServerUtilTest(unittest.TestCase):
             ),
             patch(
                 "streamlit.web.server.server_util.config.get_option",
-                side_effect=[True, "browser.server.address"],
+                side_effect=[
+                    True,
+                    "browser.server.address",
+                    "",
+                ],
             ),
         ):
             assert server_util.is_url_from_allowed_origins("browser.server.address")

@@ -167,6 +167,7 @@ class ComponentRequestHandlerTest(tornado.testing.AsyncHTTPTestCase):
         """Test request failure when invalid component name is provided."""
 
         response = self._request_component("invalid_component")
+
         assert response.code == 404
         assert response.body == b"not found"
 
@@ -217,7 +218,7 @@ class ComponentRequestHandlerTest(tornado.testing.AsyncHTTPTestCase):
             )
 
         assert response.code == 200
-        assert payload == response.body
+        assert response.body == payload
 
     def test_mimetype_is_overridden_by_server(self):
         """Test get_content_type function."""
