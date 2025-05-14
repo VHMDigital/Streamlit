@@ -53,6 +53,16 @@ function makeMarkdownHeading(tag: string, markdown: string): string {
   }
 }
 
+const OVERRIDE_COMPONENTS = {
+  p: Fragment,
+  h1: Fragment,
+  h2: Fragment,
+  h3: Fragment,
+  h4: Fragment,
+  h5: Fragment,
+  h6: Fragment,
+}
+
 function Heading(props: HeadingProtoProps): ReactElement {
   const { element } = props
   const { tag, anchor, body, help, hideAnchor, divider } = element
@@ -79,15 +89,7 @@ function Heading(props: HeadingProtoProps): ReactElement {
             allowHTML={false}
             source={makeMarkdownHeading(tag, heading)}
             // this is purely an inline string
-            overrideComponents={{
-              p: Fragment,
-              h1: Fragment,
-              h2: Fragment,
-              h3: Fragment,
-              h4: Fragment,
-              h5: Fragment,
-              h6: Fragment,
-            }}
+            overrideComponents={OVERRIDE_COMPONENTS}
           />
         </HeadingWithActionElements>
         {/* Only the first line of the body is used as a heading, the remaining text is added as regular mardkown below. */}
