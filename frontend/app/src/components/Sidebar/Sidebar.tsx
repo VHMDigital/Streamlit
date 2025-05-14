@@ -37,12 +37,11 @@ import {
 import { IAppPage, Logo, PageConfig } from "@streamlit/protobuf"
 import { localStorageAvailable } from "@streamlit/utils"
 import { shouldCollapse } from "@streamlit/app/src/components/Sidebar/utils"
+import { LogoComponent } from "@streamlit/app/src/components/Logo"
 
 import {
   RESIZE_HANDLE_WIDTH,
   StyledCollapseSidebarButton,
-  StyledLogo,
-  StyledLogoLink,
   StyledNoLogoSpacer,
   StyledResizeHandle,
   StyledSidebar,
@@ -200,54 +199,21 @@ const Sidebar: React.FC<SidebarProps> = ({
     onToggleCollapse(!collapsedSidebar)
   }, [collapsedSidebar, onToggleCollapse])
 
-  const handleLogoError = (logoUrl: string, collapsed: boolean): void => {
-    // StyledLogo does not retain the e.currentEvent.src like other onerror cases
-    // store and read from ref instead
-    const component = collapsed ? "Logo" : "Sidebar Logo"
-    LOG.error(`Client Error: ${component} source error - ${logoUrl}`)
-    endpoints.sendClientErrorToHost(
-      component,
-      "Logo source failed to load",
-      "onerror triggered",
-      logoUrl
-    )
-  }
-
-  function renderLogo(collapsed: boolean): ReactElement {
+  // Render logo or spacer - using shared LogoComponent
+  const renderLogoContent = () => {
     if (!appLogo) {
       return <StyledNoLogoSpacer data-testid="stLogoSpacer" />
     }
 
-    const displayImage =
-      collapsed && appLogo.iconImage ? appLogo.iconImage : appLogo.image
-    const source = endpoints.buildMediaURL(displayImage)
-
-    const logo = (
-      <StyledLogo
-        src={source}
-        size={appLogo.size}
+    return (
+      <LogoComponent
+        appLogo={appLogo}
+        endpoints={endpoints}
+        collapsed={collapsedSidebar}
         sidebarWidth={sidebarWidth}
-        alt="Logo"
-        className="stLogo"
-        data-testid="stLogo"
-        // Save to logo's src to send on load error
-        onError={_ => handleLogoError(source, collapsed)}
+        componentName="Sidebar Logo"
       />
     )
-
-    if (appLogo.link) {
-      return (
-        <StyledLogoLink
-          href={appLogo.link}
-          target="_blank"
-          rel="noreferrer"
-          data-testid="stLogoLink"
-        >
-          {logo}
-        </StyledLogoLink>
-      )
-    }
-    return logo
   }
 
   const hasPageNavAbove = appPages.length > 1 && !hideSidebarNav
@@ -291,7 +257,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         onMouseOut={onMouseOut}
       >
         <StyledSidebarHeaderContainer data-testid="stSidebarHeader">
-          {renderLogo(false)}
+          {renderLogoContent()}
           <StyledCollapseSidebarButton
             showSidebarCollapse={showSidebarCollapse}
             data-testid="stSidebarCollapseButton"

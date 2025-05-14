@@ -17,7 +17,6 @@
 import React, { useMemo } from "react"
 import { SidebarNavLink } from "../Navigation"
 import NavSection from "./NavSection"
-import groupBy from "lodash/groupBy"
 import Overflow from "rc-overflow"
 import { IAppPage } from "@streamlit/protobuf"
 import { StreamlitEndpoints } from "@streamlit/connection"
@@ -26,6 +25,10 @@ import {
   StyledTopNavLinkContainer,
 } from "./styled-components"
 import { isNullOrUndefined } from "@streamlit/utils"
+import {
+  groupPagesBySection,
+  hasMultipleSections,
+} from "../Navigation/NavUtils"
 
 export interface Props {
   currentPageScriptHash: string
@@ -35,6 +38,10 @@ export interface Props {
   endpoints: StreamlitEndpoints
 }
 
+/**
+ * TopNav component that displays navigation items in a responsive horizontal menu.
+ * Uses rc-overflow to dynamically manage visible items based on available space.
+ */
 const TopNav: React.FC<Props> = ({
   endpoints,
   pageLinkBaseUrl,
@@ -42,57 +49,88 @@ const TopNav: React.FC<Props> = ({
   appPages,
   onPageChange,
 }) => {
+  // Group pages by their section headers
   const navSections = useMemo(() => {
-    return groupBy(appPages, "sectionHeader")
+    return groupPagesBySection(appPages)
   }, [appPages])
 
-  const hasSections = Object.keys(navSections).length > 1
+  const hasSections = hasMultipleSections(navSections)
 
-  const data = hasSections
-    ? Object.values(navSections)
-    : Object.values(navSections).flat()
+  // Prepare data for the overflow component:
+  // If there are multiple sections, we pass the sections as groups
+  // Otherwise, we flatten all pages into a single array
+  const data = useMemo(() => {
+    return hasSections
+      ? Object.values(navSections) // Sections as groups: IAppPage[][]
+      : Object.values(navSections).flat() // All pages flattened: IAppPage[]
+  }, [hasSections, navSections])
+
+  /**
+   * Renders a single navigation link item
+   */
+  const renderNavLink = (item: IAppPage) => (
+    <StyledTopNavLinkContainer>
+      <SidebarNavLink
+        isTopNav={true}
+        isActive={currentPageScriptHash === item.pageScriptHash}
+        icon={item.icon}
+        pageUrl={endpoints.buildAppPageURL(pageLinkBaseUrl, item)}
+        onClick={e => {
+          e.preventDefault()
+          if (item.pageScriptHash) {
+            onPageChange(item.pageScriptHash)
+          }
+        }}
+      >
+        {String(item.pageName)}
+      </SidebarNavLink>
+    </StyledTopNavLinkContainer>
+  )
+
+  /**
+   * Renders a dropdown section for grouped items
+   */
+  const renderNavSection = (
+    items: IAppPage[] | IAppPage[][],
+    title: string,
+    hideChevron = false
+  ) => (
+    <NavSection
+      hideChevron={hideChevron}
+      sections={
+        Array.isArray(items[0])
+          ? (items as IAppPage[][])
+          : [items as IAppPage[]]
+      }
+      title={title}
+      handlePageChange={onPageChange}
+      endpoints={endpoints}
+      pageLinkBaseUrl={pageLinkBaseUrl}
+      currentPageScriptHash={currentPageScriptHash}
+    />
+  )
 
   return (
     <Overflow<IAppPage | IAppPage[]>
       component={StyledOverflowContainer}
+      // Generate a stable key for each item - either the section header or page hash
       itemKey={item =>
         Array.isArray(item) ? item[0].sectionHeader! : item.pageScriptHash!
       }
       data={data}
+      // "responsive" automatically determines how many items to show based on container width
       maxCount={"responsive"}
       renderItem={(item, _info) => {
+        // Case 1: Item is an array (a section with multiple pages)
         if (Array.isArray(item)) {
-          return (
-            <NavSection
-              sections={[item]}
-              title={item[0].sectionHeader || ""}
-              handlePageChange={onPageChange}
-              endpoints={endpoints}
-              pageLinkBaseUrl={pageLinkBaseUrl}
-              currentPageScriptHash={currentPageScriptHash}
-            />
-          )
-        } else {
-          return (
-            <StyledTopNavLinkContainer>
-              <SidebarNavLink
-                isTopNav={true}
-                isActive={currentPageScriptHash === item.pageScriptHash}
-                icon={item.icon}
-                pageUrl={endpoints.buildAppPageURL(pageLinkBaseUrl, item)}
-                onClick={e => {
-                  e.preventDefault()
-                  if (item.pageScriptHash) {
-                    onPageChange(item.pageScriptHash)
-                  }
-                }}
-              >
-                {String(item.pageName)}
-              </SidebarNavLink>
-            </StyledTopNavLinkContainer>
-          )
+          return renderNavSection([item], item[0].sectionHeader || "")
+        }
+        // Case 2: Item is a single page
+        else {
+          return renderNavLink(item)
         }
       }}
+      // This renders the overflow menu that shows items that don't fit
       renderRest={items => {
         if (isNullOrUndefined(items)) {
           return null
@@ -101,30 +139,13 @@ const TopNav: React.FC<Props> = ({
         const totalNumPages = items.flat().length
         const title = `${totalNumPages} more`
 
+        // Case 1: Remaining items are sections (arrays of pages)
         if (Array.isArray(items[0])) {
-          return (
-            <NavSection
-              hideChevron={true}
-              sections={items as IAppPage[][]}
-              title={title}
-              handlePageChange={onPageChange}
-              endpoints={endpoints}
-              pageLinkBaseUrl={pageLinkBaseUrl}
-              currentPageScriptHash={currentPageScriptHash}
-            />
-          )
-        } else {
-          return (
-            <NavSection
-              hideChevron={true}
-              sections={[items as IAppPage[]]}
-              title={title}
-              handlePageChange={onPageChange}
-              endpoints={endpoints}
-              pageLinkBaseUrl={pageLinkBaseUrl}
-              currentPageScriptHash={currentPageScriptHash}
-            />
-          )
+          return renderNavSection(items as IAppPage[][], title, true)
+        }
+        // Case 2: Remaining items are individual pages
+        else {
+          return renderNavSection([items as IAppPage[]], title, true)
         }
       }}
     />

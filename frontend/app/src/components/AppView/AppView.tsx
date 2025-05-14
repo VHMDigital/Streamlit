@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useContext } from "react"
+import React, { ReactElement, useContext, useMemo } from "react"
 
 import { getLogger } from "loglevel"
 
@@ -33,13 +33,14 @@ import {
   VerticalBlock,
   WidgetStateManager,
 } from "@streamlit/lib"
-import { IAppPage, Logo, Navigation } from "@streamlit/protobuf"
+import { IAppPage, Logo, Navigation, PageConfig } from "@streamlit/protobuf"
 import ThemedSidebar from "@streamlit/app/src/components/Sidebar"
 import EventContainer from "@streamlit/app/src/components/EventContainer"
 import { AppContext } from "@streamlit/app/src/components/AppContext"
 import Header from "@streamlit/app/src/components/Header"
 import TopNav from "@streamlit/app/src/components/TopNav/TopNav"
 import { useAppContext } from "@streamlit/app/src/components/StreamlitContextProvider"
+import { LogoComponent } from "@streamlit/app/src/components/Logo"
 import {
   StyledAppViewBlockContainer,
   StyledAppViewBlockSpacer,
@@ -54,10 +55,7 @@ import {
   StyledStickyBottomContainer,
 } from "./styled-components"
 import ScrollToBottomContainer from "./ScrollToBottomContainer"
-import {
-  StyledLogo,
-  StyledLogoLink,
-} from "@streamlit/app/src/components/Sidebar/styled-components"
+import { StyledLogoContainer } from "@streamlit/app/src/components/Header/styled-components"
 import HeaderColoredLine from "@streamlit/app/src/components/HeaderColoredLine"
 
 const LOG = getLogger("AppView")
@@ -258,18 +256,30 @@ function AppView(props: AppViewProps): ReactElement {
     />
   )
 
-  const [sidebarCollapsed, setSidebarCollapsed] = React.useState<boolean>(
-    initialSidebarState === 1 || // enum value for COLLAPSED
-      (initialSidebarState === 2 &&
-        window.innerWidth <=
-          parseInt(activeTheme.emotion.breakpoints.md, 10) - 0.02) // AUTO with small screen
+  const [isSidebarCollapsed, setSidebarIsCollapsed] = React.useState<boolean>(
+    initialSidebarState === PageConfig.SidebarState.COLLAPSED ||
+      (initialSidebarState === PageConfig.SidebarState.AUTO &&
+        window.innerWidth <= parseInt(activeTheme.emotion.breakpoints.md, 10))
   )
 
   const toggleSidebar = React.useCallback(() => {
-    setSidebarCollapsed(prev => !prev)
+    setSidebarIsCollapsed(prev => !prev)
   }, [])
 
   console.log({ navigationPosition })
+
+  // Logo component to be used in the header when sidebar is closed
+  const logoElement = useMemo(() => {
+    if (!appLogo) return null
+
+    return (
+      <LogoComponent
+        appLogo={appLogo}
+        endpoints={endpoints}
+        componentName="Header Logo"
+      />
+    )
+  }, [appLogo, endpoints])
 
   // The tabindex is required to support scrolling by arrow keys.
   return (
@@ -292,8 +302,8 @@ function AppView(props: AppViewProps): ReactElement {
               currentPageScriptHash={currentPageScriptHash}
               hideSidebarNav={hideSidebarNav}
               expandSidebarNav={expandSidebarNav}
-              isCollapsed={sidebarCollapsed}
-              onToggleCollapse={setSidebarCollapsed}
+              isCollapsed={isSidebarCollapsed}
+              onToggleCollapse={setSidebarIsCollapsed}
             >
               <StyledSidebarBlockContainer>
                 {renderBlock(elements.sidebar)}
@@ -303,23 +313,24 @@ function AppView(props: AppViewProps): ReactElement {
         )}
         <StyledMainContent>
           <Header
+            isStale={scriptRunState === ScriptRunState.RUNNING_STALE}
             hasSidebar={showSidebar}
-            isSidebarOpen={showSidebar && !sidebarCollapsed}
+            isSidebarOpen={showSidebar && !isSidebarCollapsed}
             onToggleSidebar={toggleSidebar}
-            logoComponent={appLogo && renderLogo(appLogo)}
             navigation={
               navigationPosition === Navigation.Position.TOP &&
               appPages.length > 1 ? (
                 <TopNav
                   endpoints={endpoints}
                   pageLinkBaseUrl={pageLinkBaseUrl}
-                  appPages={appPages}
                   currentPageScriptHash={currentPageScriptHash}
+                  appPages={appPages}
                   onPageChange={onPageChange}
                 />
               ) : null
             }
             rightContent={topRightContent}
+            logoComponent={logoElement}
           />
           <Component
             tabIndex={0}
