@@ -147,7 +147,7 @@ class WStates(MutableMapping[str, Any]):
     def __len__(self) -> int:
         return len(self.states)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         # For this and many other methods, we can't simply delegate to the
         # states field, because we need to invoke `__getitem__` for any
         # values, to handle deserialization and unwrapping of values.
