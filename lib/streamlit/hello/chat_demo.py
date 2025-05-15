@@ -29,7 +29,7 @@ def chat_demo():
         if avatar_type == "Emoji":
             cols = st.columns(2)
             ai_avatar = cols[0].selectbox(
-                "Select a ai avatar",
+                "Select an AI avatar",
                 ["🤖", "🦜", "🐶", "🐱"],
                 index=0,
             )
