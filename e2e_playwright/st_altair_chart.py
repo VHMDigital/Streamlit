@@ -101,7 +101,7 @@ stocks = alt.UrlData(
 base = (
     alt.Chart(stocks)
     .encode(x="date:T", y="price:Q", color="symbol:N")
-    .transform_filter(alt.datum.symbol == "GOOG")  # type: ignore[attr-defined]
+    .transform_filter(alt.datum.symbol == "GOOG")
 )
 
 new_base_chart = base.mark_line() + base.mark_point()
