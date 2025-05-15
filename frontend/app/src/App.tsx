@@ -1792,7 +1792,7 @@ export class App extends PureComponent<Props, State> {
    * Updates the app body when there's a connection error.
    */
   handleConnectionError = (errMarkdown: string): void => {
-    // This is just a regular error dialog, bug with type CONNECTION_ERROR
+    // This is just a regular error dialog, but with type CONNECTION_ERROR
     // instead of WARNING, so we can rescind the dialog later when reconnected.
     this.showError(
       "Connection error",
