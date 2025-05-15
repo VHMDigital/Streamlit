@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 import tornado.web
 
@@ -44,7 +44,9 @@ def allow_all_cross_origin_requests() -> bool:
     )
 
 
-def is_allowed_origin(origin: str) -> bool:
+def is_allowed_origin(origin: Any) -> bool:
+    if not isinstance(origin, str):
+        return False
     return origin in allowlisted_origins()
 
 
@@ -120,7 +122,7 @@ class _SpecialRequestHandler(tornado.web.RequestHandler):
         if allow_all_cross_origin_requests():
             self.set_header("Access-Control-Allow-Origin", "*")
         elif is_allowed_origin(origin := self.request.headers.get("Origin")):
-            self.set_header("Access-Control-Allow-Origin", origin)
+            self.set_header("Access-Control-Allow-Origin", cast("str", origin))
 
     def options(self) -> None:
         """/OPTIONS handler for preflight CORS checks.

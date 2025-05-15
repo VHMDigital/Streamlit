@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import mimetypes
 import os
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, cast
 
 import tornado.web
 
@@ -88,7 +88,7 @@ class ComponentRequestHandler(tornado.web.RequestHandler):
         elif streamlit.web.server.routes.is_allowed_origin(
             origin := self.request.headers.get("Origin")
         ):
-            self.set_header("Access-Control-Allow-Origin", origin)
+            self.set_header("Access-Control-Allow-Origin", cast("str", origin))
 
     def options(self) -> None:
         """/OPTIONS handler for preflight CORS checks."""

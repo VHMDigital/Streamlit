@@ -56,7 +56,15 @@ def is_url_from_allowed_origins(url: str) -> bool:
 
     hostname = url_util.get_hostname(url)
 
-    allowed_domains: list[str | Callable[[], str | None]] = [
+    # NOTE: Need to look into whether this is what we want to do here:
+    # This helper function should probably be named is_url_from_allowed_domains
+    # rather than *_origins since origins should contain a scheme. We keep
+    # the more lax behavior for now but should double-check that this is ok.
+    allowlisted_domains = [
+        url_util.get_hostname(origin) for origin in allowlisted_origins()
+    ]
+
+    allowed_domains: list[str | None | Callable[[], str | None]] = [
         # Check localhost first.
         "localhost",
         "0.0.0.0",  # noqa: S104
@@ -67,11 +75,7 @@ def is_url_from_allowed_origins(url: str) -> bool:
         # Then try the options that depend on HTTP requests or opening sockets.
         net_util.get_internal_ip,
         net_util.get_external_ip,
-        # NOTE: Need to look into whether this is what we want to do here:
-        # This helper function should probably be named is_url_from_allowed_domains
-        # rather than *_origins since origins should contain a scheme. We keep
-        # the more lax behavior for now but should double-check that this is ok.
-        *[url_util.get_hostname(origin) for origin in allowlisted_origins()],
+        *allowlisted_domains,
     ]
 
     for allowed_domain in allowed_domains:

@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 from urllib.parse import quote
 
 import tornado.web
@@ -47,7 +47,7 @@ class MediaFileHandler(tornado.web.StaticFileHandler):
         if allow_all_cross_origin_requests():
             self.set_header("Access-Control-Allow-Origin", "*")
         elif is_allowed_origin(origin := self.request.headers.get("Origin")):
-            self.set_header("Access-Control-Allow-Origin", origin)
+            self.set_header("Access-Control-Allow-Origin", cast("str", origin))
 
     def set_extra_headers(self, path: str) -> None:
         """Add Content-Disposition header for downloadable files.
