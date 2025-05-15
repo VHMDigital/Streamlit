@@ -29,7 +29,7 @@ class StHeaderTest(DeltaGeneratorTestCase):
         el = self.get_delta_from_queue().new_element
         assert el.heading.body == "some header"
         assert el.heading.tag == "h2"
-        assert el.heading.hide_anchor is not False
+        assert not el.heading.hide_anchor
         assert not el.heading.divider
 
     def test_st_header_with_anchor(self):
@@ -40,7 +40,7 @@ class StHeaderTest(DeltaGeneratorTestCase):
         assert el.heading.body == "some header"
         assert el.heading.tag == "h2"
         assert el.heading.anchor == "some-anchor"
-        assert el.heading.hide_anchor is not False
+        assert not el.heading.hide_anchor
         assert not el.heading.divider
 
     def test_st_header_with_hidden_anchor(self):
@@ -75,7 +75,7 @@ class StHeaderTest(DeltaGeneratorTestCase):
         el = self.get_delta_from_queue().new_element
         assert el.heading.body == "some header"
         assert el.heading.tag == "h2"
-        assert el.heading.hide_anchor is not False
+        assert not el.heading.hide_anchor
         assert el.heading.divider == "auto"
 
     def test_st_header_with_divider_color(self):
@@ -85,7 +85,7 @@ class StHeaderTest(DeltaGeneratorTestCase):
         el = self.get_delta_from_queue().new_element
         assert el.heading.body == "some header"
         assert el.heading.tag == "h2"
-        assert el.heading.hide_anchor is not False
+        assert not el.heading.hide_anchor
         assert el.heading.divider == "blue"
 
     def test_st_header_with_invalid_divider(self):
