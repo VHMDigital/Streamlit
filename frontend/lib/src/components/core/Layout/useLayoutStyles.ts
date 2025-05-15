@@ -16,7 +16,7 @@
 
 import { useMemo } from "react"
 
-import { Element, Block as BlockProto } from "@streamlit/protobuf"
+import { Block as BlockProto, Element } from "@streamlit/protobuf"
 
 type SubElement = {
   useContainerWidth?: boolean | null
@@ -35,7 +35,7 @@ export type UseLayoutStylesArgs<T> = {
   element: Element | BlockProto
   // subElement supports older config where the width/height is set on the lower
   // level element.
-  subElement?: SubElement
+  subElement?: T & SubElement
 }
 
 const isNonZeroPositiveNumber = (value: unknown): value is number =>
@@ -210,7 +210,7 @@ export const useLayoutStyles = <T>({
       width,
       height,
     }
-  }, [element])
+  }, [element, subElement])
 
   return layoutStyles
 }
