@@ -430,7 +430,7 @@ class NumberInputTest(DeltaGeneratorTestCase):
 
         # Assert output
         assert number == 42
-        assert type(number) == int
+        assert type(number) is int
 
     @parameterized.expand(
         [

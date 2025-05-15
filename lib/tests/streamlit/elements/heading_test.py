@@ -29,7 +29,7 @@ class StHeaderTest(DeltaGeneratorTestCase):
         el = self.get_delta_from_queue().new_element
         assert el.heading.body == "some header"
         assert el.heading.tag == "h2"
-        assert not el.heading.hide_anchor, False
+        assert el.heading.hide_anchor is not False
         assert not el.heading.divider
 
     def test_st_header_with_anchor(self):
@@ -40,7 +40,7 @@ class StHeaderTest(DeltaGeneratorTestCase):
         assert el.heading.body == "some header"
         assert el.heading.tag == "h2"
         assert el.heading.anchor == "some-anchor"
-        assert not el.heading.hide_anchor, False
+        assert el.heading.hide_anchor is not False
         assert not el.heading.divider
 
     def test_st_header_with_hidden_anchor(self):
@@ -51,7 +51,7 @@ class StHeaderTest(DeltaGeneratorTestCase):
         assert el.heading.body == "some header"
         assert el.heading.tag == "h2"
         assert el.heading.anchor == ""
-        assert el.heading.hide_anchor, True
+        assert el.heading.hide_anchor is True
         assert not el.heading.divider
 
     def test_st_header_with_invalid_anchor(self):
@@ -75,7 +75,7 @@ class StHeaderTest(DeltaGeneratorTestCase):
         el = self.get_delta_from_queue().new_element
         assert el.heading.body == "some header"
         assert el.heading.tag == "h2"
-        assert not el.heading.hide_anchor, False
+        assert el.heading.hide_anchor is not False
         assert el.heading.divider == "auto"
 
     def test_st_header_with_divider_color(self):
@@ -85,7 +85,7 @@ class StHeaderTest(DeltaGeneratorTestCase):
         el = self.get_delta_from_queue().new_element
         assert el.heading.body == "some header"
         assert el.heading.tag == "h2"
-        assert not el.heading.hide_anchor, False
+        assert el.heading.hide_anchor is not False
         assert el.heading.divider == "blue"
 
     def test_st_header_with_invalid_divider(self):
@@ -126,7 +126,7 @@ class StSubheaderTest(DeltaGeneratorTestCase):
         assert el.heading.body == "some subheader"
         assert el.heading.tag == "h3"
         assert el.heading.anchor == ""
-        assert el.heading.hide_anchor, True
+        assert el.heading.hide_anchor is True
         assert not el.heading.divider
 
     def test_st_subheader_with_invalid_anchor(self):

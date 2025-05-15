@@ -20,6 +20,7 @@ import asyncio
 import contextlib
 import errno
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -300,7 +301,7 @@ class PortRotateAHundredTest(unittest.TestCase):
             ) as mock_server,
         ):
             start_listening(app)
-            assert pytest_wrapped_e.type == SystemExit
+            assert pytest_wrapped_e.type is SystemExit
             assert pytest_wrapped_e.value.code == errno.EADDRINUSE
             assert mock_server.listen.call_count == MAX_PORT_SEARCH_RETRIES
 

@@ -210,7 +210,7 @@ class StHelpTest(DeltaGeneratorTestCase):
             st.help(MyClass)
 
         ds = self.get_delta_from_queue().new_element.doc_string
-        assert type(MyClass) == type
+        assert type(MyClass) is type
         assert ds.name == "MyClass"
         assert (
             ds.value
@@ -230,7 +230,7 @@ class StHelpTest(DeltaGeneratorTestCase):
             st.help(MyClass)
 
         ds = self.get_delta_from_queue().new_element.doc_string
-        assert type(MyClass) == type
+        assert type(MyClass) is type
         assert ds.name == "MyClass"
         assert (
             ds.value

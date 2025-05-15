@@ -628,7 +628,7 @@ class DataEditorTest(DeltaGeneratorTestCase):
         assert reconstructed_df.shape[0] == metadata.expected_rows
         assert reconstructed_df.shape[1] == metadata.expected_cols
 
-        assert type(return_data) == (
+        assert type(return_data) is (
             type(input_data)
             if metadata.expected_type is None
             else metadata.expected_type

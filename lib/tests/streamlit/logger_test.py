@@ -49,7 +49,7 @@ class LoggerTest(unittest.TestCase):
         """Test streamlit.logger.set_log_level."""
         with pytest.raises(SystemExit) as e:
             logger.set_log_level(90)
-        assert e.type == SystemExit
+        assert e.type is SystemExit
         assert e.value.code == 1
 
     @parameterized.expand(

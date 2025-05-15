@@ -75,7 +75,7 @@ class LocalSourcesWatcherTest(unittest.TestCase):
         args, _ = fob.call_args
         assert os.path.realpath(args[0]) == os.path.realpath(SCRIPT_PATH)
         method_type = type(self.setUp)
-        assert type(args[1]) == method_type
+        assert type(args[1]) is method_type
 
         fob.reset_mock()
         lsw.update_watched_modules()
@@ -114,10 +114,10 @@ class LocalSourcesWatcherTest(unittest.TestCase):
         assert "__init__.py" in args[0]
         args, _ = call_args_list[1]
         assert args[0] == DUMMY_MODULE_1_FILE
-        assert type(args[1]) == method_type
+        assert type(args[1]) is method_type
         args, _ = call_args_list[2]
         assert args[0] == DUMMY_MODULE_2_FILE
-        assert type(args[1]) == method_type
+        assert type(args[1]) is method_type
 
         fob.reset_mock()
         lsw.update_watched_modules()
@@ -147,7 +147,7 @@ class LocalSourcesWatcherTest(unittest.TestCase):
 
         args, _ = call_args_list[1]
         assert args[0] == DUMMY_MODULE_1_FILE
-        assert type(args[1]) == method_type
+        assert type(args[1]) is method_type
 
         sys.modules["DUMMY_MODULE_2"] = DUMMY_MODULE_2
         fob.reset_mock()
@@ -155,7 +155,7 @@ class LocalSourcesWatcherTest(unittest.TestCase):
 
         args, _ = fob.call_args
         assert args[0] == DUMMY_MODULE_2_FILE
-        assert type(args[1]) == method_type
+        assert type(args[1]) is method_type
 
         fob.assert_called_once()
 

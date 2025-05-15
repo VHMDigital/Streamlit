@@ -32,7 +32,7 @@ class DataFrameCoercionTest(unittest.TestCase):
         """
         d = {"a": [1], "b": [2], "c": [3]}
         df = dataframe_util.convert_anything_to_pandas_df(d)
-        assert type(df) == pd.DataFrame
+        assert type(df) is pd.DataFrame
         assert df.shape == (1, 3)
 
     def test_empty_numpy_array(self):
@@ -41,7 +41,7 @@ class DataFrameCoercionTest(unittest.TestCase):
         """
         arr = np.array([])
         df = dataframe_util.convert_anything_to_pandas_df(arr)
-        assert type(df) == pd.DataFrame
+        assert type(df) is pd.DataFrame
         assert df.shape == (0, 1)
 
     def test_styler(self):
@@ -49,7 +49,7 @@ class DataFrameCoercionTest(unittest.TestCase):
         d = {"a": [1], "b": [2], "c": [3]}
         styler = pd.DataFrame(d).style.format("{:.2%}")
         df = dataframe_util.convert_anything_to_pandas_df(styler)
-        assert type(df) == pd.DataFrame
+        assert type(df) is pd.DataFrame
         assert df.shape == (1, 3)
 
     def test_pyarrow_table(self):
@@ -57,5 +57,5 @@ class DataFrameCoercionTest(unittest.TestCase):
         d = {"a": [1], "b": [2], "c": [3]}
         table = pa.Table.from_pandas(pd.DataFrame(d))
         df = dataframe_util.convert_anything_to_pandas_df(table)
-        assert type(df) == pd.DataFrame
+        assert type(df) is pd.DataFrame
         assert df.shape == (1, 3)

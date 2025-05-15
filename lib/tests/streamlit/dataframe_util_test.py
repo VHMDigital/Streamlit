@@ -650,7 +650,7 @@ class DataframeUtilTest(unittest.TestCase):
                 converted_df, metadata.expected_data_format
             )
 
-            assert type(converted_data) == (
+            assert type(converted_data) is (
                 type(input_data)
                 if metadata.expected_type is None
                 else metadata.expected_type
