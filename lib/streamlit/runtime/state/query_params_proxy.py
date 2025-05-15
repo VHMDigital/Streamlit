@@ -76,18 +76,18 @@ class QueryParamsProxy(MutableMapping[str, str]):
 
     @overload
     def update(
-        self, mapping: SupportsKeysAndGetItem[str, str | Iterable[str]], /, **kwds: str
+        self, params: SupportsKeysAndGetItem[str, str | Iterable[str]], /, **kwds: str
     ) -> None: ...
 
     @overload
     def update(
-        self, keys_and_values: Iterable[tuple[str, str | Iterable[str]]], /, **kwds: str
+        self, params: Iterable[tuple[str, str | Iterable[str]]], /, **kwds: str
     ) -> None: ...
 
     @overload
     def update(self, **kwds: str | Iterable[str]) -> None: ...
 
-    def update(self, other=(), /, **kwds):
+    def update(self, params=(), /, **kwds) -> None:  # type: ignore
         """
         Update one or more values in query_params at once from a dictionary or
         dictionary-like object.
@@ -102,7 +102,7 @@ class QueryParamsProxy(MutableMapping[str, str]):
             Additional key/value pairs to update passed as keyword arguments.
         """
         with get_session_state().query_params() as qp:
-            qp.update(other, **kwds)
+            qp.update(params, **kwds)
 
     @gather_metrics("query_params.set_attr")
     def __setattr__(self, key: str, value: Any) -> None:
@@ -165,17 +165,19 @@ class QueryParamsProxy(MutableMapping[str, str]):
             return qp.to_dict()
 
     @overload
-    def from_dict(
-        self, keys_and_values: Iterable[tuple[str, str | Iterable[str]]]
-    ) -> None: ...
+    def from_dict(self, params: Iterable[tuple[str, str | Iterable[str]]]) -> None: ...
 
     @overload
     def from_dict(
-        self, mapping: SupportsKeysAndGetItem[str, str | Iterable[str]]
+        self, params: SupportsKeysAndGetItem[str, str | Iterable[str]]
     ) -> None: ...
 
     @gather_metrics("query_params.from_dict")
-    def from_dict(self, params):
+    def from_dict(
+        self,
+        params: SupportsKeysAndGetItem[str, str | Iterable[str]]
+        | Iterable[tuple[str, str | Iterable[str]]],
+    ) -> None:
         """
         Set all of the query parameters from a dictionary or dictionary-like object.
 
