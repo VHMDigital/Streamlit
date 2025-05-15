@@ -83,9 +83,9 @@ export function StreamlitDialog(dialogProps: DialogProps): ReactNode {
     case DialogType.DEPLOY_ERROR:
       return <DeployErrorDialog {...dialogProps} />
     case undefined:
-      return <NoDialog {...dialogProps} />
+      return noDialog(dialogProps)
     default:
-      return <TypeNotRecognizedDialog {...dialogProps} />
+      return typeNotRecognizedDialog(dialogProps)
   }
 }
 
@@ -315,7 +315,7 @@ function DeployErrorDialog({
 /**
  * Returns an empty dictionary, indicating that no object is to be displayed.
  */
-function NoDialog({ onClose }: { onClose: PlainEventHandler }): ReactElement {
+function noDialog({ onClose }: { onClose: PlainEventHandler }): ReactElement {
   return <Modal isOpen={false} onClose={onClose} />
 }
 
@@ -327,7 +327,7 @@ interface NotRecognizedProps {
 /**
  * If the dialog type is not recognized, display this dialog.
  */
-function TypeNotRecognizedDialog(props: NotRecognizedProps): ReactElement {
+function typeNotRecognizedDialog(props: NotRecognizedProps): ReactElement {
   return (
     <Modal isOpen onClose={props.onClose}>
       <ModalBody>{`Dialog type "${props.type}" not recognized.`}</ModalBody>
