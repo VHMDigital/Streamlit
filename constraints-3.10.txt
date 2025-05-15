@@ -44,7 +44,7 @@ MarkupSafe==3.0.2
 matplotlib==3.10.3
 mdurl==0.1.2
 more-itertools==10.7.0
-mypy==1.10.1
+mypy==1.15.0
 mypy-protobuf==3.6.0
 mypy_extensions==1.1.0
 narwhals==1.39.0
@@ -58,8 +58,8 @@ pillow==11.2.1
 pixelmatch==0.3.0
 platformdirs==4.3.8
 playwright==1.51.0
-plotly==6.0.1
-pluggy==1.5.0
+plotly==6.1.0
+pluggy==1.6.0
 pre_commit==4.2.0
 protobuf==6.31.0
 py-cpuinfo==9.0.0
@@ -89,7 +89,7 @@ requests-mock==1.12.1
 requests-toolbelt==1.0.0
 rfc3986==2.0.0
 rich==14.0.0
-rpds-py==0.24.0
+rpds-py==0.25.0
 ruff==0.11.9
 seaborn==0.13.2
 SecretStorage==3.3.3
