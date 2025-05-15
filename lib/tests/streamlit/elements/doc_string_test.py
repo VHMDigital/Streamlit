@@ -89,7 +89,9 @@ class StHelpAPITest(DeltaGeneratorTestCase):
         """Test st.help with conditional members not available
         via some non-AttributeError exception"""
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError, match="say_hello is not accessible when x is even"
+        ):
             st.help(ConditionalHello(False, ValueError))
 
     def test_help_width(self):

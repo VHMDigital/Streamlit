@@ -16,8 +16,8 @@
 
 from datetime import date, datetime, timedelta
 
+import pytest
 from parameterized import parameterized
-from pytest import raises
 
 import streamlit as st
 from streamlit.errors import StreamlitAPIException, StreamlitInvalidWidthError
@@ -169,7 +169,7 @@ class DateInputTest(DeltaGeneratorTestCase):
         ]
     )
     def test_value_out_of_range(self, value, min_date, max_date):
-        with raises(StreamlitAPIException) as exc_message:
+        with pytest.raises(StreamlitAPIException) as exc_message:
             st.date_input(
                 "the label", value=value, min_value=min_date, max_value=max_date
             )
@@ -273,7 +273,7 @@ class DateInputTest(DeltaGeneratorTestCase):
         assert c.label_visibility.value == proto_value
 
     def test_label_visibility_wrong_value(self):
-        with raises(StreamlitAPIException) as e:
+        with pytest.raises(StreamlitAPIException) as e:
             st.date_input("the label", label_visibility="wrong_value")
         assert (
             str(e.value)
@@ -320,7 +320,7 @@ class DateInputTest(DeltaGeneratorTestCase):
     )
     def test_invalid_date_format_values(self, format: str):
         """Test that it raises an exception for invalid date formats."""
-        with raises(StreamlitAPIException) as ex:
+        with pytest.raises(StreamlitAPIException) as ex:
             st.date_input("the label", format=format)
         assert str(ex.value).startswith("The provided format")
 
@@ -377,7 +377,7 @@ class DateInputTest(DeltaGeneratorTestCase):
     )
     def test_invalid_width(self, width):
         """Test that invalid width values raise exceptions."""
-        with raises(StreamlitInvalidWidthError):
+        with pytest.raises(StreamlitInvalidWidthError):
             st.date_input("the label", width=width)
 
 

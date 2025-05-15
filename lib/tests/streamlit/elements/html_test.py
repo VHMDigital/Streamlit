@@ -44,11 +44,7 @@ class StHtmlAPITest(DeltaGeneratorTestCase):
 
         # The style tag should be enqueued to the event delta generator
         style_msg = self.get_message_from_queue()
-        self.assertEqual(
-            # The path indicates it's the first element in event container (starts with 2)
-            [2, 0],
-            style_msg.metadata.delta_path,
-        )
+        assert style_msg.metadata.delta_path == [2, 0]
 
         # Check that html body is the expected style tag
         style_el = self.get_delta_from_queue().new_element
@@ -60,11 +56,7 @@ class StHtmlAPITest(DeltaGeneratorTestCase):
 
         # The style tag should be enqueued to the event delta generator
         style_msg = self.get_message_from_queue()
-        self.assertEqual(
-            # The path indicates it's the first element in event container (starts with 2)
-            [2, 0],
-            style_msg.metadata.delta_path,
-        )
+        assert style_msg.metadata.delta_path == [2, 0]
 
         # Check that html body is the expected STYLE tag
         style_el = self.get_delta_from_queue().new_element
@@ -99,11 +91,7 @@ class StHtmlAPITest(DeltaGeneratorTestCase):
 
         # Since there's a mix of style and other tags, html is enqueued to the main delta generator
         msg = self.get_message_from_queue()
-        self.assertEqual(
-            # The path indicates it's the first element in main container (starts with 0)
-            [0, 0],
-            msg.metadata.delta_path,
-        )
+        assert msg.metadata.delta_path == [0, 0]
         el = self.get_delta_from_queue().new_element
         assert (
             el.html.body

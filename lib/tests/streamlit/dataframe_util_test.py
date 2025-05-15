@@ -640,11 +640,12 @@ class DataframeUtilTest(unittest.TestCase):
         assert converted_df.shape[1] == metadata.expected_cols
 
         if metadata.expected_data_format == dataframe_util.DataFormat.UNKNOWN:
-            with pytest.raises(ValueError):
+            with pytest.raises(
+                ValueError, match="Unsupported input data format: DataFormat.UNKNOWN"
+            ):
                 dataframe_util.convert_pandas_df_to_data_format(
                     converted_df, metadata.expected_data_format
                 )
-            # We don't have to do any other tests for unknown data formats.
         else:
             converted_data = dataframe_util.convert_pandas_df_to_data_format(
                 converted_df, metadata.expected_data_format
@@ -670,11 +671,13 @@ class DataframeUtilTest(unittest.TestCase):
                     dataframe_util.convert_anything_to_pandas_df(converted_data),
                 )
 
-    def test_convert_pandas_df_to_data_format_with_unknown_data_format(self):
-        """Test that `convert_df_to_data_format` raises a ValueError when
+    def test_convert_to_unknown_format_raises_error(self):
+        """Test that convert_pandas_df_to_data_format raises an exception if it is
         passed an unknown data format.
         """
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError, match="Unsupported input data format: DataFormat.UNKNOWN"
+        ):
             dataframe_util.convert_pandas_df_to_data_format(
                 pd.DataFrame({"a": [1, 2, 3]}), dataframe_util.DataFormat.UNKNOWN
             )

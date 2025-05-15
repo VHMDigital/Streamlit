@@ -213,9 +213,7 @@ class DeclareComponentTest(unittest.TestCase):
         registered_component_names = {
             component.name for component in registered_components
         }
-        self.assertSetEqual(
-            registered_component_names, expected_registered_component_names
-        )
+        assert registered_component_names == expected_registered_component_names
 
     def test_when_registry_not_explicitly_initialized_return_defaultregistry(self):
         ComponentRegistry._instance = None

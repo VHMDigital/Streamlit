@@ -123,16 +123,16 @@ class TestIndexMethod(unittest.TestCase):
             (list(np.arange(0.0, 0.25, 0.05)), 0.150002),
         ]
     )
-    def test_unsuccessful_index_(self, input, find_value):
-        with pytest.raises(ValueError):
-            index_(input, find_value)
+    def test_unsuccessful_index_(self, input_options, find_value):
+        with pytest.raises(ValueError, match=f"{find_value} is not in iterable"):
+            index_(input_options, find_value)
 
     def test_index_list(self):
         assert index_([1, 2, 3, 4], 1) == 0
         assert index_([1, 2, 3, 4], 4) == 3
 
     def test_index_list_fails(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="5 is not in iterable"):
             index_([1, 2, 3, 4], 5)
 
     def test_index_tuple(self):
@@ -140,7 +140,7 @@ class TestIndexMethod(unittest.TestCase):
         assert index_((1, 2, 3, 4), 4) == 3
 
     def test_index_tuple_fails(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="5 is not in iterable"):
             index_((1, 2, 3, 4), 5)
 
     def test_index_numpy_array(self):
@@ -148,7 +148,7 @@ class TestIndexMethod(unittest.TestCase):
         assert index_(np.array([1, 2, 3, 4]), 4) == 3
 
     def test_index_numpy_array_fails(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="5 is not in iterable"):
             index_(np.array([1, 2, 3, 4]), 5)
 
     def test_index_pandas_series(self):
@@ -156,7 +156,7 @@ class TestIndexMethod(unittest.TestCase):
         assert index_(pd.Series([1, 2, 3, 4]), 4) == 3
 
     def test_index_pandas_series_fails(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="5 is not in iterable"):
             index_(pd.Series([1, 2, 3, 4]), 5)
 
 

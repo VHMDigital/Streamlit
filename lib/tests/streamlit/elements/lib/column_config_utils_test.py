@@ -322,17 +322,14 @@ class ColumnConfigUtilsTest(unittest.TestCase):
 
         arrow_schema = pa.Table.from_pandas(df).schema
 
-        self.assertEqual(
-            determine_dataframe_schema(df, arrow_schema),
-            {
-                INDEX_IDENTIFIER: ColumnDataKind.INTEGER,  # This is the type of the index
-                "int": ColumnDataKind.INTEGER,
-                "float": ColumnDataKind.FLOAT,
-                "bool": ColumnDataKind.BOOLEAN,
-                "str": ColumnDataKind.STRING,
-                "empty": ColumnDataKind.EMPTY,
-            },
-        )
+        assert determine_dataframe_schema(df, arrow_schema) == {
+            INDEX_IDENTIFIER: ColumnDataKind.INTEGER,  # This is the type of the index
+            "int": ColumnDataKind.INTEGER,
+            "float": ColumnDataKind.FLOAT,
+            "bool": ColumnDataKind.BOOLEAN,
+            "str": ColumnDataKind.STRING,
+            "empty": ColumnDataKind.EMPTY,
+        }
 
     def test_is_type_compatible(self):
         """Test that the is_type_compatible function correctly checks for compatibility

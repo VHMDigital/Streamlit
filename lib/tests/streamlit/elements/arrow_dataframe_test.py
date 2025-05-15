@@ -332,27 +332,17 @@ class ArrowDataFrameProtoTest(DeltaGeneratorTestCase):
         """Test that an exception is thrown if the selection_mode parameter is invalid."""
         df = pd.DataFrame([[1, 2], [3, 4]], columns=["col1", "col2"])
 
-        # Should throw an exception of the selection mode is parsed wrongly
-        with self.assertRaises(
-            StreamlitAPIException,
-            msg="Should show exception if an unknown selection mode is selected",
-        ):
+        with pytest.raises(StreamlitAPIException):
             st.dataframe(
                 df, on_select="rerun", selection_mode=["invalid", "single-row"]
             )
 
-        with self.assertRaises(
-            StreamlitAPIException,
-            msg="Should show exception if single & multi row mode is selected",
-        ):
+        with pytest.raises(StreamlitAPIException):
             st.dataframe(
                 df, on_select="rerun", selection_mode=["single-row", "multi-row"]
             )
 
-        with self.assertRaises(
-            StreamlitAPIException,
-            msg="Should show exception if single & multi column mode is selected",
-        ):
+        with pytest.raises(StreamlitAPIException):
             st.dataframe(
                 df, on_select="rerun", selection_mode=["single-column", "multi-column"]
             )

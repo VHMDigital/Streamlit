@@ -116,19 +116,15 @@ class DeltaGeneratorTest(DeltaGeneratorTestCase):
     """Test streamlit.delta_generator methods."""
 
     def test_nonexistent_method(self):
-        with pytest.raises(Exception) as ctx:
+        with pytest.raises(StreamlitAPIException):
             st.sidebar.non_existing()
 
-        assert str(ctx.value) == "`non_existing()` is not a valid Streamlit command."
-
     def test_sidebar_nonexistent_method(self):
-        with pytest.raises(Exception) as ctx:
+        with pytest.raises(
+            StreamlitAPIException,
+            match="Method `echo\\(\\)` does not exist for `st\\.sidebar`\\. Did you mean `st\\.echo\\(\\)`\\?",
+        ):
             st.sidebar.echo()
-
-        assert (
-            str(ctx.value)
-            == "Method `echo()` does not exist for `st.sidebar`. Did you mean `st.echo()`?"
-        )
 
     def set_widget_requires_args(self):
         st.text_input()
@@ -671,7 +667,7 @@ class DeltaGeneratorWriteTest(DeltaGeneratorTestCase):
         parsed_element = json.loads(element.json.body)
         set_as_list = parsed_element.get("some_set")
         assert isinstance(set_as_list, list)
-        self.assertSetEqual(json_data["some_set"], set(set_as_list))
+        assert json_data["some_set"] == set(set_as_list)
 
     def test_st_json_generator_is_serialized_as_string(self):
         """Test st.json serializes generator as string"""
@@ -830,6 +826,7 @@ class DeltaGeneratorImageTest(DeltaGeneratorTestCase):
         url = "https://streamlit.io/an_image.png"
         caption = "ahoy!"
 
-        with pytest.raises(Exception) as ctx:
+        with pytest.raises(
+            AssertionError, match="Cannot pair 2 captions with 5 images."
+        ):
             st.image([url] * 5, caption=[caption] * 2)
-        assert "Cannot pair 2 captions with 5 images." in str(ctx.value)

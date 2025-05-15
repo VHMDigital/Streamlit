@@ -47,7 +47,6 @@ from playwright.sync_api import (
     Response,
     Route,
 )
-from pytest import FixtureRequest
 from typing_extensions import Self
 
 from e2e_playwright.shared.git_utils import get_git_root
@@ -257,7 +256,7 @@ def app_server_extra_args() -> list[str]:
 def app_server(
     app_port: int,
     app_server_extra_args: list[str],
-    request: FixtureRequest,
+    request: pytest.FixtureRequest,
 ) -> Generator[AsyncSubprocess, None, None]:
     """Fixture that starts and stops the Streamlit app server."""
     streamlit_proc = AsyncSubprocess(
@@ -322,7 +321,7 @@ def app(page: Page, app_port: int) -> Page:
 def static_app(
     page: Page,
     app_port: int,
-    request: FixtureRequest,
+    request: pytest.FixtureRequest,
 ) -> Page:
     """Fixture that opens the app."""
     query_param = request.node.get_closest_marker("query_param")
@@ -339,7 +338,7 @@ def static_app(
 
 @pytest.fixture
 def app_with_query_params(
-    page: Page, app_port: int, request: FixtureRequest
+    page: Page, app_port: int, request: pytest.FixtureRequest
 ) -> tuple[Page, dict[str, Any]]:
     """Fixture that opens the app with additional query parameters.
     The query parameters are passed as a dictionary in the 'param' key of the request.
@@ -578,7 +577,7 @@ def browser_type_launch_args(
 
 
 @pytest.fixture(params=["light_theme", "dark_theme"])
-def app_theme(request: FixtureRequest) -> str:
+def app_theme(request: pytest.FixtureRequest) -> str:
     """Fixture that returns the theme name."""
     return str(request.param)
 
@@ -677,7 +676,7 @@ def output_folder(pytestconfig: Any) -> Path:
 
 @pytest.fixture
 def assert_snapshot(
-    request: FixtureRequest,
+    request: pytest.FixtureRequest,
     output_folder: Path,
     pytestconfig: Any,
 ) -> Generator[ImageCompareFunction, None, None]:
@@ -881,7 +880,7 @@ def assert_snapshot(
 
 @pytest.fixture(autouse=True)
 def playwright_profiling(
-    request: FixtureRequest, page: Page
+    request: pytest.FixtureRequest, page: Page
 ) -> Generator[None, None, None]:
     if request.node.get_closest_marker("no_perf") or not is_supported_browser(page):
         yield
