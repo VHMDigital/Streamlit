@@ -112,6 +112,8 @@ export interface AppContextProps {
   gitInfo: IGitInfo | null
 
   showToolbar: boolean
+
+  showColoredLine: boolean
 }
 
 export const AppContext = createContext<AppContextProps | null>({
@@ -128,5 +130,6 @@ export const AppContext = createContext<AppContextProps | null>({
   widgetsDisabled: false,
   gitInfo: null,
   showToolbar: true,
+  showColoredLine: true,
 })
 AppContext.displayName = "AppContext"
