@@ -150,6 +150,7 @@ const getHeight = (
 export type UseLayoutStylesShape = {
   width: React.CSSProperties["width"]
   height: React.CSSProperties["height"]
+  overflow: React.CSSProperties["overflow"]
 }
 
 /**
@@ -193,11 +194,13 @@ export const useLayoutStyles = <T>({
       subElement
     )
     let height: React.CSSProperties["height"] = "auto"
+    let overflow: React.CSSProperties["overflow"] = "visible"
 
     if (heightType === DimensionType.STRETCH) {
       height = "100%"
     } else if (heightType === DimensionType.PIXEL) {
       height = commandHeight
+      overflow = "auto"
     } else if (heightType === DimensionType.CONTENT) {
       height = "auto"
     }
@@ -205,6 +208,7 @@ export const useLayoutStyles = <T>({
     return {
       width,
       height,
+      overflow,
     }
   }, [element, subElement])
 

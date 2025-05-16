@@ -32,7 +32,7 @@ class MockElement {
     Object.assign(this, props)
   }
 
-  toJSON() {
+  toJSON(): MockElement {
     return this
   }
 }
