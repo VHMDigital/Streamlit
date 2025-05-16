@@ -167,6 +167,7 @@ export const useLayoutStyles = <T>({
       return {
         width: "auto",
         height: "auto",
+        overflow: "visible",
       }
     }
 
