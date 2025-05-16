@@ -335,6 +335,10 @@ function AppView(props: AppViewProps): ReactElement {
                 hasBottom={hasBottomElements}
                 isEmbedded={embedded}
                 hasSidebar={showSidebar}
+                hasTopNav={
+                  navigationPosition === Navigation.Position.TOP &&
+                  appPages.length > 1
+                }
               >
                 {renderBlock(elements.main)}
               </StyledAppViewBlockContainer>
