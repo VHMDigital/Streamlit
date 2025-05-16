@@ -71,7 +71,7 @@ def chat_demo():
 
     # Create a fragment function to process the chat input within a fragment.
     # This allows Streamlit to append the user input and chat response to the
-    # existing content without rerunning the whoe app.
+    # existing content without rerunning the whole app.
     @st.fragment
     def process_chat(chat_container: DeltaGenerator) -> None:
         """Fragment function to prompt user for chat input and additively
