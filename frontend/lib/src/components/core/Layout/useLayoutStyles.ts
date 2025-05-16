@@ -16,7 +16,7 @@
 
 import { useMemo } from "react"
 
-import { Block as BlockProto, Element } from "@streamlit/protobuf"
+import { Block as BlockProto, Element, streamlit } from "@streamlit/protobuf"
 
 type SubElement = {
   useContainerWidth?: boolean | null
@@ -24,11 +24,7 @@ type SubElement = {
   width?: number
   // We must include this for backwards compatiblity since
   // Alert.proto has been released with the field in this position.
-  widthConfig?: {
-    useStretch?: boolean
-    useContent?: boolean
-    pixelWidth?: number
-  }
+  widthConfig?: streamlit.IWidthConfig | null | undefined
 }
 
 export type UseLayoutStylesArgs<T> = {

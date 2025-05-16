@@ -17,13 +17,15 @@
 import { describe, expect, it } from "vitest"
 import { renderHook } from "@testing-library/react"
 
-import { Element, streamlit } from "@streamlit/protobuf"
+import { Alert, Element, IAlert, streamlit } from "@streamlit/protobuf"
 
 import { useLayoutStyles } from "./useLayoutStyles"
 
 class MockElement {
   widthConfig?: streamlit.WidthConfig
+
   heightConfig?: streamlit.HeightConfig
+
   type?: string
 
   constructor(props: Partial<MockElement> = {}) {
@@ -472,7 +474,7 @@ describe("#useLayoutStyles", () => {
           // Use type assertion to bypass TypeScript checks
           const subElement = {
             widthConfig: props.subElementWidthConfig,
-          } as any
+          } as IAlert
 
           const { result } = renderHook(() =>
             useLayoutStyles({
