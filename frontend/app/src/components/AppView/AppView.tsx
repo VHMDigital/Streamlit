@@ -79,8 +79,6 @@ export interface AppViewProps {
 
   formsData: FormsData
 
-  appLogo: Logo | null
-
   appPages: IAppPage[]
 
   navSections: string[]
@@ -102,6 +100,18 @@ export interface AppViewProps {
   pageLinkBaseUrl?: string
 
   wideMode: boolean
+
+  appLogo: Logo | null
+
+  multiplePages: boolean
+
+  embedded: boolean
+
+  addPaddingForHeader: boolean
+
+  showPadding: boolean
+
+  disableScrolling: boolean
 }
 
 /**
@@ -129,6 +139,9 @@ function AppView(props: AppViewProps): ReactElement {
     topRightContent,
     pageLinkBaseUrl = "",
     wideMode,
+    embedded,
+    showPadding,
+    disableScrolling,
   } = props
 
   React.useEffect(() => {
@@ -144,9 +157,7 @@ function AppView(props: AppViewProps): ReactElement {
 
   const {
     initialSidebarState,
-    embedded,
-    showPadding,
-    disableScrolling,
+
     showToolbar,
     showColoredLine,
     sidebarChevronDownshift,
