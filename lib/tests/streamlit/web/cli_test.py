@@ -361,8 +361,10 @@ class CliTest(unittest.TestCase):
             self.assertEqual(
                 "Collecting usage statistics" in result.output,
                 headless_mode,
-                f"Telemetry message mode is {headless_mode}"
-                + f"and output is: {result.output}",
+                (
+                    f"Telemetry message mode is {headless_mode}"
+                    f"yet output is: {result.output}"
+                ),
             )
 
     @parameterized.expand([(True,), (False,)])
@@ -386,8 +388,10 @@ class CliTest(unittest.TestCase):
                 "like to receive helpful onboarding emails, news, offers, promotions,"
                 in result.output,
                 prompt_mode,
-                f"Welcome message mode is {prompt_mode}"
-                + f"and output is: {result.output}",
+                (
+                    f"Welcome message mode is {prompt_mode}"
+                    f"yet output is: {result.output}"
+                ),
             )
 
     def test_help_command(self):
