@@ -36,8 +36,7 @@ from testfixtures import tempdir
 
 import streamlit
 import streamlit.web.bootstrap
-from lib.streamlit import file_util
-from streamlit import config
+from streamlit import config, file_util
 from streamlit.config_option import ConfigOption
 from streamlit.runtime.credentials import Credentials
 from streamlit.web import cli
