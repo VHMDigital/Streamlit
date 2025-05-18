@@ -398,11 +398,11 @@ class CliTest(unittest.TestCase):
             )
         self.assertEqual(
             prompt_mode and not headless_mode,
-            os.path.isdir(_CONFIG_FILE_PATH),
+            ex := os.path.isdir(_CONFIG_FILE_PATH),
             (
                 f"Welcome message mode is {prompt_mode} "
                 f"and headless mode is {headless_mode} "
-                f"yet the os config existence is: {config.os.path.exists()}"
+                f"yet the os config existence is: {ex}"
             ),
         )
 
