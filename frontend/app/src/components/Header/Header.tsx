@@ -80,6 +80,7 @@ const Header = ({
                   <BaseButton
                     kind={BaseButtonKind.HEADER_NO_PADDING}
                     onClick={onToggleSidebar}
+                    data-testid="stExpandSidebarButton"
                   >
                     <DynamicIcon
                       size="xl"

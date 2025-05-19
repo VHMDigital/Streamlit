@@ -104,16 +104,20 @@ def test_page_link_href(app: Page):
     expect(page_links.nth(3)).to_have_attribute("href", "page_with_duplicate_name")
 
 
-# Firefox seems to be a bit flaky here, it seems that sometimes the
-# sidebar with the nav items is still shown.
 @pytest.mark.skip_browser("firefox")
 @pytest.mark.usefixtures("configure_show_sidebar_nav")
 def test_logo_no_sidebar(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that logo renders properly with no sidebar."""
     expect(app.get_by_test_id("stSidebar")).not_to_be_attached()
-    expect(
-        app.get_by_test_id("stSidebarCollapsedControl").locator("a")
-    ).to_have_attribute("href", "https://www.example.com")
-    assert_snapshot(
-        app.get_by_test_id("stSidebarCollapsedControl"), name="logo-no-sidebar"
-    )
+    # Even with no sidebar, the logo should appear in the header area.
+    # The stExpandSidebarButton should NOT be visible as there's no sidebar to expand.
+    expect(app.get_by_test_id("stExpandSidebarButton")).not_to_be_visible()
+
+    header_element = app.get_by_test_id("stHeader")
+    logo_link_element = header_element.get_by_test_id("stLogoLink")
+    expect(logo_link_element).to_be_visible()
+    expect(logo_link_element).to_have_attribute("href", "https://www.example.com")
+
+    header_logo_image = logo_link_element.get_by_test_id("stLogo")
+    expect(header_logo_image).to_be_visible()
+    assert_snapshot(header_logo_image, name="header-logo-no-sidebar")

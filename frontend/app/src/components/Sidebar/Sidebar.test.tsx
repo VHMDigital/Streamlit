@@ -145,9 +145,7 @@ describe("Sidebar Component", () => {
     )
 
     // Click the expand sidebar > button
-    const expandButton = within(
-      screen.getByTestId("stSidebarCollapsedControl")
-    ).getByRole("button")
+    const expandButton = screen.getByTestId("stExpandSidebarButton")
     // TODO: Utilize user-event instead of fireEvent
     // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.click(expandButton)
@@ -215,28 +213,6 @@ describe("Sidebar Component", () => {
 
     expect(screen.getByTestId("stSidebarUserContent")).toHaveStyle(
       "padding-top: 1.5rem"
-    )
-  })
-
-  it("uses the default chevron spacing if chevronDownshift is zero", () => {
-    renderSidebar({
-      chevronDownshift: 0,
-      initialSidebarState: PageConfig.SidebarState.COLLAPSED,
-    })
-
-    expect(screen.getByTestId("stSidebarCollapsedControl")).toHaveStyle(
-      "top: 1.25rem"
-    )
-  })
-
-  it("uses the given chevron spacing if chevronDownshift is nonzero", () => {
-    renderSidebar({
-      chevronDownshift: 50,
-      initialSidebarState: PageConfig.SidebarState.COLLAPSED,
-    })
-
-    expect(screen.getByTestId("stSidebarCollapsedControl")).toHaveStyle(
-      "top: 50px"
     )
   })
 
@@ -347,11 +323,7 @@ describe("Sidebar Component", () => {
         initialSidebarState: PageConfig.SidebarState.COLLAPSED,
       })
 
-      const openSidebarContainer = screen.getByTestId(
-        "stSidebarCollapsedControl"
-      )
-      expect(openSidebarContainer).toBeInTheDocument()
-      const collapsedLogo = within(openSidebarContainer).getByTestId("stLogo")
+      const collapsedLogo = screen.getByTestId("stLogo")
       expect(collapsedLogo).toBeInTheDocument()
       expect(sourceSpy).toHaveBeenCalledWith(
         "https://docs.streamlit.io/logo.svg"
@@ -372,11 +344,7 @@ describe("Sidebar Component", () => {
       renderSidebar({
         initialSidebarState: PageConfig.SidebarState.COLLAPSED,
       })
-      const openSidebarContainer = screen.getByTestId(
-        "stSidebarCollapsedControl"
-      )
-      expect(openSidebarContainer).toBeInTheDocument()
-      const collapsedLogo = within(openSidebarContainer).getByTestId("stLogo")
+      const collapsedLogo = screen.getByTestId("stLogo")
       expect(collapsedLogo).toBeInTheDocument()
       expect(sourceSpy).toHaveBeenCalledWith(
         "https://global.discourse-cdn.com/business7/uploads/streamlit/original/2X/8/8cb5b6c0e1fe4e4ebfd30b769204c0d30c332fec.png"
