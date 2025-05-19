@@ -73,7 +73,7 @@ export interface SidebarProps {
   hasElements: boolean
 }
 
-const DEFAULT_WIDTH = "250"
+const DEFAULT_WIDTH = "256"
 
 const LOG = getLogger("Sidebar")
 
