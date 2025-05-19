@@ -237,7 +237,7 @@ class DeclareComponentTest(unittest.TestCase):
         mock_currentframe.return_value = None
         with pytest.raises(
             RuntimeError, match="current_frame is None. This should never happen."
-        ) as e:
+        ):
             components.declare_component("test_component", url="http://example.com")
 
     @patch("streamlit.components.v1.component_registry.inspect.currentframe")
