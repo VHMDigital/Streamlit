@@ -62,6 +62,8 @@ from streamlit.runtime.state import (
 from streamlit.source_util import page_sort_key
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from streamlit.runtime.fragment import FragmentStorage
     from streamlit.runtime.scriptrunner.script_cache import ScriptCache
     from streamlit.runtime.uploaded_file_manager import UploadedFileManager
@@ -132,14 +134,13 @@ def _mpa_v1(main_script_path: str) -> None:
     PAGES_FOLDER = MAIN_SCRIPT_PATH.parent / "pages"
 
     # Read out the my_pages folder and create a page for every script:
-    pages = PAGES_FOLDER.glob("*.py")
     pages = sorted(
         [
             page
-            for page in pages
+            for page in PAGES_FOLDER.glob("*.py")
             if page.name.endswith(".py")
             and not page.name.startswith(".")
-            and not page.name == "__init__.py"
+            and page.name != "__init__.py"
         ],
         key=page_sort_key,
     )
@@ -437,7 +438,7 @@ class ScriptRunner:
         raise StopException()
 
     @contextmanager
-    def _set_execing_flag(self):
+    def _set_execing_flag(self) -> Generator[None, None, None]:
         """A context for setting the ScriptRunner._execing flag.
 
         Used by _maybe_handle_execution_control_request to ensure that
@@ -585,7 +586,12 @@ class ScriptRunner:
             # assume is the main script directory.
             module.__dict__["__file__"] = script_path
 
-            def code_to_exec(code=code, module=module, ctx=ctx, rerun_data=rerun_data):
+            def code_to_exec(
+                code: str = code,
+                module: types.ModuleType = module,
+                ctx: ScriptRunContext = ctx,
+                rerun_data: RerunData = rerun_data,
+            ) -> None:
                 with (
                     modified_sys_path(self._main_script_path),
                     self._set_execing_flag(),

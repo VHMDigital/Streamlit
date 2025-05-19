@@ -29,7 +29,7 @@ import subprocess
 import sys
 import time
 from dataclasses import dataclass
-from io import BytesIO
+from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from random import randint
 from tempfile import TemporaryFile
@@ -59,7 +59,7 @@ from e2e_playwright.shared.performance import (
 
 if TYPE_CHECKING:
     from collections.abc import Generator
-    from types import ModuleType
+    from types import ModuleType, TracebackType
 
 
 # Used for static app testing
@@ -67,14 +67,14 @@ class StaticPage(Page):
     pass
 
 
-def pytest_configure(config: pytest.Config):
+def pytest_configure(config: pytest.Config) -> None:
     """Register custom markers."""
     config.addinivalue_line(
         "markers", "no_perf: mark test to not use performance profiling"
     )
 
 
-def reorder_early_fixtures(metafunc: pytest.Metafunc):
+def reorder_early_fixtures(metafunc: pytest.Metafunc) -> None:
     """Put fixtures with `pytest.mark.early` first during execution.
 
     This allows patch of configurations before the application is initialized
@@ -90,14 +90,20 @@ def reorder_early_fixtures(metafunc: pytest.Metafunc):
                 break
 
 
-def pytest_generate_tests(metafunc: pytest.Metafunc):
+def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     reorder_early_fixtures(metafunc)
 
 
 class AsyncSubprocess:
     """A context manager. Wraps subprocess. Popen to capture output safely."""
 
-    def __init__(self, args, cwd=None, env=None):
+    args: list[str]
+    cwd: str
+    env: dict[str, str]
+    _proc: subprocess.Popen[str] | None
+    _stdout_file: TextIOWrapper | None
+
+    def __init__(self, args: list[str], cwd: str, env: dict[str, str] | None = None):
         self.args = args
         self.cwd = cwd
         self.env = env or {}
@@ -141,7 +147,12 @@ class AsyncSubprocess:
             env={**os.environ.copy(), **self.env},
         )
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         if self._proc is not None:
             self._proc.terminate()
             self._proc = None
@@ -590,6 +601,7 @@ class ImageCompareFunction(Protocol):
         pixel_threshold: float = 0.05,
         name: str | None = None,
         fail_fast: bool = False,
+        style: str | None = None,
     ) -> None:
         """Compare a screenshot with screenshot from a past run.
 
@@ -665,7 +677,9 @@ def output_folder(pytestconfig: Any) -> Path:
 
 @pytest.fixture(scope="function")
 def assert_snapshot(
-    request: FixtureRequest, output_folder: Path, pytestconfig: Any
+    request: FixtureRequest,
+    output_folder: Path,
+    pytestconfig: Any,
 ) -> Generator[ImageCompareFunction, None, None]:
     """Fixture that compares a screenshot with screenshot from a past run."""
 
@@ -711,6 +725,7 @@ def assert_snapshot(
         name: str | None = None,
         fail_fast: bool = False,
         file_type: Literal["png", "jpg"] = "png",
+        style: str | None = None,
     ) -> None:
         """Compare a screenshot with screenshot from a past run.
 
@@ -740,12 +755,14 @@ def assert_snapshot(
         if file_type == "jpg":
             file_extension = ".jpg"
             img_bytes = element.screenshot(
-                type="jpeg", quality=90, animations="disabled"
+                type="jpeg", quality=90, animations="disabled", style=style
             )
 
         else:
             file_extension = ".png"
-            img_bytes = element.screenshot(type="png", animations="disabled")
+            img_bytes = element.screenshot(
+                type="png", animations="disabled", style=style
+            )
 
         snapshot_file_name: str = snapshot_default_file_name
         if name:
@@ -863,7 +880,9 @@ def assert_snapshot(
 
 
 @pytest.fixture(scope="function", autouse=True)
-def playwright_profiling(request: FixtureRequest, page: Page):
+def playwright_profiling(
+    request: FixtureRequest, page: Page
+) -> Generator[None, None, None]:
     if request.node.get_closest_marker("no_perf") or not is_supported_browser(page):
         yield
         return
@@ -928,7 +947,7 @@ def wait_for_app_run(
         page.wait_for_timeout(wait_delay)
 
 
-def wait_for_app_loaded(page: Page):
+def wait_for_app_loaded(page: Page) -> None:
     """Wait for the app to fully load."""
     # Wait for the app view container to appear:
     page.wait_for_selector(
@@ -938,7 +957,7 @@ def wait_for_app_loaded(page: Page):
     wait_for_app_run(page)
 
 
-def rerun_app(page: Page):
+def rerun_app(page: Page) -> None:
     """Triggers an app rerun and waits for the run to be finished."""
     # Click somewhere to clear the focus from elements:
     page.get_by_test_id("stApp").click(position={"x": 0, "y": 0})
@@ -949,7 +968,7 @@ def rerun_app(page: Page):
 
 def wait_until(
     page: Page, fn: Callable[[], None | bool], timeout: int = 5000, interval: int = 100
-):
+) -> None:
     """Run a test function in a loop until it evaluates to True
     or times out.
 

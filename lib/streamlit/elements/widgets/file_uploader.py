@@ -127,7 +127,7 @@ class FileUploaderSerde:
 
         if not files:
             return state_proto
-        elif not isinstance(files, list):
+        if not isinstance(files, list):
             files = [files]
 
         for f in files:
@@ -170,7 +170,7 @@ class FileUploaderMixin:
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         width: WidthWithoutContent = "stretch",
-    ) -> list[UploadedFile] | None: ...
+    ) -> list[UploadedFile]: ...
 
     # 1. type is given as not a keyword-only argument
     # 2. accept_multiple_files = False or omitted
@@ -213,7 +213,7 @@ class FileUploaderMixin:
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         width: WidthWithoutContent = "stretch",
-    ) -> list[UploadedFile] | None: ...
+    ) -> list[UploadedFile]: ...
 
     # 1. type is skipped or a keyword argument
     # 2. accept_multiple_files = False or omitted
@@ -497,7 +497,7 @@ class FileUploaderMixin:
 
         if isinstance(widget_state.value, DeletedFile):
             return None
-        elif isinstance(widget_state.value, list):
+        if isinstance(widget_state.value, list):
             return [f for f in widget_state.value if not isinstance(f, DeletedFile)]
 
         return widget_state.value
