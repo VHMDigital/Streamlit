@@ -130,8 +130,8 @@ If you are trying to access a Streamlit app running on another server, this coul
     const uriParts = uriPartsList[uriNumber]
     const healthzUri = buildHttpUri(uriParts, SERVER_PING_PATH)
 
-    const hostConfigServerUriParts = window.__STREAMLIT_HOST_CONFIG_BACKEND_URL
-      ? getBaseUriParts(window.__STREAMLIT_HOST_CONFIG_BACKEND_URL)
+    const hostConfigServerUriParts = window.__STREAMLIT_HOST_CONFIG_BASE_URL
+      ? getBaseUriParts(window.__STREAMLIT_HOST_CONFIG_BASE_URL)
       : uriParts
 
     const hostConfigUri = buildHttpUri(
