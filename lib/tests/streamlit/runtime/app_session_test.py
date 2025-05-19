@@ -902,7 +902,11 @@ class AppSessionScriptEventTest(IsolatedAsyncioTestCase):
                 "streamlit.runtime.app_session.asyncio.get_running_loop",
                 return_value=MagicMock(),
             ),
-            pytest.raises(AssertionError),
+            pytest.raises(
+                RuntimeError,
+                match="This function must only be called on the eventloop thread "
+                "the AppSession was created on. This should never happen.",
+            ),
         ):
             session._handle_scriptrunner_event_on_event_loop(
                 sender=MagicMock(), event=ScriptRunnerEvent.SCRIPT_STARTED
