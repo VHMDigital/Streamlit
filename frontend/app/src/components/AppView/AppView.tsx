@@ -66,26 +66,15 @@ export interface AppViewProps {
 
   sendMessageToHost: (message: IGuestToHostMessage) => void
 
-  // The unique ID for the most recent script run.
-  scriptRunId: string
-
-  scriptRunState: ScriptRunState
-
   widgetMgr: WidgetStateManager
 
   uploadClient: FileUploadClient
-
-  componentRegistry: ComponentRegistry
-
-  formsData: FormsData
 
   appPages: IAppPage[]
 
   navSections: string[]
 
   onPageChange: (pageName: string) => void
-
-  currentPageScriptHash: string
 
   hideSidebarNav: boolean
 
@@ -120,17 +109,12 @@ export interface AppViewProps {
 function AppView(props: AppViewProps): ReactElement {
   const {
     elements,
-    scriptRunId,
-    scriptRunState,
     widgetMgr,
     uploadClient,
-    componentRegistry,
-    formsData,
     appLogo,
     appPages,
     navSections,
     onPageChange,
-    currentPageScriptHash,
     expandSidebarNav,
     hideSidebarNav,
     sendMessageToHost,
@@ -157,10 +141,8 @@ function AppView(props: AppViewProps): ReactElement {
 
   const {
     initialSidebarState,
-
     showToolbar,
     showColoredLine,
-    sidebarChevronDownshift,
     widgetsDisabled,
   } = useAppContext()
 
@@ -207,18 +189,6 @@ function AppView(props: AppViewProps): ReactElement {
     removeScriptFinishedHandler,
   ])
 
-  const handleLogoError = (logoUrl: string): void => {
-    // StyledLogo does not retain the e.currentEvent.src like other onerror cases
-    // store and read from ref instead
-    LOG.error(`Client Error: Logo source error - ${logoUrl}`)
-    endpoints.sendClientErrorToHost(
-      "Logo",
-      "Logo source failed to load",
-      "onerror triggered",
-      logoUrl
-    )
-  }
-
   // Activate scroll to bottom whenever there are bottom elements:
   const Component = hasBottomElements
     ? ScrollToBottomContainer
@@ -228,13 +198,9 @@ function AppView(props: AppViewProps): ReactElement {
     <ContainerContentsWrapper
       node={node}
       endpoints={endpoints}
-      scriptRunId={scriptRunId}
-      scriptRunState={scriptRunState}
       widgetMgr={widgetMgr}
       widgetsDisabled={widgetsDisabled}
       uploadClient={uploadClient}
-      componentRegistry={componentRegistry}
-      formsData={formsData}
     />
   )
 
@@ -248,8 +214,6 @@ function AppView(props: AppViewProps): ReactElement {
     setSidebarIsCollapsed(prev => !prev)
   }, [])
 
-  console.log({ navigationPosition })
-
   // Logo component to be used in the header when sidebar is closed
   const logoElement = useMemo(() => {
     if (!appLogo) return null
@@ -262,6 +226,8 @@ function AppView(props: AppViewProps): ReactElement {
       />
     )
   }, [appLogo, endpoints])
+
+  console.log({ hideSidebarNav, showSidebar, showSidebarOverride })
 
   // The tabindex is required to support scrolling by arrow keys.
   return (

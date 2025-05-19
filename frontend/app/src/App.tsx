@@ -2095,17 +2095,12 @@ export class App extends PureComponent<Props, State> {
               endpoints={this.endpoints}
               sendMessageToHost={this.hostCommunicationMgr.sendMessageToHost}
               elements={elements}
-              scriptRunId={scriptRunId}
-              scriptRunState={scriptRunState}
               widgetMgr={this.widgetMgr}
               uploadClient={this.uploadClient}
-              componentRegistry={this.componentRegistry}
-              formsData={this.state.formsData}
               appLogo={elements.logo}
               appPages={appPages}
               navSections={navSections}
               onPageChange={this.onPageChange}
-              currentPageScriptHash={currentPageScriptHash}
               hideSidebarNav={
                 hideSidebarNav ||
                 hostHideSidebarNav ||
