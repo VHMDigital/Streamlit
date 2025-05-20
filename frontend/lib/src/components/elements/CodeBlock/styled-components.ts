@@ -67,6 +67,7 @@ export const StyledCode = styled.code(({ theme }) => ({
   See https://prismjs.com/download.html#themes=prism&languages=markup+css+clike+javascript
 */
 export const StyledPre = styled.pre(({ theme }) => ({
+  height: "100%",
   background: theme.colors.codeBackgroundColor,
   borderRadius: theme.radii.default,
   color: theme.colors.bodyText,
@@ -205,6 +206,7 @@ export const StyledCopyButtonContainer = styled.div(({ theme }) => ({
 }))
 
 export const StyledCodeBlock = styled.div(({ theme }) => ({
+  height: "100%",
   position: "relative",
   marginLeft: theme.spacing.none,
   marginRight: theme.spacing.none,
