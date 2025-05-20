@@ -54,7 +54,6 @@ import { SidebarNav } from "../Navigation"
 export interface SidebarProps {
   endpoints: StreamlitEndpoints
   children?: ReactElement
-  initialSidebarState?: PageConfig.SidebarState
   hasElements: boolean
   appLogo: Logo | null
   appPages: IAppPage[]
@@ -81,7 +80,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   endpoints,
   appPages,
   children,
-  initialSidebarState,
   hasElements,
   onPageChange,
   currentPageScriptHash,
@@ -93,10 +91,6 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const theme: EmotionTheme = useTheme()
   const mediumBreakpointPx = calculateMaxBreakpoint(theme.breakpoints.md)
-  const sideBarInitiallyCollapsed = shouldCollapse(
-    initialSidebarState,
-    mediumBreakpointPx
-  )
 
   const sidebarRef = useRef<HTMLDivElement>(null)
 

@@ -28,6 +28,7 @@ import {
   mockSessionInfo,
   render,
   WidgetStateManager,
+  ScriptRunState,
 } from "@streamlit/lib"
 import {
   Block as BlockProto,
@@ -35,6 +36,7 @@ import {
   ForwardMsgMetadata,
   Logo as LogoProto,
   PageConfig,
+  Navigation,
 } from "@streamlit/protobuf"
 import { AppContextProps } from "@streamlit/app/src/components/AppContext"
 import * as StreamlitContextProviderModule from "@streamlit/app/src/components/StreamlitContextProvider"
@@ -57,6 +59,8 @@ function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
     hideSidebarNav: false,
     widgetsDisabled: false,
     gitInfo: null,
+    showToolbar: true,
+    showColoredLine: true,
     ...context,
   }
 }
@@ -93,6 +97,13 @@ function getProps(props: Partial<AppViewProps> = {}): AppViewProps {
     showPadding: false,
     disableScrolling: false,
     hideSidebarNav: false,
+    appPages: [{ pageName: "streamlit_app", pageScriptHash: "page_hash" }],
+    navSections: [],
+    onPageChange: vi.fn(),
+    expandSidebarNav: false,
+    navigationPosition: Navigation.Position.SIDEBAR,
+    currentPageScriptHash: "",
+    scriptRunState: ScriptRunState.NOT_RUNNING,
     ...props,
   }
 }

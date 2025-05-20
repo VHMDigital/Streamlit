@@ -216,6 +216,16 @@ function AppView(props: AppViewProps): ReactElement {
         window.innerWidth <= parseInt(activeTheme.emotion.breakpoints.md, 10))
   )
 
+  // sometimes the initialSidebarState is not updated until after the script runs with a set_page_config
+  React.useEffect(() => {
+    setSidebarIsCollapsed(
+      initialSidebarState === PageConfig.SidebarState.COLLAPSED ||
+        (initialSidebarState === PageConfig.SidebarState.AUTO &&
+          window.innerWidth <=
+            parseInt(activeTheme.emotion.breakpoints.md, 10))
+    )
+  }, [initialSidebarState, activeTheme.emotion.breakpoints.md])
+
   const toggleSidebar = React.useCallback(() => {
     setSidebarIsCollapsed(prev => !prev)
   }, [])
