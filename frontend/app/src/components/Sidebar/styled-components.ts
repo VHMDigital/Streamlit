@@ -57,7 +57,8 @@ const getNavTextColor = (
  * @returns The horizontal spacing for the sidebar.
  */
 const getSidebarHorizontalSpacing = (theme: EmotionTheme): string => {
-  return `calc(${theme.spacing.sm} + 2px)`
+  // Use max(0px, ...) so output isn't negative.
+  return `max(0px, calc(${theme.spacing.lg} - var(--scrollbar-width)))`
 }
 
 export interface StyledSidebarProps {
