@@ -34,7 +34,7 @@ def test_st_map_has_consistent_visuals(
 
     # The map assets can take more time to load, add an extra timeout
     # to prevent flakiness.
-    themed_app.wait_for_timeout(10000)
+    themed_app.wait_for_timeout(15000)
 
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
