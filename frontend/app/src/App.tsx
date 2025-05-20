@@ -2115,6 +2115,8 @@ export class App extends PureComponent<Props, State> {
               addPaddingForHeader={showToolbar || showColoredLine}
               showPadding={showPadding}
               disableScrolling={disableScrolling}
+              currentPageScriptHash={currentPageScriptHash}
+              scriptRunState={scriptRunState}
               topRightContent={
                 <>
                   <StatusWidget

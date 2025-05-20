@@ -101,6 +101,10 @@ export interface AppViewProps {
   showPadding: boolean
 
   disableScrolling: boolean
+
+  currentPageScriptHash: string
+
+  scriptRunState: ScriptRunState
 }
 
 /**
@@ -126,6 +130,8 @@ function AppView(props: AppViewProps): ReactElement {
     embedded,
     showPadding,
     disableScrolling,
+    currentPageScriptHash,
+    scriptRunState,
   } = props
 
   React.useEffect(() => {
