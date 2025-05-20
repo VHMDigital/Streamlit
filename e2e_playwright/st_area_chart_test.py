@@ -14,7 +14,7 @@
 
 from playwright.sync_api import Page, expect
 
-from e2e_playwright.conftest import ImageCompareFunction
+from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_run
 from e2e_playwright.shared.app_utils import check_top_level_class
 
 TOTAL_AREA_CHARTS = 16
@@ -64,6 +64,7 @@ def test_add_rows_preserves_styling(app: Page, assert_snapshot: ImageCompareFunc
 
     # Click the button to add data to the chart
     app.get_by_text("Add data to Area Chart").click()
+    wait_for_app_run(app)
 
     # Wait for the chart to update
     chart_canvas = add_rows_chart.locator("canvas")
@@ -73,6 +74,4 @@ def test_add_rows_preserves_styling(app: Page, assert_snapshot: ImageCompareFunc
     expect(chart_canvas).to_have_attribute("width", "600")
     expect(chart_canvas).to_have_attribute("height", "300")
 
-    # Add a quick timeout to wait for the data to be added to the chart
-    app.wait_for_timeout(250)
     assert_snapshot(add_rows_chart, name="st_area_chart-add_rows_preserves_styling")
