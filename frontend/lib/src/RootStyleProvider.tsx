@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useState, useEffect } from "react"
+import React, { ReactElement, useEffect } from "react"
 
 import { BaseProvider } from "baseui"
 import createCache from "@emotion/cache"
