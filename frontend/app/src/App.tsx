@@ -2117,7 +2117,6 @@ export class App extends PureComponent<Props, State> {
               showPadding={showPadding}
               disableScrolling={disableScrolling}
               currentPageScriptHash={currentPageScriptHash}
-              scriptRunState={scriptRunState}
               topRightContent={
                 <>
                   <StatusWidget
