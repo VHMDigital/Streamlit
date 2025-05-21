@@ -41,6 +41,9 @@ import Header from "@streamlit/app/src/components/Header"
 import { TopNav } from "@streamlit/app/src/components/Navigation"
 import { useAppContext } from "@streamlit/app/src/components/StreamlitContextProvider"
 import { LogoComponent } from "@streamlit/app/src/components/Logo"
+import { StyledLogoContainer } from "@streamlit/app/src/components/Header/styled-components"
+import HeaderColoredLine from "@streamlit/app/src/components/HeaderColoredLine"
+
 import {
   StyledAppViewBlockContainer,
   StyledAppViewBlockSpacer,
@@ -55,8 +58,6 @@ import {
   StyledStickyBottomContainer,
 } from "./styled-components"
 import ScrollToBottomContainer from "./ScrollToBottomContainer"
-import { StyledLogoContainer } from "@streamlit/app/src/components/Header/styled-components"
-import HeaderColoredLine from "@streamlit/app/src/components/HeaderColoredLine"
 
 const LOG = getLogger("AppView")
 export interface AppViewProps {

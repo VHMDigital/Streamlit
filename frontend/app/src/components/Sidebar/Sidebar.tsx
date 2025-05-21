@@ -25,6 +25,7 @@ import React, {
 import { useTheme } from "@emotion/react"
 import { getLogger } from "loglevel"
 import { Resizable } from "re-resizable"
+import { SidebarNav } from "@streamlit/app/src/components/Navigation"
 
 import { StreamlitEndpoints } from "@streamlit/connection"
 import {
@@ -36,7 +37,6 @@ import {
 } from "@streamlit/lib"
 import { IAppPage, Logo, PageConfig } from "@streamlit/protobuf"
 import { localStorageAvailable } from "@streamlit/utils"
-import { shouldCollapse } from "@streamlit/app/src/components/Sidebar/utils"
 import { LogoComponent } from "@streamlit/app/src/components/Logo"
 
 import {
@@ -49,7 +49,6 @@ import {
   StyledSidebarHeaderContainer,
   StyledSidebarUserContent,
 } from "./styled-components"
-import { SidebarNav } from "../Navigation"
 
 export interface SidebarProps {
   endpoints: StreamlitEndpoints

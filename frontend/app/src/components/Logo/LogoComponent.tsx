@@ -15,7 +15,9 @@
  */
 
 import React, { ReactElement } from "react"
+
 import { getLogger } from "loglevel"
+
 import { StreamlitEndpoints } from "@streamlit/connection"
 import { Logo } from "@streamlit/protobuf"
 import {

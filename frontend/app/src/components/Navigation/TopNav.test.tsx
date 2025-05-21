@@ -15,12 +15,16 @@
  */
 
 import React from "react"
-import { render, screen, fireEvent } from "@testing-library/react"
+
+import { fireEvent, render, screen } from "@testing-library/react"
 import { vi } from "vitest"
+
 import { IAppPage } from "@streamlit/protobuf"
-import { TopNav } from "./index"
-import { StyledOverflowContainer } from "./styled-components"
 import { mockEndpoints } from "@streamlit/lib"
+
+import { StyledOverflowContainer } from "./styled-components"
+
+import { TopNav } from "./index"
 
 // Mock the Overflow component since we can't control responsive behavior in tests
 vi.mock("rc-overflow", () => {

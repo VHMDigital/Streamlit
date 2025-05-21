@@ -27,16 +27,16 @@ import {
   mockEndpoints,
   mockSessionInfo,
   render,
-  WidgetStateManager,
   ScriptRunState,
+  WidgetStateManager,
 } from "@streamlit/lib"
 import {
   Block as BlockProto,
   Element,
   ForwardMsgMetadata,
   Logo as LogoProto,
-  PageConfig,
   Navigation,
+  PageConfig,
 } from "@streamlit/protobuf"
 import { AppContextProps } from "@streamlit/app/src/components/AppContext"
 import * as StreamlitContextProviderModule from "@streamlit/app/src/components/StreamlitContextProvider"

@@ -15,6 +15,7 @@
  */
 
 import React, { ReactElement, ReactNode, useContext } from "react"
+
 import { AppContext } from "@streamlit/app/src/components/AppContext"
 import {
   BaseButton,
@@ -22,16 +23,17 @@ import {
   DynamicIcon,
   LibContext,
 } from "@streamlit/lib"
+import { useAppContext } from "@streamlit/app/src/components/StreamlitContextProvider"
+
 import {
   StyledHeader,
-  StyledHeaderToolbar,
-  StyledOpenSidebarButton,
   StyledHeaderContent,
   StyledHeaderLeftSection,
   StyledHeaderRightSection,
+  StyledHeaderToolbar,
   StyledLogoContainer,
+  StyledOpenSidebarButton,
 } from "./styled-components"
-import { useAppContext } from "@streamlit/app/src/components/StreamlitContextProvider"
 
 export interface HeaderProps {
   hasSidebar: boolean

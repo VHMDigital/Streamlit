@@ -141,7 +141,7 @@ export const StyledAppViewBlockContainer =
       hasTopNav,
     }) => {
       const littlePadding = "2.25rem"
-      let topEmbedPadding: string = showPadding
+      const topEmbedPadding: string = showPadding
         ? `${6 - parseFloat(theme.sizes.headerHeight)}rem`
         : littlePadding
 

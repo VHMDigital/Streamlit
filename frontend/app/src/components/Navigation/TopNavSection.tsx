@@ -15,27 +15,30 @@
  */
 
 import React, { useState } from "react"
+
 import { PLACEMENT, TRIGGER_TYPE, Popover as UIPopover } from "baseui/popover"
-import { SidebarNavLink } from "./index"
-import { Icon } from "@streamlit/lib"
 import {
   KeyboardArrowDown,
   KeyboardArrowUp,
 } from "@emotion-icons/material-outlined"
-import { isNullOrUndefined } from "@streamlit/utils"
 import { useTheme } from "@emotion/react"
-import { hasLightBackgroundColor } from "@streamlit/lib"
 import { transparentize } from "color2k"
-import {
-  StyledNavSection,
-  StyledTopNavSidebarNavLinkContainer,
-  StyledNavSectionText,
-  StyledSectionName,
-  StyledPopoverContent,
-  StyledIconContainer,
-} from "./styled-components"
+
+import { hasLightBackgroundColor, Icon } from "@streamlit/lib"
+import { isNullOrUndefined } from "@streamlit/utils"
 import { IAppPage } from "@streamlit/protobuf"
 import { StreamlitEndpoints } from "@streamlit/connection"
+
+import {
+  StyledIconContainer,
+  StyledNavSection,
+  StyledNavSectionText,
+  StyledPopoverContent,
+  StyledSectionName,
+  StyledTopNavSidebarNavLinkContainer,
+} from "./styled-components"
+
+import { SidebarNavLink } from "./index"
 
 interface TopNavSectionProps {
   handlePageChange: (pageScriptHash: string) => void

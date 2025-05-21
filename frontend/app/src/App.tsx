@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { PureComponent, ReactNode, ReactElement } from "react"
+import React, { PureComponent, ReactElement, ReactNode } from "react"
 
 import moment from "moment"
 import Hotkeys from "react-hot-keys"
@@ -141,6 +141,7 @@ import { showDevelopmentOptions } from "./showDevelopmentOptions"
 import "@streamlit/app/src/assets/css/theme.scss"
 import { ThemeManager } from "./util/useThemeManager"
 import { AppNavigation, MaybeStateUpdate } from "./util/AppNavigation"
+
 import { useViewportSize } from "@streamlit/app/src/hooks/useViewportSize"
 
 // vite config builds global variable PACKAGE_METADATA

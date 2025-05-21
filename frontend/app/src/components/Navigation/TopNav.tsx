@@ -15,17 +15,21 @@
  */
 
 import React, { useMemo } from "react"
-import { SidebarNavLink } from "./index"
-import TopNavSection from "./TopNavSection"
+
 import groupBy from "lodash/groupBy"
 import Overflow from "rc-overflow"
+
 import { IAppPage } from "@streamlit/protobuf"
 import { StreamlitEndpoints } from "@streamlit/connection"
+import { isNullOrUndefined } from "@streamlit/utils"
+
 import {
   StyledOverflowContainer,
   StyledTopNavLinkContainer,
 } from "./styled-components"
-import { isNullOrUndefined } from "@streamlit/utils"
+import TopNavSection from "./TopNavSection"
+
+import { SidebarNavLink } from "./index"
 
 export interface Props {
   currentPageScriptHash: string
@@ -72,26 +76,25 @@ const TopNav: React.FC<Props> = ({
               currentPageScriptHash={currentPageScriptHash}
             />
           )
-        } else {
-          return (
-            <StyledTopNavLinkContainer>
-              <SidebarNavLink
-                isTopNav={true}
-                isActive={currentPageScriptHash === item.pageScriptHash}
-                icon={item.icon}
-                pageUrl={endpoints.buildAppPageURL(pageLinkBaseUrl, item)}
-                onClick={e => {
-                  e.preventDefault()
-                  if (item.pageScriptHash) {
-                    onPageChange(item.pageScriptHash)
-                  }
-                }}
-              >
-                {String(item.pageName)}
-              </SidebarNavLink>
-            </StyledTopNavLinkContainer>
-          )
         }
+        return (
+          <StyledTopNavLinkContainer>
+            <SidebarNavLink
+              isTopNav={true}
+              isActive={currentPageScriptHash === item.pageScriptHash}
+              icon={item.icon}
+              pageUrl={endpoints.buildAppPageURL(pageLinkBaseUrl, item)}
+              onClick={e => {
+                e.preventDefault()
+                if (item.pageScriptHash) {
+                  onPageChange(item.pageScriptHash)
+                }
+              }}
+            >
+              {String(item.pageName)}
+            </SidebarNavLink>
+          </StyledTopNavLinkContainer>
+        )
       }}
       renderRest={items => {
         if (isNullOrUndefined(items)) {
@@ -113,19 +116,18 @@ const TopNav: React.FC<Props> = ({
               currentPageScriptHash={currentPageScriptHash}
             />
           )
-        } else {
-          return (
-            <TopNavSection
-              hideChevron={true}
-              sections={[items as IAppPage[]]}
-              title={title}
-              handlePageChange={onPageChange}
-              endpoints={endpoints}
-              pageLinkBaseUrl={pageLinkBaseUrl}
-              currentPageScriptHash={currentPageScriptHash}
-            />
-          )
         }
+        return (
+          <TopNavSection
+            hideChevron={true}
+            sections={[items as IAppPage[]]}
+            title={title}
+            handlePageChange={onPageChange}
+            endpoints={endpoints}
+            pageLinkBaseUrl={pageLinkBaseUrl}
+            currentPageScriptHash={currentPageScriptHash}
+          />
+        )
       }}
     />
   )

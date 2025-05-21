@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { useEffect, useState, useContext } from "react"
+import { useContext, useEffect, useState } from "react"
+
 import { LibContext } from "@streamlit/lib"
 
 export const useViewportSize = () => {
