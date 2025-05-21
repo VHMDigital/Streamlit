@@ -25,4 +25,7 @@ message Toast {
 
     // Emoji
     string icon = 2;
+
+    // Level
+    optional string level = 3;
 }

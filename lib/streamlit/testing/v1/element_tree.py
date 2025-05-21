@@ -1370,6 +1370,7 @@ class TimeInput(Widget):
 class Toast(Element):
     proto: ToastProto = field(repr=False)
     icon: str
+    level: str | None
 
     def __init__(self, proto: ToastProto, root: ElementTree) -> None:
         self.proto = proto

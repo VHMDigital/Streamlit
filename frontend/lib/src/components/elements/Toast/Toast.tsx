@@ -41,9 +41,30 @@ import {
 export interface ToastProps {
   body: string
   icon?: string
+  level?: string | null
 }
 
-function generateToastOverrides(theme: EmotionTheme): ToastOverrides {
+function getToastBgColor(theme: EmotionTheme, level?: string | null): string {
+  switch (level) {
+    case "info":
+      return theme.colors.infoBg
+    case "success":
+      return theme.colors.successBg
+    case "warning":
+      return theme.colors.warningBg
+    case "error":
+      return theme.colors.dangerBg
+    default:
+      return hasLightBackgroundColor(theme)
+        ? theme.colors.gray10
+        : theme.colors.gray90
+  }
+}
+
+function generateToastOverrides(
+  theme: EmotionTheme,
+  level?: string | null
+): ToastOverrides {
   const lightBackground = hasLightBackgroundColor(theme)
   return {
     Body: {
@@ -66,9 +87,7 @@ function generateToastOverrides(theme: EmotionTheme): ToastOverrides {
         paddingBottom: theme.spacing.lg,
         paddingLeft: theme.spacing.twoXL,
         paddingRight: theme.spacing.twoXL,
-        backgroundColor: lightBackground
-          ? theme.colors.gray10
-          : theme.colors.gray90,
+        backgroundColor: getToastBgColor(theme, level),
         color: theme.colors.bodyText,
         // Take standard BaseWeb shadow and adjust for dark backgrounds
         boxShadow: lightBackground
@@ -111,7 +130,7 @@ export function shortenMessage(fullMessage: string): string {
   return fullMessage
 }
 
-function Toast({ body, icon }: Readonly<ToastProps>): ReactElement {
+function Toast({ body, icon, level }: Readonly<ToastProps>): ReactElement {
   const theme: EmotionTheme = useTheme()
   const displayMessage = shortenMessage(body)
   const shortened = body !== displayMessage
@@ -123,7 +142,10 @@ function Toast({ body, icon }: Readonly<ToastProps>): ReactElement {
     setExpanded(!expanded)
   }, [expanded])
 
-  const styleOverrides = useMemo(() => generateToastOverrides(theme), [theme])
+  const styleOverrides = useMemo(
+    () => generateToastOverrides(theme, level),
+    [theme, level]
+  )
 
   const toastContent = useMemo(
     () => (

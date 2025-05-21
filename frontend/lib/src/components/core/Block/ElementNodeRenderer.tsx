@@ -404,6 +404,7 @@ const RawElementNodeRenderer = (
           key={node.scriptRunId}
           body={toastProto.body}
           icon={toastProto.icon}
+          level={toastProto.level}
           {...elementProps}
         />
       )

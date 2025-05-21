@@ -47,6 +47,14 @@ class ToastTest(DeltaGeneratorTestCase):
         self.assertEqual(c.body, "toast text")
         self.assertEqual(c.icon, "🦄")
 
+    def test_valid_level(self):
+        """Test that it can be called passing a valid level."""
+        st.toast("toast text", level="success")
+
+        c = self.get_delta_from_queue().new_element.toast
+        self.assertEqual(c.body, "toast text")
+        self.assertEqual(c.level, "success")
+
     def test_invalid_icon(self):
         """Test that an error is raised if an invalid icon is provided."""
         with self.assertRaises(StreamlitAPIException) as e:
@@ -54,4 +62,13 @@ class ToastTest(DeltaGeneratorTestCase):
         self.assertEqual(
             str(e.exception),
             'The value "invalid" is not a valid emoji. Shortcodes are not allowed, please use a single character instead.',
+        )
+
+    def test_invalid_level(self):
+        """Test that an error is raised if an invalid level is provided."""
+        with self.assertRaises(StreamlitAPIException) as e:
+            st.toast("toast text", level="invalid")
+        self.assertEqual(
+            str(e.exception),
+            "Invalid toast level: invalid. Must be one of: 'info', 'success', 'warning', or 'error'.",
         )

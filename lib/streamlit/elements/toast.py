@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 from streamlit.errors import StreamlitAPIException
 from streamlit.proto.Toast_pb2 import Toast as ToastProto
@@ -34,6 +34,15 @@ def validate_text(toast_text: SupportsStr) -> SupportsStr:
     return toast_text
 
 
+def validate_level(level: str) -> str:
+    if level not in ["info", "success", "warning", "error"]:
+        raise StreamlitAPIException(
+            f"Invalid toast level: {level}. Must be one of: "
+            "'info', 'success', 'warning', or 'error'."
+        )
+    return level
+
+
 class ToastMixin:
     @gather_metrics("toast")
     def toast(
@@ -41,6 +50,7 @@ class ToastMixin:
         body: SupportsStr,
         *,  # keyword-only args:
         icon: str | None = None,
+        level: Literal["info", "success", "warning", "error"] | None = None,
     ) -> DeltaGenerator:
         """Display a short message, known as a notification "toast".
         The toast appears in the app's top-right corner and disappears after four seconds.
@@ -79,6 +89,10 @@ class ToastMixin:
               <https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Rounded>`_
               font library.
 
+        level : None, "info", "success", "warning", "error"
+            The level of the toast. This determines the color of the toast.
+            The default is None.
+
 
         Example
         -------
@@ -89,6 +103,8 @@ class ToastMixin:
         toast_proto = ToastProto()
         toast_proto.body = clean_text(validate_text(body))
         toast_proto.icon = validate_icon_or_emoji(icon)
+        if level:
+            toast_proto.level = validate_level(level)
         return self.dg._enqueue("toast", toast_proto)
 
     @property
