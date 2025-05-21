@@ -146,7 +146,7 @@ def _mpa_v1(main_script_path: str) -> None:
     )
 
     # Use this script as the main page and
-    main_page = StreamlitPage(main_script_path, default=True)
+    main_page = StreamlitPage(resolved_main_script_path, default=True)
     all_pages = [main_page] + [
         StreamlitPage(pages_folder / page.name) for page in pages
     ]
