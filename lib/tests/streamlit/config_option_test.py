@@ -34,9 +34,11 @@ class ConfigOptionTest(unittest.TestCase):
         ]
     )
     def test_invalid_key(self, key):
-        with pytest.raises(AssertionError) as e:
+        with pytest.raises(
+            ValueError,
+            match=f'Key "{key}" has invalid format.',
+        ):
             ConfigOption(key)
-        assert 'Key "%s" has invalid format.' % key == str(e.value)
 
     @parameterized.expand(
         [
@@ -76,16 +78,14 @@ class ConfigOptionTest(unittest.TestCase):
         key = "mysection.myName"
         c = ConfigOption(key)
 
-        with pytest.raises(AssertionError) as e:
+        with pytest.raises(
+            RuntimeError,
+            match="Complex config options require doc strings for their description.",
+        ):
 
             @c
             def someRandomFunction():
                 pass
-
-        assert (
-            str(e.value)
-            == "Complex config options require doc strings for their description."
-        )
 
     def test_value(self):
         my_value = "myValue"
