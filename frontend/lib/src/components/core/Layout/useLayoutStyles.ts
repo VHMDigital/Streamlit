@@ -202,9 +202,12 @@ export const useLayoutStyles = <T>({
     // and the container must be allowed to expand.
     const isTextArea = element.type === "textArea"
 
-    // TODO(lwilby): iFrames need overflow to be visible. Will investigate
+    // TODO(lwilby): Some elements need overflow to be visible in webkit. Will investigate
     // if we can remove this custom handling in future layouts work.
-    const skipOverflow = element.type === "iframe"
+    const skipOverflow =
+      element.type === "iframe" ||
+      element.type === "deckGlJsonChart" ||
+      element.type === "arrowDataFrame"
 
     if (heightType === DimensionType.STRETCH) {
       height = "100%"
