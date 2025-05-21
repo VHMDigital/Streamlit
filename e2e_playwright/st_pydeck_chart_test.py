@@ -171,6 +171,6 @@ def test_all(themed_app: Page, assert_snapshot: ImageCompareFunction):
 
         # The map assets can take more time to load, add an extra timeout
         # to prevent flakiness.
-        themed_app.wait_for_timeout(15000)
+        themed_app.wait_for_timeout(10000)
 
         test(assert_snapshot, pydeck_charts)
