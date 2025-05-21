@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import re
 import textwrap
-from typing import Any, Callable, Final
+from typing import Any, Callable
 
 from streamlit.string_util import to_snake_case
 from streamlit.util import repr_
@@ -261,8 +261,7 @@ class ConfigOption:
                 # Import here to avoid circular imports
                 from streamlit.logger import get_logger
 
-                logger: Final = get_logger(__name__)
-                logger.error(
+                get_logger(__name__).error(
                     textwrap.dedent(
                         f"""
                     ════════════════════════════════════════════════
@@ -279,8 +278,7 @@ class ConfigOption:
                 # Import here to avoid circular imports
                 from streamlit.logger import get_logger
 
-                logger = get_logger(__name__)
-                logger.warning(
+                get_logger(__name__).warning(
                     textwrap.dedent(
                         f"""s
                     ════════════════════════════════════════════════
