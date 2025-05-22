@@ -1176,7 +1176,7 @@ _create_theme_options(
         An array of fonts to use in your app.
 
         Each font in the array is a table (dictionary) with the following three
-        attributes: font, url, weight, and style.
+        attributes: family, url, weight, and style.
 
         To host a font with your app, enable static file serving with
         `server.enableStaticServing=true`.
