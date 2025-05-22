@@ -49,8 +49,8 @@ export const StyledTableBorder = styled.div(({ theme }) => ({
 export const StyledTable = styled.table(({ theme }) => ({
   width: theme.sizes.full,
   color: theme.colors.bodyText,
-
   borderSpacing: 0,
+  borderCollapse: "separate", // Important for sticky headers
 }))
 
 const styleCellFunction = (theme: EmotionTheme): CSSObject => ({
@@ -68,17 +68,35 @@ const styleCellFunction = (theme: EmotionTheme): CSSObject => ({
   verticalAlign: "middle",
   padding: `${theme.spacing.twoXS} ${theme.spacing.xs}`,
   fontWeight: theme.fontWeights.normal,
+  // Add minimum width to cells
+  minWidth: "4rem",
+  boxSizing: "border-box",
 })
 
 export const StyledTableCell = styled.td(({ theme }) =>
   styleCellFunction(theme)
 )
-export const StyledTableCellHeader = styled.th(({ theme }) => ({
-  ...styleCellFunction(theme),
-  textAlign: "inherit",
-  color: theme.colors.fadedText60,
-  paddingLeft: theme.spacing.sm,
-}))
+
+export interface StyledTableCellHeaderProps {
+  scope: "col" | "row"
+}
+
+export const StyledTableCellHeader = styled.th<StyledTableCellHeaderProps>(
+  ({ theme, scope }) => ({
+    ...styleCellFunction(theme),
+    textAlign: "inherit",
+    color: theme.colors.fadedText60,
+    paddingLeft: theme.spacing.sm,
+
+    ...(scope === "col" && {
+      // Add sticky behavior - will only take effect when tbody has overflow
+      position: "sticky",
+      top: 0,
+      zIndex: theme.zIndices.priority,
+      backgroundColor: theme.colors.bgMix,
+    }),
+  })
+)
 
 export const StyledEmptyTableCell = styled(StyledTableCell)(({ theme }) => ({
   color: theme.colors.darkGray,

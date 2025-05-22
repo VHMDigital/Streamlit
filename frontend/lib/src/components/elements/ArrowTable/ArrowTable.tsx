@@ -18,6 +18,8 @@ import React, { memo, ReactElement } from "react"
 
 import range from "lodash/range"
 
+import { Arrow as ArrowProto } from "@streamlit/protobuf"
+
 import { Quiver } from "~lib/dataframes/Quiver"
 import {
   DataFrameCellType,
@@ -41,23 +43,62 @@ import {
 } from "./styled-components"
 
 export interface TableProps {
-  element: Quiver
+  element: ArrowProto
+  data: Quiver
 }
 
 export function ArrowTable(props: Readonly<TableProps>): ReactElement {
-  const table = props.element
+  const table = props.data
+  const element = props.element
   const { cssId, cssStyles, caption } = table.styler ?? {}
   const { numHeaderRows, numDataRows, numColumns } = table.dimensions
   const dataRowIndices = range(numDataRows)
 
+  // Get width, height, and use_container_width from element
+  const width = element.width || undefined
+  const height = element.height || undefined
+  const useContainerWidth = element.useContainerWidth || false
+
+  // Calculate container style based on parameters
+  const containerStyle: React.CSSProperties = {
+    width: useContainerWidth ? "100%" : width ? `${width}px` : undefined,
+  }
+
+  const borderStyle: React.CSSProperties = {
+    maxHeight: height ? `${height}px` : undefined,
+  }
+
   return (
-    <StyledTableContainer className="stTable" data-testid="stTable">
+    <StyledTableContainer
+      className="stTable"
+      data-testid="stTable"
+      style={containerStyle}
+    >
       {cssStyles && <style>{cssStyles}</style>}
-      {/* Add an extra wrapper with the border. This makes sure the border shows around
-      the entire table when scrolling horizontally. See also `styled-components.ts`. */}
-      <StyledTableBorder>
+      <StyledTableBorder style={borderStyle}>
         <StyledTable id={cssId} data-testid="stTableStyledTable">
-          {numHeaderRows > 0 && generateTableHeader(table)}
+          {numHeaderRows > 0 && (
+            <thead>
+              {getStyledHeaders(table).map((headerRow, rowIndex) => (
+                // eslint-disable-next-line @eslint-react/no-array-index-key
+                <tr key={rowIndex}>
+                  {headerRow.map((header, colIndex) => (
+                    <StyledTableCellHeader
+                      // eslint-disable-next-line @eslint-react/no-array-index-key
+                      key={colIndex}
+                      className={header.cssClass}
+                      scope="col"
+                    >
+                      <StreamlitMarkdown
+                        source={header.name || "\u00A0"}
+                        allowHTML={false}
+                      />
+                    </StyledTableCellHeader>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+          )}
           <tbody>
             {dataRowIndices.length === 0 ? (
               <tr>
@@ -85,36 +126,6 @@ export function ArrowTable(props: Readonly<TableProps>): ReactElement {
       native feature or do a pass on accessibility. */}
       {caption && <StyledTableCaption>{caption}</StyledTableCaption>}
     </StyledTableContainer>
-  )
-}
-
-/**
- * Generate the table header rows from a Quiver object.
- */
-function generateTableHeader(table: Quiver): ReactElement {
-  return (
-    <thead>
-      {getStyledHeaders(table).map((headerRow, rowIndex) => (
-        // TODO: Update to match React best practices
-        // eslint-disable-next-line @eslint-react/no-array-index-key
-        <tr key={rowIndex}>
-          {headerRow.map((header, colIndex) => (
-            <StyledTableCellHeader
-              // TODO: Update to match React best practices
-              // eslint-disable-next-line @eslint-react/no-array-index-key
-              key={colIndex}
-              className={header.cssClass}
-              scope="col"
-            >
-              <StreamlitMarkdown
-                source={header.name || "\u00A0"}
-                allowHTML={false}
-              />
-            </StyledTableCellHeader>
-          ))}
-        </tr>
-      ))}
-    </thead>
   )
 }
 

@@ -17,7 +17,7 @@ from playwright.sync_api import Page, expect
 from e2e_playwright.conftest import ImageCompareFunction
 from e2e_playwright.shared.app_utils import check_top_level_class
 
-TOTAL_TABLE_ELEMENTS = 33
+TOTAL_TABLE_ELEMENTS = 37
 
 
 def test_table_rendering(app: Page, assert_snapshot: ImageCompareFunction):
@@ -52,3 +52,54 @@ def test_pandas_styler_tooltips(app: Page, assert_snapshot: ImageCompareFunction
 def test_check_top_level_class(app: Page):
     """Check that the top level class is correctly set."""
     check_top_level_class(app, "stTable")
+
+
+def test_table_dimensions(app: Page, assert_snapshot: ImageCompareFunction):
+    """Test that st.table renders correctly with custom dimensions."""
+    # Find tables with custom dimensions
+    custom_tables = (
+        app.get_by_text("Tables with Custom Dimensions")
+        .locator(".. >> div")
+        .get_by_test_id("stTable")
+    )
+    expect(custom_tables).to_have_count(4)  # We have 4 custom tables
+
+    # Test fixed width and height
+    fixed_table = (
+        app.get_by_text("Fixed width and height")
+        .locator(".. >> div")
+        .get_by_test_id("stTable")
+    )
+    expect(fixed_table).to_have_css("width", "500px")
+    expect(fixed_table).to_have_css("height", "200px")
+    expect(fixed_table).to_have_css("overflow", "auto")
+    assert_snapshot(fixed_table, name="st_table-fixed-dimensions")
+
+    # Test use container width
+    container_width_table = (
+        app.get_by_text("Use container width")
+        .locator(".. >> div")
+        .get_by_test_id("stTable")
+    )
+    expect(container_width_table).to_have_css("width", "100%")
+    assert_snapshot(container_width_table, name="st_table-container-width")
+
+    # Test height only with scrolling
+    height_only_table = (
+        app.get_by_text("Height only (with scrolling)")
+        .locator(".. >> div")
+        .get_by_test_id("stTable")
+    )
+    expect(height_only_table).to_have_css("height", "150px")
+    expect(height_only_table).to_have_css("overflow", "auto")
+    assert_snapshot(height_only_table, name="st_table-height-only")
+
+    # Test width only with scrolling
+    width_only_table = (
+        app.get_by_text("Width only (with scrolling)")
+        .locator(".. >> div")
+        .get_by_test_id("stTable")
+    )
+    expect(width_only_table).to_have_css("width", "400px")
+    expect(width_only_table).to_have_css("overflow", "auto")
+    assert_snapshot(width_only_table, name="st_table-width-only")

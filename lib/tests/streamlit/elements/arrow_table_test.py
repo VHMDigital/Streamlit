@@ -125,3 +125,23 @@ class ArrowTest(DeltaGeneratorTestCase):
 
             st.table(df)
             convert_anything_to_df.assert_called_once()
+
+    def test_table_width_height(self):
+        """Test that width and height are correctly passed to the proto."""
+        df = mock_data_frame()
+
+        st.table(df, width=400, height=300)
+
+        proto = self.get_delta_from_queue().new_element.arrow_table
+        self.assertEqual(proto.width, 400)
+        self.assertEqual(proto.height, 300)
+        self.assertFalse(proto.use_container_width)
+
+    def test_table_use_container_width(self):
+        """Test that use_container_width is correctly passed to the proto."""
+        df = mock_data_frame()
+
+        st.table(df, use_container_width=True)
+
+        proto = self.get_delta_from_queue().new_element.arrow_table
+        self.assertTrue(proto.use_container_width)

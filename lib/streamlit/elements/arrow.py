@@ -648,7 +648,14 @@ class ArrowMixin:
         return self.dg._enqueue("arrow_data_frame", proto)
 
     @gather_metrics("table")
-    def table(self, data: Data = None) -> DeltaGenerator:
+    def table(
+        self,
+        data: Data = None,
+        width: int | None = None,
+        height: int | None = None,
+        *,
+        use_container_width: bool = False,
+    ) -> DeltaGenerator:
         """Display a static table.
 
         While ``st.dataframe`` is geared towards large datasets and interactive
@@ -671,6 +678,18 @@ class ArrowMixin:
 
             .. |st.markdown| replace:: ``st.markdown``
             .. _st.markdown: https://docs.streamlit.io/develop/api-reference/text/st.markdown
+
+        width : int or None
+            Desired width of the table in pixels. If None, the table will adjust its width
+            based on its contents and the containing element.
+
+        height : int or None
+            Desired height of the table in pixels. If None, the table will adjust its height
+            based on its contents.
+
+        use_container_width : bool
+            If True, set the table width to the column width. This takes precedence over the
+            width argument.
 
         Examples
         --------
@@ -728,6 +747,14 @@ class ArrowMixin:
         default_uuid = str(hash(delta_path))
 
         proto = ArrowProto()
+
+        # Set width, height, and use_container_width parameters
+        if width:
+            proto.width = width
+        if height:
+            proto.height = height
+        proto.use_container_width = use_container_width
+
         marshall(proto, data, default_uuid)
         return self.dg._enqueue("arrow_table", proto)
 

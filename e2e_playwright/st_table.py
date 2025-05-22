@@ -282,3 +282,43 @@ data = pd.DataFrame(
 )
 
 st.table(data)
+
+# Tests for width, height, and use_container_width
+st.header("Tables with Custom Dimensions")
+
+st.subheader("Fixed width and height")
+st.table(
+    pd.DataFrame(
+        np.random.randn(10, 3),
+        columns=["A", "B", "C"],
+    ),
+    width=500,
+    height=200,
+)
+
+st.subheader("Use container width")
+st.table(
+    pd.DataFrame(
+        np.random.randn(10, 5),
+        columns=["A", "B", "C", "D", "E"],
+    ),
+    use_container_width=True,
+)
+
+st.subheader("Height only (with scrolling)")
+st.table(
+    pd.DataFrame(
+        np.random.randn(20, 3),
+        columns=["A", "B", "C"],
+    ),
+    height=150,
+)
+
+st.subheader("Width only (with scrolling)")
+st.table(
+    pd.DataFrame(
+        np.random.randn(5, 10),
+        columns=[f"Col {i}" for i in range(10)],
+    ),
+    width=400,
+)
