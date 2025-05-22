@@ -192,12 +192,12 @@ class CodeElement(DeltaGeneratorTestCase):
         st.code(code, height=300)
 
         element = self.get_delta_from_queue().new_element
-        self.assertEqual(element.code.code_text, code)
-        self.assertEqual(
-            element.height_config.WhichOneof("height_spec"),
-            HeightConfigFields.PIXEL_HEIGHT.value,
+        assert element.code.code_text == code
+        assert (
+            element.height_config.WhichOneof("height_spec")
+            == HeightConfigFields.PIXEL_HEIGHT.value
         )
-        self.assertEqual(element.height_config.pixel_height, 300)
+        assert element.height_config.pixel_height == 300
 
     def test_st_code_with_height_content(self):
         """Test st.code with content height."""
@@ -205,12 +205,12 @@ class CodeElement(DeltaGeneratorTestCase):
         st.code(code, height="content")
 
         element = self.get_delta_from_queue().new_element
-        self.assertEqual(element.code.code_text, code)
-        self.assertEqual(
-            element.height_config.WhichOneof("height_spec"),
-            HeightConfigFields.USE_CONTENT.value,
+        assert element.code.code_text == code
+        assert (
+            element.height_config.WhichOneof("height_spec")
+            == HeightConfigFields.USE_CONTENT.value
         )
-        self.assertTrue(element.height_config.use_content)
+        assert element.height_config.use_content
 
     def test_st_code_with_height_stretch(self):
         """Test st.code with stretch height."""
@@ -218,12 +218,12 @@ class CodeElement(DeltaGeneratorTestCase):
         st.code(code, height="stretch")
 
         element = self.get_delta_from_queue().new_element
-        self.assertEqual(element.code.code_text, code)
-        self.assertEqual(
-            element.height_config.WhichOneof("height_spec"),
-            HeightConfigFields.USE_STRETCH.value,
+        assert element.code.code_text == code
+        assert (
+            element.height_config.WhichOneof("height_spec")
+            == HeightConfigFields.USE_STRETCH.value
         )
-        self.assertTrue(element.height_config.use_stretch)
+        assert element.height_config.use_stretch
 
     @parameterized.expand(
         [
