@@ -68,7 +68,7 @@ class MediaFileHandlerTest(tornado.testing.AsyncHTTPTestCase):
         "streamlit.web.server.media_file_handler.allow_all_cross_origin_requests",
         mock.MagicMock(return_value=False),
     )
-    @patch_config_options({"server.corsAllowedOrigins": "http://example.com"})
+    @patch_config_options({"server.corsAllowedOrigins": ["http://example.com"]})
     def test_media_file_allowed_origin(self) -> None:
         """Requests for media files in MediaFileManager should succeed with allowlisted origin."""
         # Add a media file and read it back

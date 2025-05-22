@@ -97,7 +97,7 @@ class ComponentRequestHandlerTest(tornado.testing.AsyncHTTPTestCase):
         "streamlit.web.server.routes.allow_all_cross_origin_requests",
         mock.MagicMock(return_value=False),
     )
-    @patch_config_options({"server.corsAllowedOrigins": "http://example.com"})
+    @patch_config_options({"server.corsAllowedOrigins": ["http://example.com"]})
     def test_success_request_allowlisted_origin(self):
         """Test request success when valid parameters are provided with an allowlisted origin."""
 

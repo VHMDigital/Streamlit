@@ -32,12 +32,7 @@ AUTH_COOKIE_NAME: Final = "_streamlit_user"
 
 
 def allowlisted_origins() -> set[str]:
-    allowlist_str = config.get_option("server.corsAllowedOrigins")
-
-    if not allowlist_str:
-        return set()
-
-    return {origin.strip() for origin in allowlist_str.split(",") if origin.strip()}
+    return {origin.strip() for origin in config.get_option("server.corsAllowedOrigins")}
 
 
 def is_url_from_allowed_origins(url: str) -> bool:

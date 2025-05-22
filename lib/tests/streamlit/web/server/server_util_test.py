@@ -28,18 +28,23 @@ from tests import testutil
 
 class ServerUtilTest(unittest.TestCase):
     def test_allowlisted_origins_empty_string(self):
-        with testutil.patch_config_options({"server.corsAllowedOrigins": ""}):
+        with testutil.patch_config_options({"server.corsAllowedOrigins": []}):
             assert server_util.allowlisted_origins() == set()
 
     def test_allowlisted_origins_singleton(self):
         with testutil.patch_config_options(
-            {"server.corsAllowedOrigins": "http://example.com"}
+            {"server.corsAllowedOrigins": ["http://example.com"]}
         ):
             assert server_util.allowlisted_origins() == {"http://example.com"}
 
     def test_allowlisted_origins_multiple_entries(self):
         with testutil.patch_config_options(
-            {"server.corsAllowedOrigins": "http://example.com,https://streamlit.io"}
+            {
+                "server.corsAllowedOrigins": [
+                    "http://example.com",
+                    "https://streamlit.io",
+                ]
+            }
         ):
             assert server_util.allowlisted_origins() == {
                 "http://example.com",
@@ -49,7 +54,10 @@ class ServerUtilTest(unittest.TestCase):
     def test_allowlisted_origins_string_with_whitespace(self):
         with testutil.patch_config_options(
             {
-                "server.corsAllowedOrigins": " http://example.com,     https://streamlit.io\t"
+                "server.corsAllowedOrigins": [
+                    " http://example.com       ",
+                    "       https://streamlit.io ",
+                ]
             }
         ):
             assert server_util.allowlisted_origins() == {
@@ -59,7 +67,12 @@ class ServerUtilTest(unittest.TestCase):
 
     def test_is_url_from_allowed_origins_allowed_domains(self):
         with testutil.patch_config_options(
-            {"server.corsAllowedOrigins": "http://example.com,https://streamlit.io"}
+            {
+                "server.corsAllowedOrigins": [
+                    "http://example.com",
+                    "https://streamlit.io",
+                ]
+            }
         ):
             for origin in [
                 "localhost",
@@ -87,11 +100,7 @@ class ServerUtilTest(unittest.TestCase):
             ),
             patch(
                 "streamlit.web.server.server_util.config.get_option",
-                side_effect=[
-                    True,
-                    "browser.server.address",
-                    "",
-                ],
+                side_effect=[True, [], "browser.server.address"],
             ),
         ):
             assert server_util.is_url_from_allowed_origins("browser.server.address")

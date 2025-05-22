@@ -23,6 +23,7 @@ import requests
 import tornado.testing
 import tornado.web
 import tornado.websocket
+
 from streamlit.logger import get_logger
 from streamlit.runtime.memory_uploaded_file_manager import MemoryUploadedFileManager
 from streamlit.web.server.server import UPLOAD_FILE_ENDPOINT
@@ -128,7 +129,7 @@ class UploadFileRequestHandlerTest(tornado.testing.AsyncHTTPTestCase):
         "streamlit.web.server.upload_file_request_handler.routes.allow_all_cross_origin_requests",
         MagicMock(return_value=False),
     )
-    @patch_config_options({"server.corsAllowedOrigins": "http://example.com"})
+    @patch_config_options({"server.corsAllowedOrigins": ["http://example.com"]})
     def test_upload_one_file_allowed_origins(self):
         """Uploading a file should populate our file_mgr."""
         file = MockFile("filename", b"123")
