@@ -23,7 +23,7 @@ type SubElement = {
   height?: number
   width?: number
   // We must include this for backwards compatiblity since
-  // Alert.proto has been released with the field in this position.
+  // Alert.proto has been released (1.45) with the field in this position.
   widthConfig?: streamlit.IWidthConfig | null | undefined
 }
 
