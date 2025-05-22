@@ -412,6 +412,7 @@ class CameraInput extends PureComponent<Props, State> {
           </>
         ) : (
           <WebcamComponent
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             handleCapture={this.handleCapture}
             width={width}
             disabled={disabled}

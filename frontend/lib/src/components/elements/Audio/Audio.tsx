@@ -105,7 +105,8 @@ function Audio({
         if (loop) {
           // If loop is true and we reached 'endTime', reset to 'startTime'
           audioNode.currentTime = startTime || 0
-          void audioNode.play()
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
+          audioNode.play()
         } else if (!stoppedByEndTime) {
           stoppedByEndTime = true
           audioNode.pause()
@@ -135,7 +136,8 @@ function Audio({
     const handleAudioEnd = (): void => {
       if (loop) {
         audioNode.currentTime = startTime || 0 // Reset to startTime or to the start if not specified
-        void audioNode.play()
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
+        audioNode.play()
       }
     }
 

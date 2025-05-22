@@ -1212,7 +1212,8 @@ export class App extends PureComponent<Props, State> {
       SessionInfo.propsFromNewSessionMessage(newSessionProto)
     )
 
-    void this.metricsMgr.initialize({
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
+    this.metricsMgr.initialize({
       gatherUsageStats: config.gatherUsageStats,
       sendMessageToHost: this.hostCommunicationMgr.sendMessageToHost,
     })
@@ -1324,15 +1325,12 @@ export class App extends PureComponent<Props, State> {
       status ===
         ForwardMsg.ScriptFinishedStatus.FINISHED_FRAGMENT_RUN_SUCCESSFULLY
     ) {
-      Promise.resolve()
-        .then(() => {
-          // Notify any subscribers of this event (and do it on the next cycle of
-          // the event loop)
-          this.state.scriptFinishedHandlers.forEach(handler => handler())
-        })
-        .catch(error => {
-          throw error
-        })
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
+      Promise.resolve().then(() => {
+        // Notify any subscribers of this event (and do it on the next cycle of
+        // the event loop)
+        this.state.scriptFinishedHandlers.forEach(handler => handler())
+      })
 
       if (
         status === ForwardMsg.ScriptFinishedStatus.FINISHED_SUCCESSFULLY ||
@@ -2017,7 +2015,8 @@ export class App extends PureComponent<Props, State> {
 
   handleKeyUp = (keyName: string): void => {
     if (keyName === "esc") {
-      void this.props.screenCast.stopRecording()
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
+      this.props.screenCast.stopRecording()
     }
   }
 

@@ -212,7 +212,8 @@ export class WebsocketConnection {
     // Perform pre-callback actions when entering certain states.
     switch (this.state) {
       case ConnectionState.PINGING_SERVER:
-        void this.pingServer()
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
+        this.pingServer()
         break
 
       default:
@@ -224,7 +225,8 @@ export class WebsocketConnection {
     // Perform post-callback actions when entering certain states.
     switch (this.state) {
       case ConnectionState.CONNECTING:
-        void this.connectToWebSocket()
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
+        this.connectToWebSocket()
         break
 
       case ConnectionState.DISCONNECTED_FOREVER:

@@ -47,7 +47,7 @@ export interface ScreenCastHOC {
   currentState: Steps
   toggleRecordAudio: () => void
   startRecording: (fileName: string) => void
-  stopRecording: () => Promise<void>
+  stopRecording: () => void
 }
 
 interface InjectedProps {
@@ -124,9 +124,8 @@ function withScreencast<P extends InjectedProps>(
       try {
         await recorderRef.current.initialize()
       } catch (e) {
-        LOG.warn(
-          `ScreenCastRecorder.initialize error: ${(e as Error).toString()}`
-        )
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        LOG.warn(`ScreenCastRecorder.initialize error: ${e}`)
         setCurrentState("UNSUPPORTED")
         return
       }
@@ -181,6 +180,7 @@ function withScreencast<P extends InjectedProps>(
       currentState,
       toggleRecordAudio,
       startRecording: showDialog, // triggers the setup/showDialog process
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       stopRecording,
     }
 
@@ -196,6 +196,7 @@ function withScreencast<P extends InjectedProps>(
           <ScreencastDialog
             recordAudio={recordAudio}
             onClose={closeDialog}
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             startRecording={startActualRecording}
             toggleRecordAudio={toggleRecordAudio}
           />

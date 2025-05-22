@@ -80,7 +80,8 @@ const ArrowVegaLiteChart: FC<Props> = ({
   // after the container is mounted to avoid layout shift.
   useLayoutEffect(() => {
     if (containerRef.current !== null) {
-      void createView(containerRef, spec)
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
+      createView(containerRef, spec)
     }
 
     return finalizeView
@@ -90,7 +91,8 @@ const ArrowVegaLiteChart: FC<Props> = ({
   // because the forward message always produces new references, so
   // this function will run regularly to update the view.
   useEffect(() => {
-    void updateView(data, datasets)
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
+    updateView(data, datasets)
   }, [data, datasets, updateView])
 
   // Create the container inside which Vega draws its content.

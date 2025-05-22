@@ -33,7 +33,7 @@ export interface Props {
   onClose: () => void
   toggleRecordAudio: () => void
   recordAudio: boolean
-  startRecording: () => Promise<void>
+  startRecording: () => void
 }
 
 const ScreencastDialog: React.FC<Props> = ({
@@ -56,7 +56,8 @@ const ScreencastDialog: React.FC<Props> = ({
   )
 
   const handleStartButton = useCallback((): void => {
-    void startRecording()
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
+    startRecording()
     onClose()
   }, [startRecording, onClose])
 

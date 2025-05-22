@@ -170,7 +170,8 @@ export class ConnectionManager {
 
     if (staticAppId) {
       // Establish a static connection
-      void establishStaticConnection(
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
+      establishStaticConnection(
         staticAppId,
         this.setConnectionState,
         this.props.onMessage,
