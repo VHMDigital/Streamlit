@@ -31,6 +31,8 @@ export const StyledElementContainerLayoutWrapper: FC<
 > = ({ node, ...rest }) => {
   const styles = useLayoutStyles({
     element: node.element,
+    subElement:
+      (node.element?.type && node.element[node.element.type]) || undefined,
   })
 
   return <StyledElementContainer {...rest} {...styles} />

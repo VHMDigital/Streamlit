@@ -33,9 +33,10 @@ type SubElement = {
 }
 
 export type UseLayoutStylesArgs = {
-  element: (Element | BlockProto) & {
-    [key: string]: SubElement | null | undefined | IEmpty
-  }
+  element: Element | BlockProto
+  // subElement supports older config where the height is set on the lower
+  // level element. This will be the proto corresponding to the element type, e.g. "textArea".
+  subElement?: SubElement
 }
 
 const isNonZeroPositiveNumber = (value: unknown): value is number =>
@@ -150,6 +151,7 @@ export type UseLayoutStylesShape = {
  */
 export const useLayoutStyles = ({
   element,
+  subElement,
 }: UseLayoutStylesArgs): UseLayoutStylesShape => {
   // Note: Consider rounding the width to the nearest pixel so we don't have
   // subpixel widths, which leads to blurriness on screen
@@ -161,12 +163,6 @@ export const useLayoutStyles = ({
         overflow: "visible",
       }
     }
-
-    // subElement supports older config where the height is set on the lower
-    // level element. This will be the proto corresponding to the element type, e.g. "textArea".
-    const subElement: SubElement | undefined = element.type
-      ? (element[element.type] as SubElement | undefined)
-      : undefined
 
     // The st.image element is potentially a list of images, so we always want
     // the enclosing container to be full width. The size of individual
@@ -220,7 +216,7 @@ export const useLayoutStyles = ({
       height,
       overflow,
     }
-  }, [element])
+  }, [element, subElement])
 
   return layoutStyles
 }

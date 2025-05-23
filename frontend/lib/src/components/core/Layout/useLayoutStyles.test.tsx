@@ -23,16 +23,13 @@ import { useLayoutStyles, UseLayoutStylesShape } from "./useLayoutStyles"
 
 class MockElement implements Element {
   widthConfig?: streamlit.WidthConfig | null
+
   heightConfig?: streamlit.HeightConfig | null
-  type?: "imgs" | "textArea" | "button" | "alert";
-  [key: string]: any
+
+  type?: "imgs" | "textArea"
 
   constructor(props: Partial<MockElement> = {}) {
     Object.assign(this, props)
-    // If type is provided, set the subElement as a property with the same name
-    if (props.type && props[props.type]) {
-      this[props.type] = props[props.type]
-    }
   }
 
   toJSON(): MockElement {
@@ -59,11 +56,11 @@ describe("#useLayoutStyles", () => {
         [NaN, getDefaultStyles({})],
         [100, getDefaultStyles({ width: 100 })],
       ])("and with a width value of %s, returns %o", (width, expected) => {
-        const element = new MockElement({
-          type: "button",
-          button: { width, useContainerWidth },
-        })
-        const { result } = renderHook(() => useLayoutStyles({ element }))
+        const element = new MockElement()
+        const subElement = { width, useContainerWidth }
+        const { result } = renderHook(() =>
+          useLayoutStyles({ element, subElement })
+        )
         expect(result.current).toEqual(expected)
       })
     })
@@ -78,16 +75,18 @@ describe("#useLayoutStyles", () => {
         [NaN, getDefaultStyles({ width: "100%" })],
         [100, getDefaultStyles({ width: "100%" })],
       ])("and with a width value of %s, returns %o", (width, expected) => {
-        const element = new MockElement({
-          type: "button",
-          button: { width, useContainerWidth },
-        })
-        const { result } = renderHook(() => useLayoutStyles({ element }))
+        const element = new MockElement()
+        const subElement = { width, useContainerWidth }
+        const { result } = renderHook(() =>
+          useLayoutStyles({ element, subElement })
+        )
         expect(result.current).toEqual(expected)
       })
     })
 
     describe("that is an image list", () => {
+      const useContainerWidth = false
+
       it.each([
         [undefined, getDefaultStyles({ width: "100%" })],
         [0, getDefaultStyles({ width: "100%" })],
@@ -95,11 +94,11 @@ describe("#useLayoutStyles", () => {
         [NaN, getDefaultStyles({ width: "100%" })],
         [100, getDefaultStyles({ width: "100%" })],
       ])("and with a width value of %s, returns %o", (width, expected) => {
-        const element = new MockElement({
-          type: "imgs",
-          imgs: { width },
-        })
-        const { result } = renderHook(() => useLayoutStyles({ element }))
+        const element = new MockElement({ type: "imgs" })
+        const subElement = { width, useContainerWidth }
+        const { result } = renderHook(() =>
+          useLayoutStyles({ element, subElement })
+        )
         expect(result.current).toEqual(expected)
       })
     })
@@ -139,12 +138,11 @@ describe("#useLayoutStyles", () => {
       ])(
         "and with a widthConfig value of %o and useContainerWidth %s, returns %o",
         (widthConfig, useContainerWidth, expected) => {
-          const element = new MockElement({
-            type: "button",
-            button: { useContainerWidth },
-            widthConfig,
-          })
-          const { result } = renderHook(() => useLayoutStyles({ element }))
+          const element = new MockElement({ widthConfig })
+          const subElement = { useContainerWidth }
+          const { result } = renderHook(() =>
+            useLayoutStyles({ element, subElement })
+          )
           expect(result.current).toEqual(expected)
         }
       )
@@ -164,11 +162,12 @@ describe("#useLayoutStyles", () => {
         "and with a pixelWidth value of %s and useContainerWidth %s, returns %o",
         (pixelWidth, useContainerWidth, expected) => {
           const element = new MockElement({
-            type: "button",
-            button: { useContainerWidth },
             widthConfig: new streamlit.WidthConfig({ pixelWidth }),
           })
-          const { result } = renderHook(() => useLayoutStyles({ element }))
+          const subElement = { useContainerWidth }
+          const { result } = renderHook(() =>
+            useLayoutStyles({ element, subElement })
+          )
           expect(result.current).toEqual(expected)
         }
       )
@@ -186,11 +185,12 @@ describe("#useLayoutStyles", () => {
         ],
       ])("and with element %o, returns %o", (props, expected) => {
         const element = new MockElement({
-          type: "button",
-          button: { useContainerWidth: props.useContainerWidth },
           widthConfig: props.widthConfig,
         })
-        const { result } = renderHook(() => useLayoutStyles({ element }))
+        const subElement = { useContainerWidth: props.useContainerWidth }
+        const { result } = renderHook(() =>
+          useLayoutStyles({ element, subElement })
+        )
         expect(result.current).toEqual(expected)
       })
     })
@@ -257,11 +257,17 @@ describe("#useLayoutStyles", () => {
         "and with element props %o and useContainerWidth %s, returns %o",
         (props, useContainerWidth, expected) => {
           const element = new MockElement({
-            type: "button",
-            button: { width: props.width, useContainerWidth },
             widthConfig: props.widthConfig,
           })
-          const { result } = renderHook(() => useLayoutStyles({ element }))
+
+          const subElement = {
+            width: props.width,
+            useContainerWidth,
+          }
+
+          const { result } = renderHook(() =>
+            useLayoutStyles({ element, subElement })
+          )
           expect(result.current).toEqual(expected)
         }
       )
@@ -283,11 +289,17 @@ describe("#useLayoutStyles", () => {
         "and with a width value of %s, useContainerWidth %s, and widthConfig %s, returns %o",
         (width, useContainerWidth, widthConfig, expected) => {
           const element = new MockElement({
-            type: "button",
-            button: { width, useContainerWidth },
             widthConfig,
           })
-          const { result } = renderHook(() => useLayoutStyles({ element }))
+
+          const subElement = {
+            width,
+            useContainerWidth,
+          }
+
+          const { result } = renderHook(() =>
+            useLayoutStyles({ element, subElement })
+          )
           expect(result.current).toEqual(expected)
         }
       )
@@ -310,11 +322,7 @@ describe("#useLayoutStyles", () => {
       ])(
         "and with a heightConfig value of %o, returns %o",
         (heightConfig, expected) => {
-          const element = new MockElement({
-            type: "button",
-            button: {},
-            heightConfig,
-          })
+          const element = new MockElement({ heightConfig })
           const { result } = renderHook(() => useLayoutStyles({ element }))
           expect(result.current).toEqual(expected)
         }
@@ -330,8 +338,6 @@ describe("#useLayoutStyles", () => {
         "and with a pixelHeight value of %s, returns %o",
         (pixelHeight, expected) => {
           const element = new MockElement({
-            type: "button",
-            button: {},
             heightConfig: new streamlit.HeightConfig({ pixelHeight }),
           })
           const { result } = renderHook(() => useLayoutStyles({ element }))
@@ -356,11 +362,16 @@ describe("#useLayoutStyles", () => {
         "and with a height value of %s and heightConfig %s, returns %o",
         (height, heightConfig, expected) => {
           const element = new MockElement({
-            type: "button",
-            button: { height },
             heightConfig,
           })
-          const { result } = renderHook(() => useLayoutStyles({ element }))
+
+          const subElement = {
+            height,
+          }
+
+          const { result } = renderHook(() =>
+            useLayoutStyles({ element, subElement })
+          )
           expect(result.current).toEqual(expected)
         }
       )
@@ -374,11 +385,11 @@ describe("#useLayoutStyles", () => {
         [NaN, getDefaultStyles({})],
         [100, getDefaultStyles({ height: 100, overflow: "auto" })],
       ])("and with a height value of %s, returns %o", (height, expected) => {
-        const element = new MockElement({
-          type: "button",
-          button: { height },
-        })
-        const { result } = renderHook(() => useLayoutStyles({ element }))
+        const element = new MockElement()
+        const subElement = { height }
+        const { result } = renderHook(() =>
+          useLayoutStyles({ element, subElement })
+        )
         expect(result.current).toEqual(expected)
       })
     })
@@ -402,9 +413,9 @@ describe("#useLayoutStyles", () => {
       ])("and with heightConfig %s, returns %o", (heightConfig, expected) => {
         const element = new MockElement({
           type: "textArea",
-          textArea: {},
           heightConfig,
         })
+
         const { result } = renderHook(() => useLayoutStyles({ element }))
         expect(result.current).toEqual(expected)
       })
@@ -456,11 +467,16 @@ describe("#useLayoutStyles", () => {
         ],
       ])("and with element props %o, returns %o", (props, expected) => {
         const element = new MockElement({
-          type: "button",
-          button: { height: props.height },
           heightConfig: props.heightConfig,
         })
-        const { result } = renderHook(() => useLayoutStyles({ element }))
+
+        const subElement = {
+          height: props.height,
+        }
+
+        const { result } = renderHook(() =>
+          useLayoutStyles({ element, subElement })
+        )
         expect(result.current).toEqual(expected)
       })
     })
@@ -489,11 +505,7 @@ describe("#useLayoutStyles", () => {
           getDefaultStyles({ width: "fit-content", height: "auto" }),
         ],
       ])("and with element props %o, returns %o", (props, expected) => {
-        const element = new MockElement({
-          type: "button",
-          button: {},
-          ...props,
-        })
+        const element = new MockElement(props)
         const { result } = renderHook(() => useLayoutStyles({ element }))
         expect(result.current).toEqual(expected)
       })
@@ -516,11 +528,10 @@ describe("#useLayoutStyles", () => {
       ])(
         "and with subElement props %o, returns %o",
         (subElementProps, expected) => {
-          const element = new MockElement({
-            type: "button",
-            button: subElementProps,
-          })
-          const { result } = renderHook(() => useLayoutStyles({ element }))
+          const element = new MockElement()
+          const { result } = renderHook(() =>
+            useLayoutStyles({ element, subElement: subElementProps })
+          )
           expect(result.current).toEqual(expected)
         }
       )
@@ -555,13 +566,19 @@ describe("#useLayoutStyles", () => {
       ])(
         "and with subElement widthConfig %o, returns %o",
         (props, expected) => {
-          const element = new MockElement({
-            type: "alert",
-            alert: {
-              widthConfig: props.subElementWidthConfig,
-            },
-          })
-          const { result } = renderHook(() => useLayoutStyles({ element }))
+          const element = new MockElement()
+
+          // Use type assertion to bypass TypeScript checks
+          const subElement = {
+            widthConfig: props.subElementWidthConfig,
+          } as IAlert
+
+          const { result } = renderHook(() =>
+            useLayoutStyles({
+              element,
+              subElement,
+            })
+          )
           expect(result.current).toEqual(expected)
         }
       )
