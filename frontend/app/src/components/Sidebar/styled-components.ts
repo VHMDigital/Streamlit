@@ -322,7 +322,7 @@ export const StyledLogo = styled.img<StyledLogoProps>(
       // L & R padding (lg) + scrollbarGutter on both sides (2 * 8px) + R margin (sm) + collapse button (2.25rem)
       maxWidth: `calc(${sidebarWidth}px - 2 * ${getSidebarHorizontalSpacing(
         theme
-      )} - (2 * var(--scrollbar-width, 0)) - ${theme.spacing.sm} - 2.25rem)`,
+      )} - (2 * var(--scrollbar-width)) - ${theme.spacing.sm} - 2.25rem)`,
     }),
   })
 )
