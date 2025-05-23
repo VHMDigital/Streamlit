@@ -60,10 +60,12 @@ def test_rerun_preserves_context(app: Page):
 
 def test_theme_type(themed_app: Page, request: pytest.FixtureRequest):
     """Test that the theme.type is correctly set."""
-    expected_value = ""
-    if request.getfixturevalue("app_theme") == "light_theme":
+    app_theme = request.getfixturevalue("app_theme")
+    if app_theme == "light_theme":
         expected_value = "light"
-    elif request.getfixturevalue("app_theme") == "dark_theme":
+    elif app_theme == "dark_theme":
         expected_value = "dark"
+    else:
+        raise ValueError(f"Unrecognized app_theme fixture value: {app_theme}")
 
     expect_prefixed_markdown(themed_app, "Theme type:", expected_value)
