@@ -577,7 +577,10 @@ export class App extends PureComponent<Props, State> {
       })
     }
     // Rerun script if the theme changed
-    if (prevProps.theme.activeTheme !== this.props.theme.activeTheme) {
+    if (
+      prevProps.theme.activeTheme?.colorScheme !==
+      this.props.theme.activeTheme?.colorScheme
+    ) {
       this.sendRerunBackMsg()
     }
   }
