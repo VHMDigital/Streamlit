@@ -27,15 +27,15 @@ const FontFaceDeclaration = ({
 }: FontFaceDeclarationProps): ReactElement => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const fontMarkup = fontFaces.map((font: any) => {
-    const { family, stringWeight, url, style, unicodeRange } = font
-
+    const { family, weight, stringWeight, url, style, unicodeRange } = font
+    const resolvedWeight = weight || stringWeight
     return `
       @font-face {
         font-family: ${family};
         src: url(${url}) format("woff2");
         font-display: swap;
         ${style ? `font-style: ${style};` : ""}
-        ${stringWeight ? `font-weight: ${stringWeight};` : ""}
+        ${resolvedWeight ? `font-weight: ${resolvedWeight};` : ""}
         ${unicodeRange ? `unicode-range: ${unicodeRange};` : ""}
       }
     `
