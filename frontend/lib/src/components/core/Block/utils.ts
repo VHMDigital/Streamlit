@@ -209,8 +209,7 @@ export function getActivateScrollToBottomBackwardsCompatible(
   blockNode: BlockNode
 ): boolean {
   const hasHeight =
-    blockNode.deltaBlock.flexContainer?.heightConfig ||
-    blockNode.deltaBlock.vertical?.height
+    blockNode.deltaBlock.heightConfig || blockNode.deltaBlock.vertical?.height
   if (
     hasHeight &&
     blockNode.children.some(node => {
