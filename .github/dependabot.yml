@@ -75,9 +75,6 @@ updates:
       - dependency-name: "prettier"
         # Breaks our build process, needs more investigation
         versions: [">=3.0.0"]
-      - dependency-name: "eslint-plugin-prettier"
-        # Breaks our build process, needs more investigation
-        versions: [">=5.0.0"]
       - dependency-name: "@vitejs/plugin-react-swc"
         # Breaks our build process, needs more investigation
         versions: [">=3.7.1"]

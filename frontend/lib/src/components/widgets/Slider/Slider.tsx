@@ -110,7 +110,7 @@ function Slider({
   }, [value])
 
   // TODO: Update to match React best practices
-  // eslint-disable-next-line react-compiler/react-compiler
+  // eslint-disable-next-line react-hooks/react-compiler
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetValueWithSource = useCallback(
     debounce(DEBOUNCE_TIME_MS, (valueArg: number[]): void => {
@@ -147,7 +147,7 @@ function Slider({
   }, [formattedMinValue, formattedMaxValue, disabled])
 
   // TODO: Update to match React best practices
-  // eslint-disable-next-line react-compiler/react-compiler
+  // eslint-disable-next-line react-hooks/react-compiler
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const renderThumb = useCallback(
     forwardRef<HTMLDivElement, StyleProps>(function renderThumb(

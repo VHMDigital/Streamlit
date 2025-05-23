@@ -23,16 +23,16 @@ import typescript from "@typescript-eslint/eslint-plugin"
 import tseslint from "typescript-eslint"
 import typescriptParser from "@typescript-eslint/parser"
 import react from "eslint-plugin-react"
-import reactHooks from "eslint-plugin-react-hooks"
-import reactCompiler from "eslint-plugin-react-compiler"
+import * as reactHooks from "eslint-plugin-react-hooks"
 import eslintReact from "@eslint-react/eslint-plugin"
 import importPlugin from "eslint-plugin-import"
-import prettier from "eslint-plugin-prettier"
+import prettier from "eslint-plugin-prettier/recommended"
 import lodash from "eslint-plugin-lodash"
 import vitest from "eslint-plugin-vitest"
 import testingLibrary from "eslint-plugin-testing-library"
 import noRelativeImportPaths from "eslint-plugin-no-relative-import-paths"
 import streamlitCustom from "eslint-plugin-streamlit-custom"
+import globals from "globals"
 
 // Import other configs
 // Note: Some configs may need to be applied differently in flat config
@@ -44,6 +44,13 @@ export default tseslint.config([
   // Base recommended configs
   eslint.configs.recommended,
   tseslint.configs.recommendedTypeChecked,
+  prettier,
+  // TODO: Look into getting onto the React eslint RC
+  // {
+  //   ...react.configs.flat.recommended,
+  //   settings: { react: { version: "detect" } },
+  // },
+  reactHooks.configs.recommended,
 
   // Add @eslint-react recommended config
   eslintReact.configs["recommended-type-checked"],
@@ -67,10 +74,7 @@ export default tseslint.config([
         },
       },
       globals: {
-        // Browser globals
-        window: "readonly",
-        document: "readonly",
-        console: "readonly",
+        ...globals.browser,
         // Node.js globals for config files
         process: "readonly",
         Buffer: "readonly",
@@ -91,9 +95,6 @@ export default tseslint.config([
     plugins: {
       "@typescript-eslint": typescript,
       react,
-      "react-hooks": reactHooks,
-      "react-compiler": reactCompiler,
-      prettier,
       lodash,
       vitest,
       "no-relative-import-paths": noRelativeImportPaths,
@@ -117,6 +118,9 @@ export default tseslint.config([
 
       // We don't escape entities
       "react/no-unescaped-entities": "off",
+
+      // Opting into the latest react-compiler rules
+      "react-hooks/react-compiler": "error",
 
       // We do want to discourage the usage of flushSync
       "@eslint-react/dom/no-flush-sync": "error",
@@ -291,7 +295,6 @@ export default tseslint.config([
         },
       ],
 
-      "react-compiler/react-compiler": "error",
       "streamlit-custom/no-hardcoded-theme-values": "error",
       "streamlit-custom/use-strict-null-equality-checks": "error",
 
@@ -343,12 +346,12 @@ export default tseslint.config([
       "testing-library": testingLibrary,
       vitest,
     },
+    ...testingLibrary.configs["flat/react"],
     rules: {
       // Allow hardcoded styles in test files
       "streamlit-custom/no-hardcoded-theme-values": "off",
 
       // Testing library rules
-      ...testingLibrary.configs.react.rules,
       "testing-library/prefer-user-event": "error",
     },
   },

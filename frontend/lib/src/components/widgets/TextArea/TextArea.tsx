@@ -81,7 +81,7 @@ const updateWidgetMgrState = (
 
 const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
   // TODO: Update to match React best practices
-  // eslint-disable-next-line react-compiler/react-compiler
+  // eslint-disable-next-line react-hooks/react-compiler
   const id = useRef(uniqueId("text_area_")).current
 
   const [width, elementRef] = useCalculatedWidth()

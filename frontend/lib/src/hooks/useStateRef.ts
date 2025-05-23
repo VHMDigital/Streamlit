@@ -58,7 +58,7 @@ export default function useStateRef<T>(
   const [state, setState] = useState<T>(initialState)
   const ref = useRef<T>(initialState)
   // TODO: Update to match React best practices
-  // eslint-disable-next-line react-compiler/react-compiler
+  // eslint-disable-next-line react-hooks/react-compiler
   ref.current = state
 
   return [state, setState, ref]
