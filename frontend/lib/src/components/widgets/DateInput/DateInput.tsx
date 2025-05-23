@@ -75,7 +75,7 @@ function datesToStrings(dates: Date[]): string[] {
   if (!dates) {
     return []
   }
-  return dates.map((value: Date) => moment(value as Date).format(DATE_FORMAT))
+  return dates.map((value: Date) => moment(value).format(DATE_FORMAT))
 }
 
 // Types for date validation
