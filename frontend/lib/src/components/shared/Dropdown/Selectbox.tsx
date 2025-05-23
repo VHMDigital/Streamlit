@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-import React, { memo, useCallback, useEffect, useRef, useState } from "react"
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 
 import { isMobile } from "react-device-detect"
 import { ChevronDown } from "baseui/icon"
@@ -22,6 +29,7 @@ import { OnChangeParams, Option, Select as UISelect } from "baseui/select"
 import { useTheme } from "@emotion/react"
 import sortBy from "lodash/sortBy"
 
+import IsSidebarContext from "~lib/components/core/IsSidebarContext"
 import VirtualDropdown from "~lib/components/shared/Dropdown/VirtualDropdown"
 import { isNullOrUndefined, LabelVisibilityOptions } from "~lib/util/utils"
 import { hasMatch, score } from "~lib/vendor/fzy.js/fuzzySearch"
@@ -88,6 +96,7 @@ const Selectbox: React.FC<Props> = ({
   acceptNewOptions,
 }) => {
   const theme: EmotionTheme = useTheme()
+  const isInSidebar = useContext(IsSidebarContext)
 
   const [value, setValue] = useState<string | null>(propValue)
   // This ref is used to store the value before the user starts removing characters so that we can restore
@@ -266,6 +275,7 @@ const Selectbox: React.FC<Props> = ({
           // Nudge the dropdown menu by 1px so the focus state doesn't get cut off
           Popover: {
             props: {
+              ignoreBoundary: isInSidebar,
               overrides: {
                 Body: {
                   style: () => ({
