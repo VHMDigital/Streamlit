@@ -30,7 +30,7 @@ class DividerTest(DeltaGeneratorTestCase):
         st.divider()
 
         c = self.get_delta_from_queue().new_element
-        assert c.body == "---"
+        assert c.markdown.body == "---"
 
     @parameterized.expand(
         [
@@ -46,7 +46,7 @@ class DividerTest(DeltaGeneratorTestCase):
         else:
             st.divider(width=width_value)
         c = self.get_delta_from_queue().new_element
-        assert c.body == "---"
+        assert c.markdown.body == "---"
         assert c.width_config.WhichOneof("width_spec") == expected_field.value
         if expected_field == WidthConfigFields.PIXEL_WIDTH:
             assert c.width_config.pixel_width == expected_value
