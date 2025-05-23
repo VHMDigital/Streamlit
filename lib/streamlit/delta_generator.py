@@ -93,6 +93,10 @@ from streamlit.elements.widgets.text_widgets import TextWidgetsMixin
 from streamlit.elements.widgets.time_widgets import TimeWidgetsMixin
 from streamlit.elements.write import WriteMixin
 from streamlit.errors import StreamlitAPIException
+from streamlit.lib.streamlit.elements.lib.layout_utils import (
+    get_height_config,
+    get_width_config,
+)
 from streamlit.proto import Block_pb2, ForwardMsg_pb2
 from streamlit.proto.RootContainer_pb2 import RootContainer
 from streamlit.runtime import caching
@@ -480,22 +484,14 @@ class DeltaGenerator(
 
         if layout_config:
             if layout_config.height:
-                if isinstance(layout_config.height, int):
-                    msg.delta.new_element.height_config.pixel_height = (
-                        layout_config.height
-                    )
-                elif layout_config.height == "content":
-                    msg.delta.new_element.height_config.use_content = True
-                else:
-                    msg.delta.new_element.height_config.use_stretch = True
+                msg.delta.new_element.height_config.CopyFrom(
+                    get_height_config(layout_config.height)
+                )
 
             if layout_config.width:
-                if isinstance(layout_config.width, int):
-                    msg.delta.new_element.width_config.pixel_width = layout_config.width
-                elif layout_config.width == "content":
-                    msg.delta.new_element.width_config.use_content = True
-                else:
-                    msg.delta.new_element.width_config.use_stretch = True
+                msg.delta.new_element.width_config.CopyFrom(
+                    get_width_config(layout_config.width)
+                )
 
         # Only enqueue message and fill in metadata if there's a container.
         msg_was_enqueued = False
