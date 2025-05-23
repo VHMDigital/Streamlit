@@ -86,6 +86,11 @@ function BaseChartColumn(
     isEditable: false, // Chart column is always read-only
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     getCell(data?: any): GridCell {
+      if (isNullOrUndefined(data)) {
+        // TODO(lukasmasuch): Use a missing cell?
+        return getEmptyCell()
+      }
+
       const chartData = toSafeArray(data)
 
       const convertedChartData: number[] = []
@@ -148,11 +153,6 @@ function BaseChartColumn(
           "Invalid min/max y-axis configuration",
           `The y_min (${minValueDefault}) and y_max (${maxValueDefault}) configuration options must be valid numbers.`
         )
-      }
-
-      if (isNullOrUndefined(data)) {
-        // TODO(lukasmasuch): Use a missing cell?
-        return getEmptyCell()
       }
 
       if (

@@ -229,7 +229,7 @@ describe("ChartColumn", () => {
     const mockColumn3 = getLineChartColumn()
 
     const mockCell3 = mockColumn3.getCell([-50])
-    // The min/max scale is 0/-50 for this case, so don't do anything:
+    // The min/max scale is -50/0 for this case, so don't do anything:
     expect((mockCell3 as SparklineCellType).data?.values).toEqual([-50])
   })
 
