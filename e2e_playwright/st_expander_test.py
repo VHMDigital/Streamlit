@@ -44,8 +44,8 @@ def test_expander_displays_correctly(
     assert_snapshot(expander_elements.nth(7), name="st_expander-with_emoji_icon")
     assert_snapshot(expander_elements.nth(8), name="st_expander-markdown_label")
     assert_snapshot(expander_elements.nth(9), name="st_expander-nested")
-    assert_snapshot(expander_elements.nth(10), name="st_expander-fixed_width")
-    assert_snapshot(expander_elements.nth(11), name="st_expander-stretch_width")
+    assert_snapshot(expander_elements.nth(11), name="st_expander-fixed_width")
+    assert_snapshot(expander_elements.nth(12), name="st_expander-stretch_width")
 
 
 def test_expander_collapses_and_expands(app: Page):

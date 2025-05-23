@@ -26,7 +26,7 @@ def test_tabs_render_correctly(themed_app: Page, assert_snapshot: ImageCompareFu
     assert_snapshot(st_tabs.nth(1), name="st_tabs-text_input")
     assert_snapshot(st_tabs.nth(2), name="st_tabs-many")
     assert_snapshot(st_tabs.nth(3), name="st_tabs-markdown_labels")
-    assert_snapshot(st_tabs.nth(4), name="st_tabs-fixed_width")
+    assert_snapshot(st_tabs.nth(5), name="st_tabs-fixed_width")
 
 
 def test_displays_correctly_in_sidebar(app: Page):
