@@ -19,7 +19,6 @@ import { fileURLToPath } from "url"
 
 // Core ESLint and plugins
 import eslint from "@eslint/js"
-import typescript from "@typescript-eslint/eslint-plugin"
 import tseslint from "typescript-eslint"
 import typescriptParser from "@typescript-eslint/parser"
 import react from "eslint-plugin-react"
@@ -62,13 +61,8 @@ export default tseslint.config([
       sourceType: "module",
       parser: typescriptParser,
       parserOptions: {
+        projectService: true,
         tsconfigRootDir: __dirname,
-        project: [
-          "./app/tsconfig.json",
-          "./lib/tsconfig.json",
-          "./connection/tsconfig.json",
-          "./utils/tsconfig.json",
-        ],
         ecmaFeatures: {
           jsx: true,
         },
@@ -327,14 +321,8 @@ export default tseslint.config([
       },
       "import/resolver": {
         typescript: {
-          // tell eslint to look at these tsconfigs for import statements
-          // project: [path.resolve(".", "tsconfig.json")],
-          project: [
-            path.resolve(__dirname, "app/tsconfig.json"),
-            path.resolve(__dirname, "lib/tsconfig.json"),
-            path.resolve(__dirname, "connection/tsconfig.json"),
-            path.resolve(__dirname, "utils/tsconfig.json"),
-          ],
+          // Use project service for import resolution as well
+          project: path.resolve(__dirname, "./tsconfig.json"),
         },
       },
     },
@@ -386,6 +374,7 @@ export default tseslint.config([
   // Ignore patterns
   {
     ignores: [
+      "eslint.config.mjs",
       "lib/src/proto.js",
       "lib/src/proto.d.ts",
       "**/vendor/*",
