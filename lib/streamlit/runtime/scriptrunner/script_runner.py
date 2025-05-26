@@ -134,11 +134,10 @@ def _mpa_v1(main_script_path: str) -> None:
     PAGES_FOLDER = MAIN_SCRIPT_PATH.parent / "pages"
 
     # Read out the my_pages folder and create a page for every script:
-    pages = PAGES_FOLDER.glob("*.py")
     pages = sorted(
         [
             page
-            for page in pages
+            for page in PAGES_FOLDER.glob("*.py")
             if page.name.endswith(".py")
             and not page.name.startswith(".")
             and page.name != "__init__.py"
@@ -323,7 +322,10 @@ class ScriptRunner:
             If there is no ScriptRunContext for the current thread.
 
         """
-        assert self._is_in_script_thread()
+        if not self._is_in_script_thread():
+            raise RuntimeError(
+                "ScriptRunner._get_script_run_ctx must be called from the script thread."
+            )
 
         ctx = get_script_run_ctx()
         if ctx is None:
@@ -343,7 +345,10 @@ class ScriptRunner:
         When the ScriptRequestQueue is empty, or when a SHUTDOWN request is
         dequeued, this function will exit and its thread will terminate.
         """
-        assert self._is_in_script_thread()
+        if not self._is_in_script_thread():
+            raise RuntimeError(
+                "ScriptRunner._run_script_thread must be called from the script thread."
+            )
 
         _LOGGER.debug("Beginning script thread")
 
@@ -373,7 +378,10 @@ class ScriptRunner:
             self._run_script(request.rerun_data)
             request = self._requests.on_scriptrunner_ready()
 
-        assert request.type == ScriptRequestType.STOP
+        if request.type != ScriptRequestType.STOP:
+            raise RuntimeError(
+                f"Unrecognized ScriptRequestType: {request.type}. This should never happen."
+            )
 
         # Send a SHUTDOWN event before exiting, so some state can be saved
         # for use in a future script run when not triggered by the client.
@@ -435,7 +443,10 @@ class ScriptRunner:
         if request.type == ScriptRequestType.RERUN:
             raise RerunException(request.rerun_data)
 
-        assert request.type == ScriptRequestType.STOP
+        if request.type != ScriptRequestType.STOP:
+            raise RuntimeError(
+                f"Unrecognized ScriptRequestType: {request.type}. This should never happen."
+            )
         raise StopException()
 
     @contextmanager
@@ -463,7 +474,10 @@ class ScriptRunner:
 
         """
 
-        assert self._is_in_script_thread()
+        if not self._is_in_script_thread():
+            raise RuntimeError(
+                "ScriptRunner._run_script must be called from the script thread."
+            )
 
         # An explicit loop instead of recursion to avoid stack overflows
         while True:

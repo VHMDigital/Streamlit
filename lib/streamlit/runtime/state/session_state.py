@@ -147,7 +147,7 @@ class WStates(MutableMapping[str, Any]):
     def __len__(self) -> int:
         return len(self.states)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         # For this and many other methods, we can't simply delegate to the
         # states field, because we need to invoke `__getitem__` for any
         # values, to handle deserialization and unwrapping of values.
@@ -252,8 +252,7 @@ class WStates(MutableMapping[str, Any]):
             for widget_id in self.states
             if self.get_serialized(widget_id)
         ]
-        states = cast("list[WidgetStateProto]", states)
-        return states
+        return cast("list[WidgetStateProto]", states)
 
     def call_callback(self, widget_id: str) -> None:
         """Call the given widget's callback and return the callback's
@@ -262,7 +261,10 @@ class WStates(MutableMapping[str, Any]):
         If the widget doesn't exist, raise an Exception.
         """
         metadata = self.widget_metadata.get(widget_id)
-        assert metadata is not None
+
+        if metadata is None:
+            raise RuntimeError(f"Widget {widget_id} not found.")
+
         callback = metadata.callback
         if callback is None:
             return
@@ -326,7 +328,7 @@ class KeyIdMapper:
         self._key_id_mapping.update(other._key_id_mapping)
         self._id_key_mapping.update(other._id_key_mapping)
 
-    def clear(self):
+    def clear(self) -> None:
         self._key_id_mapping.clear()
         self._id_key_mapping.clear()
 
@@ -469,7 +471,10 @@ class SessionState:
 
         At least one of the arguments must have a value.
         """
-        assert user_key is not None or widget_id is not None
+        if user_key is None and widget_id is None:
+            raise ValueError(
+                "user_key and widget_id cannot both be None. This should never happen."
+            )
 
         if user_key is not None:
             try:

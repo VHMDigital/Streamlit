@@ -47,7 +47,6 @@ from playwright.sync_api import (
     Response,
     Route,
 )
-from pytest import FixtureRequest
 from typing_extensions import Self
 
 from e2e_playwright.shared.git_utils import get_git_root
@@ -67,14 +66,14 @@ class StaticPage(Page):
     pass
 
 
-def pytest_configure(config: pytest.Config):
+def pytest_configure(config: pytest.Config) -> None:
     """Register custom markers."""
     config.addinivalue_line(
         "markers", "no_perf: mark test to not use performance profiling"
     )
 
 
-def reorder_early_fixtures(metafunc: pytest.Metafunc):
+def reorder_early_fixtures(metafunc: pytest.Metafunc) -> None:
     """Put fixtures with `pytest.mark.early` first during execution.
 
     This allows patch of configurations before the application is initialized
@@ -90,7 +89,7 @@ def reorder_early_fixtures(metafunc: pytest.Metafunc):
                 break
 
 
-def pytest_generate_tests(metafunc: pytest.Metafunc):
+def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     reorder_early_fixtures(metafunc)
 
 
@@ -257,7 +256,7 @@ def app_server_extra_args() -> list[str]:
 def app_server(
     app_port: int,
     app_server_extra_args: list[str],
-    request: FixtureRequest,
+    request: pytest.FixtureRequest,
 ) -> Generator[AsyncSubprocess, None, None]:
     """Fixture that starts and stops the Streamlit app server."""
     streamlit_proc = AsyncSubprocess(
@@ -293,7 +292,7 @@ def app_server(
     print(streamlit_stdout, flush=True)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def app(page: Page, app_port: int) -> Page:
     """Fixture that opens the app."""
     try:
@@ -318,11 +317,11 @@ def app(page: Page, app_port: int) -> Page:
     return page
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def static_app(
     page: Page,
     app_port: int,
-    request: FixtureRequest,
+    request: pytest.FixtureRequest,
 ) -> Page:
     """Fixture that opens the app."""
     query_param = request.node.get_closest_marker("query_param")
@@ -337,9 +336,9 @@ def static_app(
     return page
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def app_with_query_params(
-    page: Page, app_port: int, request: FixtureRequest
+    page: Page, app_port: int, request: pytest.FixtureRequest
 ) -> tuple[Page, dict[str, Any]]:
     """Fixture that opens the app with additional query parameters.
     The query parameters are passed as a dictionary in the 'param' key of the request.
@@ -375,7 +374,7 @@ class IframedPage:
     open_app: Callable[[IframedPageAttrs | None], FrameLocator]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def iframed_app(page: Page, app_port: int) -> IframedPage:
     """Fixture that returns an IframedPage.
 
@@ -577,13 +576,13 @@ def browser_type_launch_args(
     return browser_type_launch_args
 
 
-@pytest.fixture(scope="function", params=["light_theme", "dark_theme"])
-def app_theme(request: FixtureRequest) -> str:
+@pytest.fixture(params=["light_theme", "dark_theme"])
+def app_theme(request: pytest.FixtureRequest) -> str:
     """Fixture that returns the theme name."""
     return str(request.param)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def themed_app(page: Page, app_port: int, app_theme: str) -> Page:
     """Fixture that opens the app with the given theme."""
     page.goto(f"http://localhost:{app_port}/?embed_options={app_theme}")
@@ -675,9 +674,9 @@ def output_folder(pytestconfig: Any) -> Path:
     ).resolve()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def assert_snapshot(
-    request: FixtureRequest,
+    request: pytest.FixtureRequest,
     output_folder: Path,
     pytestconfig: Any,
 ) -> Generator[ImageCompareFunction, None, None]:
@@ -879,8 +878,10 @@ def assert_snapshot(
         )
 
 
-@pytest.fixture(scope="function", autouse=True)
-def playwright_profiling(request: FixtureRequest, page: Page):
+@pytest.fixture(autouse=True)
+def playwright_profiling(
+    request: pytest.FixtureRequest, page: Page
+) -> Generator[None, None, None]:
     if request.node.get_closest_marker("no_perf") or not is_supported_browser(page):
         yield
         return
@@ -945,7 +946,7 @@ def wait_for_app_run(
         page.wait_for_timeout(wait_delay)
 
 
-def wait_for_app_loaded(page: Page):
+def wait_for_app_loaded(page: Page) -> None:
     """Wait for the app to fully load."""
     # Wait for the app view container to appear:
     page.wait_for_selector(
@@ -955,7 +956,7 @@ def wait_for_app_loaded(page: Page):
     wait_for_app_run(page)
 
 
-def rerun_app(page: Page):
+def rerun_app(page: Page) -> None:
     """Triggers an app rerun and waits for the run to be finished."""
     # Click somewhere to clear the focus from elements:
     page.get_by_test_id("stApp").click(position={"x": 0, "y": 0})
@@ -966,7 +967,7 @@ def rerun_app(page: Page):
 
 def wait_until(
     page: Page, fn: Callable[[], None | bool], timeout: int = 5000, interval: int = 100
-):
+) -> None:
     """Run a test function in a loop until it evaluates to True
     or times out.
 

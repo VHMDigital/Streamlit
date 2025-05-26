@@ -11,6 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# Assert statements are allowed here since the app testing logic is used within unit tests:
+# ruff: noqa: S101
+
 from __future__ import annotations
 
 import textwrap
@@ -1342,8 +1346,7 @@ class TimeInput(Widget):
         """The current value of the widget. (time)"""  # noqa: D400
         if not isinstance(self._value, InitialValue):
             v = self._value
-            v = v.time() if isinstance(v, datetime) else v
-            return v
+            return v.time() if isinstance(v, datetime) else v
         state = self.root.session_state
         assert state
         return state[self.id]  # type: ignore
@@ -1689,8 +1692,7 @@ def format_dict(d: dict[Any, Any]) -> str:
         lines.append(line)
     r = ",\n".join(lines)
     r = textwrap.indent(r, " " * 4)
-    r = f"{{\n{r}\n}}"
-    return r
+    return f"{{\n{r}\n}}"
 
 
 @dataclass(repr=False)

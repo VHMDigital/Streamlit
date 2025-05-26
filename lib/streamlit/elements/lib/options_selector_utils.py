@@ -92,8 +92,7 @@ def get_default_indices(
     indexable_options: Sequence[T], default: Sequence[Any] | Any | None = None
 ) -> list[int]:
     default_indices = check_and_convert_to_indices(indexable_options, default)
-    default_indices = default_indices if default_indices is not None else []
-    return default_indices
+    return default_indices if default_indices is not None else []
 
 
 E1 = TypeVar("E1", bound=Enum)
@@ -186,7 +185,11 @@ def maybe_coerce_enum(
 ) -> RegisterWidgetResult[T]: ...
 
 
-def maybe_coerce_enum(register_widget_result, options, opt_sequence):
+def maybe_coerce_enum(
+    register_widget_result: RegisterWidgetResult[Any],
+    options: OptionSequence[Any],
+    opt_sequence: Sequence[Any],
+) -> RegisterWidgetResult[Any]:
     """Maybe Coerce a RegisterWidgetResult with an Enum member value to
     RegisterWidgetResult[option] if option is an EnumType, otherwise just return
     the original RegisterWidgetResult.
@@ -228,7 +231,11 @@ def maybe_coerce_enum_sequence(
 ) -> RegisterWidgetResult[tuple[T, T]]: ...
 
 
-def maybe_coerce_enum_sequence(register_widget_result, options, opt_sequence):
+def maybe_coerce_enum_sequence(
+    register_widget_result: RegisterWidgetResult[list[Any] | tuple[Any, ...]],
+    options: OptionSequence[Any],
+    opt_sequence: Sequence[Any],
+) -> RegisterWidgetResult[list[Any] | tuple[Any, ...]]:
     """Maybe Coerce a RegisterWidgetResult with a sequence of Enum members as value
     to RegisterWidgetResult[Sequence[option]] if option is an EnumType, otherwise just
     return the original RegisterWidgetResult.
