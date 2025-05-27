@@ -50,10 +50,8 @@ export default tseslint.config([
   //   settings: { react: { version: "detect" } },
   // },
   reactHooks.configs.recommended,
-
   // Add @eslint-react recommended config
   eslintReact.configs["recommended-type-checked"],
-
   // Global configuration for all files
   {
     languageOptions: {
@@ -80,9 +78,7 @@ export default tseslint.config([
       reportUnusedDisableDirectives: true,
     },
   },
-
   importPlugin.flatConfigs.recommended,
-
   // TypeScript files configuration
   {
     files: ["**/*.ts", "**/*.tsx"],
@@ -98,43 +94,30 @@ export default tseslint.config([
       ...vitest.configs.recommended.rules,
 
       "no-proto": "error",
-
       // Use `const` or `let` instead of `var`
       "no-var": "error",
-
       // Prevent unintentional use of `console.log`
       "no-console": "error",
-
       // Prevent unintentional use of `debugger`
       "no-debugger": "error",
-
       // We don't use PropTypes
       "react/prop-types": "off",
-
       // We don't escape entities
       "react/no-unescaped-entities": "off",
-
       // Opting into the latest react-compiler rules
       "react-hooks/react-compiler": "error",
-
       // We do want to discourage the usage of flushSync
       "@eslint-react/dom/no-flush-sync": "error",
-
       // This was giving false positives
       "@eslint-react/no-unused-class-component-members": "off",
-
       // This was giving false positives
       "@eslint-react/naming-convention/use-state": "off",
-
       // Helps us catch functions written as if they are hooks, but are not.
       "@eslint-react/hooks-extra/no-useless-custom-hooks": "error",
-
       // Turning off for now until we have clearer guidance on how to fix existing usages
       "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect": "off",
-
       // We don't want to warn about empty fragments
       "@eslint-react/no-useless-fragment": "off",
-
       // TypeScript rules with type-checking
       // We want to use these, but we have far too many instances of these rules
       // for it to be realistic right now. Over time, we should fix these.
@@ -144,19 +127,14 @@ export default tseslint.config([
       "@typescript-eslint/no-unsafe-member-access": "off",
       "@typescript-eslint/no-unsafe-return": "off",
       "@typescript-eslint/unbound-method": "off",
-
       // Some of these are being caught erroneously
       "@typescript-eslint/camelcase": "off",
-
       // Empty interfaces are ok
       "@typescript-eslint/no-empty-interface": "off",
-
       // Empty functions are ok
       "@typescript-eslint/no-empty-function": "off",
-
       // We prefer not using `any`, but don't disallow it
       "@typescript-eslint/explicit-module-boundary-types": "off",
-
       // Don't warn about unused function params
       "@typescript-eslint/no-unused-vars": [
         "error",
@@ -167,19 +145,16 @@ export default tseslint.config([
           argsIgnorePattern: "^_",
         },
       ],
-
       // It's safe to use functions before they're defined
       "@typescript-eslint/no-use-before-define": [
         "warn",
         { functions: false },
       ],
-
       // Functions must have return types, but we allow inline function expressions to omit them
       "@typescript-eslint/explicit-function-return-type": [
         "warn",
         { allowExpressions: true },
       ],
-
       // Disallow the @ts-ignore directive in favor of the more strict @ts-expect-error.
       "@typescript-eslint/ban-ts-comment": [
         "error",
@@ -190,10 +165,8 @@ export default tseslint.config([
           "ts-ignore": true,
         },
       ],
-
       // We want this on
       "@typescript-eslint/no-non-null-assertion": "error",
-
       // Permit for-of loops
       "no-restricted-syntax": [
         "error",
@@ -207,7 +180,6 @@ export default tseslint.config([
             "Please use the useTheme hook instead.",
         },
       ],
-
       "no-restricted-globals": [
         "error",
         {
@@ -217,8 +189,9 @@ export default tseslint.config([
             "supported in some browsers (e.g. Android WebView).",
         },
       ],
-
       // Imports should be `import "./FooModule"`, not `import "./FooModule.js"`
+      // We need to configure this to check our .tsx files, see:
+      // https://github.com/benmosher/eslint-plugin-import/issues/1615#issuecomment-577500405
       "import/extensions": [
         "error",
         "ignorePackages",
@@ -229,21 +202,16 @@ export default tseslint.config([
           tsx: "never",
         },
       ],
-
-      // Disable a bunch of AirBNB rules we're currently in violation of.
       "import/prefer-default-export": "off",
       "max-classes-per-file": "off",
       "no-shadow": "off",
       "no-param-reassign": "off",
       "no-plusplus": "off",
-
       "no-relative-import-paths/no-relative-import-paths": [
         "error",
         { allowSameFolder: true, rootDir: "src", prefix: "src" },
       ],
-
       "no-else-return": ["error", { allowElseIf: true }],
-
       "lodash/prefer-noop": "off",
       "lodash/prefer-constant": "off",
       "lodash/prefer-lodash-method": "off",
@@ -253,7 +221,6 @@ export default tseslint.config([
       "lodash/prefer-is-nil": "off",
       "lodash/prefer-matches": "off",
       "lodash/path-style": "off",
-
       "sort-imports": [
         "error",
         {
@@ -261,7 +228,6 @@ export default tseslint.config([
           ignoreDeclarationSort: true,
         },
       ],
-
       "import/order": [
         1,
         {
@@ -289,13 +255,10 @@ export default tseslint.config([
           "newlines-between": "always",
         },
       ],
-
       "streamlit-custom/no-hardcoded-theme-values": "error",
       "streamlit-custom/use-strict-null-equality-checks": "error",
-
       // We only turn this rule on for certain directories
       "streamlit-custom/enforce-memo": "off",
-
       "no-restricted-imports": [
         "error",
         {
@@ -307,11 +270,9 @@ export default tseslint.config([
           ],
         },
       ],
-
       // React configuration
       "react/jsx-uses-react": "off",
       "react/react-in-jsx-scope": "off",
-
       // React hooks rules
       ...reactHooks.configs.recommended.rules,
     },
@@ -327,7 +288,6 @@ export default tseslint.config([
       },
     },
   },
-
   // Test files specific configuration
   {
     files: ["**/*.test.ts", "**/*.test.tsx"],
@@ -344,7 +304,6 @@ export default tseslint.config([
       "testing-library/prefer-user-event": "error",
     },
   },
-
   // Theme files specific configuration
   {
     files: ["lib/src/theme/**/*"],
@@ -353,7 +312,6 @@ export default tseslint.config([
       "streamlit-custom/no-hardcoded-theme-values": "off",
     },
   },
-
   // Elements and widgets components
   {
     files: ["**/components/elements/**/*", "**/components/widgets/**/*"],
@@ -361,7 +319,6 @@ export default tseslint.config([
       "streamlit-custom/enforce-memo": "error",
     },
   },
-
   // Styled components files
   {
     files: ["**/styled-components.ts", "**/styled-components.tsx"],
@@ -370,7 +327,6 @@ export default tseslint.config([
       "@typescript-eslint/restrict-template-expressions": "off",
     },
   },
-
   // Ignore patterns
   {
     ignores: [
