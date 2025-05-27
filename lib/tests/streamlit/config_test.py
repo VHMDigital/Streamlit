@@ -488,6 +488,7 @@ class ConfigTest(unittest.TestCase):
                 "theme.textColor",
                 "theme.baseFontSize",
                 "theme.baseRadius",
+                "theme.buttonRadius",
                 "theme.font",
                 "theme.headingFont",
                 "theme.codeFont",
@@ -502,6 +503,7 @@ class ConfigTest(unittest.TestCase):
                 "theme.sidebar.secondaryBackgroundColor",
                 "theme.sidebar.textColor",
                 "theme.sidebar.baseRadius",
+                "theme.sidebar.buttonRadius",
                 "theme.sidebar.font",
                 "theme.sidebar.headingFont",
                 "theme.sidebar.codeFont",
@@ -659,6 +661,7 @@ class ConfigTest(unittest.TestCase):
             "base": None,
             "primaryColor": None,
             "baseRadius": None,
+            "buttonRadius": None,
             "secondaryBackgroundColor": None,
             "backgroundColor": None,
             "textColor": None,
@@ -683,6 +686,7 @@ class ConfigTest(unittest.TestCase):
         config._set_option("theme.base", "dark", "test")
         config._set_option("theme.textColor", "#DFFDE0", "test")
         config._set_option("theme.baseRadius", "1.2rem", "test")
+        config._set_option("theme.buttonRadius", "medium", "test")
         config._set_option("theme.secondaryBackgroundColor", "#021A09", "test")
         config._set_option("theme.backgroundColor", "#001200", "test")
         config._set_option("theme.borderColor", "#0B4C0B", "test")
@@ -710,6 +714,7 @@ class ConfigTest(unittest.TestCase):
             "base": "dark",
             "primaryColor": "#1BD760",
             "baseRadius": "1.2rem",
+            "buttonRadius": "medium",
             "secondaryBackgroundColor": "#021A09",
             "backgroundColor": "#001200",
             "textColor": "#DFFDE0",
@@ -739,6 +744,7 @@ class ConfigTest(unittest.TestCase):
 
         config._set_option("theme.sidebar.textColor", "#DFFDE0", "test")
         config._set_option("theme.sidebar.baseRadius", "1.2rem", "test")
+        config._set_option("theme.sidebar.buttonRadius", "medium", "test")
         config._set_option("theme.sidebar.secondaryBackgroundColor", "#021A09", "test")
         config._set_option("theme.sidebar.backgroundColor", "#001200", "test")
         config._set_option("theme.sidebar.borderColor", "#0B4C0B", "test")
@@ -752,6 +758,7 @@ class ConfigTest(unittest.TestCase):
         expected = {
             "primaryColor": "#FFF000",
             "baseRadius": "1.2rem",
+            "buttonRadius": "medium",
             "secondaryBackgroundColor": "#021A09",
             "backgroundColor": "#001200",
             "textColor": "#DFFDE0",
