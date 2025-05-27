@@ -287,7 +287,7 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
     const minimized = statusMinimized
     const stopRequested = scriptRunState === ScriptRunState.STOP_REQUESTED
     const isNewYear = isNewYears()
-    const runningSrc = isNewYear ? newYearsRunning : IconRunning
+// Removed unused variable `runningSrc`.
     const runningIcon = (
       <StyledAppRunningIcon isNewYears={isNewYear}>
         <IconRunning size={32} speed={600} color={theme.colors.primary} />
