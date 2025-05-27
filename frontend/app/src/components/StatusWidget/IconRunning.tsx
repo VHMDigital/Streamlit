@@ -15,8 +15,9 @@
  */
 
 import React, { useEffect, useState } from "react"
+import { useTheme } from "@emotion/react"
+import { EmotionTheme } from "@streamlit/lib"
 
-// Import icons from @emotion-icons/material-outlined
 import { AccessibleForward } from "@emotion-icons/material-outlined"
 import { AccessibilityNew } from "@emotion-icons/material-outlined"
 import { DirectionsBike } from "@emotion-icons/material-outlined"
@@ -33,9 +34,20 @@ const icons = [
   Rowing,
 ]
 
-const IconRunning = ({ size = 64, speed = 600, color = "#1976d2" }) => {
+type IconRunningProps = {
+  size?: number
+  speed?: number
+  color?: string
+}
+
+const IconRunning: React.FC<IconRunningProps> = ({
+  size = 64,
+  speed = 600,
+  color,
+}) => {
   const [index, setIndex] = useState(0)
-  // Speed adjustment here
+  const theme = useTheme() as EmotionTheme
+
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex(prev => (prev + 1) % icons.length)
@@ -44,8 +56,8 @@ const IconRunning = ({ size = 64, speed = 600, color = "#1976d2" }) => {
   }, [speed])
 
   const IconComponent = icons[index]
+  const resolvedColor = color || theme.colors.primary
 
-  //Customizetions
   return (
     <div
       style={{
@@ -55,9 +67,11 @@ const IconRunning = ({ size = 64, speed = 600, color = "#1976d2" }) => {
         alignItems: "center",
         justifyContent: "center",
         transition: "opacity 0.3s ease-in-out",
+        backgroundColor: theme.colors.background,
+        border: `1px solid ${theme.colors.border}`,
       }}
     >
-      <IconComponent size={size} color={color} />
+      <IconComponent size={size} color={resolvedColor} />
     </div>
   )
 }
