@@ -842,6 +842,7 @@ _create_option(
         Example: ['http://example.com', 'https://streamlit.io']
     """,
     default_val=[],
+    multiple=True,
 )
 
 _create_option(
