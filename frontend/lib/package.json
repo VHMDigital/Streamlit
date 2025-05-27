@@ -159,7 +159,6 @@
     "axios-mock-adapter": "^2.1.0",
     "eslint": "^9.27.0",
     "eslint-plugin-streamlit-custom": "workspace:^",
-    "eslint-plugin-vitest": "^0.5.4",
     "node-fetch": "3.3.2",
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.8.3",

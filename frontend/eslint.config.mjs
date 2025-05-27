@@ -24,9 +24,9 @@ import react from "eslint-plugin-react"
 import * as reactHooks from "eslint-plugin-react-hooks"
 import eslintReact from "@eslint-react/eslint-plugin"
 import importPlugin from "eslint-plugin-import"
-import prettier from "eslint-plugin-prettier/recommended"
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended"
 import lodash from "eslint-plugin-lodash"
-import vitest from "eslint-plugin-vitest"
+import vitest from "@vitest/eslint-plugin"
 import testingLibrary from "eslint-plugin-testing-library"
 import noRelativeImportPaths from "eslint-plugin-no-relative-import-paths"
 import streamlitCustom from "eslint-plugin-streamlit-custom"
@@ -42,9 +42,10 @@ export default tseslint.config([
   // Base recommended configs
   eslint.configs.recommended,
   tseslint.configs.recommendedTypeChecked,
-  prettier,
   reactHooks.configs.recommended,
   eslintReact.configs["recommended-type-checked"],
+  importPlugin.flatConfigs.recommended,
+  eslintPluginPrettierRecommended,
   // Global configuration for all files
   {
     languageOptions: {
@@ -71,21 +72,16 @@ export default tseslint.config([
       reportUnusedDisableDirectives: true,
     },
   },
-  importPlugin.flatConfigs.recommended,
   // TypeScript files configuration
   {
     files: ["**/*.ts", "**/*.tsx"],
     plugins: {
       react,
       lodash,
-      vitest,
       "no-relative-import-paths": noRelativeImportPaths,
       "streamlit-custom": streamlitCustom,
     },
     rules: {
-      // Recommended vitest configuration to enforce good testing practices
-      ...vitest.configs.recommended.rules,
-
       "no-proto": "error",
       // Use `const` or `let` instead of `var`
       "no-var": "error",
@@ -285,12 +281,15 @@ export default tseslint.config([
   // Test files specific configuration
   {
     files: ["**/*.test.ts", "**/*.test.tsx"],
+    ...testingLibrary.configs["flat/react"],
     plugins: {
+      ...testingLibrary.configs["flat/react"].plugins,
       "testing-library": testingLibrary,
       vitest,
     },
-    ...testingLibrary.configs["flat/react"],
     rules: {
+      // Recommended vitest configuration to enforce good testing practices
+      ...vitest.configs.recommended.rules,
       // Allow hardcoded styles in test files
       "streamlit-custom/no-hardcoded-theme-values": "off",
 
