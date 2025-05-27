@@ -307,8 +307,6 @@ def run(
 
     This starts a blocking asyncio eventloop.
     """
-    # Set the main script path to use it for config & secret files
-    config._main_script_path = main_script_path
 
     _fix_sys_path(main_script_path)
     _fix_tornado_crash()

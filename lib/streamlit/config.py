@@ -54,7 +54,8 @@ _config_options_template: dict[str, ConfigOption] = OrderedDict()
 # Stores the current state of config options.
 _config_options: dict[str, ConfigOption] | None = None
 
-# Stores the path to the main script.
+# Stores the path to the main script. This is used to
+# resolve config and secret files relative to the main script:
 _main_script_path: str | None = None
 
 # Indicates that a config option was defined by the user.
@@ -1304,6 +1305,8 @@ def _secrets_files() -> list[str]:
             _main_script_path, "secrets.toml"
         )
         if script_level_config not in secrets_files:
+            # We need to append the script-level secrets file to the list
+            # so that it overwrites project & global level secrets files:
             secrets_files.append(script_level_config)
 
     return secrets_files
@@ -1574,6 +1577,8 @@ def get_config_files() -> list[str]:
             _main_script_path, "config.toml"
         )
         if script_level_config not in config_files:
+            # We need to append the script-level config file to the list
+            # so that it overwrites project & global level config files:
             config_files.append(script_level_config)
 
     return config_files
