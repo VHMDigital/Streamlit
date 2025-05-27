@@ -85,7 +85,7 @@ def invalid_prop_subtest(
     )
 
 
-def light_style_subtest(
+def map_styles_subtest(
     assert_snapshot: ImageCompareFunction, pydeck_charts: Locator
 ) -> None:
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
@@ -96,7 +96,7 @@ def light_style_subtest(
     )
 
 
-def screenshot_5_subtest(
+def light_style_subtest(
     assert_snapshot: ImageCompareFunction, pydeck_charts: Locator
 ) -> None:
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
