@@ -133,9 +133,10 @@ jobs:
           sudo apt update
           sudo apt install rsync jq
           make package
-          INDEX_NAME=$(jq '."index.html".name' lib/streamlit/static/manifest.json)
-          if [ "${INDEX_NAME}" != "index-testFailure" ]:
-            echo 'manifest.json file is missing or malformatted'
+          INDEX_NAME=$(jq '."index.html".name' lib/streamlit/static/manifest.json | tr -d '"')
+          if [[ "${INDEX_NAME}" != "index" ]]
+          then
+            echo 'lib/streamlit/static/manifest.json is missing or malformatted!'
             exit 1
           fi
       - name: Store Whl File
