@@ -31,6 +31,7 @@ import testingLibrary from "eslint-plugin-testing-library"
 import noRelativeImportPaths from "eslint-plugin-no-relative-import-paths"
 import streamlitCustom from "eslint-plugin-streamlit-custom"
 import globals from "globals"
+import { globalIgnores } from "eslint/config"
 
 // Import other configs
 // Note: Some configs may need to be applied differently in flat config
@@ -321,15 +322,14 @@ export default tseslint.config([
     },
   },
   // Globally ignored file/directory patterns
-  {
-    ignores: [
-      "eslint.config.mjs",
-      "lib/src/proto.js",
-      "lib/src/proto.d.ts",
-      "**/vendor/*",
-      "**/node_modules/*",
-      "**/dist/*",
-      "**/build/*",
-    ],
-  },
+  globalIgnores([
+    "eslint.config.mjs",
+    "app/eslint.config.mjs",
+    "lib/src/proto.js",
+    "lib/src/proto.d.ts",
+    "**/vendor/*",
+    "**/node_modules/*",
+    "**/dist/*",
+    "**/build/*",
+  ]),
 ])
