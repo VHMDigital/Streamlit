@@ -84,7 +84,6 @@
     "@types/ua-parser-js": "^0.7.39",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
-    "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "axios-mock-adapter": "^2.1.0",
     "buffer": "^6.0.3",

@@ -20,7 +20,6 @@ import { fileURLToPath } from "url"
 // Core ESLint and plugins
 import eslint from "@eslint/js"
 import tseslint from "typescript-eslint"
-import typescriptParser from "@typescript-eslint/parser"
 import react from "eslint-plugin-react"
 import * as reactHooks from "eslint-plugin-react-hooks"
 import eslintReact from "@eslint-react/eslint-plugin"
@@ -44,20 +43,14 @@ export default tseslint.config([
   eslint.configs.recommended,
   tseslint.configs.recommendedTypeChecked,
   prettier,
-  // TODO: Look into getting onto the React eslint RC
-  // {
-  //   ...react.configs.flat.recommended,
-  //   settings: { react: { version: "detect" } },
-  // },
   reactHooks.configs.recommended,
-  // Add @eslint-react recommended config
   eslintReact.configs["recommended-type-checked"],
   // Global configuration for all files
   {
     languageOptions: {
       ecmaVersion: 2018,
       sourceType: "module",
-      parser: typescriptParser,
+      parser: tseslint.parser,
       parserOptions: {
         projectService: true,
         tsconfigRootDir: __dirname,
@@ -105,6 +98,7 @@ export default tseslint.config([
       // We don't escape entities
       "react/no-unescaped-entities": "off",
       // Opting into the latest react-compiler rules
+      // @see https://react.dev/blog/2025/04/21/react-compiler-rc
       "react-hooks/react-compiler": "error",
       // We do want to discourage the usage of flushSync
       "@eslint-react/dom/no-flush-sync": "error",
