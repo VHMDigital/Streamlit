@@ -52,9 +52,9 @@ def test_st_pydeck_clicking_on_fullscreen_toolbar_button(
     )
 
 
-def empty_chart_subtest(
-    assert_snapshot: ImageCompareFunction, pydeck_charts: Locator
-) -> None:
+def test_empty_chart(app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(app, "empty_chart_subtest")
+
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
         pydeck_charts.nth(0),
@@ -63,9 +63,9 @@ def empty_chart_subtest(
     )
 
 
-def basic_chart_subtest(
-    assert_snapshot: ImageCompareFunction, pydeck_charts: Locator
-) -> None:
+def test_basic_chart(app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(app, "basic_chart_subtest")
+
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
         pydeck_charts.nth(0).locator("canvas").nth(0),
@@ -74,9 +74,9 @@ def basic_chart_subtest(
     )
 
 
-def invalid_prop_subtest(
-    assert_snapshot: ImageCompareFunction, pydeck_charts: Locator
-) -> None:
+def test_invalid_prop(app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(app, "invalid_prop_subtest")
+
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
         pydeck_charts.nth(0).locator("canvas").nth(1),
@@ -85,9 +85,9 @@ def invalid_prop_subtest(
     )
 
 
-def map_styles_subtest(
-    assert_snapshot: ImageCompareFunction, pydeck_charts: Locator
-) -> None:
+def test_map_styles(app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(app, "map_styles_subtest")
+
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
         pydeck_charts.nth(0).locator("canvas").nth(1),
@@ -96,9 +96,9 @@ def map_styles_subtest(
     )
 
 
-def light_style_subtest(
-    assert_snapshot: ImageCompareFunction, pydeck_charts: Locator
-) -> None:
+def test_light_style(app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(app, "light_style_subtest")
+
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
         pydeck_charts.nth(0),
@@ -107,9 +107,9 @@ def light_style_subtest(
     )
 
 
-def dark_style_subtest(
-    assert_snapshot: ImageCompareFunction, pydeck_charts: Locator
-) -> None:
+def test_dark_style(app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(app, "dark_style_subtest")
+
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
         pydeck_charts.nth(0).locator("canvas").nth(0),
@@ -118,9 +118,9 @@ def dark_style_subtest(
     )
 
 
-def dimensions_subtest(
-    assert_snapshot: ImageCompareFunction, pydeck_charts: Locator
-) -> None:
+def test_dimensions(app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(app, "dimensions_subtest")
+
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
         pydeck_charts.nth(0),
@@ -129,9 +129,9 @@ def dimensions_subtest(
     )
 
 
-def mapbox_subtest(
-    assert_snapshot: ImageCompareFunction, pydeck_charts: Locator
-) -> None:
+def test_mapbox(app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(app, "mapbox_subtest")
+
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
         pydeck_charts.nth(0).locator("canvas").nth(0),
@@ -140,28 +140,19 @@ def mapbox_subtest(
     )
 
 
-SUBTESTS = {k: v for (k, v) in globals().items() if k.endswith("_subtest")}
+def select_subtest(app: Page, name: str) -> Locator:
+    # Select the text in the UI:
+    selectbox_input = app.get_by_test_id("stSelectbox").nth(0).locator("input")
+    selectbox_input.type(name)
+    selectbox_input.press("Enter")
 
+    # The pydeck chart takes a while to load so check that
+    # it gets attached with an increased timeout.
+    pydeck_charts = app.get_by_test_id("stDeckGlJsonChart")
+    expect(pydeck_charts).to_have_count(1, timeout=15000)
 
-# Firefox seems to be failing but can't reproduce locally and video produces
-# an empty page for firefox
-@pytest.mark.skip_browser("firefox")
-def test_all(themed_app: Page, assert_snapshot: ImageCompareFunction):
-    for name, subtest in SUBTESTS.items():
-        # Select the text in the UI:
-        selectbox_input = (
-            themed_app.get_by_test_id("stSelectbox").nth(0).locator("input")
-        )
-        selectbox_input.type(name)
-        selectbox_input.press("Enter")
+    # The map assets can take more time to load, add an extra timeout
+    # to prevent flakiness.
+    app.wait_for_timeout(10000)
 
-        # The pydeck chart takes a while to load so check that
-        # it gets attached with an increased timeout.
-        pydeck_charts = themed_app.get_by_test_id("stDeckGlJsonChart")
-        expect(pydeck_charts).to_have_count(1, timeout=15000)
-
-        # The map assets can take more time to load, add an extra timeout
-        # to prevent flakiness.
-        themed_app.wait_for_timeout(10000)
-
-        subtest(assert_snapshot, pydeck_charts)
+    return pydeck_charts
