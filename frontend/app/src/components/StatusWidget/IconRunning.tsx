@@ -15,6 +15,7 @@
  */
 
 import React, { useEffect, useState } from "react"
+
 import { useTheme } from "@emotion/react"
 import {
   AccessibilityNew,
@@ -24,6 +25,7 @@ import {
   Pool,
   Rowing,
 } from "@emotion-icons/material-outlined"
+
 import { EmotionTheme } from "@streamlit/lib"
 
 // Create an array of icons with their names, should be changed as per requirement
@@ -42,11 +44,7 @@ type IconRunningProps = {
   color?: string
 }
 
-const IconRunning: React.FC<IconRunningProps> = ({
-  size = 20,
-  speed = 200,
-  color,
-}) => {
+const IconRunning: React.FC<IconRunningProps> = ({ speed = 200, color }) => {
   const [index, setIndex] = useState(0)
   const theme = useTheme() as EmotionTheme
 
@@ -59,14 +57,14 @@ const IconRunning: React.FC<IconRunningProps> = ({
 
   const currentIcon = icons[index]
   const IconComponent = currentIcon.component
-  const resolvedColor = color || theme.colors.bodyText
+  const resolvedColor = theme.colors.gray85 || theme.colors.white
   const ariaLabel = `Running ${currentIcon.name} icon`
-
+  const sizeIcon = theme.sizes.appRunningMen
   return (
     <div
       style={{
-        width: size,
-        height: size,
+        width: sizeIcon,
+        height: sizeIcon,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -76,7 +74,11 @@ const IconRunning: React.FC<IconRunningProps> = ({
       role="img"
       aria-label={ariaLabel}
     >
-      <IconComponent size={size} color={resolvedColor} aria-hidden="true" />
+      <IconComponent
+        size={sizeIcon}
+        color={resolvedColor}
+        aria-hidden="true"
+      />
     </div>
   )
 }
