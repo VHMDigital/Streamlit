@@ -29,8 +29,13 @@
   },
   "devDependencies": {
     "@types/eslint": "^9.6.1",
+<<<<<<< HEAD
     "eslint": "^9.28.0",
     "prettier": "^3.5.3",
+=======
+    "eslint": "^9.27.0",
+    "prettier": "^2.8.3",
+>>>>>>> 98293f53c ([refactor] Upgrade to eslint v9 and flat config (#11446))
     "typesync": "^0.14.3",
     "vite": "^6.3.5",
     "vite-plugin-dts": "^4.5.4",

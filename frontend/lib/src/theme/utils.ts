@@ -209,7 +209,10 @@ export const createEmotionTheme = (
         colorsArg[key] = color
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
       } else if (isColor(`#${color}`)) {
+<<<<<<< HEAD
         isInvalidColor = false
+=======
+>>>>>>> 98293f53c ([refactor] Upgrade to eslint v9 and flat config (#11446))
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
         colorsArg[key] = `#${color}`
       }

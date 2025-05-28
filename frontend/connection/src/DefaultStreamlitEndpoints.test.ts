@@ -220,7 +220,12 @@ describe("DefaultStreamlitEndpoints", () => {
         )
         .reply(() => [200, 1])
 
+<<<<<<< HEAD
       const mockOnUploadProgress = vi.fn()
+=======
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
+      const mockOnUploadProgress = (_: any): void => {}
+>>>>>>> 98293f53c ([refactor] Upgrade to eslint v9 and flat config (#11446))
       const mockCancelToken = axios.CancelToken.source().token
 
       await expect(
@@ -255,7 +260,12 @@ describe("DefaultStreamlitEndpoints", () => {
         .onPut("http://example.com/upload_file/file_2")
         .reply(() => [200, 1])
 
+<<<<<<< HEAD
       const mockOnUploadProgress = vi.fn()
+=======
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
+      const mockOnUploadProgress = (_: any): void => {}
+>>>>>>> 98293f53c ([refactor] Upgrade to eslint v9 and flat config (#11446))
       const mockCancelToken = axios.CancelToken.source().token
 
       await expect(
@@ -288,7 +298,12 @@ describe("DefaultStreamlitEndpoints", () => {
         .onPut("http://example.com/someprefix/upload_file/file_2")
         .reply(() => [200, 1])
 
+<<<<<<< HEAD
       const mockOnUploadProgress = vi.fn()
+=======
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
+      const mockOnUploadProgress = (_: any): void => {}
+>>>>>>> 98293f53c ([refactor] Upgrade to eslint v9 and flat config (#11446))
       const mockCancelToken = axios.CancelToken.source().token
 
       endpoints.setFileUploadClientConfig({
