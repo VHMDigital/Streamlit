@@ -35,15 +35,15 @@ def test_check_top_level_class(app: Page):
 # Firefox seems to be failing but can't reproduce locally and video produces an empty page for firefox
 @pytest.mark.skip_browser("firefox")
 def test_st_pydeck_clicking_on_fullscreen_toolbar_button(
-    app: Page, assert_snapshot: ImageCompareFunction
+    themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
     """Test that clicking on fullscreen toolbar button expands the map into fullscreen."""
 
     # wait for mapbox to load
-    wait_for_app_run(app, 15000)
+    wait_for_app_run(themed_app, 15000)
 
     assert_fullscreen_toolbar_button_interactions(
-        app,
+        themed_app,
         assert_snapshot=assert_snapshot,
         widget_test_id="stDeckGlJsonChart",
         filename_prefix="st_pydeck_chart",
@@ -54,8 +54,8 @@ def test_st_pydeck_clicking_on_fullscreen_toolbar_button(
 
 # Firefox seems to be failing but can't reproduce locally and video produces an empty page for firefox
 @pytest.mark.skip_browser("firefox")
-def test_empty_chart(app: Page, assert_snapshot: ImageCompareFunction) -> None:
-    pydeck_charts = select_subtest(app, "empty_chart_subtest")
+def test_empty_chart(themed_app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(themed_app, "empty_chart_subtest")
 
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
@@ -67,8 +67,8 @@ def test_empty_chart(app: Page, assert_snapshot: ImageCompareFunction) -> None:
 
 # Firefox seems to be failing but can't reproduce locally and video produces an empty page for firefox
 @pytest.mark.skip_browser("firefox")
-def test_basic_chart(app: Page, assert_snapshot: ImageCompareFunction) -> None:
-    pydeck_charts = select_subtest(app, "basic_chart_subtest")
+def test_basic_chart(themed_app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(themed_app, "basic_chart_subtest")
 
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
@@ -80,8 +80,8 @@ def test_basic_chart(app: Page, assert_snapshot: ImageCompareFunction) -> None:
 
 # Firefox seems to be failing but can't reproduce locally and video produces an empty page for firefox
 @pytest.mark.skip_browser("firefox")
-def test_invalid_prop(app: Page, assert_snapshot: ImageCompareFunction) -> None:
-    pydeck_charts = select_subtest(app, "invalid_prop_subtest")
+def test_invalid_prop(themed_app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(themed_app, "invalid_prop_subtest")
 
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
@@ -93,8 +93,8 @@ def test_invalid_prop(app: Page, assert_snapshot: ImageCompareFunction) -> None:
 
 # Firefox seems to be failing but can't reproduce locally and video produces an empty page for firefox
 @pytest.mark.skip_browser("firefox")
-def test_map_styles(app: Page, assert_snapshot: ImageCompareFunction) -> None:
-    pydeck_charts = select_subtest(app, "map_styles_subtest")
+def test_map_styles(themed_app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(themed_app, "map_styles_subtest")
 
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
@@ -106,8 +106,8 @@ def test_map_styles(app: Page, assert_snapshot: ImageCompareFunction) -> None:
 
 # Firefox seems to be failing but can't reproduce locally and video produces an empty page for firefox
 @pytest.mark.skip_browser("firefox")
-def test_light_style(app: Page, assert_snapshot: ImageCompareFunction) -> None:
-    pydeck_charts = select_subtest(app, "light_style_subtest")
+def test_light_style(themed_app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(themed_app, "light_style_subtest")
 
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
@@ -119,8 +119,8 @@ def test_light_style(app: Page, assert_snapshot: ImageCompareFunction) -> None:
 
 # Firefox seems to be failing but can't reproduce locally and video produces an empty page for firefox
 @pytest.mark.skip_browser("firefox")
-def test_dark_style(app: Page, assert_snapshot: ImageCompareFunction) -> None:
-    pydeck_charts = select_subtest(app, "dark_style_subtest")
+def test_dark_style(themed_app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(themed_app, "dark_style_subtest")
 
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
@@ -132,8 +132,8 @@ def test_dark_style(app: Page, assert_snapshot: ImageCompareFunction) -> None:
 
 # Firefox seems to be failing but can't reproduce locally and video produces an empty page for firefox
 @pytest.mark.skip_browser("firefox")
-def test_dimensions(app: Page, assert_snapshot: ImageCompareFunction) -> None:
-    pydeck_charts = select_subtest(app, "dimensions_subtest")
+def test_dimensions(themed_app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(themed_app, "dimensions_subtest")
 
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
@@ -145,8 +145,8 @@ def test_dimensions(app: Page, assert_snapshot: ImageCompareFunction) -> None:
 
 # Firefox seems to be failing but can't reproduce locally and video produces an empty page for firefox
 @pytest.mark.skip_browser("firefox")
-def test_mapbox(app: Page, assert_snapshot: ImageCompareFunction) -> None:
-    pydeck_charts = select_subtest(app, "mapbox_subtest")
+def test_mapbox(themed_app: Page, assert_snapshot: ImageCompareFunction) -> None:
+    pydeck_charts = select_subtest(themed_app, "mapbox_subtest")
 
     # The pydeck tests are a lot flakier than need be so increase the pixel threshold
     assert_snapshot(
