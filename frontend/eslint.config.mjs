@@ -32,6 +32,7 @@ import noRelativeImportPaths from "eslint-plugin-no-relative-import-paths"
 import streamlitCustom from "eslint-plugin-streamlit-custom"
 import globals from "globals"
 import { globalIgnores } from "eslint/config"
+import jsxA11y from "eslint-plugin-jsx-a11y"
 
 // Import other configs
 // Note: Some configs may need to be applied differently in flat config
@@ -77,6 +78,7 @@ export default tseslint.config([
   {
     files: ["**/*.ts", "**/*.tsx"],
     plugins: {
+      ...jsxA11y.flatConfigs.recommended.plugins,
       react,
       lodash,
       "no-relative-import-paths": noRelativeImportPaths,
@@ -266,6 +268,11 @@ export default tseslint.config([
       "react/react-in-jsx-scope": "off",
       // React hooks rules
       ...reactHooks.configs.recommended.rules,
+      // jsx-a11y rules
+      ...jsxA11y.flatConfigs.recommended.rules,
+      // prohibit autoFocus prop
+      // https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/no-autofocus.md
+      "jsx-a11y/no-autofocus": ["error", { ignoreNonDOM: true }],
     },
     settings: {
       react: {
