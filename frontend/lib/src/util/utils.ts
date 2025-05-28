@@ -612,8 +612,8 @@ export function keysToSnakeCase(
 
       acc[newKey] = value
       return acc
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     {} as Record<string, any>
   )
 }
