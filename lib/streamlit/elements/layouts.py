@@ -20,6 +20,11 @@ from typing import TYPE_CHECKING, Literal, Union, cast
 from typing_extensions import TypeAlias
 
 from streamlit.delta_generator_singletons import get_dg_singleton_instance
+from streamlit.elements.lib.layout_utils import (
+    WidthWithoutContent,
+    get_width_config,
+    validate_width,
+)
 from streamlit.elements.lib.utils import Key, compute_and_register_element_id, to_key
 from streamlit.errors import (
     StreamlitAPIException,
@@ -401,7 +406,12 @@ class LayoutsMixin:
 
     @gather_metrics("tabs")
     def tabs(
-        self, tabs: Sequence[str], default: str | None = None
+
+        self,
+        tabs: Sequence[str],
+        *,
+        width: WidthWithoutContent = "stretch",
+    , default: str | None = None
     ) -> Sequence[DeltaGenerator]:
         r"""Insert containers separated into tabs.
 
@@ -512,6 +522,8 @@ class LayoutsMixin:
         default_index = tabs.index(default) if default else 1
         block_proto.tab_container.default_tab_index = default_index
 
+        validate_width(width)
+        block_proto.width_config.CopyFrom(get_width_config(width))
         tab_container = self.dg._block(block_proto)
 
         return tuple(tab_container._block(tab_proto(tab)) for tab in tabs)
@@ -523,6 +535,7 @@ class LayoutsMixin:
         expanded: bool = False,
         *,
         icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
     ) -> DeltaGenerator:
         r"""Insert a multi-element container that can be expanded/collapsed.
 
@@ -625,6 +638,8 @@ class LayoutsMixin:
         block_proto = BlockProto()
         block_proto.allow_empty = False
         block_proto.expandable.CopyFrom(expandable_proto)
+        validate_width(width)
+        block_proto.width_config.CopyFrom(get_width_config(width))
 
         return self.dg._block(block_proto=block_proto)
 

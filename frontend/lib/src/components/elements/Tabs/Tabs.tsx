@@ -40,10 +40,11 @@ export interface TabProps extends BlockPropsWithoutWidth {
   node: BlockNode
   isStale: boolean
   renderTabContent: (childProps: any) => ReactElement
+  width: React.CSSProperties["width"]
 }
 
 function Tabs(props: Readonly<TabProps>): ReactElement {
-  const { widgetsDisabled, node, isStale, scriptRunState, scriptRunId } = props
+  const { widgetsDisabled, node, isStale, scriptRunState, scriptRunId, width } = props
   const { fragmentIdsThisRun } = useContext(LibContext)
   const defaultTabIndex = node.deltaBlock?.tabContainer?.defaultTabIndex ?? 0
 
@@ -100,6 +101,7 @@ function Tabs(props: Readonly<TabProps>): ReactElement {
       data-testid="stTabs"
       isOverflowing={isOverflowing}
       tabHeight={TAB_HEIGHT}
+      width={width}
     >
       <UITabs
         activateOnFocus
