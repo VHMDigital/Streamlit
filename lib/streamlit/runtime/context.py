@@ -74,13 +74,13 @@ class StreamlitTheme(AttributeDictionary):
     attribute-style access.
     """
 
-    type: str
+    type: str | None = None
 
-    def __init__(self, theme_info: dict[str, str]):
+    def __init__(self, theme_info: dict[str, str | None]):
         super().__init__(theme_info)
 
     @classmethod
-    def from_context_info(cls, context_dict: dict[str, str]) -> StreamlitTheme:
+    def from_context_info(cls, context_dict: dict[str, str | None]) -> StreamlitTheme:
         return cls(context_dict)
 
 
@@ -238,12 +238,12 @@ class ContextProxy:
 
     @property
     @gather_metrics("context.theme")
-    def theme(self) -> StreamlitTheme | None:
+    def theme(self) -> StreamlitTheme:
         """A read-only object containing information about the current Streamlit app theme."""
         ctx = get_script_run_ctx()
 
         if ctx is None or ctx.context_info is None:
-            return None
+            return StreamlitTheme({"type": None})
 
         return StreamlitTheme.from_context_info({"type": ctx.context_info.color_scheme})
 
