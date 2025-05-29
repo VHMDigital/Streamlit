@@ -214,10 +214,4 @@ export const StyledMainContent = styled.div(({ theme }) => ({
   height: "100vh",
   display: "flex",
   flexDirection: "column",
-
-  // Note: this was done to move the scrollbar down underneath the header so that it wasn't clipped.
-  paddingTop: theme.sizes.headerHeight,
-  [`& > * > ${StyledAppViewBlockContainer}`]: {
-    marginTop: `-${theme.sizes.headerHeight}`,
-  },
 }))
