@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 /**
  * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
@@ -470,9 +471,12 @@ describe("App", () => {
     beforeEach(() => {
       prevWindowLocation = window.location
     })
-
     afterEach(() => {
-      window.location = prevWindowLocation
+      Object.defineProperty(window, "location", {
+        value: prevWindowLocation,
+        writable: true,
+        configurable: true,
+      })
     })
 
     it("triggers page reload", () => {
@@ -554,7 +558,11 @@ describe("App", () => {
     })
 
     afterEach(() => {
-      window.location = prevWindowLocation
+      Object.defineProperty(window, "location", {
+        value: prevWindowLocation,
+        writable: true,
+        configurable: true,
+      })
 
       window.__streamlit = undefined
 
@@ -2072,7 +2080,11 @@ describe("App", () => {
     })
 
     afterEach(() => {
-      window.location = prevWindowLocation
+      Object.defineProperty(window, "location", {
+        value: prevWindowLocation,
+        writable: true,
+        configurable: true,
+      })
       window.parent = prevWindowParent
     })
 
@@ -2549,7 +2561,11 @@ describe("App", () => {
     })
 
     afterEach(() => {
-      window.location = prevWindowLocation
+      Object.defineProperty(window, "location", {
+        value: prevWindowLocation,
+        writable: true,
+        configurable: true,
+      })
     })
 
     it.each([
@@ -2580,7 +2596,7 @@ describe("App", () => {
       ["remoteHost", true, Config.ToolbarMode.VIEWER, false],
     ])(
       "should render or not render dev menu depending on hostname, host ownership, toolbarMode[%s, %s, %s]",
-      async (hostname, hostIsOwnr, toolbarMode, expectedResult) => {
+      (hostname, hostIsOwnr, toolbarMode, expectedResult) => {
         mockWindowLocation(hostname)
 
         const result = showDevelopmentOptions(hostIsOwnr, toolbarMode)
@@ -3237,7 +3253,7 @@ describe("App", () => {
       })
     })
 
-    it("clears fragment auto rerun intervals when page changes", async () => {
+    it("clears fragment auto rerun intervals when page changes", () => {
       prepareHostCommunicationManager()
 
       // autoRerun uses setInterval under-the-hood, so use fake timers
@@ -3298,13 +3314,16 @@ describe("App", () => {
       })
 
       afterEach(() => {
-        window.location = prevWindowLocation
+        Object.defineProperty(window, "location", {
+          value: prevWindowLocation,
+          writable: true,
+          configurable: true,
+        })
       })
 
       it("shows hostMenuItems", () => {
         mockWindowLocation("https://devel.streamlit.test")
         // We need this to use the Main Menu Button
-        // eslint-disable-next-line testing-library/render-result-naming-convention
         const app = renderApp(getProps())
 
         const hostCommunicationMgr = getStoredValue<HostCommunicationManager>(

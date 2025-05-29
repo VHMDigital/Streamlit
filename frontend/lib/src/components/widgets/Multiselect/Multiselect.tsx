@@ -18,8 +18,8 @@ import React, { FC, memo, useCallback, useMemo } from "react"
 
 import { ChevronDown } from "baseui/icon"
 import {
-  OnChangeParams,
-  Option,
+  type OnChangeParams,
+  type Option,
   TYPE,
   Select as UISelect,
 } from "baseui/select"
@@ -142,6 +142,7 @@ const Multiselect: FC<Props> = props => {
           return value.concat([data.option?.value])
         }
         default: {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           throw new Error(`State transition is unknown: ${data.type}`)
         }
       }

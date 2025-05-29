@@ -31,7 +31,7 @@ from typing import (
     overload,
 )
 
-from typing_extensions import TypeAlias
+from typing_extensions import Required, TypeAlias
 
 from streamlit import dataframe_util, type_util
 from streamlit.elements.lib import dicttools
@@ -218,7 +218,7 @@ class VegaLiteState(TypedDict, total=False):
 
     """
 
-    selection: AttributeDictionary
+    selection: Required[AttributeDictionary]
 
 
 @dataclass
@@ -242,7 +242,7 @@ class VegaLiteStateSerde:
         )
 
         if "selection" not in selection_state:
-            selection_state = empty_selection_state
+            selection_state = empty_selection_state  # type: ignore[unreachable]
 
         return cast("VegaLiteState", AttributeDictionary(selection_state))
 
@@ -742,6 +742,7 @@ class VegaChartsMixin:
             size_from_user=None,
             width=width,
             height=height,
+            use_container_width=use_container_width,
         )
         return cast(
             "DeltaGenerator",
@@ -983,6 +984,7 @@ class VegaChartsMixin:
             width=width,
             height=height,
             stack=stack,
+            use_container_width=use_container_width,
         )
         return cast(
             "DeltaGenerator",
@@ -1248,7 +1250,9 @@ class VegaChartsMixin:
             size_from_user=None,
             width=width,
             height=height,
+            use_container_width=use_container_width,
             stack=stack,
+            horizontal=horizontal,
         )
         return cast(
             "DeltaGenerator",
@@ -1459,6 +1463,7 @@ class VegaChartsMixin:
             size_from_user=size,
             width=width,
             height=height,
+            use_container_width=use_container_width,
         )
         return cast(
             "DeltaGenerator",
@@ -1479,7 +1484,7 @@ class VegaChartsMixin:
         use_container_width: bool | None = None,
         theme: Literal["streamlit"] | None = "streamlit",
         key: Key | None = None,
-        on_select: Literal["ignore"],  # No default value here to make it work with mypy
+        on_select: Literal["ignore"] = "ignore",
         selection_mode: str | Iterable[str] | None = None,
     ) -> DeltaGenerator: ...
 
@@ -1492,7 +1497,7 @@ class VegaChartsMixin:
         use_container_width: bool | None = None,
         theme: Literal["streamlit"] | None = "streamlit",
         key: Key | None = None,
-        on_select: Literal["rerun"] | WidgetCallback = "rerun",
+        on_select: Literal["rerun"] | WidgetCallback,
         selection_mode: str | Iterable[str] | None = None,
     ) -> VegaLiteState: ...
 
@@ -1638,7 +1643,7 @@ class VegaChartsMixin:
         use_container_width: bool | None = None,
         theme: Literal["streamlit"] | None = "streamlit",
         key: Key | None = None,
-        on_select: Literal["ignore"],  # No default value here to make it work with mypy
+        on_select: Literal["ignore"] = "ignore",
         selection_mode: str | Iterable[str] | None = None,
         **kwargs: Any,
     ) -> DeltaGenerator: ...
@@ -1653,7 +1658,7 @@ class VegaChartsMixin:
         use_container_width: bool | None = None,
         theme: Literal["streamlit"] | None = "streamlit",
         key: Key | None = None,
-        on_select: Literal["rerun"] | WidgetCallback = "rerun",
+        on_select: Literal["rerun"] | WidgetCallback,
         selection_mode: str | Iterable[str] | None = None,
         **kwargs: Any,
     ) -> VegaLiteState: ...
@@ -1942,6 +1947,7 @@ class VegaChartsMixin:
                 "arrow_vega_lite_chart",
                 user_key=key,
                 form_id=vega_lite_proto.form_id,
+                dg=self.dg,
                 vega_lite_spec=vega_lite_proto.spec,
                 # The data is either in vega_lite_proto.data.data
                 # or in a named dataset in vega_lite_proto.datasets

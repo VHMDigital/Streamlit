@@ -18,8 +18,12 @@ from __future__ import annotations
 import os
 import signal
 import subprocess
+from typing import TYPE_CHECKING
 
 import pytest
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 CONFIG_FILE_PATH: str
 CREDENTIALS_FILE_PATH: str
@@ -50,7 +54,7 @@ class TestCLIRegressions:
     """
 
     @pytest.fixture(scope="module", autouse=True)
-    def setup(self):
+    def setup(self) -> Generator[None, None, None]:
         # ---- Initialization
         global CONFIG_FILE_PATH  # noqa: PLW0603
         CONFIG_FILE_PATH = os.path.expanduser("~/.streamlit/config.toml")
@@ -156,9 +160,10 @@ class TestCLIRegressions:
         reason="Skip version verification when `SKIP_VERSION_CHECK` env var is set",
     )
     def test_streamlit_version(self) -> None:
-        assert (
-            STREAMLIT_RELEASE_VERSION is not None and STREAMLIT_RELEASE_VERSION != ""
-        ), "You must set the $STREAMLIT_RELEASE_VERSION env variable"
+        assert STREAMLIT_RELEASE_VERSION is not None
+        assert STREAMLIT_RELEASE_VERSION != "", (
+            "You must set the $STREAMLIT_RELEASE_VERSION env variable"
+        )
         assert STREAMLIT_RELEASE_VERSION in self.run_command("streamlit version"), (
             f"Package version does not match the desired version of {STREAMLIT_RELEASE_VERSION}"
         )
