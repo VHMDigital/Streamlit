@@ -255,7 +255,8 @@ const BlockNodeRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
   const { formsData } = useRequiredContext(FormsContext)
 
   const styles = useLayoutStyles({
-    element:
+    element: node.deltaBlock,
+    subElement:
       (node.deltaBlock.type && node.deltaBlock[node.deltaBlock.type]) ||
       undefined,
   })
@@ -305,7 +306,7 @@ const BlockNodeRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
   }
 
   if (node.deltaBlock.expandable) {
-    return (
+    containerElement = (
       <Expander
         empty={node.isEmpty}
         isStale={isStale}
@@ -382,10 +383,17 @@ const BlockNodeRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
       mappedChildProps: JSX.IntrinsicAttributes & BlockPropsWithoutWidth
     ): ReactElement => {
       // avoid circular dependency where Tab uses VerticalBlock but VerticalBlock uses tabs
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return <ContainerContentsWrapper {...mappedChildProps} />
     }
-    const tabsProps: TabProps = { ...childProps, isStale, renderTabContent }
+    // We can't use StyledLayoutWrapper for tabs currently because of the horizontal scrolling
+    // management that is handled in the Tabs component. TODO(lwilby): Investigate whether it makes
+    // sense to consolidate that logic with the StyledLayoutWrapper.
+    const tabsProps: TabProps = {
+      ...childProps,
+      isStale,
+      renderTabContent,
+      width: styles.width,
+    }
     return <Tabs {...tabsProps} />
   }
 
