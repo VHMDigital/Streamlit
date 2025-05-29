@@ -41,10 +41,9 @@ const icons = [
 type IconRunningProps = {
   size?: number
   speed?: number
-  color?: string
 }
 
-const IconRunning: React.FC<IconRunningProps> = ({ speed = 200, color }) => {
+const IconRunning: React.FC<IconRunningProps> = ({ speed = 200 }) => {
   const [index, setIndex] = useState(0)
   const theme = useTheme() as EmotionTheme
 
