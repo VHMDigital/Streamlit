@@ -277,7 +277,12 @@ export const createEmotionTheme = (
     const [radiusValue, cssUnit] = parseRadius(baseRadius)
 
     if (notNullOrUndefined(radiusValue) && !isNaN(radiusValue)) {
-      conditionalOverrides.radii.default = addCssUnit(radiusValue, cssUnit)
+      const radiusWithCssUnit = addCssUnit(radiusValue, cssUnit)
+      conditionalOverrides.radii.default = radiusWithCssUnit
+
+      // Set the fallback button radius if baseRadius is set
+      conditionalOverrides.radii.button = radiusWithCssUnit
+
       // Adapt all the other radii sizes based on the base radii:
       // We make sure that the value is rounded to 2 decimal places to avoid
       // floating point precision issues.
@@ -311,6 +316,7 @@ export const createEmotionTheme = (
     const [radiusValue, cssUnit] = parseRadius(buttonRadius)
 
     if (notNullOrUndefined(radiusValue) && !isNaN(radiusValue)) {
+      // If valid buttonRadius set, override baseRadius fallback
       conditionalOverrides.radii.button = addCssUnit(radiusValue, cssUnit)
     } else {
       LOG.warn(

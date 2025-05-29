@@ -780,6 +780,20 @@ describe("createEmotionTheme", () => {
       expect(theme.radii.xxl).toBe(baseTheme.emotion.radii.xxl)
     }
   )
+
+  it("sets buttonRadius based on baseRadius if buttonRadius not configured", () => {
+    const themeInput: Partial<CustomThemeConfig> = {
+      baseRadius: "0.77rem",
+    }
+
+    const theme = createEmotionTheme(themeInput)
+
+    expect(theme.radii.button).toBe("0.77rem")
+    expect(theme.radii.default).toBe("0.77rem")
+    expect(theme.radii.md).toBe("0.39rem")
+    expect(theme.radii.xl).toBe("1.16rem")
+    expect(theme.radii.xxl).toBe("1.54rem")
+  })
 })
 
 describe("toThemeInput", () => {
