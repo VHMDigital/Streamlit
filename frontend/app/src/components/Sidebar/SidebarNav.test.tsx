@@ -24,8 +24,9 @@ import { mockEndpoints, render } from "@streamlit/lib"
 import { IAppPage, PageConfig } from "@streamlit/protobuf"
 import { AppContextProps } from "@streamlit/app/src/components/AppContext"
 import * as StreamlitContextProviderModule from "@streamlit/app/src/components/StreamlitContextProvider"
-
-import SidebarNav, { Props } from "../Navigation/SidebarNav"
+import SidebarNav, {
+  Props,
+} from "@streamlit/app/src/components/Navigation/SidebarNav"
 
 vi.mock("~lib/util/Hooks", async () => ({
   __esModule: true,

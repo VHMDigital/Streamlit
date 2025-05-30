@@ -60,7 +60,9 @@ const TopNav: React.FC<Props> = ({
     <Overflow<IAppPage | IAppPage[]>
       component={StyledOverflowContainer}
       itemKey={item =>
-        Array.isArray(item) ? item[0].sectionHeader! : item.pageScriptHash!
+        Array.isArray(item)
+          ? (item[0]?.sectionHeader ?? "")
+          : (item.pageScriptHash ?? "")
       }
       data={data}
       maxCount={"responsive"}

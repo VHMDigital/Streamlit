@@ -120,7 +120,7 @@ describe("SidebarNav", () => {
     it("are added to each link", () => {
       const buildAppPageURL = vi
         .fn()
-        .mockImplementation((pageLinkBaseURL: string, page: IAppPage) => {
+        .mockImplementation((_pageLinkBaseURL: string, page: IAppPage) => {
           return `http://mock/app/page/${page.urlPathname}`
         })
       const props = getProps({ endpoints: mockEndpoints({ buildAppPageURL }) })

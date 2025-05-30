@@ -31,21 +31,18 @@ export const StyledConnectionStatus = styled.div(({ theme }) => ({
   color: theme.colors.gray,
 }))
 
-export interface StyledConnectionStatusLabelProps {}
-
-export const StyledConnectionStatusLabel =
-  styled.label<StyledConnectionStatusLabelProps>(({ theme }) => ({
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.gray,
-    textTransform: "uppercase",
-    marginTop: theme.spacing.none,
-    marginRight: theme.spacing.lg,
-    marginBottom: theme.spacing.none,
-    marginLeft: theme.spacing.sm,
-    whiteSpace: "nowrap",
-    maxWidth: theme.sizes.appStatusMaxWidth,
-    lineHeight: theme.lineHeights.none,
-  }))
+export const StyledConnectionStatusLabel = styled.label(({ theme }) => ({
+  fontSize: theme.fontSizes.sm,
+  color: theme.colors.gray,
+  textTransform: "uppercase",
+  marginTop: theme.spacing.none,
+  marginRight: theme.spacing.lg,
+  marginBottom: theme.spacing.none,
+  marginLeft: theme.spacing.sm,
+  whiteSpace: "nowrap",
+  maxWidth: theme.sizes.appStatusMaxWidth,
+  lineHeight: theme.lineHeights.none,
+}))
 
 /*
   "AppStatus" styles are for app-related statuses:
@@ -79,13 +76,10 @@ export const StyledAppStatusLabel = styled.label<StyledAppStatusLabelProps>(
   })
 )
 
-export interface StyledAppButtonContainerProps {}
-
-export const StyledAppButtonContainer =
-  styled.span<StyledAppButtonContainerProps>(({ theme }) => ({
-    marginLeft: theme.spacing.md,
-    whiteSpace: "nowrap",
-  }))
+export const StyledAppButtonContainer = styled.span(({ theme }) => ({
+  marginLeft: theme.spacing.md,
+  whiteSpace: "nowrap",
+}))
 
 export interface StyledAppRunningIconProps {
   isNewYears: boolean
