@@ -291,7 +291,7 @@ export class ElementNode implements AppNode {
   }
 
   public removeClearableNodes(): ElementNode | undefined {
-    return this.element.empty?.clear ? this : undefined
+    return this.element.empty?.clear ? undefined : this
   }
 
   public getElements(elements?: Set<Element>): Set<Element> {
