@@ -34,8 +34,10 @@ declare global {
   // rather than adding to the one in App.tsx as these also need to be
   // accessible within this package when no app exists.
   interface Window {
-    __STREAMLIT_BACKEND_BASE_URL?: string
-    __STREAMLIT_HOST_CONFIG_BASE_URL?: string
+    __streamlit?: {
+      BACKEND_BASE_URL?: string
+      HOST_CONFIG_BASE_URL?: string
+    }
   }
 }
 
