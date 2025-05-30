@@ -191,7 +191,7 @@ class LayoutsMixin:
         self,
         spec: SpecType,
         *,
-        gap: Literal["small", "medium", "large", "none"] = "small",
+        gap: Literal["small", "medium", "large"] | None = "small",
         vertical_alignment: Literal["top", "center", "bottom"] = "top",
         border: bool = False,
     ) -> list[DeltaGenerator]:
@@ -366,7 +366,6 @@ class LayoutsMixin:
                 "small": GapSize.SMALL,
                 "medium": GapSize.MEDIUM,
                 "large": GapSize.LARGE,
-                "none": GapSize.NONE,
             }
 
             if isinstance(gap, str):
@@ -375,6 +374,8 @@ class LayoutsMixin:
 
                 if gap_size in valid_sizes:
                     return gap_mapping[gap_size]
+            elif gap is None:
+                return GapSize.NONE
 
             raise StreamlitInvalidColumnGapError(gap=gap)
 
