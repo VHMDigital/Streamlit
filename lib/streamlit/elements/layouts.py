@@ -220,7 +220,7 @@ class LayoutsMixin:
               Or ``[1, 2, 3]`` creates three columns where the second one is two times
               the width of the first one, and the third one is three times that width.
 
-        gap : "small", "medium", "large", or "none"
+        gap : "small", "medium", "large", or None
             The size of the gap between the columns. The default is ``"small"``.
 
         vertical_alignment : "top", "center", or "bottom"
@@ -361,7 +361,7 @@ class LayoutsMixin:
                 vertical_alignment=vertical_alignment
             )
 
-        def column_gap(gap: str) -> GapSize.ValueType:
+        def column_gap(gap: str | None) -> GapSize.ValueType:
             gap_mapping = {
                 "small": GapSize.SMALL,
                 "medium": GapSize.MEDIUM,
