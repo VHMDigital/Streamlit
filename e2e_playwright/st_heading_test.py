@@ -288,3 +288,55 @@ def test_not_scrolled_on_empty_anchor_tag(app: Page):
 def test_check_top_level_class(app: Page):
     """Check that the top level class is correctly set."""
     check_top_level_class(app, "stHeading")
+
+
+def test_heading_widths_snapshot(
+    themed_app: Page, assert_snapshot: ImageCompareFunction
+):
+    """Test that headings with different width configurations render correctly."""
+
+    # Get the width example elements (they appear at the end of the page)
+    # Title width examples
+    title_400px = _get_title_elements(themed_app).filter(
+        has_text="Title with 400px width"
+    )
+    title_stretch = _get_title_elements(themed_app).filter(
+        has_text="Title with stretch width"
+    )
+    title_content = _get_title_elements(themed_app).filter(
+        has_text="Title with content width"
+    )
+
+    assert_snapshot(title_400px, name="st_title-width_400px")
+    assert_snapshot(title_stretch, name="st_title-width_stretch")
+    assert_snapshot(title_content, name="st_title-width_content")
+
+    # Header width examples
+    header_400px = _get_header_elements(themed_app).filter(
+        has_text="Header with 400px width"
+    )
+    header_stretch = _get_header_elements(themed_app).filter(
+        has_text="Header with stretch width"
+    )
+    header_content = _get_header_elements(themed_app).filter(
+        has_text="Header with content width"
+    )
+
+    assert_snapshot(header_400px, name="st_header-width_400px")
+    assert_snapshot(header_stretch, name="st_header-width_stretch")
+    assert_snapshot(header_content, name="st_header-width_content")
+
+    # Subheader width examples
+    subheader_300px = _get_subheader_elements(themed_app).filter(
+        has_text="Subheader with 300px width"
+    )
+    subheader_stretch = _get_subheader_elements(themed_app).filter(
+        has_text="Subheader with stretch width"
+    )
+    subheader_content = _get_subheader_elements(themed_app).filter(
+        has_text="Subheader with content width"
+    )
+
+    assert_snapshot(subheader_300px, name="st_subheader-width_300px")
+    assert_snapshot(subheader_stretch, name="st_subheader-width_stretch")
+    assert_snapshot(subheader_content, name="st_subheader-width_content")
