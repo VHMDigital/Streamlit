@@ -42,13 +42,16 @@ import { Source, WidgetStateManager } from "~lib/WidgetStateManager"
 import TooltipIcon from "~lib/components/shared/TooltipIcon"
 import Tooltip, { Placement } from "~lib/components/shared/Tooltip"
 import Icon, { DynamicIcon } from "~lib/components/shared/Icon"
-import { hasLightBackgroundColor } from "~lib/theme"
+import {
+  convertRemToPx,
+  EmotionTheme,
+  hasLightBackgroundColor,
+} from "~lib/theme"
 import InputInstructions from "~lib/components/shared/InputInstructions/InputInstructions"
 import {
   StyledWidgetLabelHelp,
   WidgetLabel,
 } from "~lib/components/widgets/BaseWidget"
-import { convertRemToPx, EmotionTheme } from "~lib/theme"
 import { useCalculatedWidth } from "~lib/hooks/useCalculatedWidth"
 
 import {
@@ -180,7 +183,6 @@ const NumberInput: React.FC<Props> = ({
     [
       min,
       max,
-      inputRef,
       widgetMgr,
       fragmentId,
       step,
@@ -451,7 +453,7 @@ const NumberInput: React.FC<Props> = ({
                 paddingTop: theme.spacing.sm,
                 ...(error && {
                   backgroundColor: theme.colors.dangerBg, // Light red background when error
-                  fontWeight: "bold", // Bold text for emphasis
+                  fontWeight: theme.fontWeights.bold, // Bold text for emphasis
                   color: hasLightBackgroundColor(theme) // font color according to background
                     ? theme.colors.red100
                     : theme.colors.red20,
@@ -522,14 +524,17 @@ const NumberInput: React.FC<Props> = ({
                   >
                     <span
                       style={{
-                        marginRight: "5px", // Add space between the icon and the message
+                        marginRight: theme.spacing.xs, // Add space between the icon and the message
                         color: theme.colors.danger,
                       }}
                     >
                       <Icon content={ErrorOutline} size="lg" />
                     </span>
                     <span>
-                      <strong style={{ fontWeight: "bold" }}>Error</strong>:{" "}
+                      <strong style={{ fontWeight: theme.fontWeights.bold }}>
+                        Error
+                      </strong>
+                      :{" "}
                       {error === "BelowMin"
                         ? `Value must be greater than or equal to ${min}.`
                         : `Value must be lower than or equal to ${max}.`}
