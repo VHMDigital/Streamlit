@@ -27,8 +27,8 @@ import {
 } from "@emotion-icons/material-outlined"
 
 import { EmotionTheme, hasLightBackgroundColor } from "@streamlit/lib"
+import newYearsRunning from "@streamlit/app/src/assets/img/fireworks.gif"
 
-// Create an array of icons with their names, should be changed as per requirement
 const icons = [
   { component: AccessibleForward, name: "accessible-forward" },
   { component: AccessibilityNew, name: "accessibility-new" },
@@ -42,26 +42,50 @@ type IconRunningProps = {
   size?: number
   speed?: number
   color?: string
+  isNewYears?: boolean
 }
 
-const IconRunning: React.FC<IconRunningProps> = ({ speed = 200, color }) => {
+const IconRunning: React.FC<IconRunningProps> = ({
+  speed = 200,
+  color,
+  isNewYears = false,
+}) => {
   const [index, setIndex] = useState(0)
   const theme = useTheme() as EmotionTheme
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex(prev => (prev + 1) % icons.length)
-    }, speed)
-    return () => clearInterval(interval)
-  }, [speed])
+    if (!isNewYears) {
+      const interval = setInterval(() => {
+        setIndex(prev => (prev + 1) % icons.length)
+      }, speed)
+      return () => clearInterval(interval)
+    }
+  }, [speed, isNewYears])
+
+  if (isNewYears) {
+    return (
+      <img
+        src={newYearsRunning}
+        alt="New Year's Celebration"
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+        }}
+      />
+    )
+  }
 
   const currentIcon = icons[index]
   const IconComponent = currentIcon.component
-  const resolvedColor = !hasLightBackgroundColor(theme)
+  const resolvedColor = color
+    ? color
+    : !hasLightBackgroundColor(theme)
     ? theme.colors.white
     : theme.colors.gray85
   const ariaLabel = `Running ${currentIcon.name} icon`
   const sizeIcon = theme.sizes.appRunningMen
+
   return (
     <div
       style={{
