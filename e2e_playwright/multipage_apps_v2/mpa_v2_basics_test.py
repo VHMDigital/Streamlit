@@ -420,7 +420,7 @@ def test_renders_logos(app: Page, assert_snapshot: ImageCompareFunction):
     expect(logo_link_element).to_be_visible()
     expect(logo_link_element).to_have_attribute("href", "https://www.example.com")
 
-    collapsed_logo_image = logo_link_element.get_by_test_id("stLogo")
+    collapsed_logo_image = logo_link_element.get_by_test_id("stHeaderLogo")
     expect(collapsed_logo_image).to_be_visible()
     assert_snapshot(collapsed_logo_image, name="collapsed-header-logo")
 

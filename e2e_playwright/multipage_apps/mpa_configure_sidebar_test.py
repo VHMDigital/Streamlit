@@ -118,6 +118,6 @@ def test_logo_no_sidebar(app: Page, assert_snapshot: ImageCompareFunction):
     expect(logo_link_element).to_be_visible()
     expect(logo_link_element).to_have_attribute("href", "https://www.example.com")
 
-    header_logo_image = logo_link_element.get_by_test_id("stLogo")
+    header_logo_image = logo_link_element.get_by_test_id("stHeaderLogo")
     expect(header_logo_image).to_be_visible()
     assert_snapshot(header_logo_image, name="header-logo-no-sidebar")
