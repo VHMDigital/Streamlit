@@ -50,7 +50,7 @@ class HeadingMixin:
         *,  # keyword-only arguments:
         help: str | None = None,
         divider: Divider = False,
-        width: Width = "content",
+        width: Width = "stretch",
     ) -> DeltaGenerator:
         """Display text in header formatting.
 
@@ -132,7 +132,7 @@ class HeadingMixin:
         *,  # keyword-only arguments:
         help: str | None = None,
         divider: Divider = False,
-        width: Width = "content",
+        width: Width = "stretch",
     ) -> DeltaGenerator:
         """Display text in subheader formatting.
 
@@ -213,7 +213,7 @@ class HeadingMixin:
         anchor: Anchor = None,
         *,  # keyword-only arguments:
         help: str | None = None,
-        width: Width = "content",
+        width: Width = "stretch",
     ) -> DeltaGenerator:
         """Display text in title formatting.
 
