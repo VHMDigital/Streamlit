@@ -347,7 +347,7 @@ describe("Sidebar Component", () => {
         isCollapsed: true,
       })
 
-      const collapsedLogo = screen.getByTestId("stLogo")
+      const collapsedLogo = screen.getByTestId("stSidebarLogo")
       expect(collapsedLogo).toBeInTheDocument()
       expect(sourceSpy).toHaveBeenCalledWith(
         "https://docs.streamlit.io/logo.svg"
@@ -368,7 +368,7 @@ describe("Sidebar Component", () => {
       RenderSidebar({
         isCollapsed: true,
       })
-      const collapsedLogo = screen.getByTestId("stLogo")
+      const collapsedLogo = screen.getByTestId("stSidebarLogo")
       expect(collapsedLogo).toBeInTheDocument()
       expect(sourceSpy).toHaveBeenCalledWith(
         "https://global.discourse-cdn.com/business7/uploads/streamlit/original/2X/8/8cb5b6c0e1fe4e4ebfd30b769204c0d30c332fec.png"
