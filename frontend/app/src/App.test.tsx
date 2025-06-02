@@ -551,7 +551,6 @@ describe("App", () => {
     beforeEach(() => {
       prevWindowLocation = window.location
 
-      // @ts-expect-error
       window.__streamlit = {
         ENABLE_RELOAD_BASED_ON_HARDCODED_STREAMLIT_VERSION: true,
       }
@@ -2140,7 +2139,7 @@ describe("App", () => {
         }
       )
 
-      expect(screen.getByTestId("stLogo")).toBeInTheDocument()
+      expect(screen.getByTestId("stHeaderLogo")).toBeInTheDocument()
     })
 
     it("MPA V2 - will remove logo if activeScriptHash does not match", async () => {
@@ -2171,7 +2170,7 @@ describe("App", () => {
           activeScriptHash: "other_page_script_hash",
         }
       )
-      expect(screen.getByTestId("stLogo")).toBeInTheDocument()
+      expect(screen.getByTestId("stHeaderLogo")).toBeInTheDocument()
 
       // Trigger a new session with a different pageScriptHash
       sendForwardMessage("newSession", {
@@ -2182,7 +2181,7 @@ describe("App", () => {
       // Specifically did not send the scriptFinished here as that would handle cleanup based on scriptRunId
       // Cleanup for MPA V2 in filterMainScriptElements
       await waitFor(() => {
-        expect(screen.queryByTestId("stLogo")).not.toBeInTheDocument()
+        expect(screen.queryByTestId("stHeaderLogo")).not.toBeInTheDocument()
       })
     })
 
@@ -2200,7 +2199,7 @@ describe("App", () => {
         }
       )
 
-      expect(screen.getByTestId("stLogo")).toBeInTheDocument()
+      expect(screen.getByTestId("stHeaderLogo")).toBeInTheDocument()
 
       // Trigger a new scriptRunId via new session
       sendForwardMessage("newSession", NEW_SESSION_JSON)
@@ -2214,7 +2213,7 @@ describe("App", () => {
       // Since no logo is sent in this script run, logo must not be present in the script anymore
       // Stale logo should be removed
       await waitFor(() => {
-        expect(screen.queryByTestId("stLogo")).not.toBeInTheDocument()
+        expect(screen.queryByTestId("stHeaderLogo")).not.toBeInTheDocument()
       })
     })
 
@@ -2251,7 +2250,7 @@ describe("App", () => {
         ForwardMsg.ScriptFinishedStatus.FINISHED_SUCCESSFULLY
       )
       await waitFor(() => {
-        expect(screen.getByTestId("stLogo")).toBeInTheDocument()
+        expect(screen.getByTestId("stHeaderLogo")).toBeInTheDocument()
       })
 
       // Fragment run - logo is not sent, but should persist (triggers scriptRunId to be updated)
@@ -2264,7 +2263,7 @@ describe("App", () => {
         ForwardMsg.ScriptFinishedStatus.FINISHED_FRAGMENT_RUN_SUCCESSFULLY
       )
       await waitFor(() => {
-        expect(screen.getByTestId("stLogo")).toBeInTheDocument()
+        expect(screen.getByTestId("stHeaderLogo")).toBeInTheDocument()
       })
 
       // Full re-run - logo is not sent, should be removed as stale (scriptRunId is different)
@@ -2277,7 +2276,7 @@ describe("App", () => {
         ForwardMsg.ScriptFinishedStatus.FINISHED_SUCCESSFULLY
       )
       await waitFor(() => {
-        expect(screen.queryByTestId("stLogo")).not.toBeInTheDocument()
+        expect(screen.queryByTestId("stHeaderLogo")).not.toBeInTheDocument()
       })
     })
   })

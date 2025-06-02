@@ -64,7 +64,7 @@ export interface SidebarProps {
   onToggleCollapse: (collapsed: boolean) => void
 }
 
-const MIN_WIDTH = "336"
+const DEFAULT_WIDTH = "256"
 
 function calculateMaxBreakpoint(value: string): number {
   // We subtract a margin of 0.02 to use as a max-width
@@ -84,7 +84,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   navSections,
   isCollapsed,
   onToggleCollapse,
-}) => {
+}): ReactElement => {
   const theme: EmotionTheme = useTheme()
   const mediumBreakpointPx = calculateMaxBreakpoint(theme.breakpoints.md)
 
@@ -95,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     : undefined
 
   const [sidebarWidth, setSidebarWidth] = useState<string>(
-    cachedSidebarWidth || MIN_WIDTH
+    cachedSidebarWidth || DEFAULT_WIDTH
   )
   const [lastInnerWidth, setLastInnerWidth] = useState<number>(
     window ? window.innerWidth : Infinity
@@ -182,9 +182,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   function resetSidebarWidth(event: React.MouseEvent<HTMLDivElement>): void {
     // Double clicking on the resize handle resets sidebar to default width
     if (event.detail === 2) {
-      setSidebarWidth(MIN_WIDTH)
+      setSidebarWidth(DEFAULT_WIDTH)
       if (localStorageAvailable()) {
-        window.localStorage.setItem("sidebarWidth", MIN_WIDTH)
+        window.localStorage.setItem("sidebarWidth", DEFAULT_WIDTH)
       }
     }
   }
@@ -249,6 +249,8 @@ const Sidebar: React.FC<SidebarProps> = ({
         ref={sidebarRef}
         onMouseOver={onMouseOver}
         onMouseOut={onMouseOut}
+        // Safari fix: hide scrollbars when not hovered. See globalStyles.ts
+        className={"hideScrollbar"}
       >
         <StyledSidebarHeaderContainer data-testid="stSidebarHeader">
           {renderLogoContent()}

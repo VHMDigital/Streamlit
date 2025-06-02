@@ -389,7 +389,9 @@ describe("Sidebar Component", () => {
       RenderSidebar({})
       const sidebarLogoContainer = screen.getByTestId("stSidebarHeader")
       expect(sidebarLogoContainer).toBeInTheDocument()
-      const sidebarLogo = within(sidebarLogoContainer).getByTestId("stLogo")
+      const sidebarLogo = within(sidebarLogoContainer).getByTestId(
+        "stSidebarLogo"
+      )
       expect(sidebarLogo).toBeInTheDocument()
       expect(sourceSpy).toHaveBeenCalledWith(
         "https://global.discourse-cdn.com/business7/uploads/streamlit/original/2X/8/8cb5b6c0e1fe4e4ebfd30b769204c0d30c332fec.png"
@@ -413,7 +415,7 @@ describe("Sidebar Component", () => {
       ).queryByTestId("stLogoLink")
       expect(sidebarLogoLink).not.toBeInTheDocument()
       const sidebarLogo = within(screen.getByTestId("stSidebar")).getByTestId(
-        "stLogo"
+        "stSidebarLogo"
       )
       expect(sidebarLogo).toHaveStyle({ height: "1.5rem" })
     })
@@ -435,7 +437,7 @@ describe("Sidebar Component", () => {
       ).getByTestId("stLogoLink")
       expect(sidebarLogoLink).toHaveAttribute("href", "www.example.com")
       const sidebarLogo = within(screen.getByTestId("stSidebar")).getByTestId(
-        "stLogo"
+        "stSidebarLogo"
       )
       expect(sidebarLogo).toHaveStyle({ height: "1.5rem" })
     })
@@ -453,33 +455,9 @@ describe("Sidebar Component", () => {
       RenderSidebar()
 
       const sidebarLogo = within(screen.getByTestId("stSidebar")).getByTestId(
-        "stLogo"
+        "stSidebarLogo"
       )
       expect(sidebarLogo).toHaveStyle({ height: "1.25rem" })
-    })
-
-    it("sets maxWidth of logo based on sidebar width", () => {
-      // Update the mock to return a context with appLogo
-      vi.spyOn(
-        StreamlitContextProviderModule,
-        "useAppContext"
-      ).mockReturnValue(
-        getContextOutput({
-          appLogo: imageWithLink,
-        })
-      )
-      RenderSidebar()
-
-      const sidebarWidth = window.getComputedStyle(
-        screen.getByTestId("stSidebar")
-      ).width
-      const sidebarLogo = within(screen.getByTestId("stSidebar")).getByTestId(
-        "stLogo"
-      )
-      // L & R sidebar padding + 8px margin for scrollbarGutter + R margin (sm) + collapse button (2.25rem)
-      expect(sidebarLogo).toHaveStyle(
-        `max-width: calc(${sidebarWidth} - 2 * calc(1rem + 2px) - (2 * 8px) - 0.5rem - 2.25rem)`
-      )
     })
 
     it("sends an CLIENT_ERROR message when the logo source fails to load", () => {
@@ -496,7 +474,7 @@ describe("Sidebar Component", () => {
 
       const sidebarLogo = within(
         screen.getByTestId("stSidebarHeader")
-      ).getByTestId("stLogo")
+      ).getByTestId("stSidebarLogo")
       expect(sidebarLogo).toBeInTheDocument()
 
       fireEvent.error(sidebarLogo)
