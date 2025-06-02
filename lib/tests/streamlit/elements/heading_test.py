@@ -142,7 +142,7 @@ class StHeaderTest(DeltaGeneratorTestCase):
                 assert str(exc.value) == expected_error_message
 
     def test_st_header_default_width(self):
-        """Test that st.header defaults to content width."""
+        """Test that st.header defaults to stretch width."""
         st.header("some header")
 
         el = self.get_delta_from_queue().new_element
@@ -150,9 +150,9 @@ class StHeaderTest(DeltaGeneratorTestCase):
         assert el.heading.tag == "h2"
         assert (
             el.width_config.WhichOneof("width_spec")
-            == WidthConfigFields.USE_CONTENT.value
+            == WidthConfigFields.USE_STRETCH.value
         )
-        assert el.width_config.use_content is True
+        assert el.width_config.use_stretch is True
 
 
 class StSubheaderTest(DeltaGeneratorTestCase):
@@ -277,7 +277,7 @@ class StSubheaderTest(DeltaGeneratorTestCase):
                 assert str(exc.value) == expected_error_message
 
     def test_st_subheader_default_width(self):
-        """Test that st.subheader defaults to content width."""
+        """Test that st.subheader defaults to stretch width."""
         st.subheader("some subheader")
 
         el = self.get_delta_from_queue().new_element
@@ -285,9 +285,9 @@ class StSubheaderTest(DeltaGeneratorTestCase):
         assert el.heading.tag == "h3"
         assert (
             el.width_config.WhichOneof("width_spec")
-            == WidthConfigFields.USE_CONTENT.value
+            == WidthConfigFields.USE_STRETCH.value
         )
-        assert el.width_config.use_content is True
+        assert el.width_config.use_stretch is True
 
 
 class StTitleTest(DeltaGeneratorTestCase):
@@ -401,7 +401,7 @@ class StTitleTest(DeltaGeneratorTestCase):
                 assert str(exc.value) == expected_error_message
 
     def test_st_title_default_width(self):
-        """Test that st.title defaults to content width."""
+        """Test that st.title defaults to stretch width."""
         st.title("some title")
 
         el = self.get_delta_from_queue().new_element
@@ -409,6 +409,6 @@ class StTitleTest(DeltaGeneratorTestCase):
         assert el.heading.tag == "h1"
         assert (
             el.width_config.WhichOneof("width_spec")
-            == WidthConfigFields.USE_CONTENT.value
+            == WidthConfigFields.USE_STRETCH.value
         )
-        assert el.width_config.use_content is True
+        assert el.width_config.use_stretch is True
