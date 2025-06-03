@@ -329,6 +329,7 @@ class CheckboxMixin:
             label=label,
             value=bool(value),
             help=help,
+            width=width,
         )
 
         checkbox_proto = CheckboxProto()
