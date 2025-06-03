@@ -106,6 +106,8 @@ def run_theme_tester_app():
                 column_config={"B": st.column_config.LinkColumn()},
                 use_container_width=True,
             )
+            # Test dataframeBorderColor config also applies to tables
+            # incl. st.table and markdown tables
             st.table(
                 pd.DataFrame(
                     {
@@ -116,6 +118,30 @@ def run_theme_tester_app():
                         ],
                     }
                 )
+            )
+
+            st.markdown("""
+            | A | B | C |
+            |---|---|---|
+            | Cell 1 | Cell 2 | Cell 3 |
+            | Cell 4 | Cell 5 | Cell 6 |
+            | Cell 7 | Cell 8 | Cell 9 |
+            """)
+
+            st.write(
+                """
+            <table>
+                <tr>
+                    <th>Heading A</th>
+                    <th>Heading B</th>
+                </tr>
+                <tr>
+                    <td>Data 1</td>
+                    <td>Data 2</td>
+                </tr>
+            </table>
+            """,
+                unsafe_allow_html=True,
             )
 
     with st.sidebar:
