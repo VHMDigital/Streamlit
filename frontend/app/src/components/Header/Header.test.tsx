@@ -106,4 +106,76 @@ describe("Header", () => {
     render(<Header {...getProps()} />) // No navigation or rightContent
     expect(screen.queryByTestId("stToolbar")).not.toBeInTheDocument()
   })
+
+  it("renders with transparent background when isTransparentBackground is true", () => {
+    render(<Header {...getProps({ isTransparentBackground: true })} />)
+
+    const header = screen.getByTestId("stHeader")
+    expect(header).toHaveStyle("background-color: rgba(0, 0, 0, 0)")
+  })
+
+  it("renders with default background when isTransparentBackground is false", () => {
+    render(<Header {...getProps({ isTransparentBackground: false })} />)
+
+    const header = screen.getByTestId("stHeader")
+    // Check that it doesn't have transparent background
+    expect(header).not.toHaveStyle("background-color: rgba(0, 0, 0, 0)")
+  })
+
+  it("renders navigation content in the left section", () => {
+    const navigationContent = <div data-testid="test-nav">Navigation</div>
+    render(<Header {...getProps({ navigation: navigationContent })} />)
+
+    expect(screen.getByTestId("test-nav")).toBeInTheDocument()
+    // Navigation is rendered directly in the toolbar, not in a specific section
+    expect(screen.getByTestId("stToolbar")).toContainElement(
+      screen.getByTestId("test-nav")
+    )
+  })
+
+  it("renders right content in the right section", () => {
+    const rightContent = <div data-testid="test-right">Right Content</div>
+    render(<Header {...getProps({ rightContent })} />)
+
+    expect(screen.getByTestId("test-right")).toBeInTheDocument()
+    // Right content is rendered in the toolbar
+    expect(screen.getByTestId("stToolbar")).toContainElement(
+      screen.getByTestId("test-right")
+    )
+  })
+
+  it("renders logo in the left section when provided", () => {
+    const logo = <div data-testid="test-logo">Logo</div>
+    render(<Header {...getProps({ logoComponent: logo })} />)
+
+    expect(screen.getByTestId("test-logo")).toBeInTheDocument()
+    // Logo is rendered in the toolbar
+    expect(screen.getByTestId("stToolbar")).toContainElement(
+      screen.getByTestId("test-logo")
+    )
+  })
+
+  it("renders sidebar expand button when hasSidebar is true", () => {
+    render(<Header {...getProps({ hasSidebar: true })} />)
+
+    expect(screen.getByTestId("stExpandSidebarButton")).toBeInTheDocument()
+  })
+
+  it("does not render sidebar expand button when hasSidebar is false", () => {
+    render(<Header {...getProps({ hasSidebar: false })} />)
+
+    expect(
+      screen.queryByTestId("stExpandSidebarButton")
+    ).not.toBeInTheDocument()
+  })
+
+  it("calls onToggleSidebar when expand button is clicked", () => {
+    const onToggleSidebar = vi.fn()
+    render(<Header {...getProps({ hasSidebar: true, onToggleSidebar })} />)
+
+    const expandButton = screen.getByTestId("stExpandSidebarButton")
+    expandButton.click()
+
+    expect(onToggleSidebar).toHaveBeenCalled()
+  })
 })

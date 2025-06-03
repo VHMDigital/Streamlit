@@ -61,6 +61,7 @@ const SidebarNavLink = ({
         disabled={disableSidebarNavLinks}
         href={pageUrl}
         onClick={onClick}
+        aria-current={isActive ? "page" : undefined}
       >
         {icon?.length ? (
           <StyledSidebarNavIcon isActive={isActive}>

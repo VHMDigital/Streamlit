@@ -553,4 +553,94 @@ describe("AppView element", () => {
     const stbContainer = screen.queryByTestId("stAppScrollToBottomContainer")
     expect(stbContainer).toBeInTheDocument()
   })
+
+  describe("navigation position rendering", () => {
+    it("renders sidebar navigation when navigationPosition=SIDEBAR", () => {
+      render(
+        <AppView
+          {...getProps({
+            navigationPosition: Navigation.Position.SIDEBAR,
+            multiplePages: true,
+            appPages: [
+              { pageName: "page1", pageScriptHash: "hash1" },
+              { pageName: "page2", pageScriptHash: "hash2" },
+            ],
+          })}
+        />
+      )
+
+      expect(screen.queryByTestId("stSidebar")).toBeInTheDocument()
+      expect(screen.queryByTestId("stTopNavWrapper")).not.toBeInTheDocument()
+    })
+
+    it("renders top navigation when navigationPosition=TOP", () => {
+      render(
+        <AppView
+          {...getProps({
+            navigationPosition: Navigation.Position.TOP,
+            multiplePages: true,
+            appPages: [
+              { pageName: "page1", pageScriptHash: "hash1" },
+              { pageName: "page2", pageScriptHash: "hash2" },
+            ],
+          })}
+        />
+      )
+
+      expect(screen.queryByTestId("stTopNavWrapper")).toBeInTheDocument()
+      expect(screen.queryByTestId("stSidebar")).not.toBeInTheDocument()
+    })
+
+    it("renders neither sidebar nor top nav when navigationPosition=HIDDEN", () => {
+      render(
+        <AppView
+          {...getProps({
+            navigationPosition: Navigation.Position.HIDDEN,
+            multiplePages: true,
+            appPages: [
+              { pageName: "page1", pageScriptHash: "hash1" },
+              { pageName: "page2", pageScriptHash: "hash2" },
+            ],
+          })}
+        />
+      )
+
+      expect(screen.queryByTestId("stSidebar")).not.toBeInTheDocument()
+      expect(screen.queryByTestId("stTopNavWrapper")).not.toBeInTheDocument()
+    })
+
+    it("does not render top nav when navigationPosition=TOP but hideSidebarNav=true", () => {
+      render(
+        <AppView
+          {...getProps({
+            navigationPosition: Navigation.Position.TOP,
+            multiplePages: true,
+            hideSidebarNav: true,
+            appPages: [
+              { pageName: "page1", pageScriptHash: "hash1" },
+              { pageName: "page2", pageScriptHash: "hash2" },
+            ],
+          })}
+        />
+      )
+
+      expect(screen.queryByTestId("stTopNavWrapper")).not.toBeInTheDocument()
+      expect(screen.queryByTestId("stSidebar")).not.toBeInTheDocument()
+    })
+
+    it("does not render top nav with single page when navigationPosition=TOP", () => {
+      render(
+        <AppView
+          {...getProps({
+            navigationPosition: Navigation.Position.TOP,
+            multiplePages: false,
+            appPages: [{ pageName: "page1", pageScriptHash: "hash1" }],
+          })}
+        />
+      )
+
+      expect(screen.queryByTestId("stTopNavWrapper")).not.toBeInTheDocument()
+      expect(screen.queryByTestId("stSidebar")).not.toBeInTheDocument()
+    })
+  })
 })
