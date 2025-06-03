@@ -257,6 +257,13 @@ def navigation(
     .. _st.Page: https://docs.streamlit.io/develop/api-reference/navigation/st.page
 
     """
+    # Validate position parameter
+    if not isinstance(position, str) or position not in ["sidebar", "hidden", "top"]:
+        raise StreamlitAPIException(
+            f'Invalid position "{position}". '
+            'The position parameter must be one of "sidebar", "hidden", or "top".'
+        )
+
     # Disable the use of the pages feature (ie disregard v1 behavior of Multipage Apps)
     PagesManager.uses_pages_directory = False
 
@@ -333,14 +340,19 @@ def _navigation(
             }
 
     msg = ForwardMsg()
-    if (
-        position == "hidden"
-        or config.get_option("client.showSidebarNavigation") is False
-    ):
+    # Handle position logic correctly
+    if position == "hidden":
         msg.navigation.position = NavigationProto.Position.HIDDEN
     elif position == "top":
         msg.navigation.position = NavigationProto.Position.TOP
+    elif position == "sidebar":
+        # Only apply config override if position is sidebar
+        if config.get_option("client.showSidebarNavigation") is False:
+            msg.navigation.position = NavigationProto.Position.HIDDEN
+        else:
+            msg.navigation.position = NavigationProto.Position.SIDEBAR
     else:
+        # This should never happen due to validation above, but just in case
         msg.navigation.position = NavigationProto.Position.SIDEBAR
 
     msg.navigation.expanded = expanded
