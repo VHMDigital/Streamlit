@@ -852,8 +852,8 @@ class VegaLiteChartTest(DeltaGeneratorTestCase):
         spec_dict = json.loads(proto.spec)
 
         color = spec_dict["encoding"].get("color", {})
-        self.assertIn("title", color)
-        self.assertEqual(color["title"], " ")
+        assert "title" in color
+        assert color["title"] == " "
 
     def test_altair_chart_patches_null_legend_title(self):
         """Test that legend.title=None is converted to ' ' in the 'color' channel
@@ -881,8 +881,8 @@ class VegaLiteChartTest(DeltaGeneratorTestCase):
         spec_dict = json.loads(proto.spec)
 
         legend = spec_dict["encoding"]["color"].get("legend", {})
-        self.assertIn("title", legend)
-        self.assertEqual(legend["title"], " ")
+        assert "title" in legend
+        assert legend["title"] == " "
 
 
 ST_CHART_ARGS = [
