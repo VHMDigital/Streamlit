@@ -258,7 +258,7 @@ def navigation(
 
     """
     # Validate position parameter
-    if not isinstance(position, str) or position not in NavigationProto.Position:
+    if not isinstance(position, str) or position not in ["sidebar", "hidden", "top"]:
         raise StreamlitAPIException(
             f'Invalid position "{position}". '
             'The position parameter must be one of "sidebar", "hidden", or "top".'
@@ -351,9 +351,6 @@ def _navigation(
             msg.navigation.position = NavigationProto.Position.HIDDEN
         else:
             msg.navigation.position = NavigationProto.Position.SIDEBAR
-    else:
-        # This should never happen due to validation above, but just in case
-        msg.navigation.position = NavigationProto.Position.SIDEBAR
 
     msg.navigation.expanded = expanded
     msg.navigation.sections[:] = nav_sections.keys()
