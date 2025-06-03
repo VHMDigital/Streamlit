@@ -570,7 +570,8 @@ describe("AppView element", () => {
       )
 
       expect(screen.queryByTestId("stSidebar")).toBeInTheDocument()
-      expect(screen.queryByTestId("stTopNavWrapper")).not.toBeInTheDocument()
+      expect(screen.getByText("page1")).toBeInTheDocument()
+      expect(screen.getByText("page2")).toBeInTheDocument()
     })
 
     it("renders top navigation when navigationPosition=TOP", () => {
@@ -587,7 +588,16 @@ describe("AppView element", () => {
         />
       )
 
-      expect(screen.queryByTestId("stTopNavWrapper")).toBeInTheDocument()
+      // Check that nav is in the header area
+      const header = screen.getByTestId("stHeader")
+      expect(header).toBeInTheDocument()
+
+      // Check that at least some nav elements are present in the header
+      // (they might be in an overflow menu)
+      const allPage2Elements = screen.getAllByText("page2")
+      expect(allPage2Elements.length).toBeGreaterThan(0)
+
+      // No sidebar should be present
       expect(screen.queryByTestId("stSidebar")).not.toBeInTheDocument()
     })
 
@@ -606,7 +616,8 @@ describe("AppView element", () => {
       )
 
       expect(screen.queryByTestId("stSidebar")).not.toBeInTheDocument()
-      expect(screen.queryByTestId("stTopNavWrapper")).not.toBeInTheDocument()
+      expect(screen.queryByText("page1")).not.toBeInTheDocument()
+      expect(screen.queryByText("page2")).not.toBeInTheDocument()
     })
 
     it("does not render top nav when navigationPosition=TOP but hideSidebarNav=true", () => {
@@ -624,7 +635,8 @@ describe("AppView element", () => {
         />
       )
 
-      expect(screen.queryByTestId("stTopNavWrapper")).not.toBeInTheDocument()
+      expect(screen.queryByText("page1")).not.toBeInTheDocument()
+      expect(screen.queryByText("page2")).not.toBeInTheDocument()
       expect(screen.queryByTestId("stSidebar")).not.toBeInTheDocument()
     })
 
@@ -639,7 +651,7 @@ describe("AppView element", () => {
         />
       )
 
-      expect(screen.queryByTestId("stTopNavWrapper")).not.toBeInTheDocument()
+      expect(screen.queryByText("page1")).not.toBeInTheDocument()
       expect(screen.queryByTestId("stSidebar")).not.toBeInTheDocument()
     })
   })

@@ -163,7 +163,9 @@ function AppView(props: AppViewProps): ReactElement {
 
   const showSidebar =
     hasSidebarElements ||
-    (!hideSidebarNav && appPages.length > 1) ||
+    (navigationPosition === Navigation.Position.SIDEBAR &&
+      !hideSidebarNav &&
+      appPages.length > 1) ||
     showSidebarOverride
 
   useEffect(() => {
@@ -229,7 +231,9 @@ function AppView(props: AppViewProps): ReactElement {
 
   // logo component to be used in the header when sidebar is closed
   const logoElement = useMemo(() => {
-    if (!appLogo) return null
+    if (!appLogo) {
+      return null
+    }
 
     return (
       <LogoComponent
@@ -287,7 +291,8 @@ function AppView(props: AppViewProps): ReactElement {
               onToggleSidebar={toggleSidebar}
               navigation={
                 navigationPosition === Navigation.Position.TOP &&
-                appPages.length > 1 ? (
+                appPages.length > 1 &&
+                !hideSidebarNav ? (
                   <TopNav
                     endpoints={endpoints}
                     pageLinkBaseUrl={pageLinkBaseUrl}

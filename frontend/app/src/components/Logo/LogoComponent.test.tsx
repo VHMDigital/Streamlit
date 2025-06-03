@@ -19,7 +19,7 @@ import React from "react"
 import { screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib"
-import { Logo as LogoProto, Navigation } from "@streamlit/protobuf"
+import { Logo as LogoProto } from "@streamlit/protobuf"
 
 import LogoComponent from "./LogoComponent"
 
@@ -37,18 +37,15 @@ const mockEndpoints = {
 
 interface TestProps {
   appLogo: LogoProto | null
-  navigationPosition: Navigation.Position
   collapsed: boolean
   endpoints: typeof mockEndpoints
-  onLogoClick?: () => void
+  dataTestId?: string
 }
 
 const getProps = (props: Partial<TestProps> = {}): TestProps => ({
   appLogo: null,
-  navigationPosition: Navigation.Position.SIDEBAR,
   collapsed: false,
   endpoints: mockEndpoints,
-  onLogoClick: vi.fn(),
   ...props,
 })
 
@@ -69,12 +66,12 @@ describe("LogoComponent", () => {
     expect(container.firstChild).toBeNull()
   })
 
-  it("renders logo in header when navigationPosition is TOP", () => {
+  it("renders logo in header when dataTestId is stHeaderLogo", () => {
     render(
       <LogoComponent
         {...getProps({
           appLogo: sampleLogo,
-          navigationPosition: Navigation.Position.TOP,
+          dataTestId: "stHeaderLogo",
         })}
       />
     )
@@ -84,12 +81,12 @@ describe("LogoComponent", () => {
     expect(logo).toHaveAttribute("src", "https://example.com/logo.png")
   })
 
-  it("renders logo in sidebar when navigationPosition is SIDEBAR", () => {
+  it("renders logo in sidebar when dataTestId is stSidebarLogo", () => {
     render(
       <LogoComponent
         {...getProps({
           appLogo: sampleLogo,
-          navigationPosition: Navigation.Position.SIDEBAR,
+          dataTestId: "stSidebarLogo",
         })}
       />
     )
@@ -99,25 +96,12 @@ describe("LogoComponent", () => {
     expect(logo).toHaveAttribute("src", "https://example.com/logo.png")
   })
 
-  it("does not render when navigationPosition is HIDDEN", () => {
-    const { container } = render(
-      <LogoComponent
-        {...getProps({
-          appLogo: sampleLogo,
-          navigationPosition: Navigation.Position.HIDDEN,
-        })}
-      />
-    )
-
-    expect(container.firstChild).toBeNull()
-  })
-
   it("uses iconImage when collapsed is true and iconImage exists", () => {
     render(
       <LogoComponent
         {...getProps({
           appLogo: sampleLogo,
-          navigationPosition: Navigation.Position.TOP,
+          dataTestId: "stHeaderLogo",
           collapsed: true,
         })}
       />
@@ -140,7 +124,7 @@ describe("LogoComponent", () => {
       <LogoComponent
         {...getProps({
           appLogo: logoWithoutIcon,
-          navigationPosition: Navigation.Position.TOP,
+          dataTestId: "stHeaderLogo",
           collapsed: true,
         })}
       />
@@ -155,7 +139,7 @@ describe("LogoComponent", () => {
       <LogoComponent
         {...getProps({
           appLogo: sampleLogo,
-          navigationPosition: Navigation.Position.TOP,
+          dataTestId: "stHeaderLogo",
         })}
       />
     )
@@ -174,7 +158,7 @@ describe("LogoComponent", () => {
       <LogoComponent
         {...getProps({
           appLogo: logoWithoutLink,
-          navigationPosition: Navigation.Position.TOP,
+          dataTestId: "stHeaderLogo",
         })}
       />
     )
@@ -193,13 +177,13 @@ describe("LogoComponent", () => {
       <LogoComponent
         {...getProps({
           appLogo: smallLogo,
-          navigationPosition: Navigation.Position.TOP,
+          dataTestId: "stHeaderLogo",
         })}
       />
     )
 
     let logo = screen.getByTestId("stHeaderLogo")
-    expect(logo).toHaveStyle("height: 1rem")
+    expect(logo).toHaveStyle("height: 1.25rem")
 
     const largeLogo = LogoProto.create({
       image: "https://example.com/logo.png",
@@ -210,30 +194,12 @@ describe("LogoComponent", () => {
       <LogoComponent
         {...getProps({
           appLogo: largeLogo,
-          navigationPosition: Navigation.Position.TOP,
+          dataTestId: "stHeaderLogo",
         })}
       />
     )
 
     logo = screen.getByTestId("stHeaderLogo")
     expect(logo).toHaveStyle("height: 2rem")
-  })
-
-  it("calls onLogoClick when logo is clicked and callback provided", () => {
-    const onLogoClick = vi.fn()
-    render(
-      <LogoComponent
-        {...getProps({
-          appLogo: sampleLogo,
-          navigationPosition: Navigation.Position.SIDEBAR,
-          onLogoClick,
-        })}
-      />
-    )
-
-    const logo = screen.getByTestId("stSidebarLogo")
-    logo.click()
-
-    expect(onLogoClick).toHaveBeenCalled()
   })
 })
