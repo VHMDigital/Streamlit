@@ -291,8 +291,7 @@ function AppView(props: AppViewProps): ReactElement {
               onToggleSidebar={toggleSidebar}
               navigation={
                 navigationPosition === Navigation.Position.TOP &&
-                appPages.length > 1 &&
-                !hideSidebarNav ? (
+                appPages.length > 1 ? (
                   <TopNav
                     endpoints={endpoints}
                     pageLinkBaseUrl={pageLinkBaseUrl}
