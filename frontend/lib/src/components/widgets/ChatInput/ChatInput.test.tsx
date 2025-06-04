@@ -87,7 +87,6 @@ describe("ChatInput widget", () => {
   beforeEach(() => {
     vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
       elementRef: { current: null },
-      forceRecalculate: vitest.fn(),
       values: [250],
     })
   })
@@ -116,7 +115,7 @@ describe("ChatInput widget", () => {
     expect(chatInput).toHaveAttribute("aria-label", props.element.placeholder)
   })
 
-  it("sets the value intially to the element default", () => {
+  it("sets the value initially to the element default", () => {
     const props = getProps()
     render(<ChatInput {...props} />)
 
@@ -394,7 +393,6 @@ describe("ChatInput widget", () => {
         "stChatInputFileUploadButton"
       )
       // The `input` element isn't accessible, so we need to access it directly via the DOM
-      // eslint-disable-next-line testing-library/no-node-access
       const fileUploadInput = fileUploadButton.querySelector("input")
       if (!fileUploadInput) {
         throw new Error("File upload input not found")

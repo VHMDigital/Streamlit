@@ -83,7 +83,7 @@ function NumberColumn(props: BaseColumnProps): BaseColumn {
       ? countDecimals(parameters.step)
       : undefined
 
-  const cellTemplate = {
+  const cellTemplate: NumberCell = {
     kind: GridCellKind.Number,
     data: undefined,
     displayData: "",
@@ -98,8 +98,9 @@ function NumberColumn(props: BaseColumnProps): BaseColumn {
     // We don't want to show any thousand separators
     // in the cell overlay/editor:
     thousandSeparator: "",
-  } as NumberCell
+  }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const validateInput = (data?: any): boolean | number => {
     let cellData: number | null = toSafeNumber(data)
 
@@ -149,6 +150,7 @@ function NumberColumn(props: BaseColumnProps): BaseColumn {
     kind: "number",
     sortMode: "smart",
     validateInput,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     getCell(data?: any, validate?: boolean): GridCell {
       if (validate === true) {
         const validationResult = validateInput(data)
@@ -204,8 +206,10 @@ function NumberColumn(props: BaseColumnProps): BaseColumn {
           return getErrorCell(
             toSafeString(cellData),
             notNullOrUndefined(parameters.format)
-              ? `Failed to format the number based on the provided format configuration: (${parameters.format}). Error: ${error}`
-              : `Failed to format the number. Error: ${error}`
+              ? // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                `Failed to format the number based on the provided format configuration: (${parameters.format}). Error: ${error}`
+              : // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                `Failed to format the number. Error: ${error}`
           )
         }
       }

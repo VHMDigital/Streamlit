@@ -25,7 +25,7 @@ import sys
 import tempfile
 import time
 import zipfile
-from typing import Any
+from typing import Any, cast
 
 import requests
 
@@ -45,7 +45,9 @@ def get_token_from_credential_manager() -> str:
     """
     cmd = ["git", "credential", "fill"]
     input_data = "protocol=https\nhost=github.com\n\n"
-    result = subprocess.run(cmd, input=input_data, capture_output=True, text=True)
+    result = subprocess.run(
+        cmd, input=input_data, capture_output=True, text=True, check=False
+    )
     if result.returncode != 0:
         print(
             f"Error getting credentials from git credential manager: {result.stderr.strip()}"
@@ -62,7 +64,7 @@ def get_token_from_credential_manager() -> str:
 def get_last_commit_sha() -> str:
     """Get the last commit SHA of the local branch."""
     cmd = ["git", "rev-parse", "HEAD"]
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     if result.returncode != 0:
         raise Exception(f"Error getting last commit SHA: {result.stderr.strip()}")
     return result.stdout.strip()
@@ -109,12 +111,11 @@ def wait_for_workflow_completion(
             if conclusion == "failure":
                 # Only failed runs are expected to have updated snapshots.
                 return workflow_run
-            else:
-                print(
-                    f"The latest workflow run completed with status: {conclusion}. "
-                    "The snapshot update is only working on failed runs."
-                )
-                sys.exit(1)
+            print(
+                f"The latest workflow run completed with status: {conclusion}. "
+                "The snapshot update is only working on failed runs."
+            )
+            sys.exit(1)
         print(
             f"Workflow is still {status}. Waiting 60 seconds before checking again..."
         )
@@ -136,8 +137,7 @@ def get_artifacts(
             f"Error getting artifacts: {response.status_code} {response.text}"
         )
     data = response.json()
-    artifacts = data.get("artifacts", [])
-    return artifacts  # type: ignore
+    return cast("list[dict[str, Any]]", data.get("artifacts", []))
 
 
 def download_artifact(artifact_url: str, token: str, download_path: str) -> None:

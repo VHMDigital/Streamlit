@@ -41,9 +41,9 @@ export const StyledTableBorder = styled.div(({ theme }) => ({
   // Add the enclosing border on an extra wrapper around the table. This ensures that
   // when the table scrolls horizontally on small windows, it still shows a border all
   // around the table and the table doesn't look cut off.
-  border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
+  border: `${theme.sizes.borderWidth} solid ${theme.colors.dataframeBorderColor}`,
   borderRadius: theme.radii.default,
-  overflow: ["auto", "overlay"],
+  overflow: "auto",
 }))
 
 export const StyledTable = styled.table(({ theme }) => ({
@@ -57,11 +57,11 @@ const styleCellFunction = (theme: EmotionTheme): CSSObject => ({
   // Only have borders on the bottom and right of each cell. And remove the borders
   // of the last row and column to prevent double borders together with the enclosing
   // border from `StyledTableBorder`.
-  borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
+  borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.dataframeBorderColor}`,
   "tbody tr:last-child &": {
     borderBottom: "none",
   },
-  borderRight: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
+  borderRight: `${theme.sizes.borderWidth} solid ${theme.colors.dataframeBorderColor}`,
   "&:last-child": {
     borderRight: "none",
   },
@@ -77,6 +77,7 @@ export const StyledTableCellHeader = styled.th(({ theme }) => ({
   ...styleCellFunction(theme),
   textAlign: "inherit",
   color: theme.colors.fadedText60,
+  paddingLeft: theme.spacing.sm,
 }))
 
 export const StyledEmptyTableCell = styled(StyledTableCell)(({ theme }) => ({

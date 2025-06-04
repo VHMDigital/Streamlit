@@ -39,9 +39,12 @@ const GENERATED_ELEMENT_ID_PREFIX = "$$ID"
  * will only be called after the full interval has elapsed since the last
  * call.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function debounce(delay: number, fn: any): any {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   let timerId: any
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   return (...args: any[]) => {
     if (timerId) {
       clearTimeout(timerId)
@@ -212,6 +215,54 @@ export function isInChildFrame(): boolean {
 }
 
 /**
+ * Returns the URL of the app without query parameters, handling both embedded and non-embedded cases.
+ * If the app is embedded in an iframe, it attempts to get the parent frame's URL.
+ */
+export function getUrl(): string {
+  let url: string
+
+  try {
+    // Try to access top location if we're in an iframe
+    if (isInChildFrame() && window.top) {
+      url = window.top.location.href
+    } else {
+      url = document.location.href
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    // CSP error might occur when trying to access parent frame
+    url = document.location.href
+  }
+
+  // Remove query parameters and anchor from the URL
+  const urlObj = new URL(url)
+  urlObj.search = ""
+  urlObj.hash = ""
+  return urlObj.toString()
+}
+
+/**
+ * Returns the timezone from the browser's Intl API.
+ */
+export function getTimezone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone
+}
+
+/**
+ * Returns the timezone offset in minutes from the browser's Date API.
+ */
+export function getTimezoneOffset(): number {
+  return new Date().getTimezoneOffset()
+}
+
+/**
+ * Returns the browser's locale language setting.
+ */
+export function getLocaleLanguage(): string {
+  return navigator.language
+}
+
+/**
  * Returns a string with the type of loading screen to use while the app is
  * waiting for the backend to send displayable protos.
  */
@@ -221,8 +272,8 @@ export function getLoadingScreenType(): LoadingScreenType {
   return params.has(EMBED_HIDE_LOADING_SCREEN)
     ? LoadingScreenType.NONE
     : params.has(EMBED_SHOW_LOADING_SCREEN_V1)
-    ? LoadingScreenType.V1
-    : LoadingScreenType.V2
+      ? LoadingScreenType.V1
+      : LoadingScreenType.V2
 }
 
 /** Return an info Element protobuf with the given text. */
@@ -332,6 +383,7 @@ export function isValidElementId(
  * If the element has a valid ID, returns it. Otherwise, returns undefined.
  */
 export function getElementId(element: Element): string | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const elementId = get(element as any, [requireNonNull(element.type), "id"])
   if (elementId && isValidElementId(elementId)) {
     // We only care about valid element IDs (with the correct prefix)
@@ -418,6 +470,7 @@ export function canAccessIFrame(iframe: HTMLIFrameElement): boolean {
     const doc = iframe.contentDocument || iframe.contentWindow.document
     const html = doc.body.innerHTML
     return html !== null && html !== ""
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     return false
   }
@@ -436,9 +489,8 @@ export function getIFrameEnclosingApp(
   }
   const embeddingIdClassName = getEmbeddingIdClassName(embeddingId)
   const qsStreamlitAppStr = 'iframe[title="streamlitApp"]'
-  let qs = window.document.querySelectorAll(
-    qsStreamlitAppStr
-  ) as NodeListOf<HTMLIFrameElement>
+  let qs: NodeListOf<HTMLIFrameElement> =
+    window.document.querySelectorAll(qsStreamlitAppStr)
   let foundIFrame = findAnIFrameWithClassName(qs, embeddingIdClassName)
   if (foundIFrame && !canAccessIFrame(foundIFrame)) {
     return null
@@ -456,9 +508,7 @@ export function getIFrameEnclosingApp(
   if (foundIFrame) {
     return foundIFrame
   }
-  let htmlCollection = window.document.getElementsByTagName(
-    "iframe"
-  ) as HTMLCollectionOf<HTMLIFrameElement>
+  let htmlCollection = window.document.getElementsByTagName("iframe")
   foundIFrame = findAnIFrameWithClassName(htmlCollection, embeddingIdClassName)
   if (foundIFrame && !canAccessIFrame(foundIFrame)) {
     return null
@@ -511,7 +561,7 @@ export function extractPageNameFromPathName(
   // regex special-characters. This is why we're stuck with the
   // weird-looking triple `replace()`.
   return decodeURIComponent(
-    document.location.pathname
+    pathname
       .replace(basePath, "")
       .replace(new RegExp("^/?"), "")
       .replace(new RegExp("/$"), "")
@@ -539,27 +589,33 @@ export function extractPageNameFromPathName(
  * // }
  */
 export function keysToSnakeCase(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   obj: Record<string, any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 ): Record<string, any> {
-  return Object.keys(obj).reduce((acc, key) => {
-    const newKey = decamelize(key, {
-      preserveConsecutiveUppercase: true,
-    }).replace(".", "_")
-    let value = obj[key]
+  return Object.keys(obj).reduce(
+    (acc, key) => {
+      const newKey = decamelize(key, {
+        preserveConsecutiveUppercase: true,
+      }).replace(".", "_")
+      let value = obj[key]
 
-    if (value && typeof value === "object" && !Array.isArray(value)) {
-      value = keysToSnakeCase(value)
-    }
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        value = keysToSnakeCase(value)
+      }
 
-    if (Array.isArray(value)) {
-      value = value.map(item =>
-        typeof item === "object" ? keysToSnakeCase(item) : item
-      )
-    }
+      if (Array.isArray(value)) {
+        value = value.map(item =>
+          typeof item === "object" ? keysToSnakeCase(item) : item
+        )
+      }
 
-    acc[newKey] = value
-    return acc
-  }, {} as Record<string, any>)
+      acc[newKey] = value
+      return acc
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
+    {} as Record<string, any>
+  )
 }
 
 // TODO: Update all imports to use @streamlit/utils and remove this line.

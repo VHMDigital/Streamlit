@@ -18,7 +18,7 @@ import React, { ReactElement } from "react"
 
 import { useTheme } from "@emotion/react"
 import {
-  ProgressBarOverrides,
+  type ProgressBarOverrides,
   ProgressBar as UIProgressBar,
 } from "baseui/progress-bar"
 import { mergeOverrides } from "baseui"
@@ -36,6 +36,7 @@ export enum Size {
 
 export interface ProgressBarProps {
   value: number
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   overrides?: Overrides<any>
   size?: Size
 }
@@ -63,6 +64,7 @@ function ProgressBar({
       },
     },
     Bar: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
       style: ({ $theme }: { $theme: any }) => ({
         marginTop: theme.spacing.none,
         marginBottom: theme.spacing.none,

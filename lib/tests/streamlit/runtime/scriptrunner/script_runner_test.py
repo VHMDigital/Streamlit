@@ -64,6 +64,17 @@ text_no_encoding = text_utf
 text_latin = "complete! ð\x9f\x91¨â\x80\x8dð\x9f\x8e¤"
 
 
+# Workaround for https://github.com/pytest-dev/pytest/issues/12263:
+# Newer pytest version require this method to exist, but its not implemented
+# in older Tornado versions for AsyncTestCase.
+# Adding this to the test harmless and not affecting the ScriptRunnerTest below.
+def runTest(*args, **kwargs):
+    pass
+
+
+AsyncTestCase.runTest = runTest
+
+
 def _create_widget(id: str, states: WidgetStates) -> WidgetState:
     """
     Returns
@@ -138,10 +149,7 @@ class ScriptRunnerTest(AsyncTestCase):
 
         # maybe_handle_execution_control_request should be called by the
         # enqueue function.
-        self.assertEqual(
-            1,
-            maybe_handle_execution_control_request_mock.call_count,
-        )
+        assert maybe_handle_execution_control_request_mock.call_count == 1
 
     def test_dont_enqueue_with_pending_script_request(self):
         """No ForwardMsgs are enqueued when the ScriptRunner has
@@ -165,7 +173,7 @@ class ScriptRunnerTest(AsyncTestCase):
         # Now, "stop" our ScriptRunner. Enqueuing should result in
         # a StopException being raised, and no message enqueued.
         runner._requests.request_stop()
-        with self.assertRaises(StopException):
+        with pytest.raises(StopException):
             runner._enqueue_forward_msg(MagicMock())
         self._assert_forward_msgs(runner, [])
 
@@ -173,7 +181,7 @@ class ScriptRunnerTest(AsyncTestCase):
         # a RerunException being raised and no message enqueued.
         runner._requests = ScriptRequests()
         runner.request_rerun(RerunData())
-        with self.assertRaises(RerunException):
+        with pytest.raises(RerunException):
             runner._enqueue_forward_msg(MagicMock())
         self._assert_forward_msgs(runner, [])
 
@@ -200,7 +208,7 @@ class ScriptRunnerTest(AsyncTestCase):
         # If _is_in_script_thread is True, our rerun request should get
         # popped (and this will result in a RerunException being raised).
         runner._is_in_script_thread = MagicMock(return_value=True)
-        with self.assertRaises(RerunException):
+        with pytest.raises(RerunException):
             runner._maybe_handle_execution_control_request()
         requests_mock.on_scriptrunner_yield.assert_called_once()
 
@@ -230,7 +238,7 @@ class ScriptRunnerTest(AsyncTestCase):
         # _run_script should have been called 3 times, once for each
         # RERUN request.
         self._assert_no_exceptions(scriptrunner)
-        self.assertEqual(3, run_script_mock.call_count)
+        assert run_script_mock.call_count == 3
 
     @parameterized.expand(
         [
@@ -265,11 +273,9 @@ class ScriptRunnerTest(AsyncTestCase):
         # work correctly. The CodeHasher is scoped to
         # files contained in the directory of __main__.__file__, which we
         # assume is the main script directory.
-        self.assertEqual(
-            os.path.realpath(scriptrunner._main_script_path),
-            os.path.realpath(sys.modules["__main__"].__file__),
-            (" ScriptRunner should set the __main__.__file__ attribute correctly"),
-        )
+        assert os.path.realpath(scriptrunner._main_script_path) == os.path.realpath(
+            sys.modules["__main__"].__file__
+        ), " ScriptRunner should set the __main__.__file__ attribute correctly"
 
         Runtime._instance.media_file_mgr.clear_session_refs.assert_called_once()
 
@@ -371,7 +377,7 @@ class ScriptRunnerTest(AsyncTestCase):
             ],
         )
 
-        self.assertTrue(raised_exception["called"])
+        assert raised_exception["called"]
         fragment.assert_has_calls([call(), call()])
         Runtime._instance.media_file_mgr.clear_session_refs.assert_not_called()
 
@@ -404,7 +410,8 @@ class ScriptRunnerTest(AsyncTestCase):
         ex = patched_handle_exception.call_args[0][0]
         assert isinstance(ex, KeyError)
 
-    def test_compile_error(self):
+    @patch("streamlit.runtime.scriptrunner.script_runner._LOGGER.exception")
+    def test_compile_error(self, patched_logger_exception):
         """Tests that we get an exception event when a script can't compile."""
         scriptrunner = TestScriptRunner("compile_error.py.txt")
         scriptrunner.request_rerun(RerunData())
@@ -421,6 +428,13 @@ class ScriptRunnerTest(AsyncTestCase):
             ],
         )
         self._assert_text_deltas(scriptrunner, [])
+
+        # Verify that the exception was logged
+        patched_logger_exception.assert_called_once()
+        # Verify the logger was called with the correct message
+        assert patched_logger_exception.call_args[0][0] == "Script compilation error"
+        # Ensure that exc_info parameter was passed (contains the actual exception)
+        assert "exc_info" in patched_logger_exception.call_args[1]
 
     @patch("streamlit.runtime.state.session_state.SessionState._call_callbacks")
     def test_calls_widget_callbacks(self, patched_call_callbacks):
@@ -626,16 +640,16 @@ class ScriptRunnerTest(AsyncTestCase):
             # We'll get two deltas: one for st.text(), and one for the
             # exception that gets thrown afterwards.
             elts = scriptrunner.elements()
-            self.assertEqual(elts[0].WhichOneof("type"), "text")
+            assert elts[0].WhichOneof("type") == "text"
 
             if show_error_details:
                 self._assert_num_deltas(scriptrunner, 2)
-                self.assertEqual(elts[1].WhichOneof("type"), "exception")
+                assert elts[1].WhichOneof("type") == "exception"
             else:
                 self._assert_num_deltas(scriptrunner, 2)
-                self.assertEqual(elts[1].WhichOneof("type"), "exception")
+                assert elts[1].WhichOneof("type") == "exception"
                 exc_msg = elts[1].exception.message
-                self.assertTrue(_GENERIC_UNCAUGHT_EXCEPTION_TEXT == exc_msg)
+                assert exc_msg == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
 
     @pytest.mark.slow
     def test_stop_script(self):
@@ -771,8 +785,8 @@ class ScriptRunnerTest(AsyncTestCase):
         )
 
         shutdown_data = scriptrunner.event_data[-1]
-        self.assertEqual(shutdown_data["client_state"].query_string, "foo=bar")
-        self.assertEqual(shutdown_data["client_state"].page_script_hash, "hash1")
+        assert shutdown_data["client_state"].query_string == "foo=bar"
+        assert shutdown_data["client_state"].page_script_hash == "hash1"
 
     def test_coalesce_rerun(self):
         """Tests that multiple pending rerun requests get coalesced."""
@@ -796,7 +810,9 @@ class ScriptRunnerTest(AsyncTestCase):
         self._assert_text_deltas(scriptrunner, [text_utf])
 
     def test_remove_nonexistent_elements(self):
-        """Tests that nonexistent elements are removed from widget cache after script run."""
+        """Tests that nonexistent elements are removed from widget cache after
+        script run.
+        """
 
         widget_id = "nonexistent_widget_id"
 
@@ -810,18 +826,21 @@ class ScriptRunnerTest(AsyncTestCase):
         # At this point, scriptrunner should have finished running, detected
         # that our widget_id wasn't in the list of widgets found this run, and
         # culled it. Ensure widget cache no longer holds our widget ID.
-        self.assertRaises(KeyError, lambda: scriptrunner._session_state[widget_id])
+        with pytest.raises(KeyError):
+            scriptrunner._session_state[widget_id]
 
     def test_dg_stack_preserved_for_fragment_rerun(self):
         """Tests that the dg_stack and cursor are preserved for a fragment rerun.
 
-        Having a fragment rerun that is interrupted by a RerunException triggered by another fragment run
-        simulates what we have seen in the issue where the main app was rendered inside of a dialog when
-        two fragment-related reruns were handled in the same ScriptRunner thread.
+        Having a fragment rerun that is interrupted by a RerunException triggered by
+        another fragment run simulates what we have seen in the issue where the main app
+        was rendered inside of a dialog when two fragment-related reruns were handled
+        in the same ScriptRunner thread.
         """
         scriptrunner = TestScriptRunner("good_script.py")
 
-        # set the dg_stack from the fragment to simulate a populated dg_stack of a real app
+        # set the dg_stack from the fragment to simulate a populated dg_stack of
+        # a real app
         dg_stack_set_by_fragment = (
             DeltaGenerator(),
             DeltaGenerator(),
@@ -833,13 +852,16 @@ class ScriptRunnerTest(AsyncTestCase):
             lambda: context_dg_stack.set(dg_stack_set_by_fragment),
         )
 
-        # trigger a run with fragment_id to avoid clearing the fragment_storage in the script runner
+        # trigger a run with fragment_id to avoid clearing the fragment_storage in the
+        # script runner
         scriptrunner.request_rerun(RerunData(fragment_id_queue=["my_fragment1"]))
 
-        # yielding a rerun request will raise a RerunException in the script runner with the provided RerunData
+        # yielding a rerun request will raise a RerunException in the script runner
+        # with the provided RerunData
         on_scriptrunner_yield_mock = MagicMock()
         on_scriptrunner_yield_mock.side_effect = [
-            # the original_dg_stack will be set to the dg_stack populated by the first requested_rerun of the fragment
+            # the original_dg_stack will be set to the dg_stack populated by the first
+            # requested_rerun of the fragment
             ScriptRequest(
                 ScriptRequestType.RERUN, RerunData(fragment_id_queue=["my_fragment1"])
             ),
@@ -871,10 +893,12 @@ class ScriptRunnerTest(AsyncTestCase):
             lambda: context_dg_stack.set(dg_stack_set_by_fragment),
         )
 
-        # trigger a run with fragment_id to avoid clearing the fragment_storage in the script runner
+        # trigger a run with fragment_id to avoid clearing the fragment_storage
+        # in the script runner
         scriptrunner.request_rerun(RerunData(fragment_id_queue=["my_fragment1"]))
 
-        # yielding a rerun request will raise a RerunException in the script runner with the provided RerunData
+        # yielding a rerun request will raise a RerunException in the script runner
+        # with the provided RerunData
         on_scriptrunner_yield_mock = MagicMock()
         on_scriptrunner_yield_mock.side_effect = [
             # raise RerunException for full app run
@@ -925,7 +949,7 @@ class ScriptRunnerTest(AsyncTestCase):
         # Ensure that each runner's radio value is as expected.
         for ii, runner in enumerate(runners):
             self._assert_text_deltas(
-                runner, ["False", "ahoy!", "%s" % ii, "False", "loop_forever"]
+                runner, ["False", "ahoy!", str(ii), "False", "loop_forever"]
             )
             runner.request_stop()
 
@@ -964,32 +988,31 @@ class ScriptRunnerTest(AsyncTestCase):
             ],
         )
         self._assert_text_deltas(scriptrunner, [text_utf2])
-        self.assertEqual(
+        assert (
             os.path.join(
                 os.path.dirname(__file__), "test_data", "good_navigation_script.py"
-            ),
-            sys.modules["__main__"].__file__,
-            (" ScriptRunner should set the __main__.__file__ attribute correctly"),
-        )
+            )
+            == sys.modules["__main__"].__file__
+        ), " ScriptRunner should set the __main__.__file__ attribute correctly"
 
         shutdown_data = scriptrunner.event_data[-1]
-        self.assertEqual(
-            shutdown_data["client_state"].page_script_hash,
-            "f0b2ab81496648a6f2af976dfd35f4a8",
+        assert (
+            shutdown_data["client_state"].page_script_hash
+            == "f0b2ab81496648a6f2af976dfd35f4a8"
         )
 
     def _assert_no_exceptions(self, scriptrunner: TestScriptRunner) -> None:
         """Assert that no uncaught exceptions were thrown in the
         scriptrunner's run thread.
         """
-        self.assertEqual([], scriptrunner.script_thread_exceptions)
+        assert scriptrunner.script_thread_exceptions == []
 
     def _assert_events(
         self, scriptrunner: TestScriptRunner, expected_events: list[ScriptRunnerEvent]
     ) -> None:
         """Assert that the ScriptRunnerEvents emitted by a TestScriptRunner
         are what we expect."""
-        self.assertEqual(expected_events, scriptrunner.events)
+        assert expected_events == scriptrunner.events
 
     def _assert_control_events(
         self, scriptrunner: TestScriptRunner, expected_events: list[ScriptRunnerEvent]
@@ -1001,7 +1024,7 @@ class ScriptRunnerTest(AsyncTestCase):
         control_events = [
             event for event in scriptrunner.events if _is_control_event(event)
         ]
-        self.assertEqual(expected_events, control_events)
+        assert expected_events == control_events
 
     def _assert_forward_msgs(
         self, scriptrunner: TestScriptRunner, messages: list[ForwardMsg]
@@ -1009,7 +1032,7 @@ class ScriptRunnerTest(AsyncTestCase):
         """Assert that the ScriptRunner's ForwardMsgQueue contains the
         given list of ForwardMsgs.
         """
-        self.assertEqual(messages, scriptrunner.forward_msgs())
+        assert messages == scriptrunner.forward_msgs()
 
     def _assert_num_deltas(
         self, scriptrunner: TestScriptRunner, num_deltas: int
@@ -1023,7 +1046,7 @@ class ScriptRunnerTest(AsyncTestCase):
         num_deltas : int
 
         """
-        self.assertEqual(num_deltas, len(scriptrunner.deltas()))
+        assert num_deltas == len(scriptrunner.deltas())
 
     def _assert_text_deltas(
         self, scriptrunner: TestScriptRunner, text_deltas: list[str]
@@ -1031,7 +1054,7 @@ class ScriptRunnerTest(AsyncTestCase):
         """Assert that the scriptrunner's ForwardMsgQueue contains text deltas
         with the given contents.
         """
-        self.assertEqual(text_deltas, scriptrunner.text_deltas())
+        assert text_deltas == scriptrunner.text_deltas()
 
 
 class TestScriptRunner(ScriptRunner):

@@ -30,7 +30,7 @@ export const StyledInlineCode = styled.code(({ theme }) => ({
   whiteSpace: "pre-wrap",
   margin: 0,
   borderRadius: theme.radii.md,
-  background: theme.colors.codeHighlightColor,
+  background: theme.colors.codeBackgroundColor,
   color: theme.colors.codeTextColor,
   fontFamily: theme.genericFonts.codeFont,
   // Use em here so that it works correctly within captions
@@ -60,19 +60,15 @@ export const StyledCode = styled.code(({ theme }) => ({
   ...codeBlockStyle(theme),
 }))
 
-interface StyledPreProps {
-  height?: number
-}
-
 /*
   This is the default prism.js theme for JavaScript, CSS and HTML, but
   stripped of everything except for token styling.
 
   See https://prismjs.com/download.html#themes=prism&languages=markup+css+clike+javascript
 */
-export const StyledPre = styled.pre<StyledPreProps>(({ theme, height }) => ({
-  height: height ? `${height}px` : undefined,
-  background: theme.colors.codeHighlightColor,
+export const StyledPre = styled.pre(({ theme }) => ({
+  height: "100%",
+  background: theme.colors.codeBackgroundColor,
   borderRadius: theme.radii.default,
   color: theme.colors.bodyText,
   fontSize: theme.fontSizes.twoSm,
@@ -210,6 +206,7 @@ export const StyledCopyButtonContainer = styled.div(({ theme }) => ({
 }))
 
 export const StyledCodeBlock = styled.div(({ theme }) => ({
+  height: "100%",
   position: "relative",
   marginLeft: theme.spacing.none,
   marginRight: theme.spacing.none,

@@ -16,6 +16,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final, Literal, cast
 
+from streamlit.elements.lib.layout_utils import (
+    LayoutConfig,
+    Width,
+    WidthWithoutContent,
+    validate_width,
+)
 from streamlit.proto.Markdown_pb2 import Markdown as MarkdownProto
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.string_util import clean_text, validate_icon_or_emoji
@@ -81,9 +87,10 @@ class MarkdownMixin:
               configuration option.
 
             - Colored badges, using the syntax ``:color-badge[text in the badge]``.
-              Supported colors are: blue, green, orange, red, violet, gray/grey,
-              or primary. For example, you can use ``:orange-badge[your text here]``
-              or ``:blue-badge[your text here]``.
+              ``color`` must be replaced with any of the following supported
+              colors: blue, green, orange, red, violet, gray/grey, or primary.
+              For example, you can use ``:orange-badge[your text here]`` or
+              ``:blue-badge[your text here]``.
 
             - Small text, using the syntax ``:small[text to show small]``.
 
@@ -211,6 +218,7 @@ class MarkdownMixin:
         body: SupportsStr | sympy.Expr,
         *,  # keyword-only arguments:
         help: str | None = None,
+        width: Width = "stretch",
     ) -> DeltaGenerator:
         # This docstring needs to be "raw" because of the backslashes in the
         # example below.
@@ -234,6 +242,12 @@ class MarkdownMixin:
             including the Markdown directives described in the ``body``
             parameter of ``st.markdown``.
 
+        width : int or "stretch" or "content"
+            The width of the LaTeX expression. If "stretch" (default), the
+            expression will take up the full width of the container. If "content",
+            the expression will take up only as much width as needed. If an integer,
+            the width will be set to that number of pixels.
+
         Example
         -------
         >>> import streamlit as st
@@ -245,21 +259,33 @@ class MarkdownMixin:
         ...     ''')
 
         """
+
         if is_sympy_expression(body):
             import sympy
 
             body = sympy.latex(body)
 
         latex_proto = MarkdownProto()
-        latex_proto.body = "$$\n%s\n$$" % clean_text(body)
+        latex_proto.body = f"$$\n{clean_text(body)}\n$$"
         latex_proto.element_type = MarkdownProto.Type.LATEX
         if help:
             latex_proto.help = help
-        return self.dg._enqueue("markdown", latex_proto)
+
+        validate_width(width, allow_content=True)
+        layout_config = LayoutConfig(width=width)
+
+        return self.dg._enqueue("markdown", latex_proto, layout_config=layout_config)
 
     @gather_metrics("divider")
-    def divider(self) -> DeltaGenerator:
+    def divider(self, *, width: WidthWithoutContent = "stretch") -> DeltaGenerator:
         """Display a horizontal rule.
+
+        Parameters
+        ----------
+        width : int or "stretch"
+            The width of the divider. If "stretch" (default), the divider will
+            take up the full width of the container. If an integer, the width
+            will be set to that number of pixels.
 
         .. note::
             You can achieve the same effect with st.write("---") or
@@ -272,10 +298,15 @@ class MarkdownMixin:
         >>> st.divider()
 
         """
+
         divider_proto = MarkdownProto()
         divider_proto.body = MARKDOWN_HORIZONTAL_RULE_EXPRESSION
         divider_proto.element_type = MarkdownProto.Type.DIVIDER
-        return self.dg._enqueue("markdown", divider_proto)
+
+        validate_width(width, allow_content=False)
+        layout_config = LayoutConfig(width=width)
+
+        return self.dg._enqueue("markdown", divider_proto, layout_config=layout_config)
 
     @gather_metrics("badge")
     def badge(
@@ -291,16 +322,21 @@ class MarkdownMixin:
             "violet",
             "gray",
             "grey",
-            "rainbow",
             "primary",
         ] = "blue",
     ) -> DeltaGenerator:
         """Display a colored badge with an icon and label.
 
-        You can also insert badges directly in Markdown, e.g. via
-        `st.markdown(":blue-badge[Home]")`. This works in all places where Streamlit
-        supports Markdown, e.g. widget labels or `st.table` cells. See `st.markdown`
-        for more information.
+        This is a thin wrapper around the color-badge Markdown directive.
+        The following are equivalent:
+
+        - ``st.markdown(":blue-badge[Home]")``
+        - ``st.badge("Home", color="blue")``
+
+        .. note::
+            You can insert badges everywhere Streamlit supports Markdown by
+            using the color-badge Markdown directive. See ``st.markdown`` for
+            more information.
 
         Parameters
         ----------
@@ -310,7 +346,9 @@ class MarkdownMixin:
             Strikethroughs, Inline Code.
 
             See the ``body`` parameter of |st.markdown|_ for additional,
-            supported Markdown directives.
+            supported Markdown directives. Because this command escapes square
+            brackets (``[ ]``) in this parameter, any directive requiring
+            square brackets is not supported.
 
             .. |st.markdown| replace:: ``st.markdown``
             .. _st.markdown: https://docs.streamlit.io/develop/api-reference/text/st.markdown
@@ -333,31 +371,34 @@ class MarkdownMixin:
               font library.
 
         color : str
-            The color to use for the badge. Supported colors are: blue, green,
-            orange, red, violet, gray/grey, primary.
-            If you use "primary" for color, Streamlit will use the default
-            primary accent color unless you set the ``theme.primaryColor``
-            configuration option.
+            The color to use for the badge. This defaults to ``"blue"``.
+
+            This can be one of the following supported colors: blue, green,
+            orange, red, violet, gray/grey, or primary. If you use
+            ``"primary"``, Streamlit will use the default primary accent color
+            unless you set the ``theme.primaryColor`` configuration option.
 
         Examples
         --------
+        Create standalone badges with ``st.badge`` (with or without icons). If
+        you want to have multiple, side-by-side badges, you can use the
+        Markdown directive in ``st.markdown``.
+
         >>> import streamlit as st
         >>>
-        >>> # Simple badge
-        >>> st.badge("Home")
-        >>>
-        >>> # Badge with icon and color
+        >>> st.badge("New")
         >>> st.badge("Success", icon=":material/check:", color="green")
         >>>
-        >>> # Multiple badges side by side in Markdown
         >>> st.markdown(
-        ...     "Here are some badges: :orange-badge[⭐️ Favorite] :blue-badge[🏠 Home] :green-badge[✅ Success]"
-        ... )
+        >>>     ":violet-badge[:material/star: Favorite] :orange-badge[⚠️ Needs review] :gray-badge[Deprecated]"
+        >>> )
+
+        .. output ::
+            https://doc-badge.streamlit.app/
+            height: 220px
+
         """
-        if icon is not None:
-            icon_str = validate_icon_or_emoji(icon) + " "
-        else:
-            icon_str = ""
+        icon_str = validate_icon_or_emoji(icon) + " " if icon is not None else ""
 
         # Escape [ and ] characters in the label to prevent breaking the directive syntax
         escaped_label = label.replace("[", "\\[").replace("]", "\\]")

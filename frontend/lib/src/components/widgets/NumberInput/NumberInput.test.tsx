@@ -70,7 +70,6 @@ describe("NumberInput widget", () => {
   beforeEach(() => {
     vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
       elementRef: { current: null },
-      forceRecalculate: vitest.fn(),
       values: [250],
     })
   })
@@ -271,6 +270,26 @@ describe("NumberInput widget", () => {
     await user.keyboard("{backspace}5")
 
     expect(screen.queryByTestId("InputInstructions")).toHaveTextContent("")
+  })
+
+  it("renders an emoji icon when provided", () => {
+    const props = getFloatProps({ icon: "💵" })
+    render(<NumberInput {...props} />)
+    // Dynamic Icon parent element
+    expect(screen.getByTestId("stNumberInputIcon")).toBeInTheDocument()
+    // Element rendering emoji icon
+    const emojiIcon = screen.getByTestId("stIconEmoji")
+    expect(emojiIcon).toHaveTextContent("💵")
+  })
+
+  it("renders a material icon when provided", () => {
+    const props = getFloatProps({ icon: ":material/attach_money:" })
+    render(<NumberInput {...props} />)
+    // Dynamic Icon parent element
+    expect(screen.getByTestId("stNumberInputIcon")).toBeInTheDocument()
+    // Element rendering material icon
+    const materialIcon = screen.getByTestId("stIconMaterial")
+    expect(materialIcon).toHaveTextContent("attach_money")
   })
 
   describe("FloatData", () => {
@@ -601,7 +620,6 @@ describe("NumberInput widget", () => {
     it("hides stepUp and stepDown buttons when width is smaller than 120px", () => {
       vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
         elementRef: { current: null },
-        forceRecalculate: vitest.fn(),
         values: [100],
       })
 
@@ -627,7 +645,6 @@ describe("NumberInput widget", () => {
     it("hides Please enter to apply text when width is smaller than 120px", async () => {
       vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
         elementRef: { current: null },
-        forceRecalculate: vitest.fn(),
         values: [100],
       })
 

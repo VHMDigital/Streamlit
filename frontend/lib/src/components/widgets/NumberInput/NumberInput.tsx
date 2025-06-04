@@ -40,13 +40,13 @@ import { useFormClearHelper } from "~lib/components/widgets/Form"
 import { Source, WidgetStateManager } from "~lib/WidgetStateManager"
 import TooltipIcon from "~lib/components/shared/TooltipIcon"
 import { Placement } from "~lib/components/shared/Tooltip"
-import Icon from "~lib/components/shared/Icon"
+import Icon, { DynamicIcon } from "~lib/components/shared/Icon"
 import InputInstructions from "~lib/components/shared/InputInstructions/InputInstructions"
 import {
   StyledWidgetLabelHelp,
   WidgetLabel,
 } from "~lib/components/widgets/BaseWidget"
-import { EmotionTheme } from "~lib/theme"
+import { convertRemToPx, EmotionTheme } from "~lib/theme"
 import { useCalculatedWidth } from "~lib/hooks/useCalculatedWidth"
 
 import {
@@ -84,6 +84,7 @@ const NumberInput: React.FC<Props> = ({
     formId: elementFormId,
     default: elementDefault,
     format: elementFormat,
+    icon,
     min,
     max,
   } = element
@@ -119,11 +120,17 @@ const NumberInput: React.FC<Props> = ({
   }, [element.dataType, element.step])
 
   const commitValue = useCallback(
-    ({ value, source }: { value: number | null; source: Source }) => {
-      if (notNullOrUndefined(value) && (min > value || value > max)) {
+    ({
+      value: valueArg,
+      source,
+    }: {
+      value: number | null
+      source: Source
+    }) => {
+      if (notNullOrUndefined(valueArg) && (min > valueArg || valueArg > max)) {
         inputRef.current?.reportValidity()
       } else {
-        const newValue = value ?? elementDefault ?? null
+        const newValue = valueArg ?? elementDefault ?? null
 
         switch (elementDataType) {
           case NumberInputProto.DataType.INT:
@@ -185,11 +192,13 @@ const NumberInput: React.FC<Props> = ({
   }, [])
 
   const updateFromProtobuf = useCallback((): void => {
-    const { value } = element
+    const { value: elementValue } = element
     element.setValue = false
-    setValue(value ?? null)
-    setFormattedValue(formatValue({ value: value ?? null, ...element, step }))
-    commitValue({ value: value ?? null, source: { fromUi: false } })
+    setValue(elementValue ?? null)
+    setFormattedValue(
+      formatValue({ value: elementValue ?? null, ...element, step })
+    )
+    commitValue({ value: elementValue ?? null, source: { fromUi: false } })
   }, [element, step, commitValue])
 
   // on component mount, we want to update the value from protobuf if setValue is true, otherwise commit current value
@@ -219,7 +228,7 @@ const NumberInput: React.FC<Props> = ({
     // Additionally, it's okay if commitValue changes, because we only call
     // it once in the beginning anyways.
     // TODO: Update to match React best practices
-    // eslint-disable-next-line react-compiler/react-compiler
+    // eslint-disable-next-line react-hooks/react-compiler
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [])
 
@@ -245,9 +254,9 @@ const NumberInput: React.FC<Props> = ({
   const onChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void => {
-    const { value } = e.target
+    const { value: targetValue } = e.target
 
-    if (value === "") {
+    if (targetValue === "") {
       setDirty(true)
       setValue(null)
       setFormattedValue(null)
@@ -255,14 +264,14 @@ const NumberInput: React.FC<Props> = ({
       let numValue: number
 
       if (element.dataType === NumberInputProto.DataType.INT) {
-        numValue = parseInt(value, 10)
+        numValue = parseInt(targetValue, 10)
       } else {
-        numValue = parseFloat(value)
+        numValue = parseFloat(targetValue)
       }
 
       setDirty(true)
       setValue(numValue)
-      setFormattedValue(value)
+      setFormattedValue(targetValue)
     }
   }
 
@@ -313,6 +322,21 @@ const NumberInput: React.FC<Props> = ({
     [dirty, value, commitValue, widgetMgr, elementFormId, fragmentId]
   )
 
+  // Material icons need to be larger to render similar size of emojis,
+  // and we change their text color
+  const isMaterialIcon = icon?.startsWith(":material")
+  const dynamicIconSize = isMaterialIcon ? "lg" : "base"
+
+  // Adjust breakpoint for icon so the total width of the input element
+  // is same when input controls hidden
+  const iconAdjustment =
+    // Account for icon size + its left/right padding
+    convertRemToPx(theme.iconSizes.lg) +
+    2 * convertRemToPx(theme.spacing.twoXS)
+  const numberInputControlBreakpoint = icon
+    ? theme.breakpoints.hideNumberInputControls + iconAdjustment
+    : theme.breakpoints.hideNumberInputControls
+
   return (
     <div
       className="stNumberInput"
@@ -354,6 +378,15 @@ const NumberInput: React.FC<Props> = ({
           clearOnEscape={clearable}
           disabled={disabled}
           aria-label={element.label}
+          startEnhancer={
+            element.icon && (
+              <DynamicIcon
+                data-testid="stNumberInputIcon"
+                iconValue={element.icon}
+                size={dynamicIconSize}
+              />
+            )
+          }
           id={id.current}
           overrides={{
             ClearIconContainer: {
@@ -395,7 +428,7 @@ const NumberInput: React.FC<Props> = ({
                 lineHeight: theme.lineHeights.inputWidget,
                 // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
                 paddingRight: theme.spacing.sm,
-                paddingLeft: theme.spacing.sm,
+                paddingLeft: theme.spacing.md,
                 paddingBottom: theme.spacing.sm,
                 paddingTop: theme.spacing.sm,
               },
@@ -418,12 +451,23 @@ const NumberInput: React.FC<Props> = ({
                 borderTopWidth: 0,
                 borderBottomWidth: 0,
                 paddingRight: 0,
+                paddingLeft: icon ? theme.spacing.sm : 0,
+              },
+            },
+            StartEnhancer: {
+              style: {
+                paddingLeft: 0,
+                paddingRight: 0,
+                // Keeps emoji icons from being cut off on the right
+                minWidth: theme.iconSizes.lg,
+                // Material icons color changed as inactionable
+                color: isMaterialIcon ? theme.colors.fadedText60 : "inherit",
               },
             },
           }}
         />
         {/* We only want to show the increment/decrement controls when there is sufficient room to display the value and these controls. */}
-        {width > theme.breakpoints.hideNumberInputControls && (
+        {width > numberInputControlBreakpoint && (
           <StyledInputControls>
             <StyledInputControl
               data-testid="stNumberInputStepDown"

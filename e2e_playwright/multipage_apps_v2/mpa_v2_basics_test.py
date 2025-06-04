@@ -14,31 +14,37 @@
 from __future__ import annotations
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Locator, Page, expect
 
 from e2e_playwright.conftest import (
     ImageCompareFunction,
     wait_for_app_loaded,
     wait_for_app_run,
+    wait_until,
 )
 from e2e_playwright.shared.app_utils import (
     click_button,
     click_checkbox,
+    expect_prefixed_markdown,
     get_element_by_key,
 )
 
 
-def main_heading(app: Page):
+def main_heading(app: Page) -> Locator:
     return app.get_by_test_id("stHeading").nth(0)
 
 
-def page_heading(app: Page):
+def page_heading(app: Page) -> Locator:
     return app.get_by_test_id("stHeading").nth(1)
 
 
 def check_field(
-    app: Page, *, hide_sidebarnav=False, dynamic_pages=False, add_sidebar_elements=False
-):
+    app: Page,
+    *,
+    hide_sidebarnav: bool = False,
+    dynamic_pages: bool = False,
+    add_sidebar_elements: bool = False,
+) -> None:
     if hide_sidebarnav:
         click_checkbox(app, "Hide sidebar")
 
@@ -68,7 +74,7 @@ expected_page_order = [
 
 def get_page_link(
     app: Page, page_name: str, page_order: list[str] = expected_page_order
-):
+) -> Locator:
     return (
         app.get_by_test_id("stSidebarNav").locator("a").nth(page_order.index(page_name))
     )
@@ -125,6 +131,18 @@ def test_main_script_widgets_persist_across_page_changes(app: Page):
     get_page_link(app, "page 5").click()
     wait_for_app_run(app)
     expect(app.get_by_test_id("stMarkdown").nth(0)).to_contain_text("x is 1")
+
+
+def test_context_url(app: Page, app_port: int):
+    """Test that the page url_path is correct."""
+
+    expected_url = f"http://localhost:{app_port}"
+    expect_prefixed_markdown(app, "Context URL:", expected_url)
+
+    get_page_link(app, "Different Title").click()
+    wait_for_app_run(app)
+    new_expected_url = f"http://localhost:{app_port}/page_3"
+    expect_prefixed_markdown(app, "Context URL:", new_expected_url)
 
 
 def test_supports_navigating_to_page_directly_via_url(app: Page, app_port: int):
@@ -461,12 +479,12 @@ def test_widgets_maintain_state_in_fragment(app: Page):
     """Test that widgets maintain state in a fragment."""
     get_page_link(app, "page 10").click()
 
-    input = app.get_by_test_id("stTextInput").locator("input").first
-    input.fill("Hello")
-    input.blur()
+    input_el = app.get_by_test_id("stTextInput").locator("input").first
+    input_el.fill("Hello")
+    input_el.blur()
     wait_for_app_run(app)
 
-    expect(input).to_have_value("Hello")
+    expect(input_el).to_have_value("Hello")
 
 
 def test_widget_state_reset_on_page_switch(app: Page):
@@ -539,3 +557,35 @@ def test_sidebar_interaction_performance(app: Page):
     options = sidebar.locator("li")
     for option in options.all():
         option.hover()
+
+
+def test_logo_source_errors(app: Page, app_port: int):
+    """Test that logo source errors are logged."""
+    app.route(
+        f"http://localhost:{app_port}/media/**",
+        lambda route: route.fulfill(
+            status=404, headers={"Content-Type": "text/plain"}, body="Not Found"
+        ),
+    )
+
+    # Capture console messages
+    messages = []
+    app.on("console", lambda msg: messages.append(msg.text))
+
+    # Navigate to the app
+    app.goto(f"http://localhost:{app_port}")
+
+    # Wait until the expected error is logged, indicating CLIENT_ERROR was sent
+    # for the logo in the main app area and the sidebar
+    wait_until(
+        app,
+        lambda: any(
+            "Client Error: Logo source error" in message for message in messages
+        ),
+    )
+    wait_until(
+        app,
+        lambda: any(
+            "Client Error: Sidebar Logo source error" in message for message in messages
+        ),
+    )

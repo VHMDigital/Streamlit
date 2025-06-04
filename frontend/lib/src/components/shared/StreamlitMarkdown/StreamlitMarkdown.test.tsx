@@ -17,7 +17,6 @@
 import React, { ReactElement } from "react"
 
 import ReactMarkdown from "react-markdown"
-// eslint-disable-next-line testing-library/no-manual-cleanup
 import { cleanup, screen } from "@testing-library/react"
 import { transparentize } from "color2k"
 
@@ -44,16 +43,41 @@ const getMarkdownElement = (body: string): ReactElement => {
 }
 
 describe("createAnchorFromText", () => {
-  it("generates slugs correctly", () => {
-    const cases = [
-      ["some header", "some-header"],
-      ["some -24$35-9824  header", "some-24-35-9824-header"],
-      ["blah___blah___blah", "blah-blah-blah"],
-    ]
+  it.each([
+    // Basic cases
+    ["UPPERCASE", "uppercase"],
+    ["some header", "some-header"],
+    ["some -24$35-9824  header", "some-24-35-9824-header"],
+    ["blah___blah___blah", "blah-blah-blah"],
 
-    cases.forEach(([s, want]) => {
-      expect(createAnchorFromText(s)).toEqual(want)
-    })
+    // Special characters and symbols
+    ["header!@#$%^&*()", "header-and"],
+    ["  spaces  everywhere  ", "spaces-everywhere"],
+    ["multiple---dashes", "multiple-dashes"],
+    ["dots...and,commas", "dots-and-commas"],
+    ["emoji 👋 test", "emoji-test"],
+    ["mixed_case_UPPER", "mixed-case-upper"],
+
+    // Non-English languages and special characters that we can transliterate and slugify
+    ["Présentation", "presentation"],
+    ["Привет мир", "privet-mir"],
+    ["مرحبا بالعالم", "mrhba-balealm"],
+    ["Γεια σας κόσμος", "geia-sas-kosmos"],
+
+    // Languages we are not able to slugify - fallback to hash
+    ["안녕하세요", "c40769b7"],
+    ["こんにちは世界", "f73d32df"],
+
+    // Empty string
+    ["", ""],
+
+    // Edge cases that fallback to hash
+    [" ", "aa76e70b"],
+    ["###", "3ec1ca7"],
+    ["---", "6110bfd"],
+    ["___", "647ce586"],
+  ])("converts '%s' to '%s'", (input, expected) => {
+    expect(createAnchorFromText(input)).toEqual(expected)
   })
 })
 
@@ -386,6 +410,7 @@ describe("StreamlitMarkdown", () => {
       const tagName = markdown.nodeName.toLowerCase()
       expect(tagName).toBe("span")
       expect(markdown).toHaveStyle(`color: ${style}`)
+      expect(markdown).toHaveClass("colored-text")
 
       // Removes rendered StreamlitMarkdown component before next case run
       cleanup()
@@ -529,7 +554,7 @@ describe("CustomCodeTag Element", () => {
     })
     render(<CustomCodeTag {...props} />)
     // queryBy returns null vs. error
-    const copyButton = screen.queryByRole("button") // eslint-disable-line testing-library/prefer-presence-queries
+    const copyButton = screen.queryByRole("button")
 
     expect(copyButton).toBeNull()
   })
