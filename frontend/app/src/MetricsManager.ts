@@ -149,6 +149,7 @@ export class MetricsManager {
   }
 
   // Fallback - Checks if cached in localStorage, otherwise fetches the config from a default URL
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   private async requestDefaultMetricsConfig(): Promise<any> {
     const isLocalStoreAvailable = localStorageAvailable()
 
@@ -192,6 +193,7 @@ export class MetricsManager {
     } else if (this.metricsUrl === "postMessage") {
       this.postMessageEvent(evName, data)
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
       this.track(data)
     }
   }
@@ -203,7 +205,6 @@ export class MetricsManager {
     this.pendingEvents = []
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private async track(data: MetricsEvent): Promise<void> {
     // Send the event to the metrics URL
     // @ts-expect-error - send func calls track & checks metricsUrl defined
@@ -244,6 +245,9 @@ export class MetricsManager {
       appId: this.sessionInfo.current.appId,
       sessionId: this.sessionInfo.current.sessionId,
       pythonVersion: this.sessionInfo.current.pythonVersion,
+      serverOs: this.sessionInfo.current.serverOS,
+      hasDisplay: this.sessionInfo.current.hasDisplay,
+      isWebdriver: isWebdriver(),
       ...this.getContextData(),
     })
 
@@ -260,6 +264,7 @@ export class MetricsManager {
   private getInstallationData(): Partial<IMetricsEvent> {
     return {
       machineIdV3: this.sessionInfo.current.installationIdV3,
+      machineIdV4: this.sessionInfo.current.installationIdV4,
     }
   }
 
@@ -336,4 +341,8 @@ export class MetricsManager {
       }
     }
   }
+}
+
+function isWebdriver(): boolean {
+  return window.navigator?.webdriver ?? false
 }

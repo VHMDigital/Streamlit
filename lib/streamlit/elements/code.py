@@ -16,6 +16,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
+from streamlit.elements.lib.layout_utils import (
+    Height,
+    LayoutConfig,
+    WidthWithoutContent,
+    validate_height,
+    validate_width,
+)
 from streamlit.proto.Code_pb2 import Code as CodeProto
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.string_util import clean_text
@@ -34,7 +41,8 @@ class CodeMixin:
         *,
         line_numbers: bool = False,
         wrap_lines: bool = False,
-        height: int | None = None,
+        height: Height = "content",
+        width: WidthWithoutContent = "stretch",
     ) -> DeltaGenerator:
         """Display a code block with optional syntax highlighting.
 
@@ -65,7 +73,12 @@ class CodeMixin:
             Desired height of the code block expressed in pixels. If ``height``
             is ``None`` (default), Streamlit sets the element's height to fit
             its content. Vertical scrolling within the element is enabled when
-            the height does not accomodate all lines.
+            the height does not accommodate all lines.
+
+        width : "stretch" or int
+            The width of the code block. This can be either:
+            - "stretch" (default): The code block will stretch to fill the container width
+            - An integer: The code block will have a fixed width in pixels
 
         Examples
         --------
@@ -104,9 +117,12 @@ class CodeMixin:
         code_proto.language = language or "plaintext"
         code_proto.show_line_numbers = line_numbers
         code_proto.wrap_lines = wrap_lines
-        if height:
-            code_proto.height = height
-        return self.dg._enqueue("code", code_proto)
+
+        validate_height(height, allow_content=True)
+        validate_width(width)
+        layout_config = LayoutConfig(height=height, width=width)
+
+        return self.dg._enqueue("code", code_proto, layout_config=layout_config)
 
     @property
     def dg(self) -> DeltaGenerator:

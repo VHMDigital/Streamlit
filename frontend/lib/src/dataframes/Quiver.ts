@@ -15,7 +15,6 @@
  */
 
 // Private members use _.
-/* eslint-disable no-underscore-dangle */
 
 import { Field, Vector } from "apache-arrow"
 import { immerable, produce } from "immer"
@@ -286,6 +285,7 @@ export class Quiver {
    *
    * Index columns only exist if the DataFrame was created based on a Pandas DataFrame.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   private getIndexValue(rowIndex: number, columnIndex: number): any {
     const index = this._pandasIndexData[columnIndex]
     const value =
@@ -294,6 +294,7 @@ export class Quiver {
   }
 
   /** Get the raw value of a data cell. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   private getDataValue(rowIndex: number, columnIndex: number): any {
     return this._data.getChildAt(columnIndex)?.get(rowIndex)
   }

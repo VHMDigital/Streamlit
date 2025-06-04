@@ -53,6 +53,7 @@ export enum BaseButtonSize {
 export interface BaseButtonProps {
   kind: BaseButtonKind
   size?: BaseButtonSize
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   onClick?: (event: MouseEvent<HTMLButtonElement>) => any
   disabled?: boolean
   // If true, the button should take up container's full width
@@ -95,7 +96,7 @@ export const StyledBaseButton = styled.button<RequiredBaseButtonProps>(
       justifyContent: "center",
       fontWeight: theme.fontWeights.normal,
       padding: `${theme.spacing.xs} ${theme.spacing.md}`,
-      borderRadius: theme.radii.default,
+      borderRadius: theme.radii.button,
       minHeight: theme.sizes.minElementHeight,
       margin: theme.spacing.none,
       lineHeight: theme.lineHeights.base,
@@ -391,12 +392,12 @@ export const StyledSegmentedControlButton = styled(
     marginRight: `-${theme.sizes.borderWidth}`, // Add negative margin to overlap borders
 
     "&:first-child": {
-      borderTopLeftRadius: theme.radii.default,
-      borderBottomLeftRadius: theme.radii.default,
+      borderTopLeftRadius: theme.radii.button,
+      borderBottomLeftRadius: theme.radii.button,
     },
     "&:last-child": {
-      borderTopRightRadius: theme.radii.default,
-      borderBottomRightRadius: theme.radii.default,
+      borderTopRightRadius: theme.radii.button,
+      borderBottomRightRadius: theme.radii.button,
       marginRight: theme.spacing.none, // Reset margin for the last child
     },
     "&:hover": {
@@ -533,7 +534,7 @@ export const StyledElementToolbarButton = styled(
   return {
     backgroundColor: theme.colors.transparent,
     border: "none",
-    padding: theme.spacing.xs,
+    padding: theme.spacing.twoXS,
     fontSize: theme.fontSizes.twoSm,
     marginLeft: theme.spacing.none,
     marginRight: theme.spacing.none,

@@ -72,8 +72,6 @@ jobs:
   run-python-tests:
     needs: create-nightly-tag
     permissions:
-      # Pass additional permission needed to upload constraints
-      contents: write
       # Additional permissions for py-coverage-report
       actions: read
       pull-requests: write
@@ -89,6 +87,10 @@ jobs:
     uses: ./.github/workflows/js-tests.yml
     with:
       ref: ${{needs.create-nightly-tag.outputs.tag}}
+    permissions:
+      # Additional permissions for coverage-comment
+      actions: read
+      pull-requests: write
 
   run-playwright-tests:
     uses: ./.github/workflows/playwright.yml

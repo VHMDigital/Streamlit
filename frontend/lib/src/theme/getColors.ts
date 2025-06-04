@@ -92,11 +92,14 @@ export const createEmotionColors = (genericColors: {
 
     borderColor: derivedColors.fadedText10,
     borderColorLight: derivedColors.fadedText05,
+    // Used for borders around dataframes and tables
+    dataframeBorderColor: derivedColors.fadedText05,
 
     headingColor: genericColors.bodyText,
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function getDividerColors(theme: EmotionTheme): any {
   const lightTheme = hasLightBackgroundColor(theme)
   const blue = lightTheme ? theme.colors.blue60 : theme.colors.blue90
@@ -118,6 +121,7 @@ export function getDividerColors(theme: EmotionTheme): any {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function getMarkdownTextColors(theme: EmotionTheme): any {
   const lightTheme = hasLightBackgroundColor(theme)
   const primary = theme.colors.primary
@@ -143,6 +147,7 @@ export function getMarkdownTextColors(theme: EmotionTheme): any {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 export function getMarkdownBgColors(theme: EmotionTheme): any {
   const lightTheme = hasLightBackgroundColor(theme)
 

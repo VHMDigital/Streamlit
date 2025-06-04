@@ -398,6 +398,7 @@ export function formatPeriodFromFreq(
   try {
     return momentConverter(durationNumber, freqParam)
   } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     LOG.warn(`Error while formatting period value: ${error}`)
     return String(duration)
   }
@@ -427,7 +428,7 @@ function formatPeriod(duration: number | bigint, field?: Field): string {
     return String(duration)
   }
 
-  const parsedExtensionMetadata = JSON.parse(extensionMetadata as string)
+  const parsedExtensionMetadata = JSON.parse(extensionMetadata)
   const { freq } = parsedExtensionMetadata
   return formatPeriodFromFreq(duration, freq)
 }
@@ -439,6 +440,7 @@ function formatPeriod(duration: number | bigint, field?: Field): string {
  * @param field The field metadata from arrow containing metadata about the column.
  * @returns The formatted JSON string.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 function formatObject(object: any, field?: Field): string {
   if (field?.type instanceof Struct) {
     // This type is used by python dictionary values
@@ -495,7 +497,7 @@ function formatInterval(x: StructRow, field?: Field): string {
     )
     const { subtype, closed } = extensionMetadata
 
-    const interval = (x as StructRow).toJSON() as PandasInterval
+    const interval = x.toJSON() as PandasInterval
 
     const leftBracket = closed === "both" || closed === "left" ? "[" : "("
     const rightBracket = closed === "both" || closed === "right" ? "]" : ")"
@@ -588,6 +590,7 @@ export function format(x: DataType, type: ArrowType): string {
       return formatObject(x, type.arrowField)
     }
   } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     LOG.warn(`Unexpected error occurred while formatting value: ${error}`)
     // Fallback to string conversion if any error occurs.
     // It's not expected that this happens, but we want to guard against

@@ -28,8 +28,11 @@ export function mockSessionInfoProps(
     sessionId: "mockSessionId",
     streamlitVersion: "mockStreamlitVersion",
     pythonVersion: "mockPythonVersion",
+    serverOS: "mockServerOS",
+    hasDisplay: true,
     installationId: "mockInstallationId",
     installationIdV3: "mockInstallationIdV3",
+    installationIdV4: "mockInstallationIdV4",
     maxCachedMessageAge: 123,
     isHello: false,
     isConnected: true,
@@ -60,7 +63,7 @@ export function mockEndpoints(
     buildAppPageURL: vi
       .fn()
       .mockImplementation(
-        (pageLinkBaseURL: string, page: IAppPage, pageIndex: number) => {
+        (_pageLinkBaseURL: string, page: IAppPage, pageIndex: number) => {
           return `http://mock/app/page/${page.pageName}.${pageIndex}`
         }
       ),

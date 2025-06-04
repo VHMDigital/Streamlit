@@ -76,7 +76,6 @@ describe("Slider widget", () => {
 
     vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
       elementRef: { current: null },
-      forceRecalculate: vitest.fn(),
       values: [250],
     })
   })
@@ -179,6 +178,7 @@ describe("Slider widget", () => {
       const slider = screen.getByRole("slider")
       expect(slider).toHaveAttribute(
         "aria-valuetext",
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         `${props.element.default}`
       )
       expect(slider).toHaveAttribute("aria-valuemin", `${props.element.min}`)

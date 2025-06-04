@@ -226,7 +226,8 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
   public async uploadFileUploaderFile(
     fileUploadUrl: string,
     file: File,
-    sessionId: string,
+    _sessionId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     onUploadProgress?: (progressEvent: any) => void,
     cancelToken?: CancelToken
   ): Promise<void> {
@@ -249,6 +250,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
       // If the request succeeds, we don't care about the response body
     } catch (error: unknown) {
       // Send error info on failure
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- TODO: Fix this
       LOG.error(`Client Error: File uploader error on file upload - ${error}`)
       const message = error instanceof Error ? error.message : "Unknown Error"
       this.sendClientErrorToHost(
@@ -293,6 +295,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
       // If the request succeeds, we don't care about the response body
     } catch (error: unknown) {
       // Send error info on failure
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- TODO: Fix this
       LOG.error(`Client Error: File uploader error on file delete - ${error}`)
       const message = error instanceof Error ? error.message : "Unknown Error"
       this.sendClientErrorToHost(
@@ -329,6 +332,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
    * Wrapper around axios.request to update the request config with
    * CSRF headers if client has CSRF protection enabled.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   private csrfRequest<T = any, R = AxiosResponse<T>>(
     url: string,
     params: AxiosRequestConfig

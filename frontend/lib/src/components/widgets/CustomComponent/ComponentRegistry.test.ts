@@ -32,7 +32,9 @@ describe("ComponentRegistry", () => {
     const { onMessageEvent } = registry
 
     // Create some mocks
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     const msgSource1: any = {}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     const msgSource2: any = {}
     const msgListener1 = vi.fn()
     const msgListener2 = vi.fn()
@@ -106,7 +108,7 @@ describe("ComponentRegistry", () => {
     )
   })
 
-  test("Triggers call to endpoint's checkSourceUrlResponse when registry's checkSourceUrlResponse is called", () => {
+  test("Triggers call to endpoint's checkSourceUrlResponse when registry's checkSourceUrlResponse is called", async () => {
     const registry = new ComponentRegistry(mockEndpoints())
     const url = registry.getComponentURL("foo", "index.html")
     const registryCheckSourceResponseSpy = vi.spyOn(
@@ -118,7 +120,7 @@ describe("ComponentRegistry", () => {
       registry.endpoints,
       "checkSourceUrlResponse"
     )
-    registry.checkSourceUrlResponse(url, "foo")
+    await registry.checkSourceUrlResponse(url, "foo")
     expect(registryCheckSourceResponseSpy).toHaveBeenCalledWith(url, "foo")
     expect(endpointsCheckSourceResponseSpy).toHaveBeenCalledWith(
       url,

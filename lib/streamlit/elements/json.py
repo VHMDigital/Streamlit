@@ -19,6 +19,11 @@ import types
 from collections import ChainMap, UserDict
 from typing import TYPE_CHECKING, Any, cast
 
+from streamlit.elements.lib.layout_utils import (
+    LayoutConfig,
+    WidthWithoutContent,
+    validate_width,
+)
 from streamlit.proto.Json_pb2 import Json as JsonProto
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.type_util import (
@@ -46,6 +51,7 @@ class JsonMixin:
         body: object,
         *,  # keyword-only arguments:
         expanded: bool | int = True,
+        width: WidthWithoutContent = "stretch",
     ) -> DeltaGenerator:
         """Display an object or string as a pretty-printed, interactive JSON string.
 
@@ -68,6 +74,11 @@ class JsonMixin:
 
             Regardless of the initial expansion state, users can collapse or
             expand any key-value pair to show or hide any part of the object.
+
+        width : "stretch" or int
+            The width of the JSON element. This can be either:
+            - "stretch" (default): The element will stretch to fill the container width
+            - An integer: The element will have a fixed width in pixels
 
         Example
         -------
@@ -127,11 +138,14 @@ class JsonMixin:
             json_proto.max_expand_depth = expanded
         else:
             raise TypeError(
-                f"The type {str(type(expanded))} of `expanded` is not supported"
+                f"The type {type(expanded)} of `expanded` is not supported"
                 ", must be bool or int."
             )
 
-        return self.dg._enqueue("json", json_proto)
+        validate_width(width)
+        layout_config = LayoutConfig(width=width)
+
+        return self.dg._enqueue("json", json_proto, layout_config=layout_config)
 
     @property
     def dg(self) -> DeltaGenerator:

@@ -30,6 +30,7 @@ function convertRemToEm(s: string): string {
   return s.replace(/rem$/, "em")
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 function sharedMarkdownStyle(theme: Theme): any {
   return {
     a: {
@@ -63,6 +64,7 @@ function getMarkdownHeadingDefinitions(
   theme: Theme,
   useSmallerHeadings: boolean,
   isCaption: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
 ): any {
   return {
     "h1, h2, h3, h4, h5, h6": {
@@ -167,6 +169,12 @@ export const StyledStreamlitMarkdown =
           isCaption
         ),
 
+        // This is required so that long Latex formulas in `st.latex` are scrollable
+        // when `help` is set (see below).
+        "&:has(.katex-display)": {
+          overflowX: "hidden",
+        },
+
         p: {
           wordBreak: "break-word",
           marginBottom: isLabel ? theme.spacing.none : "",
@@ -186,18 +194,26 @@ export const StyledStreamlitMarkdown =
         },
 
         li: {
-          // TODO(lukasmasuch): We might want to refactor
-          // these settings to use our spacing props instead.
-          // But this would require some styling changes.
-          margin: "0.2em 0 0.2em 1.2em",
-          padding: "0 0 0 0.6em",
+          margin: "0.2em 0 0.2em 1.15em",
+          padding: "0 0 0 0.3em",
+        },
+
+        "li.task-list-item": {
+          listStyleType: "none",
+          padding: "0",
+          marginLeft: "0",
+          "input[type='checkbox']": {
+            verticalAlign: "middle",
+            margin: "0 0.35em 0.1em 0",
+          },
         },
 
         // Handles quotes:
         blockquote: {
           margin: "1em 0 1em 0",
-          padding: "0 0 0 1.2em",
-          borderLeft: `${theme.sizes.borderWidth} solid ${theme.colors.lightGray}`,
+          padding: `0 0 0 0.75em`,
+          borderLeft: `0.15em solid ${theme.colors.borderColor}`,
+          opacity: 0.6,
         },
 
         "b, strong": {
@@ -228,7 +244,7 @@ export const StyledStreamlitMarkdown =
         },
 
         tr: {
-          borderTop: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+          borderTop: `${theme.sizes.borderWidth} solid ${theme.colors.dataframeBorderColor}`,
         },
 
         th: {
@@ -237,7 +253,7 @@ export const StyledStreamlitMarkdown =
 
         "th, td": {
           padding: `${theme.spacing.xs} ${theme.spacing.md}`,
-          border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+          border: `${theme.sizes.borderWidth} solid ${theme.colors.dataframeBorderColor}`,
         },
 
         "span.has-background-color": {
@@ -266,6 +282,13 @@ export const StyledStreamlitMarkdown =
 
         "p, ol, ul, dl, li": {
           fontSize: "inherit",
+        },
+
+        // Allow long Latex formulas that are not inline (i.e. either from `st.latex`
+        // or in their own paragraph inside `st.markdown`) to scroll horizontally.
+        ".katex-display": {
+          overflowX: "auto",
+          overflowY: "hidden",
         },
       }
     }
@@ -301,12 +324,14 @@ export const StyledHeadingWithActionElements = styled.div(({ theme }) => ({
   textWrap: "pretty",
 
   // show link-icon when hovering somewhere over the heading
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   [StyledLinkIcon as any]: {
     visibility: "hidden",
   },
 
   // we have to set the hover here so that the link icon becomes visible when hovering anywhere over the heading
   "&:hover": {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
     [StyledLinkIcon as any]: {
       visibility: "visible",
     },

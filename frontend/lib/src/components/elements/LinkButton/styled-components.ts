@@ -41,6 +41,7 @@ export interface BaseLinkButtonProps {
   href: string
   target: string
   rel: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   onClick: (event: MouseEvent<HTMLAnchorElement>) => any
 }
 
@@ -76,7 +77,7 @@ export const StyledBaseLinkButton = styled.a<RequiredBaseLinkButtonProps>(
       justifyContent: "center",
       fontWeight: theme.fontWeights.normal,
       padding: `${theme.spacing.xs} ${theme.spacing.md}`,
-      borderRadius: theme.radii.default,
+      borderRadius: theme.radii.button,
       minHeight: theme.sizes.minElementHeight,
       margin: 0,
       lineHeight: theme.lineHeights.base,
