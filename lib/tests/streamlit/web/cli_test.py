@@ -378,11 +378,9 @@ class CliTest(unittest.TestCase):
                 result = self.runner.invoke(cli, ["run", "file_name.py"])
 
             assert result.exit_code != 0
-            assert (
-                (prompt_mode and not headless_mode) == (
-                  "like to receive helpful onboarding emails, news, offers, promotions,"
-                  in result.output
-                )
+            assert (prompt_mode and not headless_mode) == (
+                "like to receive helpful onboarding emails, news, offers, promotions,"
+                in result.output
             ), (
                 f"Welcome message mode is {prompt_mode} "
                 f"and headless mode is {headless_mode} "
