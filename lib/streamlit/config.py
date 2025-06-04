@@ -1316,23 +1316,7 @@ def _secrets_files() -> list[str]:
     first to last, so secrets in later files will take precedence over
     earlier ones.
     """
-    secrets_files = [
-        # NOTE: The order here is important! Project-level secrets should overwrite
-        # global secrets.
-        file_util.get_streamlit_file_path("secrets.toml"),
-        file_util.get_project_streamlit_file_path("secrets.toml"),
-    ]
-
-    if _main_script_path is not None:
-        script_level_config = file_util.get_main_script_streamlit_file_path(
-            _main_script_path, "secrets.toml"
-        )
-        if script_level_config not in secrets_files:
-            # We need to append the script-level secrets file to the list
-            # so that it overwrites project & global level secrets files:
-            secrets_files.append(script_level_config)
-
-    return secrets_files
+    return get_config_files("secrets.toml")
 
 
 def get_where_defined(key: str) -> str:
@@ -1583,22 +1567,22 @@ def _maybe_convert_to_number(v: Any) -> Any:
 _on_config_parsed = Signal(doc="Emitted when the config file is parsed.")
 
 
-def get_config_files() -> list[str]:
-    """Return the list of config files to be parsed.
+def get_config_files(file_name: str) -> list[str]:
+    """Return the list of config files (e.g. config.toml or secrets.toml) to be parsed.
 
-    Order is important, import is first to last, so secrets in later files
+    Order is important, import is first to last, so options in later files
     will take precedence over earlier ones.
     """
     # script-level config files overwrite project-level config
     # files, which in turn overwrite global config files.
     config_files = [
-        file_util.get_streamlit_file_path("config.toml"),
-        file_util.get_project_streamlit_file_path("config.toml"),
+        file_util.get_streamlit_file_path(file_name),
+        file_util.get_project_streamlit_file_path(file_name),
     ]
 
     if _main_script_path is not None:
         script_level_config = file_util.get_main_script_streamlit_file_path(
-            _main_script_path, "config.toml"
+            _main_script_path, file_name
         )
         if script_level_config not in config_files:
             # We need to append the script-level config file to the list
@@ -1656,7 +1640,7 @@ def get_config_options(
 
         # Values set in files later in the CONFIG_FILENAMES list overwrite those
         # set earlier.
-        for filename in get_config_files():
+        for filename in get_config_files("config.toml"):
             if not os.path.exists(filename):
                 continue
 

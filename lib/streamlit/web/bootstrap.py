@@ -290,7 +290,7 @@ def _install_config_watchers(flag_options: dict[str, Any]) -> None:
     def on_config_changed(_path: str) -> None:
         load_config_options(flag_options)
 
-    for filename in config.get_config_files():
+    for filename in config.get_config_files("config.toml"):
         if os.path.exists(filename):
             watch_file(filename, on_config_changed)
 
