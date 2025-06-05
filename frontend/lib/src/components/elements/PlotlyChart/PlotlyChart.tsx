@@ -312,8 +312,8 @@ export function PlotlyChart({
     calculatedHeight = height
   } else if (calculatedHeight === undefined) {
     // If no height was specified in the initial spec and we're not in fullscreen,
-    // use the default Plotly height (450px)
-    calculatedHeight = 450
+    // use the default Plotly height
+    calculatedHeight = DEFAULT_PLOTLY_HEIGHT
   }
 
   if (
