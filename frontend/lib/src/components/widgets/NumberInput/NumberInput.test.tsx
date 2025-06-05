@@ -17,6 +17,7 @@ import React from "react"
 
 import { act, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
+import { ThemeProvider } from "@emotion/react"
 
 import {
   LabelVisibilityMessage as LabelVisibilityMessageProto,
@@ -26,6 +27,7 @@ import {
 import { render } from "~lib/test_util"
 import { WidgetStateManager } from "~lib/WidgetStateManager"
 import * as UseResizeObserver from "~lib/hooks/useResizeObserver"
+import emotionBaseTheme from "~lib/theme/emotionBaseTheme"
 
 import NumberInput, { Props } from "./NumberInput"
 
@@ -668,6 +670,7 @@ describe("NumberInput widget", () => {
 
       // userEvent necessary to trigger dirty state
       await user.click(numberInput)
+      await user.clear(numberInput)
       await user.keyboard("20")
 
       expect(screen.getByText("Press Enter to apply")).toBeVisible()
@@ -704,5 +707,155 @@ describe("NumberInput widget", () => {
     const forId2 = numberInputLabel2.getAttribute("for")
 
     expect(forId2).toBe(forId1)
+  })
+
+  describe("Error Handling", () => {
+    beforeEach(() => {
+      vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
+        elementRef: { current: null },
+        forceRecalculate: vitest.fn(),
+        // Keep width large so controls/instructions would normally show
+        values: [250],
+      })
+    })
+
+    // Helper function to render NumberInput with a theme provider
+    const renderNumberInput = (props: any): ReturnType<typeof render> =>
+      render(
+        <ThemeProvider theme={emotionBaseTheme}>
+          <NumberInput {...props} />
+        </ThemeProvider>
+      )
+
+    it("shows BelowMin error when input is below min", async () => {
+      const user = userEvent.setup()
+      const props = getIntProps({ default: 5, min: 0, max: 10 })
+      renderNumberInput(props)
+
+      const input = screen.getByTestId("stNumberInputField")
+      const container = screen.getByTestId("stNumberInputContainer")
+
+      // Clear and type a value below min
+      await user.clear(input)
+      await user.type(input, "-1")
+      await user.tab() // blur triggers commitValue / useEffect
+
+      // 1) Container should have the danger background style.
+      expect(getComputedStyle(container).backgroundColor).toBe(
+        emotionBaseTheme.colors.dangerBg
+      )
+
+      // 2) Input should have aria-invalid="true"
+      expect(input).toHaveAttribute("aria-invalid", "true")
+
+      // 3) The tooltip icon (ErrorOutline) should be rendered.
+      const errorIcon = screen.getByTestId("stTooltipErrorHoverTarget")
+      expect(errorIcon).toBeVisible()
+
+      // 4)Hover over the error icon to trigger the tooltip
+      await user.hover(errorIcon)
+
+      const tooltip = await screen.findByTestId("stTooltipErrorContent")
+      expect(tooltip).toHaveTextContent(
+        "Error: Value must be greater than or equal to 0."
+      )
+    })
+
+    it("shows AboveMax error when input is above max", async () => {
+      const user = userEvent.setup()
+      const props = getIntProps({ default: 5, min: 0, max: 10 })
+      renderNumberInput(props)
+
+      const input = screen.getByTestId("stNumberInputField")
+      const container = screen.getByTestId("stNumberInputContainer")
+
+      // Clear and type a value above max
+      await user.clear(input)
+      await user.type(input, "15")
+      await user.tab()
+
+      // 1) Container should have the danger background style.
+      expect(container).toHaveStyle({
+        backgroundColor: emotionBaseTheme.colors.dangerBg,
+      })
+
+      // 2) Input should have aria-invalid="true"
+      expect(input).toHaveAttribute("aria-invalid", "true")
+
+      // 3) The tooltip icon (ErrorOutline) should be rendered.
+      const errorIcon = screen.getByTestId("stTooltipErrorHoverTarget")
+      expect(errorIcon).toBeVisible()
+
+      // 4)Hover over the error icon to trigger the tooltip
+      await user.hover(errorIcon)
+
+      const tooltip = await screen.findByTestId("stTooltipErrorContent")
+      expect(tooltip).toHaveTextContent(
+        "Error: Value must be lower than or equal to 10."
+      )
+    })
+
+    it("clears error when a valid value is typed", async () => {
+      const user = userEvent.setup()
+      const props = getIntProps({ default: 5, min: 0, max: 10 })
+      renderNumberInput(props)
+
+      const input = screen.getByTestId("stNumberInputField")
+      const container = screen.getByTestId("stNumberInputContainer")
+
+      // First, type an invalid value
+      await user.clear(input)
+      await user.type(input, "15")
+      await user.tab()
+
+      // Sanity check: error is shown
+      expect(container).toHaveStyle({
+        backgroundColor: emotionBaseTheme.colors.dangerBg,
+      })
+      expect(input).toHaveAttribute("aria-invalid", "true")
+      const errorIcon = screen.getByTestId("stTooltipErrorHoverTarget")
+      expect(errorIcon).toBeVisible()
+
+      // Now type a valid number (e.g. "7") and blur
+      await user.clear(input)
+      await user.type(input, "7")
+      await user.tab()
+
+      // Error background should be gone, aria-invalid removed, no tooltip text
+      expect(container).not.toHaveStyle({
+        backgroundColor: emotionBaseTheme.colors.dangerBg,
+      })
+      expect(input).not.toHaveAttribute("aria-invalid", "true")
+      expect(
+        screen.queryByTestId("stTooltipErrorHoverTarget")
+      ).not.toBeInTheDocument()
+    })
+
+    it("does not show error for valid input within range", async () => {
+      const user = userEvent.setup()
+      const props = getIntProps({ default: 5, min: 0, max: 10 })
+      renderNumberInput(props)
+
+      const input = screen.getByTestId("stNumberInputField")
+      const container = screen.getByTestId("stNumberInputContainer")
+
+      // Type a valid value
+      await user.clear(input)
+      await user.type(input, "7")
+      await user.tab()
+
+      // 1) Error background shouldn't be visible:
+      expect(container).not.toHaveStyle({
+        backgroundColor: emotionBaseTheme.colors.dangerBg,
+      })
+
+      // 2) The input shouldn't be marked invalid:
+      expect(input).not.toHaveAttribute("aria-invalid", "true")
+
+      // 3) Tooltip text shouldn't be in the DOM
+      expect(
+        screen.queryByTestId("stTooltipErrorContent")
+      ).not.toBeInTheDocument()
+    })
   })
 })
