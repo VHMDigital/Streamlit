@@ -358,6 +358,9 @@ def test_renders_large_logos(app: Page, assert_snapshot: ImageCompareFunction):
     app.get_by_test_id("stSidebarContent").hover()
     collapse_button = app.get_by_test_id("stSidebarCollapseButton").locator("button")
     collapse_button.click()
+
+    app.wait_for_timeout(500)
+
     # Wait for sidebar to be collapsed, the expand button should now be visible in the header
     expect(app.get_by_test_id("stExpandSidebarButton")).to_be_visible()
 
