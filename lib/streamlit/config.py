@@ -774,8 +774,6 @@ _create_option(
     "server.port",
     description="""
         The port where the server will listen for browser connections.
-
-        Don't use port 3000 which is reserved for internal development.
     """,
     default_val=8501,
     type_=int,
@@ -954,8 +952,7 @@ def _browser_server_port() -> int:
     - Open the browser automatically (part of `streamlit run`).
 
     This option is for advanced use cases. To change the port of your app, use
-    `server.Port` instead. Don't use port 3000 which is reserved for internal
-    development.
+    `server.Port` instead.
 
     Default: whatever value is set in server.port.
     """
