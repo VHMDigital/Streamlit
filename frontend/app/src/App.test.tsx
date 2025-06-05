@@ -2454,6 +2454,7 @@ describe("App", () => {
             timezone: "UTC",
             timezoneOffset: 0,
             url: "http://localhost:3000/",
+            colorScheme: "light",
           },
         },
       })
@@ -3031,6 +3032,7 @@ describe("App", () => {
             timezone: "UTC",
             timezoneOffset: 0,
             url: "http://localhost:3000/",
+            colorScheme: "light",
           },
         },
       })
@@ -3247,6 +3249,7 @@ describe("App", () => {
             timezone: "UTC",
             timezoneOffset: 0,
             url: "http://localhost:3000/",
+            colorScheme: "light",
           },
         },
       })
