@@ -411,6 +411,10 @@ def test_renders_logos(app: Page, assert_snapshot: ImageCompareFunction):
     app.get_by_test_id("stSidebarContent").hover()
     collapse_button = app.get_by_test_id("stSidebarCollapseButton").locator("button")
     collapse_button.click()
+
+    # If we don't have this, it takes the screenshot while animating causing some diff antialiasing
+    # causing a screenshot diff
+    app.wait_for_timeout(500)
     # Wait for sidebar to be collapsed, the expand button should now be visible in the header
     expect(app.get_by_test_id("stExpandSidebarButton")).to_be_visible()
 
