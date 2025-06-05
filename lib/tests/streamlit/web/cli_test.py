@@ -339,7 +339,7 @@ class CliTest(unittest.TestCase):
 
     @parameterized.expand([(True,), (False,)])
     def test_headless_telemetry_message(self, headless_mode):
-        """Iff headless mode, show a message about usage metrics gathering."""
+        """If headless mode, show a message about usage metrics gathering."""
 
         with testutil.patch_config_options({"server.headless": headless_mode}):
             with (
@@ -361,7 +361,7 @@ class CliTest(unittest.TestCase):
 
     @parameterized.expand([(False, False), (False, True), (True, False), (True, True)])
     def test_prompt_welcome_message(self, prompt_mode, headless_mode):
-        """Iff prompt is true, show a welcome prompt, unless headless."""
+        """If prompt is true, show a welcome prompt, unless headless."""
 
         with testutil.patch_config_options(
             {"server.showEmailPrompt": prompt_mode, "server.headless": headless_mode}

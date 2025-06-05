@@ -739,9 +739,9 @@ def _server_headless() -> bool:
 _create_option(
     "server.showEmailPrompt",
     description="""
-        Show a prompt asking the user for their email when they start Streamlit
-        for the first time. If server.headless is set to True, that prompt will
-        not be shown regardless of this config option.
+        Whether to show a terminal prompt for the user to enter their email
+        address when they run Streamlit for the first time. If you set
+        `server.headless=True`, Streamlit will not show this prompt.
     """,
     default_val=True,
     type_=bool,
