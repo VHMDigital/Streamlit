@@ -40,6 +40,8 @@ import { applyTheming, handleSelection, sendEmptySelection } from "./utils"
 
 // Minimum width for Plotly charts
 const MIN_WIDTH = 150
+// Default height for Plotly charts when no height is specified
+const DEFAULT_PLOTLY_HEIGHT = 450
 
 // Custom icon used in the fullscreen expand toolbar button:
 /* eslint-disable streamlit-custom/no-hardcoded-theme-values */
@@ -311,8 +313,6 @@ export function PlotlyChart({
     calculatedWidth = width
     calculatedHeight = height
   } else if (calculatedHeight === undefined) {
-    // If no height was specified in the initial spec and we're not in fullscreen,
-    // use the default Plotly height
     calculatedHeight = DEFAULT_PLOTLY_HEIGHT
   }
 
