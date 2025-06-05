@@ -265,12 +265,14 @@ def _use_display_values(df: DataFrame, styles: Mapping[str, Any]) -> DataFrame:
         rows = styles["body"]
         for row in rows:
             for cell in row:
-                if "id" in cell:
-                    if match := cell_selector_regex.match(cell["id"]):
-                        r, c = map(int, match.groups())
-                        if isinstance(cell["display_value"], Enum):
-                            new_df.iloc[r, c] = str(cell["display_value"].value)
-                        else:
-                            new_df.iloc[r, c] = str(cell["display_value"])
+                if "id" in cell and (match := cell_selector_regex.match(cell["id"])):
+                    r, c = map(int, match.groups())
+                    # Check if the display value is an Enum type. Enum values need to be
+                    # converted to their `.value` attribute to ensure proper serialization
+                    # and display logic.
+                    if isinstance(cell["display_value"], Enum):
+                        new_df.iloc[r, c] = str(cell["display_value"].value)
+                    else:
+                        new_df.iloc[r, c] = str(cell["display_value"])
 
     return new_df
