@@ -89,7 +89,6 @@ function getProps(props: Partial<AppViewProps> = {}): AppViewProps {
       requestFileURLs: vi.fn(),
     }),
     appLogo: null,
-    multiplePages: false,
     wideMode: false,
     embedded: false,
     addPaddingForHeader: false,
@@ -180,7 +179,6 @@ describe("AppView element", () => {
     render(
       <AppView
         {...getProps({
-          multiplePages: true,
           appPages: [
             { pageName: "streamlit_app", pageScriptHash: "page_hash" },
             { pageName: "page2", pageScriptHash: "page2_hash" },
@@ -195,7 +193,15 @@ describe("AppView element", () => {
 
   it("does not render a sidebar when there are no elements, multiple pages, and hideSidebarNav is true", () => {
     render(
-      <AppView {...getProps({ multiplePages: true, hideSidebarNav: true })} />
+      <AppView
+        {...getProps({
+          hideSidebarNav: true,
+          appPages: [
+            { pageName: "streamlit_app", pageScriptHash: "page_hash" },
+            { pageName: "page2", pageScriptHash: "page2_hash" },
+          ],
+        })}
+      />
     )
 
     const sidebar = screen.queryByTestId("stSidebar")
@@ -237,7 +243,10 @@ describe("AppView element", () => {
         FAKE_SCRIPT_HASH,
         new BlockNode(FAKE_SCRIPT_HASH, [main, sidebar, event, bottom])
       ),
-      multiplePages: true,
+      appPages: [
+        { pageName: "streamlit_app", pageScriptHash: "page_hash" },
+        { pageName: "page2", pageScriptHash: "page2_hash" },
+      ],
     })
     render(<AppView {...props} />)
 
@@ -248,7 +257,10 @@ describe("AppView element", () => {
   it("does not render the sidebar if there are no elements, multiple pages but hideSidebarNav is true", () => {
     const props = getProps({
       hideSidebarNav: true,
-      multiplePages: true,
+      appPages: [
+        { pageName: "streamlit_app", pageScriptHash: "page_hash" },
+        { pageName: "page2", pageScriptHash: "page2_hash" },
+      ],
     })
     render(<AppView {...props} />)
 
@@ -560,7 +572,6 @@ describe("AppView element", () => {
         <AppView
           {...getProps({
             navigationPosition: Navigation.Position.SIDEBAR,
-            multiplePages: true,
             appPages: [
               { pageName: "page1", pageScriptHash: "hash1" },
               { pageName: "page2", pageScriptHash: "hash2" },
@@ -579,7 +590,6 @@ describe("AppView element", () => {
         <AppView
           {...getProps({
             navigationPosition: Navigation.Position.TOP,
-            multiplePages: true,
             appPages: [
               { pageName: "page1", pageScriptHash: "hash1" },
               { pageName: "page2", pageScriptHash: "hash2" },
@@ -606,7 +616,6 @@ describe("AppView element", () => {
         <AppView
           {...getProps({
             navigationPosition: Navigation.Position.HIDDEN,
-            multiplePages: true,
             appPages: [
               { pageName: "page1", pageScriptHash: "hash1" },
               { pageName: "page2", pageScriptHash: "hash2" },
@@ -625,7 +634,6 @@ describe("AppView element", () => {
         <AppView
           {...getProps({
             navigationPosition: Navigation.Position.TOP,
-            multiplePages: false,
             appPages: [{ pageName: "page1", pageScriptHash: "hash1" }],
           })}
         />

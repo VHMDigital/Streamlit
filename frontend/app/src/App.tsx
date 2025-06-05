@@ -2151,7 +2151,6 @@ export class App extends PureComponent<Props, State> {
               navigationPosition={effectiveNavigationPosition}
               pageLinkBaseUrl={this.state.pageLinkBaseUrl}
               wideMode={userSettings.wideMode}
-              multiplePages={appPages.length > 1}
               embedded={isEmbed()}
               addPaddingForHeader={showToolbar || showColoredLine}
               showPadding={showPadding}

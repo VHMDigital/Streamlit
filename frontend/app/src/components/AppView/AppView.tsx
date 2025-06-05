@@ -81,17 +81,13 @@ export interface AppViewProps {
 
   navigationPosition: Navigation.Position
 
-  // Header props
   topRightContent?: React.ReactNode
 
-  // Base URL for page links
   pageLinkBaseUrl?: string
 
   wideMode: boolean
 
   appLogo: Logo | null
-
-  multiplePages: boolean
 
   embedded: boolean
 
