@@ -44,6 +44,7 @@ import {
   Html as HtmlProto,
   IFrame as IFrameProto,
   ImageList as ImageListProto,
+  IPdf,
   Json as JsonProto,
   LinkButton as LinkButtonProto,
   Markdown as MarkdownProto,
@@ -128,6 +129,7 @@ const ImageList = lazy(() => import("~lib/components/elements/ImageList"))
 const LinkButton = lazy(() => import("~lib/components/elements/LinkButton"))
 
 const PageLink = lazy(() => import("~lib/components/elements/PageLink"))
+const Pdf = lazy(() => import("~lib/components/elements/Pdf"))
 
 const PlotlyChart = lazy(() => import("~lib/components/elements/PlotlyChart"))
 const Video = lazy(() => import("~lib/components/elements/Video"))
@@ -192,6 +194,21 @@ const RawElementNodeRenderer = (
     widgetMgr: props.widgetMgr,
     disabled: props.widgetsDisabled,
     fragmentId: node.fragmentId,
+  }
+
+  // Debug: Let's see what we're actually getting
+  if (node.element.pdf || !node.element.type) {
+    console.log("PDF Debug - Element type and structure:", {
+      elementType: node.element.type,
+      elementTypeTypeof: typeof node.element.type,
+      elementKeys: Object.keys(node.element),
+      hasPdf: !!node.element.pdf,
+      pdfContent: node.element.pdf,
+      whichOneof:
+        typeof node.element.constructor?.prototype?.getType === "function"
+          ? node.element.constructor.prototype.getType.call(node.element)
+          : "no getType method",
+    })
   }
 
   switch (node.element.type) {
@@ -341,6 +358,16 @@ const RawElementNodeRenderer = (
         />
       )
     }
+
+    case "pdf":
+      console.log("PDF element", node.element.pdf)
+      return (
+        <Pdf
+          element={node.element.pdf as IPdf}
+          endpoints={props.endpoints}
+          {...elementProps}
+        />
+      )
 
     case "progress":
       return (
