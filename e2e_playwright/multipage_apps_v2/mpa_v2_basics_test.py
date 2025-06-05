@@ -422,7 +422,7 @@ def test_renders_logos(app: Page, assert_snapshot: ImageCompareFunction):
 
     collapsed_logo_image = logo_link_element.get_by_test_id("stHeaderLogo")
     expect(collapsed_logo_image).to_be_visible()
-    assert_snapshot(collapsed_logo_image, name="collapsed-header-logo")
+    assert_snapshot(collapsed_logo_image, name="mpa-v2-collapsed-header-logo")
 
 
 def test_page_link_with_path(app: Page):
