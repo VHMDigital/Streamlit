@@ -157,7 +157,7 @@
     "@types/xxhashjs": "^0.2.2",
     "@vitejs/plugin-react-swc": "^3.10.0",
     "axios-mock-adapter": "^2.1.0",
-    "eslint": "^9.27.0",
+    "eslint": "^9.28.0",
     "eslint-plugin-streamlit-custom": "workspace:^",
     "node-fetch": "3.3.2",
     "postinstall-postinstall": "^2.1.0",
@@ -169,7 +169,7 @@
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-svgr": "^4.3.0",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.4",
+    "vitest": "^3.2.1",
     "vitest-canvas-mock": "^0.3.3",
     "vitest-fetch-mock": "^0.4.5"
   }
