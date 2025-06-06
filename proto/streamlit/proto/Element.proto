@@ -108,6 +108,7 @@ message Element {
     IFrame iframe = 38;
     ImageList imgs = 6;
     Json json = 31;
+    Json json_editor = 57;
     LinkButton link_button = 51;
     Markdown markdown = 29;
     Metric metric = 42;
@@ -132,7 +133,7 @@ message Element {
     Video video = 14;
     Heading heading = 47;
     Code code = 48;
-    // Next ID: 57
+    // Next ID: 58
   }
 
   reserved 9;

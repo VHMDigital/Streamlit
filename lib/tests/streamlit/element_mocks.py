@@ -62,6 +62,7 @@ WIDGET_ELEMENTS: list[tuple[str, ELEMENT_PRODUCER]] = [
     ("toggle", lambda: st.toggle("Toggle me")),
     # arrows
     ("data_editor", lambda: st.data_editor(pd.DataFrame())),
+    ("json_editor", lambda: st.json_editor({})),
     ("dataframe", lambda: st.dataframe(pd.DataFrame(), on_select="rerun")),
     # other widgets
     ("color_picker", lambda: st.color_picker("Pick a color")),

@@ -31,4 +31,13 @@ message Json {
   optional int32 max_expand_depth = 3;
   // Width configuration
   streamlit.WidthConfig width_config = 4;
+  // deactivates editing
+  bool disabled = 5;
+  // The form ID of the widget, required if json is editable
+  string form_id = 6;
+  // The id of the widget, required if json is editable
+  string id = 7;
+  // string for the current value of the json
+  string value = 8;
+  bool set_value = 9;
 }

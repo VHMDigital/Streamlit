@@ -150,6 +150,7 @@ const Checkbox = lazy(() => import("~lib/components/widgets/Checkbox"))
 const ColorPicker = lazy(() => import("~lib/components/widgets/ColorPicker"))
 const DateInput = lazy(() => import("~lib/components/widgets/DateInput"))
 const Html = lazy(() => import("~lib/components/elements/Html"))
+const JsonEditor = lazy(() => import("~lib/components/widgets/JsonEditor"))
 const Multiselect = lazy(() => import("~lib/components/widgets/Multiselect"))
 const Progress = lazy(() => import("~lib/components/elements/Progress"))
 const Spinner = lazy(() => import("~lib/components/elements/Spinner"))
@@ -570,6 +571,18 @@ const RawElementNodeRenderer = (
           key={fileUploaderProto.id}
           element={fileUploaderProto}
           uploadClient={props.uploadClient}
+          {...widgetProps}
+        />
+      )
+    }
+
+    case "jsonEditor": {
+      const jsonEditorProto = node.element.jsonEditor as JsonProto
+      widgetProps.disabled = widgetProps.disabled || jsonEditorProto.disabled
+      return (
+        <JsonEditor
+          key={jsonEditorProto.id}
+          element={jsonEditorProto}
           {...widgetProps}
         />
       )

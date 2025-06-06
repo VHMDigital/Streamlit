@@ -203,6 +203,7 @@ html = _main.html
 image = _main.image
 info = _main.info
 json = _main.json
+json_editor = _main.json_editor
 latex = _main.latex
 line_chart = _main.line_chart
 link_button = _main.link_button
