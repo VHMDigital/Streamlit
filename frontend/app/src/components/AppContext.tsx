@@ -111,8 +111,21 @@ export interface AppContextProps {
    */
   gitInfo: IGitInfo | null
 
+  /**
+   * Whether to show the toolbar in the app header.
+   * Can be configured via host message.
+   * Pulled from appContext in Header
+   * @see Header
+   */
   showToolbar: boolean
 
+  /**
+   * Whether to show the colored line at the top of the app.
+   * Can be configured via host message.
+   * Pulled from appContext in Header and HeaderColoredLine
+   * @see Header
+   * @see HeaderColoredLine
+   */
   showColoredLine: boolean
 }
 
