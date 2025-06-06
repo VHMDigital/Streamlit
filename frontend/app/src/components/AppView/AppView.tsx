@@ -243,7 +243,10 @@ function AppView(props: AppViewProps): ReactElement {
     navigationPosition === Navigation.Position.TOP && appPages.length > 1
 
   const hasHeaderUserContent =
-    shouldShowLogo || shouldShowExpandButton || shouldShowNavigation
+    shouldShowLogo ||
+    shouldShowExpandButton ||
+    shouldShowNavigation ||
+    showToolbar
 
   const isHeaderTransparent = !hasHeaderUserContent
 
