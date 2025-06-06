@@ -109,5 +109,5 @@ else:
     position = "top"
 
 # Create navigation
-pg = st.navigation(pages, position=position)
+pg = st.navigation(pages, position=position)  # type: ignore
 pg.run()
