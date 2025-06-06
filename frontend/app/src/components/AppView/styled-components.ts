@@ -124,6 +124,7 @@ export interface StyledAppViewBlockContainerProps {
   showPadding: boolean
   isEmbedded: boolean
   hasSidebar: boolean
+  hasHeader: boolean
 }
 
 export const StyledAppViewBlockContainer =
@@ -134,11 +135,13 @@ export const StyledAppViewBlockContainer =
       showPadding,
       hasSidebar,
       isEmbedded,
+      hasHeader,
       theme,
     }) => {
       const littlePadding = "2.25rem"
 
-      const shouldGet6RemTopPadding = showPadding || (isEmbedded && hasSidebar)
+      const shouldGet6RemTopPadding =
+        showPadding || (isEmbedded && hasSidebar) || hasHeader
       const topEmbedPadding: string = shouldGet6RemTopPadding
         ? `6rem`
         : littlePadding

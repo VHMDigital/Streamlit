@@ -241,7 +241,7 @@ function AppView(props: AppViewProps): ReactElement {
   const shouldShowExpandButton = showSidebar && isSidebarCollapsed
   const shouldShowNavigation =
     navigationPosition === Navigation.Position.TOP && appPages.length > 1
-  const shouldShowRightContent = showToolbar && topRightContent
+  const shouldShowRightContent = Boolean(showToolbar && topRightContent)
 
   const hasHeaderContent =
     shouldShowLogo ||
@@ -317,6 +317,7 @@ function AppView(props: AppViewProps): ReactElement {
                 hasBottom={hasBottomElements}
                 isEmbedded={embedded}
                 hasSidebar={showSidebar}
+                hasHeader={hasHeaderContent}
               >
                 {renderBlock(elements.main)}
               </StyledAppViewBlockContainer>
