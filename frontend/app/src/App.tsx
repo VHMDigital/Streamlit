@@ -2169,7 +2169,6 @@ export class App extends PureComponent<Props, State> {
               pageLinkBaseUrl={this.state.pageLinkBaseUrl}
               wideMode={userSettings.wideMode}
               embedded={isEmbed()}
-              addPaddingForHeader={showToolbar || showColoredLine}
               showPadding={showPadding}
               disableScrolling={disableScrolling}
               currentPageScriptHash={currentPageScriptHash}
