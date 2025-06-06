@@ -241,14 +241,11 @@ function AppView(props: AppViewProps): ReactElement {
   const shouldShowExpandButton = showSidebar && isSidebarCollapsed
   const shouldShowNavigation =
     navigationPosition === Navigation.Position.TOP && appPages.length > 1
-  const shouldShowRightContent = Boolean(showToolbar && topRightContent)
 
-  const hasHeaderContent =
-    shouldShowLogo ||
-    shouldShowExpandButton ||
-    shouldShowNavigation ||
-    shouldShowRightContent
-  const isHeaderTransparent = !hasHeaderContent
+  const hasHeaderUserContent =
+    shouldShowLogo || shouldShowExpandButton || shouldShowNavigation
+
+  const isHeaderTransparent = !hasHeaderUserContent
 
   // The tabindex is required to support scrolling by arrow keys.
   return (
@@ -317,7 +314,7 @@ function AppView(props: AppViewProps): ReactElement {
                 hasBottom={hasBottomElements}
                 isEmbedded={embedded}
                 hasSidebar={showSidebar}
-                hasHeader={hasHeaderContent}
+                hasHeader={hasHeaderUserContent}
               >
                 {renderBlock(elements.main)}
               </StyledAppViewBlockContainer>
