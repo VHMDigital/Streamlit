@@ -30,7 +30,7 @@ def test_radio_widget_rendering(
 ):
     """Test that the radio widgets are correctly rendered via screenshot matching."""
     radio_widgets = themed_app.get_by_test_id("stRadio")
-    expect(radio_widgets).to_have_count(18)
+    expect(radio_widgets).to_have_count(17)
 
     assert_snapshot(radio_widgets.nth(0), name="st_radio-default")
     assert_snapshot(radio_widgets.nth(1), name="st_radio-formatted_options")
