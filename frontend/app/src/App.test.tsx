@@ -1781,13 +1781,13 @@ describe("App", () => {
       ).toBe("baz")
     })
 
-    it("extracts pageName if window.__streamlit.DOCUMENT_BASE_URL is set (main page)", () => {
+    it("extracts pageName if window.__streamlit.MAIN_PAGE_BASE_URL is set (main page)", () => {
       renderApp(getProps())
       const widgetStateManager =
         getStoredValue<WidgetStateManager>(WidgetStateManager)
       const connectionManager = getMockConnectionManager()
 
-      window.__streamlit = { DOCUMENT_BASE_URL: "http://localhost/foo/bar" }
+      window.__streamlit = { MAIN_PAGE_BASE_URL: "http://localhost/foo/bar" }
       window.history.pushState({}, "", "/foo/bar/")
       widgetStateManager.sendUpdateWidgetsMessage(undefined)
 
@@ -1797,13 +1797,13 @@ describe("App", () => {
       ).toBe("")
     })
 
-    it("extracts pageName if window.__streamlit.DOCUMENT_BASE_URL is set (non-main page)", () => {
+    it("extracts pageName if window.__streamlit.MAIN_PAGE_BASE_URL is set (non-main page)", () => {
       renderApp(getProps())
       const widgetStateManager =
         getStoredValue<WidgetStateManager>(WidgetStateManager)
       const connectionManager = getMockConnectionManager()
 
-      window.__streamlit = { DOCUMENT_BASE_URL: "http://localhost/foo/bar" }
+      window.__streamlit = { MAIN_PAGE_BASE_URL: "http://localhost/foo/bar" }
       window.history.pushState({}, "", "/foo/bar/baz")
       widgetStateManager.sendUpdateWidgetsMessage(undefined)
 
@@ -3876,10 +3876,10 @@ describe("App", () => {
       )
     })
 
-    it("works with window.__streamlit.DOCUMENT_BASE_URL", () => {
+    it("works with window.__streamlit.MAIN_PAGE_BASE_URL", () => {
       renderApp(getProps())
 
-      window.__streamlit = { DOCUMENT_BASE_URL: "http://example.com/foo" }
+      window.__streamlit = { MAIN_PAGE_BASE_URL: "http://example.com/foo" }
 
       sendForwardMessage("newSession", {
         ...NEW_SESSION_JSON,

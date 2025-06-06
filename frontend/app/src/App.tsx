@@ -1080,9 +1080,9 @@ export class App extends PureComponent<Props, State> {
 
     if (baseUriParts) {
       let pathname
-      if (window.__streamlit?.DOCUMENT_BASE_URL) {
+      if (window.__streamlit?.MAIN_PAGE_BASE_URL) {
         pathname = parseUriIntoBaseParts(
-          window.__streamlit.DOCUMENT_BASE_URL
+          window.__streamlit.MAIN_PAGE_BASE_URL
         ).pathname
       } else {
         pathname = baseUriParts.pathname
@@ -1667,9 +1667,9 @@ export class App extends PureComponent<Props, State> {
       pageScriptHash = currentPageScriptHash
     } else {
       let pathname
-      if (window.__streamlit?.DOCUMENT_BASE_URL) {
+      if (window.__streamlit?.MAIN_PAGE_BASE_URL) {
         pathname = parseUriIntoBaseParts(
-          window.__streamlit.DOCUMENT_BASE_URL
+          window.__streamlit.MAIN_PAGE_BASE_URL
         ).pathname
       } else {
         pathname = baseUriParts.pathname

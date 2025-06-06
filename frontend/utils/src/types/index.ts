@@ -35,13 +35,16 @@ export function isNullOrUndefined<T>(
 }
 
 export interface StreamlitWindowObject {
-  // These window variables are used so that some deployments of Streamlit can
-  // edit the index.html served to the client so that a Streamlit server at an
-  // origin different from where the frontend static assets are served can be
-  // set.
+  // URL pointing to where the Streamlit server is running. This is useful in
+  // deployments of Streamlit where the server is running on a different origin
+  // from where index.html is served.
   BACKEND_BASE_URL?: string
+  // URL pointing to where the _stcore/host-config endpoint is being served.
   HOST_CONFIG_BASE_URL?: string
-  DOCUMENT_BASE_URL?: string
+  // URL pointing to the main page of this Streamlit app. Setting this is needed
+  // when setting BACKEND_BASE_URL so that handling page URLs in multipage apps
+  // works.
+  MAIN_PAGE_BASE_URL?: string
 
   // Theme related settings.
   LIGHT_THEME?: ICustomThemeConfig
