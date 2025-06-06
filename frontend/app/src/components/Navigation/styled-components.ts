@@ -15,9 +15,41 @@
  */
 
 import styled from "@emotion/styled"
+import { transparentize } from "color2k"
 
-import { getNavTextColor } from "@streamlit/app/src/components/Sidebar/styled-components"
-import { EmotionTheme } from "@streamlit/lib"
+import { EmotionTheme, hasLightBackgroundColor } from "@streamlit/lib"
+
+/**
+ * Returns the color of the text in the sidebar nav.
+ *
+ * @param theme The theme to use.
+ * @param isActive Whether the nav text should show as active.
+ * @returns The color of the text in the sidebar nav.
+ */
+export const getNavTextColor = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
+  theme: any,
+  isActive: boolean,
+  disabled: boolean = false,
+  isTopNav?: boolean
+): string => {
+  if (disabled) {
+    return theme.colors.fadedText40
+  }
+
+  if (isTopNav) {
+    return theme.colors.bodyText
+  }
+
+  const isLightTheme = hasLightBackgroundColor(theme)
+
+  if (isActive) {
+    return theme.colors.bodyText
+  }
+  return isLightTheme
+    ? transparentize(theme.colors.bodyText, 0.2)
+    : transparentize(theme.colors.bodyText, 0.25)
+}
 
 /**
  * Returns the horizontal spacing for the sidebar. Since scrollbarGutter is set
@@ -208,6 +240,8 @@ export const StyledViewButton = styled.button(({ theme }) => {
 export const StyledSidebarNavSeparator = styled.div(({ theme }) => ({
   paddingTop: theme.spacing.lg,
   borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+  marginRight: getSidebarHorizontalSpacing(theme),
+  marginLeft: getSidebarHorizontalSpacing(theme),
 }))
 
 // TopNav styled components
