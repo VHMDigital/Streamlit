@@ -47,7 +47,8 @@ height_value = st.sidebar.slider(
 )
 
 # Use external module toggle
-use_ext_module = st.sidebar.checkbox("Use external module (react-pdf)", value=True)
+use_ext_module = st.sidebar.checkbox("Use external module (react-pdf)", value=False)
+hide_toolbar = st.sidebar.checkbox("Hide Toolbar")
 
 # Display current settings
 st.sidebar.markdown("---")
@@ -56,7 +57,7 @@ st.sidebar.write(f"PDF: {selected_pdf}")
 st.sidebar.write(f"Width: {width_value}")
 st.sidebar.write(f"Height: {height_value}")
 st.sidebar.write(f"External module: {use_ext_module}")
-
+st.sidebar.write(f"Hide Toolbar: {hide_toolbar}")
 # Display the PDF with selected options
 st.subheader(f"Displaying: {selected_pdf}")
 
@@ -66,6 +67,7 @@ try:
         width=width_value,
         height=height_value,
         use_ext_module=use_ext_module,
+        hide_toolbar=hide_toolbar,
     )
     st.success("PDF loaded successfully!")
 except Exception as e:

@@ -43,7 +43,7 @@ export interface PdfProps {
 }
 
 function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
-  const { url, widthConfig, height, useExtModule } = element
+  const { url, widthConfig, height, useExtModule, hideToolbar } = element
 
   // State for react-pdf
   const [numPages, setNumPages] = useState<number>(0)
@@ -52,6 +52,9 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
   const pdfUrl = url?.startsWith("http")
     ? url
     : endpoints.buildMediaURL(url || "")
+
+  // Add toolbar parameter to URL for iframe rendering
+  const iframePdfUrl = hideToolbar ? `${pdfUrl}#toolbar=0` : pdfUrl
 
   // Memoize options to prevent re-renders
   const options = useMemo(
@@ -103,7 +106,7 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
     <StyledPdf
       className="stPdf"
       data-testid="stPdf"
-      src={pdfUrl}
+      src={iframePdfUrl}
       height={height || 500}
       widthConfig={widthConfig || undefined}
       title="PDF Viewer"

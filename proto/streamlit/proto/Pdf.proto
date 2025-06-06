@@ -27,4 +27,5 @@ message Pdf {
   optional streamlit.WidthConfig width_config = 3;
   int32 height = 4;
   bool use_ext_module = 5;
+  bool hide_toolbar = 6;
 }

@@ -196,21 +196,6 @@ const RawElementNodeRenderer = (
     fragmentId: node.fragmentId,
   }
 
-  // Debug: Let's see what we're actually getting
-  if (node.element.pdf || !node.element.type) {
-    console.log("PDF Debug - Element type and structure:", {
-      elementType: node.element.type,
-      elementTypeTypeof: typeof node.element.type,
-      elementKeys: Object.keys(node.element),
-      hasPdf: !!node.element.pdf,
-      pdfContent: node.element.pdf,
-      whichOneof:
-        typeof node.element.constructor?.prototype?.getType === "function"
-          ? node.element.constructor.prototype.getType.call(node.element)
-          : "no getType method",
-    })
-  }
-
   switch (node.element.type) {
     case "alert": {
       const alertProto = node.element.alert as AlertProto
