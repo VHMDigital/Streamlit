@@ -56,9 +56,20 @@ const Header = ({
   const { showToolbar } = useAppContext()
   const { activeTheme } = useContext(LibContext)
 
-  const hasContent = navigation || rightContent
   const shouldShowLogo = logoComponent && !isSidebarOpen
   const shouldShowExpandButton = hasSidebar && !isSidebarOpen
+
+  // Determine what content should be shown
+  // When showToolbar is false (embed=true without show_toolbar), we still show
+  // logo, sidebar icon, and navigation, but hide rightContent
+  const shouldShowRightContent = showToolbar && rightContent
+
+  // Check if there's any content to display at all
+  const hasAnyContent =
+    shouldShowLogo ||
+    shouldShowExpandButton ||
+    navigation ||
+    shouldShowRightContent
 
   return (
     <StyledHeader
@@ -67,7 +78,7 @@ const Header = ({
       data-testid="stHeader"
       isTransparentBackground={isTransparentBackground}
     >
-      {showToolbar && hasContent ? (
+      {hasAnyContent ? (
         <StyledHeaderToolbar
           className="stAppToolbar"
           data-testid="stToolbar"
@@ -95,40 +106,11 @@ const Header = ({
               )}
             </StyledHeaderLeftSection>
             {navigation}
-            {rightContent ? (
+            {shouldShowRightContent ? (
               <StyledHeaderRightSection>
                 {rightContent}
               </StyledHeaderRightSection>
             ) : null}
-          </StyledHeaderContent>
-        </StyledHeaderToolbar>
-      ) : showToolbar && (shouldShowLogo || shouldShowExpandButton) ? (
-        <StyledHeaderToolbar
-          className="stAppToolbar"
-          data-testid="stToolbar"
-          theme={activeTheme.emotion}
-        >
-          <StyledHeaderContent>
-            <StyledHeaderLeftSection>
-              {shouldShowLogo ? (
-                <StyledLogoContainer>{logoComponent}</StyledLogoContainer>
-              ) : null}
-              {shouldShowExpandButton && (
-                <StyledOpenSidebarButton>
-                  <BaseButton
-                    kind={BaseButtonKind.HEADER_NO_PADDING}
-                    onClick={onToggleSidebar}
-                    data-testid="stExpandSidebarButton"
-                  >
-                    <DynamicIcon
-                      size="xl"
-                      iconValue={":material/keyboard_double_arrow_right:"}
-                      color={activeTheme.emotion.colors.fadedText60}
-                    />
-                  </BaseButton>
-                </StyledOpenSidebarButton>
-              )}
-            </StyledHeaderLeftSection>
           </StyledHeaderContent>
         </StyledHeaderToolbar>
       ) : null}

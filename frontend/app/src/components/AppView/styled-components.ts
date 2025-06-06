@@ -119,29 +119,29 @@ const applyWideModePadding = (theme: EmotionTheme): CSSObject => {
 }
 
 export interface StyledAppViewBlockContainerProps {
-  hasSidebar: boolean
-  isEmbedded: boolean
   isWideMode: boolean
-  showPadding: boolean
-  addPaddingForHeader: boolean
-  hasTopNav: boolean
   hasBottom: boolean
+  showPadding: boolean
+  isEmbedded: boolean
+  hasSidebar: boolean
 }
 
 export const StyledAppViewBlockContainer =
   styled.div<StyledAppViewBlockContainerProps>(
     ({
-      hasSidebar: _hasSidebar,
       hasBottom,
-      isEmbedded: _isEmbedded,
       isWideMode,
       showPadding,
-      addPaddingForHeader: _addPaddingForHeader,
+      hasSidebar,
+      isEmbedded,
       theme,
-      hasTopNav: _hasTopNav,
     }) => {
       const littlePadding = "2.25rem"
-      const topEmbedPadding: string = showPadding ? `6rem` : littlePadding
+
+      const shouldGet6RemTopPadding = showPadding || (isEmbedded && hasSidebar)
+      const topEmbedPadding: string = shouldGet6RemTopPadding
+        ? `6rem`
+        : littlePadding
 
       const bottomEmbedPadding =
         showPadding && !hasBottom ? "10rem" : theme.spacing.lg

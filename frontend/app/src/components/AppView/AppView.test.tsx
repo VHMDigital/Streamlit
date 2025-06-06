@@ -91,7 +91,6 @@ function getProps(props: Partial<AppViewProps> = {}): AppViewProps {
     appLogo: null,
     wideMode: false,
     embedded: false,
-    addPaddingForHeader: false,
     showPadding: false,
     disableScrolling: false,
     hideSidebarNav: false,
@@ -343,19 +342,6 @@ describe("AppView element", () => {
       expect(style.paddingBottom).toEqual("10rem")
     })
 
-    it("addPaddingForHeader triggers expected top padding", () => {
-      render(
-        <AppView
-          {...getProps({ embedded: true, addPaddingForHeader: true })}
-        />
-      )
-      const style = window.getComputedStyle(
-        screen.getByTestId("stMainBlockContainer")
-      )
-      expect(style.paddingTop).toEqual("2.25rem")
-      expect(style.paddingBottom).toEqual("1rem")
-    })
-
     it("hasSidebar triggers expected top padding", () => {
       const sidebarElement = new ElementNode(
         makeElementWithInfoText("sidebar!"),
@@ -388,7 +374,7 @@ describe("AppView element", () => {
       const style = window.getComputedStyle(
         screen.getByTestId("stMainBlockContainer")
       )
-      expect(style.paddingTop).toEqual("2.25rem")
+      expect(style.paddingTop).toEqual("6rem")
       expect(style.paddingBottom).toEqual("1rem")
     })
   })
@@ -641,6 +627,203 @@ describe("AppView element", () => {
 
       expect(screen.queryByText("page1")).not.toBeInTheDocument()
       expect(screen.queryByTestId("stSidebar")).not.toBeInTheDocument()
+    })
+  })
+
+  describe("header transparency and padding logic", () => {
+    it("header has transparent background when no content is shown", () => {
+      // Minimal setup with no logo, no sidebar, no navigation, no toolbar
+      render(
+        <AppView
+          {...getProps({
+            appLogo: null,
+            appPages: [{ pageName: "page1", pageScriptHash: "hash1" }], // Single page, no nav
+            navigationPosition: Navigation.Position.SIDEBAR,
+          })}
+        />
+      )
+
+      const header = screen.getByTestId("stHeader")
+      // The Header component should be rendered with isTransparentBackground=true
+      // when no content is shown
+      expect(header).toBeInTheDocument()
+      expect(header).toHaveStyle("background-color: rgba(0, 0, 0, 0)")
+    })
+
+    it("header has solid background when logo is shown", () => {
+      const logo = LogoProto.create({
+        image: "https://example.com/logo.png",
+      })
+
+      render(<AppView {...getProps({ appLogo: logo })} />)
+
+      const header = screen.getByTestId("stHeader")
+      expect(header).toBeInTheDocument()
+      // Logo should be visible in header when sidebar is collapsed
+      expect(screen.getByTestId("stHeaderLogo")).toBeInTheDocument()
+    })
+
+    it("header has solid background when navigation is shown", () => {
+      render(
+        <AppView
+          {...getProps({
+            navigationPosition: Navigation.Position.TOP,
+            appPages: [
+              { pageName: "page1", pageScriptHash: "hash1" },
+              { pageName: "page2", pageScriptHash: "hash2" },
+            ],
+          })}
+        />
+      )
+
+      const header = screen.getByTestId("stHeader")
+      expect(header).toBeInTheDocument()
+      expect(header).not.toHaveStyle({ backgroundColor: "transparent" })
+      // Navigation should be present in the header
+      const allPage2Elements = screen.getAllByText("page2")
+      expect(allPage2Elements.length).toBeGreaterThan(0)
+    })
+
+    it("header shows logo and sidebar button in embed mode", () => {
+      // Mock embed mode (showToolbar = false)
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          showToolbar: false, // This simulates embed=true without show_toolbar
+          initialSidebarState: PageConfig.SidebarState.COLLAPSED, // Ensure sidebar starts collapsed
+        })
+      )
+
+      const logo = LogoProto.create({
+        image: "https://example.com/logo.png",
+      })
+
+      const sidebarElement = new ElementNode(
+        makeElementWithInfoText("sidebar!"),
+        ForwardMsgMetadata.create({}),
+        "no script run id",
+        FAKE_SCRIPT_HASH
+      )
+
+      const sidebar = new BlockNode(
+        FAKE_SCRIPT_HASH,
+        [sidebarElement],
+        new BlockProto({ allowEmpty: true })
+      )
+
+      const empty = new BlockNode(
+        FAKE_SCRIPT_HASH,
+        [],
+        new BlockProto({ allowEmpty: true })
+      )
+
+      const props = getProps({
+        elements: new AppRoot(
+          FAKE_SCRIPT_HASH,
+          new BlockNode(FAKE_SCRIPT_HASH, [empty, sidebar, empty, empty])
+        ),
+        appLogo: logo,
+        embedded: true,
+      })
+
+      render(<AppView {...props} />)
+
+      // Header should be visible
+      expect(screen.getByTestId("stHeader")).toBeInTheDocument()
+
+      // Logo should be visible (when sidebar is collapsed)
+      expect(screen.getByTestId("stHeaderLogo")).toBeInTheDocument()
+
+      // Expand sidebar button should be visible
+      expect(screen.getByTestId("stExpandSidebarButton")).toBeInTheDocument()
+    })
+
+    it("header shows navigation in embed mode with top nav", () => {
+      // Mock embed mode (showToolbar = false)
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          showToolbar: false, // This simulates embed=true without show_toolbar
+        })
+      )
+
+      render(
+        <AppView
+          {...getProps({
+            navigationPosition: Navigation.Position.TOP,
+            appPages: [
+              { pageName: "page1", pageScriptHash: "hash1" },
+              { pageName: "page2", pageScriptHash: "hash2" },
+            ],
+            embedded: true,
+          })}
+        />
+      )
+
+      // Header should be visible
+      expect(screen.getByTestId("stHeader")).toBeInTheDocument()
+
+      // Navigation should still be shown in embed mode
+      const allPage2Elements = screen.getAllByText("page2")
+      expect(allPage2Elements.length).toBeGreaterThan(0)
+    })
+
+    it("header does NOT show toolbar actions in embed mode without show_toolbar", () => {
+      // Mock embed mode (showToolbar = false)
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          showToolbar: false, // This simulates embed=true without show_toolbar
+        })
+      )
+
+      render(
+        <AppView
+          {...getProps({
+            embedded: true,
+            topRightContent: <div data-testid="toolbar-actions">Toolbar</div>,
+          })}
+        />
+      )
+
+      // Header should be visible
+      expect(screen.getByTestId("stHeader")).toBeInTheDocument()
+
+      // Toolbar actions should NOT be visible
+      expect(screen.queryByTestId("toolbar-actions")).not.toBeInTheDocument()
+    })
+
+    it("header shows toolbar actions in embed mode WITH show_toolbar", () => {
+      // Mock embed mode with show_toolbar (showToolbar = true)
+      vi.spyOn(
+        StreamlitContextProviderModule,
+        "useAppContext"
+      ).mockReturnValue(
+        getContextOutput({
+          showToolbar: true, // This simulates embed=true&embed_options=show_toolbar
+        })
+      )
+
+      render(
+        <AppView
+          {...getProps({
+            embedded: true,
+            topRightContent: <div data-testid="toolbar-actions">Toolbar</div>,
+          })}
+        />
+      )
+
+      // Header should be visible
+      expect(screen.getByTestId("stHeader")).toBeInTheDocument()
+
+      // Toolbar actions SHOULD be visible
+      expect(screen.getByTestId("toolbar-actions")).toBeInTheDocument()
     })
   })
 })

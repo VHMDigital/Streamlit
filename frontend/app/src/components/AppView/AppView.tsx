@@ -91,8 +91,6 @@ export interface AppViewProps {
 
   embedded: boolean
 
-  addPaddingForHeader: boolean
-
   showPadding: boolean
 
   disableScrolling: boolean
@@ -137,12 +135,7 @@ function AppView(props: AppViewProps): ReactElement {
     return () => window.removeEventListener("hashchange", listener, false)
   }, [sendMessageToHost])
 
-  const {
-    initialSidebarState,
-    showToolbar,
-    showColoredLine,
-    widgetsDisabled,
-  } = useAppContext()
+  const { initialSidebarState, showToolbar, widgetsDisabled } = useAppContext()
 
   const {
     addScriptFinishedHandler,
@@ -242,12 +235,20 @@ function AppView(props: AppViewProps): ReactElement {
     )
   }, [appLogo, endpoints, isSidebarCollapsed, showSidebar])
 
-  // Determine if we should render the header at all
-  const shouldRenderHeader =
-    !embedded ||
-    showToolbar ||
-    showColoredLine ||
-    navigationPosition === Navigation.Position.TOP
+  // Determine if the header should have transparent background
+  // Only transparent when no content is shown at all
+  const shouldShowLogo = logoElement && (!showSidebar || isSidebarCollapsed)
+  const shouldShowExpandButton = showSidebar && isSidebarCollapsed
+  const shouldShowNavigation =
+    navigationPosition === Navigation.Position.TOP && appPages.length > 1
+  const shouldShowRightContent = showToolbar && topRightContent
+
+  const hasHeaderContent =
+    shouldShowLogo ||
+    shouldShowExpandButton ||
+    shouldShowNavigation ||
+    shouldShowRightContent
+  const isHeaderTransparent = !hasHeaderContent
 
   // The tabindex is required to support scrolling by arrow keys.
   return (
@@ -280,28 +281,26 @@ function AppView(props: AppViewProps): ReactElement {
           </Profiler>
         )}
         <StyledMainContent>
-          {shouldRenderHeader && (
-            <Header
-              hasSidebar={showSidebar}
-              isSidebarOpen={showSidebar && !isSidebarCollapsed}
-              onToggleSidebar={toggleSidebar}
-              navigation={
-                navigationPosition === Navigation.Position.TOP &&
-                appPages.length > 1 ? (
-                  <TopNav
-                    endpoints={endpoints}
-                    pageLinkBaseUrl={pageLinkBaseUrl}
-                    currentPageScriptHash={currentPageScriptHash}
-                    appPages={appPages}
-                    onPageChange={onPageChange}
-                  />
-                ) : null
-              }
-              rightContent={topRightContent}
-              logoComponent={logoElement}
-              isTransparentBackground={appPages.length <= 1}
-            />
-          )}
+          <Header
+            hasSidebar={showSidebar}
+            isSidebarOpen={showSidebar && !isSidebarCollapsed}
+            onToggleSidebar={toggleSidebar}
+            navigation={
+              navigationPosition === Navigation.Position.TOP &&
+              appPages.length > 1 ? (
+                <TopNav
+                  endpoints={endpoints}
+                  pageLinkBaseUrl={pageLinkBaseUrl}
+                  currentPageScriptHash={currentPageScriptHash}
+                  appPages={appPages}
+                  onPageChange={onPageChange}
+                />
+              ) : null
+            }
+            rightContent={topRightContent}
+            logoComponent={logoElement}
+            isTransparentBackground={isHeaderTransparent}
+          />
           <Component
             tabIndex={0}
             isEmbedded={embedded}
@@ -315,18 +314,9 @@ function AppView(props: AppViewProps): ReactElement {
                 data-testid="stMainBlockContainer"
                 isWideMode={wideMode}
                 showPadding={showPadding}
-                addPaddingForHeader={
-                  showToolbar ||
-                  showColoredLine ||
-                  navigationPosition === Navigation.Position.TOP
-                }
                 hasBottom={hasBottomElements}
                 isEmbedded={embedded}
                 hasSidebar={showSidebar}
-                hasTopNav={
-                  navigationPosition === Navigation.Position.TOP &&
-                  appPages.length > 1
-                }
               >
                 {renderBlock(elements.main)}
               </StyledAppViewBlockContainer>
