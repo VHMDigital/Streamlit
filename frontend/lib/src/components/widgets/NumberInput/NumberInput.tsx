@@ -141,8 +141,8 @@ const NumberInput: React.FC<Props> = ({
 
   const commitValue = useCallback(
     ({ value, source }: { value: number | null; source: Source }) => {
-      if (notNullOrUndefined(value) && (min > value || value > max)) {
-        setError(value < min ? "BelowMin" : "AboveMax")
+      if (notNullOrUndefined(value) && (min > value! || value! > max)) {
+        setError(value! < min ? "BelowMin" : "AboveMax")
       } else {
         const newValue = value ?? elementDefault ?? null
 
@@ -376,7 +376,6 @@ const NumberInput: React.FC<Props> = ({
       </WidgetLabel>
 
       <StyledInputContainer
-        hasError={!!error}
         className={isFocused ? "focused" : ""}
         data-testid="stNumberInputContainer"
         style={{
@@ -452,8 +451,7 @@ const NumberInput: React.FC<Props> = ({
                 paddingBottom: theme.spacing.sm,
                 paddingTop: theme.spacing.sm,
                 ...(error && {
-                  backgroundColor: theme.colors.dangerBg, // Light red background when error
-                  fontWeight: theme.fontWeights.bold, // Bold text for emphasis
+                  //backgroundColor: theme.colors.dangerBg, // Light red background when error
                   color: hasLightBackgroundColor(theme) // font color according to background
                     ? theme.colors.red100
                     : theme.colors.red20,
@@ -495,9 +493,6 @@ const NumberInput: React.FC<Props> = ({
                 minWidth: theme.iconSizes.lg,
                 // Material icons color changed as inactionable
                 color: isMaterialIcon ? theme.colors.fadedText60 : "inherit",
-                ...(error && {
-                  backgroundColor: theme.colors.dangerBg,
-                }),
               },
             },
             // Tooltip icon space
@@ -506,7 +501,6 @@ const NumberInput: React.FC<Props> = ({
                 color: hasLightBackgroundColor(theme) // font color according to background
                   ? theme.colors.red100
                   : theme.colors.red20,
-                backgroundColor: theme.colors.dangerBg,
               },
             },
           }}
@@ -519,17 +513,8 @@ const NumberInput: React.FC<Props> = ({
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      color: theme.colors.danger,
                     }}
                   >
-                    <span
-                      style={{
-                        marginRight: theme.spacing.xs, // Add space between the icon and the message
-                        color: theme.colors.danger,
-                      }}
-                    >
-                      <Icon content={ErrorOutline} size="lg" />
-                    </span>
                     <span>
                       <strong style={{ fontWeight: theme.fontWeights.bold }}>
                         Error
@@ -553,13 +538,12 @@ const NumberInput: React.FC<Props> = ({
         {width > numberInputControlBreakpoint && (
           <StyledInputControls>
             <StyledInputControl
-              hasError={!!error}
               data-testid="stNumberInputStepDown"
               onClick={decrement}
               disabled={!canDec || disabled}
               tabIndex={-1}
               style={{
-                ...(error && { backgroundColor: theme.colors.dangerBg }), // Light red background when error
+                ...(error && { backgroundColor: theme.colors.transparent }), // so the red background color can be seen
               }}
             >
               <Icon
@@ -569,13 +553,12 @@ const NumberInput: React.FC<Props> = ({
               />
             </StyledInputControl>
             <StyledInputControl
-              hasError={!!error}
               data-testid="stNumberInputStepUp"
               onClick={increment}
               disabled={!canInc || disabled}
               tabIndex={-1}
               style={{
-                ...(error && { backgroundColor: theme.colors.dangerBg }), // Light red background when error
+                ...(error && { backgroundColor: theme.colors.transparent }), // so the red background color can be seen
               }}
             >
               <Icon

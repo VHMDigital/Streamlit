@@ -27,6 +27,7 @@ export const StyledInputContainer = styled.div(({ theme }) => ({
   borderWidth: theme.sizes.borderWidth,
   borderStyle: "solid",
   borderColor: theme.colors.widgetBorderColor ?? theme.colors.secondaryBg,
+  backgroundColor: theme.colors.transparent,
   transitionDuration: "200ms",
   transitionProperty: "border",
   transitionTimingFunction: "cubic-bezier(0.2, 0.8, 0.4, 1)",
@@ -52,22 +53,18 @@ export const StyledInputControls = styled.div({
   alignSelf: "stretch",
 })
 
-interface StyledInputControlProps {
-  hasError?: boolean
-}
+interface StyledInputControlProps {}
 
 export const StyledInputControl = styled.button<StyledInputControlProps>(
-  ({ theme, hasError }) => ({
+  ({ theme }) => ({
     border: "none",
     height: theme.sizes.full,
     display: "flex",
     alignItems: "center",
     width: theme.sizes.numberInputControlsWidth,
     justifyContent: "center",
-    color: hasError ? theme.colors.danger : theme.colors.bodyText,
-    backgroundColor: hasError
-      ? theme.colors.dangerBg
-      : theme.colors.secondaryBg,
+    color: theme.colors.bodyText,
+    backgroundColor: theme.colors.secondaryBg,
     transition: "color 300ms, backgroundColor 300ms",
     "&:hover:enabled, &:focus:enabled": {
       color: theme.colors.white,
