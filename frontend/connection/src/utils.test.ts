@@ -72,7 +72,7 @@ test("gets window URI parts with weird basePath", () => {
 })
 
 test("Uses provided URL instead of window.location.href to get URI parts if provided", () => {
-  location.href = " https://the_host:9988/foo/bar"
+  location.href = "https://the_host:9988/foo/bar"
 
   expect(
     parseUriIntoBaseParts("https://the_other_host:9999/foo/bar/baz")
