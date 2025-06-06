@@ -99,12 +99,14 @@ class SpinnerTest(DeltaGeneratorTestCase):
         ) in enumerate(test_cases):
             with self.subTest(width_value=width_value):
                 with spinner(f"test text {index}", width=width_value):
-                    time.sleep(0.1)
-                el = self.get_delta_from_queue().new_element
-                assert el.spinner.text == f"test text {index}"
+                    time.sleep(0.7)
+                    el = self.get_delta_from_queue().new_element
+                    assert el.spinner.text == f"test text {index}"
 
-                assert el.width_config.WhichOneof("width_spec") == expected_width_spec
-                assert getattr(el.width_config, field_name) == field_value
+                    assert (
+                        el.width_config.WhichOneof("width_spec") == expected_width_spec
+                    )
+                    assert getattr(el.width_config, field_name) == field_value
 
     def test_spinner_with_invalid_width(self):
         """Test st.spinner with invalid width values."""
@@ -137,11 +139,11 @@ class SpinnerTest(DeltaGeneratorTestCase):
     def test_spinner_default_width(self):
         """Test that st.spinner defaults to content width."""
         with spinner("test text"):
-            time.sleep(0.1)
-        el = self.get_delta_from_queue().new_element
-        assert el.spinner.text == "test text"
-        assert (
-            el.width_config.WhichOneof("width_spec")
-            == WidthConfigFields.USE_CONTENT.value
-        )
-        assert el.width_config.use_content is True
+            time.sleep(0.7)
+            el = self.get_delta_from_queue().new_element
+            assert el.spinner.text == "test text"
+            assert (
+                el.width_config.WhichOneof("width_spec")
+                == WidthConfigFields.USE_CONTENT.value
+            )
+            assert el.width_config.use_content is True
