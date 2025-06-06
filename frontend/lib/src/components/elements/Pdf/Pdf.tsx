@@ -150,6 +150,7 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
       height={height || 500}
       widthConfig={widthConfig || undefined}
       title="PDF Viewer"
+      sandbox="allow-scripts allow-forms allow-downloads allow-top-navigation-by-user-activation"
     />
   )
 }
