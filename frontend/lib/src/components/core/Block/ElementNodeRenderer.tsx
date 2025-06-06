@@ -345,7 +345,6 @@ const RawElementNodeRenderer = (
     }
 
     case "pdf":
-      console.log("PDF element", node.element.pdf)
       return (
         <Pdf
           element={node.element.pdf as IPdf}

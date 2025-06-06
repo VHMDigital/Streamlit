@@ -47,6 +47,7 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
 
   // State for react-pdf
   const [numPages, setNumPages] = useState<number>(0)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   // Build the media URL if it's not already a full URL
   const pdfUrl = url?.startsWith("http")
@@ -69,6 +70,19 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages)
+    setLoadError(null) // Clear any previous errors
+  }
+
+  const onDocumentLoadError = (error: Error) => {
+    console.error("PDF load error:", error)
+    if (error.message.includes("CORS") || error.message.includes("fetch")) {
+      setLoadError(
+        "CORS Error: This PDF cannot be loaded due to cross-origin restrictions. " +
+          "Try with another PDF instead or uncheck 'Use external module'."
+      )
+    } else {
+      setLoadError(`Failed to load PDF: ${error.message}`)
+    }
   }
 
   if (useExtModule) {
@@ -80,23 +94,49 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
         height={height || 500}
         widthConfig={widthConfig || undefined}
       >
-        <Document
-          file={pdfUrl}
-          onLoadSuccess={onDocumentLoadSuccess}
-          options={options}
-          loading={<div>Loading PDF...</div>}
-          error={<div>Failed to load PDF file.</div>}
-        >
-          {Array.from(new Array(numPages), (el, index) => (
-            <StyledReactPdfPage key={`page_${index + 1}`}>
-              <Page
-                pageNumber={index + 1}
-                renderAnnotationLayer={true}
-                renderTextLayer={true}
-              />
-            </StyledReactPdfPage>
-          ))}
-        </Document>
+        {loadError ? (
+          <div
+            style={{
+              padding: "20px",
+              color: "#ff4b4b",
+              backgroundColor: "#fff2f2",
+              border: "1px solid #ffcccb",
+              borderRadius: "4px",
+              margin: "10px",
+            }}
+          >
+            <strong>Error loading PDF:</strong>
+            <br />
+            {loadError}
+          </div>
+        ) : (
+          <Document
+            file={pdfUrl}
+            onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={onDocumentLoadError}
+            options={options}
+            loading={
+              <div style={{ padding: "20px", textAlign: "center" }}>
+                Loading PDF...
+              </div>
+            }
+            error={
+              <div style={{ padding: "20px", color: "#ff4b4b" }}>
+                Failed to load PDF file.
+              </div>
+            }
+          >
+            {Array.from(new Array(numPages), (el, index) => (
+              <StyledReactPdfPage key={`page_${index + 1}`}>
+                <Page
+                  pageNumber={index + 1}
+                  renderAnnotationLayer={true}
+                  renderTextLayer={true}
+                />
+              </StyledReactPdfPage>
+            ))}
+          </Document>
+        )}
       </StyledReactPdfContainer>
     )
   }
