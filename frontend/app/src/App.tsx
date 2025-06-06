@@ -49,6 +49,7 @@ import {
   getUrl,
   handleFavicon,
   hashString,
+  hasLightBackgroundColor,
   HostCommunicationManager,
   IMenuItem,
   isColoredLineDisplayed,
@@ -574,6 +575,12 @@ export class App extends PureComponent<Props, State> {
         type: "SCRIPT_RUN_STATE_CHANGED",
         scriptRunState: this.state.scriptRunState,
       })
+    }
+    // Rerun script if the theme changed
+    if (
+      _prevProps.theme.activeTheme.name !== this.props.theme.activeTheme.name
+    ) {
+      this.sendRerunBackMsg()
     }
   }
 
@@ -1648,6 +1655,7 @@ export class App extends PureComponent<Props, State> {
       locale: getLocaleLanguage(),
       url: getUrl(),
       isEmbedded: isEmbed(),
+      colorScheme: this.getThemeColorScheme(),
     }
 
     if (pageScriptHash) {
@@ -1958,6 +1966,15 @@ export class App extends PureComponent<Props, State> {
         : document.location.search
 
     return queryString.startsWith("?") ? queryString.substring(1) : queryString
+  }
+
+  getThemeColorScheme = (): string => {
+    const { activeTheme } = this.props.theme
+
+    if (hasLightBackgroundColor(activeTheme.emotion)) {
+      return "light"
+    }
+    return "dark"
   }
 
   isInCloudEnvironment = (): boolean => {
