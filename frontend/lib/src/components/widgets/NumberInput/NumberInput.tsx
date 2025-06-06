@@ -493,6 +493,7 @@ const NumberInput: React.FC<Props> = ({
                 minWidth: theme.iconSizes.lg,
                 // Material icons color changed as inactionable
                 color: isMaterialIcon ? theme.colors.fadedText60 : "inherit",
+                backgroundColor: theme.colors.transparent, // so the red background color can be seen
               },
             },
             // Tooltip icon space
@@ -501,6 +502,7 @@ const NumberInput: React.FC<Props> = ({
                 color: hasLightBackgroundColor(theme) // font color according to background
                   ? theme.colors.red100
                   : theme.colors.red20,
+                backgroundColor: theme.colors.transparent, // so the red background color can be seen
               },
             },
           }}
