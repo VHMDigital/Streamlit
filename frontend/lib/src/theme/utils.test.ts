@@ -1046,7 +1046,7 @@ describe("parseFont", () => {
     ["SANS-SERIF", '"Source Sans", sans-serif'], // All caps
     ["sans serif", '"Source Sans", sans-serif'], // With space
     ["serif", '"Source Serif", serif'],
-    ["monospace", '"Source Code", monospace'],
+    ["monospace", '"Source Code Pro", monospace'],
 
     // Test fonts that aren't in the map (should return as-is)
     ["Arial", "Arial"],
