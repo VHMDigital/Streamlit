@@ -320,7 +320,7 @@ _NEWLINES = re.compile(r"[\n\r]+")
 
 
 def _get_current_line_of_code_as_str() -> str | None:
-    scriptrunner_frame = _get_scriptrunner_frame()
+    scriptrunner_frame, code_context = _get_scriptrunner_frame()
 
     if scriptrunner_frame is None:
         # If there's no ScriptRunner frame, something weird is going on. This
@@ -328,8 +328,6 @@ def _get_current_line_of_code_as_str() -> str | None:
         # Either way, let's bail out nicely just in case there's some valid
         # edge case where this is OK.
         return None
-
-    code_context = scriptrunner_frame.code_context
 
     if not code_context:
         # Sometimes a frame has no code_context. This can happen inside certain exec() calls, for
@@ -339,30 +337,44 @@ def _get_current_line_of_code_as_str() -> str | None:
         return None
 
     code_as_string = "".join(code_context)
+
     return re.sub(_NEWLINES, "", code_as_string.strip())
 
 
-def _get_scriptrunner_frame() -> inspect.FrameInfo | None:
-    prev_frame = None
-    scriptrunner_frame = None
+def _get_scriptrunner_frame() -> tuple[inspect.FrameInfo | None, list[str] | None]:
+    """
+    Search the call stack for the frame where `st.help(...)` was called.
 
-    # Look back in call stack to get the variable name passed into st.help().
-    # The frame *before* the ScriptRunner frame is the correct one.
-    # IMPORTANT: This will change if we refactor the code. But hopefully our tests will catch the
-    # issue and we'll fix it before it lands upstream!
+    The function scans the call stack and returns:
+      - The first frame that corresponds to `streamlit.runtime.scriptrunner.script_runner`,
+        which indicates the point where Streamlit begins executing user code.
+      - The code context of the line that contains `st.help(...)`, if found.
+
+    Returns
+    -------
+    Tuple[FrameInfo | None, list[str] | None]
+        A tuple of the ScriptRunner frame and the code context containing the call to `st.help(...)`,
+        or (None, None) if not found.
+    """
+    code_context: list[str] | None = None
+    scriptrunner_frame: inspect.FrameInfo | None = None
+
+    """Find the frame where the user called st.help(...)"""
     for frame in inspect.stack():
-        # Check if this is running inside a funny "exec()" block that won't provide the info we
-        # need. If so, just quit.
-        if frame.code_context is None:
-            return None
+        context = frame.code_context
+        if not context:
+            return None, None
 
+        # Search for the call to st.help in the code context.
+        if "st.help" in context[0]:
+            code_context = context
+
+        # If the frame is from the script runner, we can stop looking.
         if frame.filename == SCRIPTRUNNER_FILENAME:
-            scriptrunner_frame = prev_frame
+            scriptrunner_frame = frame
             break
 
-        prev_frame = frame
-
-    return scriptrunner_frame
+    return scriptrunner_frame, code_context
 
 
 def _is_stcommand(tree: Any, command_name: str) -> bool:
