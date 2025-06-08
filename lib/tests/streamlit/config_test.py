@@ -496,6 +496,7 @@ class ConfigTest(unittest.TestCase):
                 "theme.dataframeBorderColor",
                 "theme.showWidgetBorder",
                 "theme.linkColor",
+                "theme.linkUnderline",
                 "theme.codeBackgroundColor",
                 "theme.showSidebarBorder",
                 "theme.sidebar.primaryColor",
@@ -511,6 +512,7 @@ class ConfigTest(unittest.TestCase):
                 "theme.sidebar.dataframeBorderColor",
                 "theme.sidebar.showWidgetBorder",
                 "theme.sidebar.linkColor",
+                "theme.sidebar.linkUnderline",
                 "theme.sidebar.codeBackgroundColor",
                 "global.appTest",
                 "global.developmentMode",
@@ -671,6 +673,7 @@ class ConfigTest(unittest.TestCase):
             "dataframeBorderColor": None,
             "showWidgetBorder": None,
             "linkColor": None,
+            "linkUnderline": None,
             "font": None,
             "headingFont": None,
             "codeFont": None,
@@ -696,6 +699,7 @@ class ConfigTest(unittest.TestCase):
         config._set_option("theme.dataframeBorderColor", "#280f63", "test")
         config._set_option("theme.showWidgetBorder", True, "test")
         config._set_option("theme.linkColor", "#2EC163", "test")
+        config._set_option("theme.linkUnderline", False, "test")
         config._set_option("theme.codeBackgroundColor", "#29361e", "test")
         config._set_option("theme.font", "Inter", "test")
         config._set_option("theme.headingFont", "Inter", "test")
@@ -726,6 +730,7 @@ class ConfigTest(unittest.TestCase):
             "dataframeBorderColor": "#280f63",
             "showWidgetBorder": True,
             "linkColor": "#2EC163",
+            "linkUnderline": False,
             "font": "Inter",
             "headingFont": "Inter",
             "codeFont": "Monaspace Argon",
@@ -756,6 +761,7 @@ class ConfigTest(unittest.TestCase):
         config._set_option("theme.sidebar.dataframeBorderColor", "#280f63", "test")
         config._set_option("theme.sidebar.showWidgetBorder", True, "test")
         config._set_option("theme.sidebar.linkColor", "#2EC163", "test")
+        config._set_option("theme.sidebar.linkUnderline", False, "test")
         config._set_option("theme.sidebar.font", "Inter", "test")
         config._set_option("theme.sidebar.headingFont", "Inter", "test")
         config._set_option("theme.sidebar.codeFont", "Monaspace Argon", "test")
@@ -772,6 +778,7 @@ class ConfigTest(unittest.TestCase):
             "dataframeBorderColor": "#280f63",
             "showWidgetBorder": True,
             "linkColor": "#2EC163",
+            "linkUnderline": False,
             "font": "Inter",
             "headingFont": "Inter",
             "codeFont": "Monaspace Argon",
