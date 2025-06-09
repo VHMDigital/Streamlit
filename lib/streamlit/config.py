@@ -54,6 +54,9 @@ _config_options_template: dict[str, ConfigOption] = OrderedDict()
 # Stores the current state of config options.
 _config_options: dict[str, ConfigOption] | None = None
 
+# Stores the path to the main script. This is used to
+# resolve config and secret files relative to the main script:
+_main_script_path: str | None = None
 
 # Indicates that a config option was defined by the user.
 _USER_DEFINED: Final = "<user defined>"
@@ -167,7 +170,7 @@ def set_user_option(key: str, value: Any) -> None:
 
     raise StreamlitAPIException(
         f"{key} cannot be set on the fly. Set as command line option, e.g. "
-        "streamlit run script.py --{key}, or in config.toml instead."
+        f"streamlit run script.py --{key}, or in config.toml instead."
     )
 
 
@@ -243,6 +246,7 @@ def _create_option(
     replaced_by: str | None = None,
     type_: type = str,
     sensitive: bool = False,
+    multiple: bool = False,
 ) -> ConfigOption:
     '''Create a ConfigOption and store it globally in this module.
 
@@ -291,6 +295,7 @@ def _create_option(
         replaced_by=replaced_by,
         type_=type_,
         sensitive=sensitive,
+        multiple=multiple,
     )
     if option.section not in _section_descriptions:
         raise RuntimeError(
@@ -384,6 +389,7 @@ _create_option(
 
 
 @_create_option("global.developmentMode", visibility="hidden", type_=bool)
+@util.memoize
 def _global_development_mode() -> bool:
     """Are we in development mode.
 
@@ -492,6 +498,7 @@ def _logger_message_format() -> str:
     type_=bool,
     scriptable=True,
 )
+@util.memoize
 def _logger_enable_rich() -> bool:
     """
     Controls whether uncaught app exceptions are logged via the rich library.
@@ -677,6 +684,7 @@ _create_option(
         Note: This is a list of absolute paths.
     """,
     default_val=[],
+    multiple=True,
 )
 
 _create_option(
@@ -689,6 +697,7 @@ _create_option(
         Example: ['/home/user1/env', 'relative/path/to/folder']
     """,
     default_val=[],
+    multiple=True,
 )
 
 _create_option(
@@ -774,8 +783,6 @@ _create_option(
     "server.port",
     description="""
         The port where the server will listen for browser connections.
-
-        Don't use port 3000 which is reserved for internal development.
     """,
     default_val=8501,
     type_=int,
@@ -831,6 +838,7 @@ _create_option(
         Example: ['http://example.com', 'https://streamlit.io']
     """,
     default_val=[],
+    multiple=True,
 )
 
 _create_option(
@@ -954,8 +962,7 @@ def _browser_server_port() -> int:
     - Open the browser automatically (part of `streamlit run`).
 
     This option is for advanced use cases. To change the port of your app, use
-    `server.Port` instead. Don't use port 3000 which is reserved for internal
-    development.
+    `server.Port` instead.
 
     Default: whatever value is set in server.port.
     """
@@ -1020,6 +1027,7 @@ _create_option(
         to pass the Mapbox API token.
     """,
     default_val="",
+    type_=str,
     sensitive=True,
     deprecated=True,
     deprecation_text="""
@@ -1226,10 +1234,36 @@ _create_theme_options(
 )
 
 _create_theme_options(
+    "buttonRadius",
+    categories=["theme", CustomThemeCategories.SIDEBAR],
+    description="""
+        The radius used as basis for the corners of buttons.
+
+        This can be one of the following:
+        - "none"
+        - "small"
+        - "medium"
+        - "large"
+        - "full"
+        - ...or the number in pixels or rem. For example, you can use "10px",
+          "0.5rem", or "2rem". To follow best practices, use rem instead of
+          pixels when specifying a numeric size.
+    """,
+)
+
+_create_theme_options(
     "borderColor",
     categories=["theme", CustomThemeCategories.SIDEBAR],
     description="""
         The color of the border around elements.
+    """,
+)
+
+_create_theme_options(
+    "dataframeBorderColor",
+    categories=["theme", CustomThemeCategories.SIDEBAR],
+    description="""
+        The color of the border around dataframes and tables.
     """,
 )
 
@@ -1269,23 +1303,17 @@ _create_theme_options(
 
 _create_section("secrets", "Secrets configuration.")
 
-_create_option(
-    "secrets.files",
-    description="""
-        List of locations where secrets are searched.
 
-        An entry can be a path to a TOML file or directory path where
-        Kubernetes style secrets are saved. Order is important, import is
-        first to last, so secrets in later files will take precedence over
-        earlier ones.
-    """,
-    default_val=[
-        # NOTE: The order here is important! Project-level secrets should overwrite
-        # global secrets.
-        file_util.get_streamlit_file_path("secrets.toml"),
-        file_util.get_project_streamlit_file_path("secrets.toml"),
-    ],
-)
+@_create_option("secrets.files", multiple=True)
+def _secrets_files() -> list[str]:
+    """List of locations where secrets are searched.
+
+    An entry can be a path to a TOML file or directory path where
+    Kubernetes style secrets are saved. Order is important, import is
+    first to last, so secrets in later files will take precedence over
+    earlier ones.
+    """
+    return get_config_files("secrets.toml")
 
 
 def get_where_defined(key: str) -> str:
@@ -1301,7 +1329,8 @@ def get_where_defined(key: str) -> str:
         config_options = get_config_options()
 
         if key not in config_options:
-            raise RuntimeError('Config key "%s" not defined.' % key)
+            msg = f'Config key "{key}" not defined.'
+            raise RuntimeError(msg)
         return config_options[key].where_defined
 
 
@@ -1380,11 +1409,12 @@ def _set_option(key: str, value: Any, where_defined: str) -> None:
         # Import logger locally to prevent circular references
         from streamlit.logger import get_logger
 
-        LOGGER = get_logger(__name__)
+        logger: Final = get_logger(__name__)
 
-        LOGGER.warning(
-            f'"{key}" is not a valid config option. If you previously had this config '
-            "option set, it may have been removed."
+        logger.warning(
+            '"%s" is not a valid config option. If you previously had this config '
+            "option set, it may have been removed.",
+            key,
         )
 
     else:
@@ -1505,9 +1535,9 @@ def _maybe_read_env_variable(value: Any) -> Any:
             # Import logger locally to prevent circular references
             from streamlit.logger import get_logger
 
-            LOGGER = get_logger(__name__)
+            logger: Final = get_logger(__name__)
 
-            LOGGER.error("No environment variable called %s", var_name)
+            logger.error("No environment variable called %s", var_name)
         else:
             return _maybe_convert_to_number(env_var)
 
@@ -1533,10 +1563,30 @@ def _maybe_convert_to_number(v: Any) -> Any:
 # something.
 _on_config_parsed = Signal(doc="Emitted when the config file is parsed.")
 
-CONFIG_FILENAMES = [
-    file_util.get_streamlit_file_path("config.toml"),
-    file_util.get_project_streamlit_file_path("config.toml"),
-]
+
+def get_config_files(file_name: str) -> list[str]:
+    """Return the list of config files (e.g. config.toml or secrets.toml) to be parsed.
+
+    Order is important, import is first to last, so options in later files
+    will take precedence over earlier ones.
+    """
+    # script-level config files overwrite project-level config
+    # files, which in turn overwrite global config files.
+    config_files = [
+        file_util.get_streamlit_file_path(file_name),
+        file_util.get_project_streamlit_file_path(file_name),
+    ]
+
+    if _main_script_path is not None:
+        script_level_config = file_util.get_main_script_streamlit_file_path(
+            _main_script_path, file_name
+        )
+        if script_level_config not in config_files:
+            # We need to append the script-level config file to the list
+            # so that it overwrites project & global level config files:
+            config_files.append(script_level_config)
+
+    return config_files
 
 
 def get_config_options(
@@ -1587,7 +1637,7 @@ def get_config_options(
 
         # Values set in files later in the CONFIG_FILENAMES list overwrite those
         # set earlier.
-        for filename in CONFIG_FILENAMES:
+        for filename in get_config_files("config.toml"):
             if not os.path.exists(filename):
                 continue
 
@@ -1607,8 +1657,8 @@ def get_config_options(
             # Import logger locally to prevent circular references.
             from streamlit.logger import get_logger
 
-            LOGGER = get_logger(__name__)
-            LOGGER.warning(
+            logger: Final = get_logger(__name__)
+            logger.warning(
                 "An update to the [server] config option section was detected."
                 " To have these changes be reflected, please restart streamlit."
             )
@@ -1623,12 +1673,12 @@ def _check_conflicts() -> None:
     # When using the Node server, we must always connect to 8501 (this is
     # hard-coded in JS). Otherwise, the browser would decide what port to
     # connect to based on window.location.port, which in dev is going
-    # to be (3000)
+    # to be 3000.
 
     # Import logger locally to prevent circular references
     from streamlit.logger import get_logger
 
-    LOGGER = get_logger(__name__)
+    logger: Final = get_logger(__name__)
 
     if get_option("global.developmentMode"):
         if not _is_unset("server.port"):
@@ -1645,7 +1695,7 @@ def _check_conflicts() -> None:
     if get_option("server.enableXsrfProtection") and (
         not get_option("server.enableCORS") or get_option("global.developmentMode")
     ):
-        LOGGER.warning(
+        logger.warning(
             """
 Warning: the config option 'server.enableCORS=false' is not compatible with
 'server.enableXsrfProtection=true'.
