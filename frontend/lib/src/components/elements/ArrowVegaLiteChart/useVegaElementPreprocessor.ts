@@ -16,9 +16,8 @@
 
 import { useMemo } from "react"
 
-import { useTheme } from "@emotion/react"
-
 import { EmotionTheme } from "~lib/theme"
+import { useEmotionTheme } from "~lib/hooks/useEmotionTheme"
 import { isNullOrUndefined } from "~lib/util/utils"
 
 import { applyStreamlitTheme, applyThemeDefaults } from "./CustomTheme"
@@ -168,7 +167,12 @@ export const useVegaElementPreprocessor = (
   width: number,
   height: number
 ): VegaLiteChartElement => {
-  const theme = useTheme()
+  const theme = useEmotionTheme()
+  const {
+    expanded: isFullScreen,
+    width,
+    height,
+  } = useRequiredContext(ElementFullscreenContext)
 
   const {
     id,
@@ -186,7 +190,7 @@ export const useVegaElementPreprocessor = (
   // reference).
   const selectionMode = useMemo(() => {
     return inputSelectionMode
-    // eslint-disable-next-line react-hooks/react-compiler
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(inputSelectionMode)])
 

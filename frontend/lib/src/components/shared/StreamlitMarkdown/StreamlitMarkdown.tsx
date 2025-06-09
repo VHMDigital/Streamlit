@@ -32,10 +32,8 @@ import xxhash from "xxhashjs"
 import slugify from "@sindresorhus/slugify"
 import { visit } from "unist-util-visit"
 import { useTheme } from "@emotion/react"
-import ReactMarkdown, {
-  Components,
-  Options as ReactMarkdownProps,
-} from "react-markdown"
+import ReactMarkdown from "react-markdown"
+import { Components, Options as ReactMarkdownProps } from "react-markdown"
 import { PluggableList } from "unified"
 import once from "lodash/once"
 import omit from "lodash/omit"
@@ -60,6 +58,7 @@ import {
   getMarkdownBgColors,
   getMarkdownTextColors,
 } from "~lib/theme"
+import { useEmotionTheme } from "~lib/hooks/useEmotionTheme"
 import streamlitLogo from "~lib/assets/img/streamlit-logo/streamlit-mark-color.svg"
 
 import {
@@ -195,7 +194,7 @@ const HeaderActionElements: FC<HeadingActionElements> = ({
   help,
   hideAnchor,
 }) => {
-  const theme: EmotionTheme = useTheme()
+  const theme = useEmotionTheme()
   if (!help && hideAnchor) {
     return <></>
   }
@@ -717,7 +716,15 @@ export const RenderedMarkdown = memo(function RenderedMarkdown({
   isLabel,
   disableLinks,
 }: Readonly<RenderedMarkdownProps>): ReactElement {
-  const theme: EmotionTheme = useTheme()
+  const theme = useEmotionTheme()
+
+  const rehypePlugins: PluggableList = useMemo(
+    () =>
+      allowHTML
+        ? [rehypeKatex, [rehypeRaw, { passThrough: ["rb", "rt"] }]]
+        : [rehypeKatex],
+    [allowHTML]
+  )
 
   const colorMapping = useMemo(() => createColorMapping(theme), [theme])
 
@@ -729,16 +736,6 @@ export const RenderedMarkdown = memo(function RenderedMarkdown({
     ],
     [theme, colorMapping]
   )
-
-  const rehypePlugins = useMemo<PluggableList>(() => {
-    const plugins: PluggableList = [rehypeSetCodeInlineProperty, rehypeKatex]
-
-    if (allowHTML) {
-      plugins.push(rehypeRaw)
-    }
-
-    return plugins
-  }, [allowHTML])
 
   const renderers = useMemo(
     () =>

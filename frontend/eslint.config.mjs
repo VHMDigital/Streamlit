@@ -262,6 +262,12 @@ export default tseslint.config([
               name: "timezone-mock",
               message: "Please use the withTimezones test harness instead",
             },
+            {
+              name: "@emotion/react",
+              message:
+                "Please use the useEmotionTheme hook instead of useTheme for type-safety",
+              importNames: ["useTheme"],
+            },
           ],
         },
       ],
