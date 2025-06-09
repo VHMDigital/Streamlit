@@ -432,26 +432,11 @@ class AppSessionTest(unittest.TestCase):
     def test_passes_client_state_on_run_on_save(self):
         session = _create_test_session()
         session._run_on_save = True
-
-        # Set up some client state data
-        session._client_state.context_info.timezone = "original_timezone"
-        session._client_state.query_string = "test_query"
-        session._client_state.page_script_hash = "test_hash"
-
-        session._enqueue_forward_msg = MagicMock()
+        session.request_rerun = MagicMock()
         session._on_source_file_changed()
 
         session._script_cache.clear.assert_called_once()
-
-        # Verify that a file change message was sent to the frontend
-        session._enqueue_forward_msg.assert_called_once()
-
-        # Get the message that was sent
-        sent_msg = session._enqueue_forward_msg.call_args[0][0]
-
-        # Verify it's a script_changed_on_disk message
-        assert sent_msg.WhichOneof("type") == "session_event"
-        assert sent_msg.session_event.script_changed_on_disk is True
+        session.request_rerun.assert_called_once_with(session._client_state)
 
     @patch(
         "streamlit.runtime.app_session.AppSession._should_rerun_on_file_change",
