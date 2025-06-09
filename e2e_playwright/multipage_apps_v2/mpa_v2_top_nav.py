@@ -100,7 +100,7 @@ else:
         st.Page(page3, title="Page 3", icon="🔧"),
     ]
 
-position: Literal["sidebar", "hidden", "top"] = "sidebar"
+position: Literal["sidebar", "hidden", "top"] = "top"
 # Determine position
 if test_hidden:
     position = "hidden"
