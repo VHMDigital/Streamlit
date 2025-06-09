@@ -53,39 +53,35 @@ export const StyledInputControls = styled.div({
   alignSelf: "stretch",
 })
 
-interface StyledInputControlProps {}
-
-export const StyledInputControl = styled.button<StyledInputControlProps>(
-  ({ theme }) => ({
+export const StyledInputControl = styled.button(({ theme }) => ({
+  border: "none",
+  height: theme.sizes.full,
+  display: "flex",
+  alignItems: "center",
+  width: theme.sizes.numberInputControlsWidth,
+  justifyContent: "center",
+  color: theme.colors.bodyText,
+  backgroundColor: theme.colors.secondaryBg,
+  transition: "color 300ms, backgroundColor 300ms",
+  "&:hover:enabled, &:focus:enabled": {
+    color: theme.colors.white,
+    backgroundColor: theme.colors.primary,
+    transition: "none",
+    outline: "none",
+  },
+  "&:active": {
+    outline: "none",
     border: "none",
-    height: theme.sizes.full,
-    display: "flex",
-    alignItems: "center",
-    width: theme.sizes.numberInputControlsWidth,
-    justifyContent: "center",
-    color: theme.colors.bodyText,
-    backgroundColor: theme.colors.secondaryBg,
-    transition: "color 300ms, backgroundColor 300ms",
-    "&:hover:enabled, &:focus:enabled": {
-      color: theme.colors.white,
-      backgroundColor: theme.colors.primary,
-      transition: "none",
-      outline: "none",
-    },
-    "&:active": {
-      outline: "none",
-      border: "none",
-    },
-    "&:last-of-type": {
-      borderTopRightRadius: theme.radii.default,
-      borderBottomRightRadius: theme.radii.default,
-    },
-    "&:disabled": {
-      cursor: "not-allowed",
-      color: theme.colors.fadedText40,
-    },
-  })
-)
+  },
+  "&:last-of-type": {
+    borderTopRightRadius: theme.radii.default,
+    borderBottomRightRadius: theme.radii.default,
+  },
+  "&:disabled": {
+    cursor: "not-allowed",
+    color: theme.colors.fadedText40,
+  },
+}))
 
 export interface StyledInstructionsContainerProps {
   // If widget is clearable, the instruction needs to be moved a couple

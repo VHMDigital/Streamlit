@@ -141,8 +141,8 @@ const NumberInput: React.FC<Props> = ({
 
   const commitValue = useCallback(
     ({ value, source }: { value: number | null; source: Source }) => {
-      if (notNullOrUndefined(value) && (min > value! || value! > max)) {
-        setError(value! < min ? "BelowMin" : "AboveMax")
+      if (notNullOrUndefined(value) && (min > value || value > max)) {
+        setError(value < min ? "BelowMin" : "AboveMax")
       } else {
         const newValue = value ?? elementDefault ?? null
 

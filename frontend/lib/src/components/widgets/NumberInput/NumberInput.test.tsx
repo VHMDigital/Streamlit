@@ -713,14 +713,13 @@ describe("NumberInput widget", () => {
     beforeEach(() => {
       vi.spyOn(UseResizeObserver, "useResizeObserver").mockReturnValue({
         elementRef: { current: null },
-        forceRecalculate: vitest.fn(),
         // Keep width large so controls/instructions would normally show
         values: [250],
       })
     })
 
     // Helper function to render NumberInput with a theme provider
-    const renderNumberInput = (props: any): ReturnType<typeof render> =>
+    const renderNumberInput = (props: Props): ReturnType<typeof render> =>
       render(
         <ThemeProvider theme={emotionBaseTheme}>
           <NumberInput {...props} />
