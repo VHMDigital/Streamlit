@@ -49,6 +49,7 @@ import {
   getUrl,
   handleFavicon,
   hashString,
+  hasLightBackgroundColor,
   HostCommunicationManager,
   IMenuItem,
   isColoredLineDisplayed,
@@ -127,6 +128,7 @@ import {
   DefaultStreamlitEndpoints,
   IHostConfigResponse,
   LibConfig,
+  parseUriIntoBaseParts,
   StreamlitEndpoints,
 } from "@streamlit/connection"
 import { SessionEventDispatcher } from "@streamlit/app/src/SessionEventDispatcher"
@@ -574,6 +576,12 @@ export class App extends PureComponent<Props, State> {
         type: "SCRIPT_RUN_STATE_CHANGED",
         scriptRunState: this.state.scriptRunState,
       })
+    }
+    // Rerun script if the theme changed
+    if (
+      _prevProps.theme.activeTheme.name !== this.props.theme.activeTheme.name
+    ) {
+      this.sendRerunBackMsg()
     }
   }
 
@@ -1070,13 +1078,15 @@ export class App extends PureComponent<Props, State> {
   ): void => {
     const baseUriParts = this.getBaseUriParts()
 
-    // TODO(vdonato): Support the situation where window.__streamlit.BACKEND_BASE_URL
-    // is set, so the Streamlit backend URL is set to be different from where
-    // we loaded index.html. Until this is done, the browser's back/forward
-    // buttons may not work correctly with multipage apps when
-    // window.__streamlit.BACKEND_BASE_URL is set.
-    if (baseUriParts && !window.__streamlit?.BACKEND_BASE_URL) {
-      const { pathname } = baseUriParts
+    if (baseUriParts) {
+      let pathname
+      if (window.__streamlit?.MAIN_PAGE_BASE_URL) {
+        pathname = parseUriIntoBaseParts(
+          window.__streamlit.MAIN_PAGE_BASE_URL
+        ).pathname
+      } else {
+        pathname = baseUriParts.pathname
+      }
 
       const prevPageNameInPath = extractPageNameFromPathName(
         document.location.pathname,
@@ -1225,12 +1235,6 @@ export class App extends PureComponent<Props, State> {
 
   /**
    * Handler called when the history state changes, e.g. `popstate` event.
-   *
-   * TODO(vdonato): Support the situation where window.__streamlit.BACKEND_BASE_URL
-   * is set, so the Streamlit backend URL is set to be different from where
-   * we loaded index.html. Until this is done, the browser's back/forward
-   * buttons may not work correctly with multipage apps when
-   * window.__streamlit.BACKEND_BASE_URL is set.
    */
   onHistoryChange = (): void => {
     const { currentPageScriptHash } = this.state
@@ -1633,7 +1637,6 @@ export class App extends PureComponent<Props, State> {
     }
 
     const { currentPageScriptHash } = this.state
-    const { pathname } = baseUriParts
     let queryString = this.getQueryString()
     let pageName = ""
 
@@ -1643,6 +1646,7 @@ export class App extends PureComponent<Props, State> {
       locale: getLocaleLanguage(),
       url: getUrl(),
       isEmbedded: isEmbed(),
+      colorScheme: this.getThemeColorScheme(),
     }
 
     if (pageScriptHash) {
@@ -1661,17 +1665,16 @@ export class App extends PureComponent<Props, State> {
       // click the "Rerun" button in the main menu. In this case, we
       // rerun the current page.
       pageScriptHash = currentPageScriptHash
-    } else if (window.__streamlit?.BACKEND_BASE_URL) {
-      // We currently don't support navigating directly to a subpage of a
-      // multipage app when setting the backend URL of an app to be a different
-      // location from where we load index.html. In this case, we set both
-      // pageName and pageScriptHash to the empty string, which will result in
-      // the app's main page being run.
-      // TODO(vdonato): Support this case or decide we can do without it when
-      // setting a different backend URL.
-      pageName = ""
-      pageScriptHash = ""
     } else {
+      let pathname
+      if (window.__streamlit?.MAIN_PAGE_BASE_URL) {
+        pathname = parseUriIntoBaseParts(
+          window.__streamlit.MAIN_PAGE_BASE_URL
+        ).pathname
+      } else {
+        pathname = baseUriParts.pathname
+      }
+
       // We must be in the case where the user is navigating directly to a
       // non-main page of this app. Since we haven't received the list of the
       // app's pages from the server at this point, we fall back to requesting
@@ -1953,6 +1956,15 @@ export class App extends PureComponent<Props, State> {
         : document.location.search
 
     return queryString.startsWith("?") ? queryString.substring(1) : queryString
+  }
+
+  getThemeColorScheme = (): string => {
+    const { activeTheme } = this.props.theme
+
+    if (hasLightBackgroundColor(activeTheme.emotion)) {
+      return "light"
+    }
+    return "dark"
   }
 
   isInCloudEnvironment = (): boolean => {
