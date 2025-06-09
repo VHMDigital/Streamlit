@@ -173,5 +173,5 @@ def test_width_configurations(app: Page, assert_snapshot: ImageCompareFunction):
     code_elements = app.get_by_test_id("stCode")
 
     # Test longer code blocks with different widths
-    assert_snapshot(code_elements.nth(17), name="st_code-width_pixels")
-    assert_snapshot(code_elements.nth(18), name="st_code-width_stretch")
+    assert_snapshot(code_elements.nth(21), name="st_code-width_pixels")
+    assert_snapshot(code_elements.nth(22), name="st_code-width_stretch")
