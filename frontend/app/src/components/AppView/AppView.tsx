@@ -30,6 +30,7 @@ import {
   ContainerContentsWrapper,
   FileUploadClient,
   IGuestToHostMessage,
+  isToolbarDisplayed,
   LibContext,
   Profiler,
   WidgetStateManager,
@@ -246,7 +247,7 @@ function AppView(props: AppViewProps): ReactElement {
     shouldShowLogo ||
     shouldShowExpandButton ||
     shouldShowNavigation ||
-    showToolbar
+    isToolbarDisplayed()
 
   const isHeaderTransparent = !hasHeaderUserContent
 
