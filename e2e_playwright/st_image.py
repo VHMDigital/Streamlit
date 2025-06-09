@@ -27,7 +27,7 @@ import streamlit as st
 TEST_ASSETS_DIR = Path(__file__).parent / "test_assets"
 
 img: npt.NDArray[np.int_] = np.repeat(0, 10000).reshape(100, 100)
-img800 = np.repeat(0, 640000).reshape(800, 800)
+img800: npt.NDArray[np.int_] = np.repeat(0, 640000).reshape(800, 800)
 
 
 st.header("Images from numpy arrays")
