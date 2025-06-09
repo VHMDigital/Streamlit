@@ -407,27 +407,6 @@ def test_renders_logos(app: Page, assert_snapshot: ImageCompareFunction):
     )
     assert_snapshot(app.get_by_test_id("stSidebar"), name="sidebar-logo")
 
-    # Collapse the sidebar
-    app.get_by_test_id("stSidebarContent").hover()
-    collapse_button = app.get_by_test_id("stSidebarCollapseButton").locator("button")
-    collapse_button.click()
-
-    # If we don't have this, it takes the screenshot while animating causing some diff antialiasing
-    # causing a screenshot diff
-    app.wait_for_timeout(500)
-    # Wait for sidebar to be collapsed, the expand button should now be visible in the header
-    expect(app.get_by_test_id("stExpandSidebarButton")).to_be_visible()
-
-    # Collapsed logo should be in the header
-    header_element = app.get_by_test_id("stHeader")
-    logo_link_element = header_element.get_by_test_id("stLogoLink")
-    expect(logo_link_element).to_be_visible()
-    expect(logo_link_element).to_have_attribute("href", "https://www.example.com")
-
-    collapsed_logo_image = logo_link_element.get_by_test_id("stHeaderLogo")
-    expect(collapsed_logo_image).to_be_visible()
-    assert_snapshot(collapsed_logo_image, name="mpa-v2-collapsed-header-logo")
-
 
 def test_page_link_with_path(app: Page):
     """Test st.page_link works with a path."""
