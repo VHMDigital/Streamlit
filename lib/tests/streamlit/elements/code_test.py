@@ -243,7 +243,7 @@ class CodeElement(DeltaGeneratorTestCase):
         assert "Invalid height" in str(e.value)
 
     def test_st_code_with_leading_whitespace(self):
-        """Test st.code with height in pixels."""
+        """Test st.code with code containing leading whitespace."""
         code = """
             def hello():
                 print("Hello, Streamlit!")
