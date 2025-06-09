@@ -115,6 +115,7 @@ export const StyledColumn = styled.div<StyledColumnProps>(
       // e.g. if it overflows to next row.
       width,
       flex: `1 1 ${width}`,
+      minWidth: "4rem",
 
       [`@media (max-width: ${theme.breakpoints.columns})`]: {
         minWidth: `calc(100% - ${theme.spacing.twoXL})`,
@@ -147,36 +148,19 @@ export const StyledColumn = styled.div<StyledColumnProps>(
   }
 )
 
-export interface StyledBlockWrapperProps {
-  border: boolean
-  height?: number
-}
-
-export const StyledBlockWrapper = styled.div<StyledBlockWrapperProps>(
-  ({ theme, border, height }) => ({
-    display: "block",
-    ...(border && {
-      border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
-      borderRadius: theme.radii.default,
-      padding: `calc(${theme.spacing.lg} - ${theme.sizes.borderWidth})`,
-    }),
-    ...(height && {
-      height: `${height}px`,
-      overflow: "auto",
-    }),
-  })
-)
-
 export interface StyledFlexContainerBlockProps {
   direction: React.CSSProperties["flexDirection"]
   gap?: streamlit.GapSize | undefined
   flex?: React.CSSProperties["flex"]
   wrap?: boolean
+  overflow?: React.CSSProperties["overflow"]
+  border: boolean
+  height?: React.CSSProperties["height"]
 }
 
 export const StyledFlexContainerBlock =
   styled.div<StyledFlexContainerBlockProps>(
-    ({ theme, direction, gap, flex, wrap }) => {
+    ({ theme, direction, gap, flex, wrap, overflow, border, height }) => {
       let gapWidth
       if (gap !== undefined) {
         gapWidth = translateGapWidth(gap, theme)
@@ -187,10 +171,17 @@ export const StyledFlexContainerBlock =
         gap: gapWidth,
         width: "100%",
         maxWidth: "100%",
-        height: "auto",
+        minWidth: "4rem",
+        height: height,
         flexDirection: direction,
         flex,
         flexWrap: wrap ? "wrap" : "nowrap",
+        overflow,
+        ...(border && {
+          border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+          borderRadius: theme.radii.default,
+          padding: `calc(${theme.spacing.lg} - ${theme.sizes.borderWidth})`,
+        }),
       }
     }
   )
