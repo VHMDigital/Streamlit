@@ -220,11 +220,11 @@ class CacheResourceAPI:
         *,
         ttl: float | timedelta | str | None = None,
         max_entries: int | None = None,
+        show_spinner: bool | str = True,
+        show_time: bool = False,
         validate: ValidateFunc | None = None,
         experimental_allow_widgets: bool = False,
         hash_funcs: HashFuncsDict | None = None,
-        show_time: bool = False,
-        show_spinner: bool | str = True,
     ) -> Callable[[F], F]: ...
 
     def __call__(
@@ -234,20 +234,20 @@ class CacheResourceAPI:
         ttl: float | timedelta | str | None = None,
         max_entries: int | None = None,
         show_spinner: bool | str = True,
+        show_time: bool = False,
         validate: ValidateFunc | None = None,
         experimental_allow_widgets: bool = False,
         hash_funcs: HashFuncsDict | None = None,
-        show_time: bool = False,
     ) -> F | Callable[[F], F]:
         return self._decorator(
             func,
             ttl=ttl,
             max_entries=max_entries,
+            show_spinner=show_spinner,
+            show_time=show_time,
             validate=validate,
             experimental_allow_widgets=experimental_allow_widgets,
             hash_funcs=hash_funcs,
-            show_spinner=show_spinner,
-            show_time=show_time,
         )
 
     def _decorator(
@@ -257,10 +257,10 @@ class CacheResourceAPI:
         ttl: float | timedelta | str | None,
         max_entries: int | None,
         show_spinner: bool | str,
+        show_time: bool = False,
         validate: ValidateFunc | None,
         experimental_allow_widgets: bool,
         hash_funcs: HashFuncsDict | None = None,
-        show_time: bool = False,  # New parameter
     ) -> F | Callable[[F], F]:
         """Decorator to cache functions that return global resources (e.g. database connections, ML models).
 
@@ -426,24 +426,24 @@ class CacheResourceAPI:
             return lambda f: make_cached_func_wrapper(  # type: ignore
                 CachedResourceFuncInfo(
                     func=f,  # type: ignore
+                    show_spinner=show_spinner,
+                    show_time=show_time,
                     max_entries=max_entries,
                     ttl=ttl,
                     validate=validate,
                     hash_funcs=hash_funcs,
-                    show_spinner=show_spinner,
-                    show_time=show_time,
                 )
             )
 
         return make_cached_func_wrapper(
             CachedResourceFuncInfo(
                 func=cast("types.FunctionType", func),
+                show_spinner=show_spinner,
+                show_time=show_time,
                 max_entries=max_entries,
                 ttl=ttl,
                 validate=validate,
                 hash_funcs=hash_funcs,
-                show_spinner=show_spinner,
-                show_time=show_time,
             )
         )
 

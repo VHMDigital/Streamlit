@@ -67,7 +67,6 @@ def cache(
     show_time : bool
         Whether to show the elapsed time next to the spinner text. If this is
         ``False`` (default), no time is displayed. If this is ``True``,
-
         elapsed time is displayed with a precision of 0.1 seconds. The time
         format is not configurable.
 
