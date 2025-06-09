@@ -17,7 +17,7 @@
 import React, { Suspense } from "react"
 import { useTheme } from "@emotion/react"
 
-import { IconSize, EmotionTheme, getMarkdownTextColors } from "~lib/theme"
+import { EmotionTheme, getMarkdownTextColors, IconSize } from "~lib/theme"
 
 import { EmojiIcon } from "./Icon"
 import MaterialFontIcon from "./Material/MaterialFontIcon"
@@ -114,7 +114,7 @@ const DynamicIconDispatcher = ({
 }
 
 function createColorMapping(theme: EmotionTheme): Map<string, Object> {
-  const { red, orange, yellow, green, blue, violet, purple, gray, primary } =
+  const { red, orange, green, blue, violet, gray, primary } =
     getMarkdownTextColors(theme)
 
   return new Map(
