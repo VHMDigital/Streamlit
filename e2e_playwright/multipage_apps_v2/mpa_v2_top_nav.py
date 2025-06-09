@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
+from typing import Any, Literal
 
 import streamlit as st
 
@@ -100,6 +100,7 @@ else:
         st.Page(page3, title="Page 3", icon="🔧"),
     ]
 
+position: Literal["sidebar", "hidden", "top"] = "sidebar"
 # Determine position
 if test_hidden:
     position = "hidden"
