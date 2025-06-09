@@ -16,6 +16,8 @@
 
 import React, { memo, ReactElement } from "react"
 
+import { getLogger } from "loglevel"
+
 import { Exception as ExceptionProto } from "@streamlit/protobuf"
 import { isLocalhost } from "@streamlit/utils"
 
@@ -35,6 +37,8 @@ import {
   StyledStackTraceRow,
   StyledStackTraceTitle,
 } from "./styled-components"
+
+export const LOG = getLogger("ExceptionElement")
 
 export interface ExceptionElementProps {
   element: ExceptionProto
@@ -126,12 +130,10 @@ function ExceptionElement({
     formattedExceptionFull
   )}`
 
-  const onCopyClick = () => {
-    try {
-      navigator.clipboard.writeText(formattedExceptionFull)
-    } catch (error) {
-      console.log(error)
-    }
+  const onCopyClick = (): void => {
+    navigator.clipboard.writeText(formattedExceptionFull).catch(error => {
+      LOG.error("Failed to copy exception details to clipboard:", error)
+    })
   }
 
   return (
