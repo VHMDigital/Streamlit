@@ -136,7 +136,7 @@ function AppView(props: AppViewProps): ReactElement {
     return () => window.removeEventListener("hashchange", listener, false)
   }, [sendMessageToHost])
 
-  const { initialSidebarState, showToolbar, widgetsDisabled } = useAppContext()
+  const { initialSidebarState, widgetsDisabled } = useAppContext()
 
   const {
     addScriptFinishedHandler,
