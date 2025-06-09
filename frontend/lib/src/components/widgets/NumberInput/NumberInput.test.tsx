@@ -751,8 +751,7 @@ describe("NumberInput widget", () => {
       const errorIcon = screen.getByTestId("stTooltipErrorHoverTarget")
       expect(errorIcon).toBeVisible()
 
-      // 4)Hover over the error icon to trigger the tooltip
-      // 4) Hover over the error icon
+      // 4) Hover over the error icon to trigger the tooltip
       await user.hover(errorIcon)
 
       const tooltip = await screen.findByTestId("stTooltipErrorContent")
