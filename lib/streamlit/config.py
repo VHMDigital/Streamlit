@@ -1174,6 +1174,18 @@ _create_theme_options(
 )
 
 _create_theme_options(
+    "codeFontSize",
+    categories=["theme", CustomThemeCategories.SIDEBAR],
+    description="""
+        Sets the font size (in pixels or rem) for code blocks and code text.
+
+        This applies to inline code, code blocks (ex: `st.code`), as well as font in `st.json` and `st.help`.
+
+        When unset, the font size will be 0.875rem.
+    """,
+)
+
+_create_theme_options(
     "headingFont",
     categories=["theme", CustomThemeCategories.SIDEBAR],
     description="""
