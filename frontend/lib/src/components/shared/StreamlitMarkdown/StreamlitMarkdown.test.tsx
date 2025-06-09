@@ -17,7 +17,6 @@
 import React, { ReactElement } from "react"
 
 import ReactMarkdown from "react-markdown"
-// eslint-disable-next-line testing-library/no-manual-cleanup
 import { cleanup, screen } from "@testing-library/react"
 import { transparentize } from "color2k"
 
@@ -411,7 +410,7 @@ describe("StreamlitMarkdown", () => {
       const tagName = markdown.nodeName.toLowerCase()
       expect(tagName).toBe("span")
       expect(markdown).toHaveStyle(`color: ${style}`)
-      expect(markdown).toHaveClass("colored-text")
+      expect(markdown).toHaveClass("stMarkdownColoredText")
 
       // Removes rendered StreamlitMarkdown component before next case run
       cleanup()
@@ -555,7 +554,7 @@ describe("CustomCodeTag Element", () => {
     })
     render(<CustomCodeTag {...props} />)
     // queryBy returns null vs. error
-    const copyButton = screen.queryByRole("button") // eslint-disable-line testing-library/prefer-presence-queries
+    const copyButton = screen.queryByRole("button")
 
     expect(copyButton).toBeNull()
   })

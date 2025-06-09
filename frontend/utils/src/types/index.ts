@@ -1,3 +1,4 @@
+import { ICustomThemeConfig } from "@streamlit/protobuf"
 /**
  * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
@@ -31,4 +32,24 @@ export function isNullOrUndefined<T>(
   value: T | null | undefined
 ): value is null | undefined {
   return <T>value === null || <T>value === undefined
+}
+
+export interface StreamlitWindowObject {
+  // URL pointing to where the Streamlit server is running. This is useful in
+  // deployments of Streamlit where the server is running on a different origin
+  // from where index.html is served.
+  BACKEND_BASE_URL?: string
+  // URL pointing to where the _stcore/host-config endpoint is being served.
+  HOST_CONFIG_BASE_URL?: string
+  // URL pointing to the main page of this Streamlit app. Setting this is needed
+  // when setting BACKEND_BASE_URL so that handling page URLs in multipage apps
+  // works.
+  MAIN_PAGE_BASE_URL?: string
+
+  // Theme related settings.
+  LIGHT_THEME?: ICustomThemeConfig
+  DARK_THEME?: ICustomThemeConfig
+
+  // Other options.
+  ENABLE_RELOAD_BASED_ON_HARDCODED_STREAMLIT_VERSION?: boolean
 }

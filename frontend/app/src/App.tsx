@@ -49,6 +49,7 @@ import {
   getUrl,
   handleFavicon,
   hashString,
+  hasLightBackgroundColor,
   HostCommunicationManager,
   IMenuItem,
   isColoredLineDisplayed,
@@ -127,6 +128,7 @@ import {
   DefaultStreamlitEndpoints,
   IHostConfigResponse,
   LibConfig,
+  parseUriIntoBaseParts,
   StreamlitEndpoints,
 } from "@streamlit/connection"
 import { SessionEventDispatcher } from "@streamlit/app/src/SessionEventDispatcher"
@@ -208,7 +210,6 @@ const INITIAL_SCRIPT_RUN_ID = "<null>"
 
 export const LOG = getLogger("App")
 
-// eslint-disable-next-line
 declare global {
   interface Window {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
@@ -565,6 +566,7 @@ export class App extends PureComponent<Props, State> {
             ScriptRunState.RUNNING,
             ScriptRunState.NOT_RUNNING
           )
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
           // It's okay if this fails, the `measure` call is for debugging/profiling
         }
@@ -574,6 +576,12 @@ export class App extends PureComponent<Props, State> {
         type: "SCRIPT_RUN_STATE_CHANGED",
         scriptRunState: this.state.scriptRunState,
       })
+    }
+    // Rerun script if the theme changed
+    if (
+      _prevProps.theme.activeTheme.name !== this.props.theme.activeTheme.name
+    ) {
+      this.sendRerunBackMsg()
     }
   }
 
@@ -1070,13 +1078,15 @@ export class App extends PureComponent<Props, State> {
   ): void => {
     const baseUriParts = this.getBaseUriParts()
 
-    // TODO(vdonato): Support the situation where window.__STREAMLIT_BACKEND_BASE_URL
-    // is set, so the Streamlit backend URL is set to be different from where
-    // we loaded index.html. Until this is done, the browser's back/forward
-    // buttons may not work correctly with multipage apps when
-    // window.__STREAMLIT_BACKEND_BASE_URL is set.
-    if (baseUriParts && !window.__STREAMLIT_BACKEND_BASE_URL) {
-      const { pathname } = baseUriParts
+    if (baseUriParts) {
+      let pathname
+      if (window.__streamlit?.MAIN_PAGE_BASE_URL) {
+        pathname = parseUriIntoBaseParts(
+          window.__streamlit.MAIN_PAGE_BASE_URL
+        ).pathname
+      } else {
+        pathname = baseUriParts.pathname
+      }
 
       const prevPageNameInPath = extractPageNameFromPathName(
         document.location.pathname,
@@ -1225,12 +1235,6 @@ export class App extends PureComponent<Props, State> {
 
   /**
    * Handler called when the history state changes, e.g. `popstate` event.
-   *
-   * TODO(vdonato): Support the situation where window.__STREAMLIT_BACKEND_BASE_URL
-   * is set, so the Streamlit backend URL is set to be different from where
-   * we loaded index.html. Until this is done, the browser's back/forward
-   * buttons may not work correctly with multipage apps when
-   * window.__STREAMLIT_BACKEND_BASE_URL is set.
    */
   onHistoryChange = (): void => {
     const { currentPageScriptHash } = this.state
@@ -1633,7 +1637,6 @@ export class App extends PureComponent<Props, State> {
     }
 
     const { currentPageScriptHash } = this.state
-    const { pathname } = baseUriParts
     let queryString = this.getQueryString()
     let pageName = ""
 
@@ -1643,6 +1646,7 @@ export class App extends PureComponent<Props, State> {
       locale: getLocaleLanguage(),
       url: getUrl(),
       isEmbedded: isEmbed(),
+      colorScheme: this.getThemeColorScheme(),
     }
 
     if (pageScriptHash) {
@@ -1661,17 +1665,16 @@ export class App extends PureComponent<Props, State> {
       // click the "Rerun" button in the main menu. In this case, we
       // rerun the current page.
       pageScriptHash = currentPageScriptHash
-    } else if (window.__STREAMLIT_BACKEND_BASE_URL) {
-      // We currently don't support navigating directly to a subpage of a
-      // multipage app when setting the backend URL of an app to be a different
-      // location from where we load index.html. In this case, we set both
-      // pageName and pageScriptHash to the empty string, which will result in
-      // the app's main page being run.
-      // TODO(vdonato): Support this case or decide we can do without it when
-      // setting a different backend URL.
-      pageName = ""
-      pageScriptHash = ""
     } else {
+      let pathname
+      if (window.__streamlit?.MAIN_PAGE_BASE_URL) {
+        pathname = parseUriIntoBaseParts(
+          window.__streamlit.MAIN_PAGE_BASE_URL
+        ).pathname
+      } else {
+        pathname = baseUriParts.pathname
+      }
+
       // We must be in the case where the user is navigating directly to a
       // non-main page of this app. Since we haven't received the list of the
       // app's pages from the server at this point, we fall back to requesting
@@ -1885,6 +1888,7 @@ export class App extends PureComponent<Props, State> {
       } else {
         windowToPrint = window
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       windowToPrint = window
     } finally {
@@ -1954,6 +1958,15 @@ export class App extends PureComponent<Props, State> {
     return queryString.startsWith("?") ? queryString.substring(1) : queryString
   }
 
+  getThemeColorScheme = (): string => {
+    const { activeTheme } = this.props.theme
+
+    if (hasLightBackgroundColor(activeTheme.emotion)) {
+      return "light"
+    }
+    return "dark"
+  }
+
   isInCloudEnvironment = (): boolean => {
     const { hostMenuItems } = this.state
     return hostMenuItems && hostMenuItems?.length > 0
@@ -2015,7 +2028,6 @@ export class App extends PureComponent<Props, State> {
 
   handleKeyUp = (keyName: string): void => {
     if (keyName === "esc") {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises -- TODO: Fix this
       this.props.screenCast.stopRecording()
     }
   }
