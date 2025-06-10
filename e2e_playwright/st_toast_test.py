@@ -89,3 +89,24 @@ def test_toast_with_material_icon_rendering(
 
     expect(toasts.nth(0)).to_contain_text("cabinYour edited image was saved!Close")
     assert_snapshot(toasts.nth(0), name="toast-material-icon")
+
+
+def test_toast_above_dialog(themed_app: Page, assert_snapshot: ImageCompareFunction):
+    """Test that toasts are correctly rendered above dialog."""
+    themed_app.keyboard.press("r")
+    wait_for_app_loaded(themed_app)
+    themed_app.wait_for_timeout(250)
+
+    # Trigger dialog
+    themed_app.get_by_text("Trigger dialog").click()
+    # Ensure previous toasts have timed out
+    themed_app.wait_for_timeout(4500)
+
+    # Trigger toast from dialog
+    themed_app.get_by_text("Toast from dialog").click()
+
+    toasts = themed_app.get_by_test_id("stToast")
+    expect(toasts).to_have_count(1)
+    expect(toasts.nth(0)).to_contain_text("🎉Toast above dialogClose")
+    toaster = themed_app.get_by_test_id("stToastContainer")
+    assert_snapshot(toaster, name="toast-above-dialog")
