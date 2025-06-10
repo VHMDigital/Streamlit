@@ -52,13 +52,13 @@ import IsDialogContext from "~lib/components/core/IsDialogContext"
 import IsSidebarContext from "~lib/components/core/IsSidebarContext"
 import ErrorBoundary from "~lib/components/shared/ErrorBoundary"
 import { InlineTooltipIcon } from "~lib/components/shared/TooltipIcon"
+import { useEmotionTheme } from "~lib/hooks/useEmotionTheme"
 import {
   convertRemToPx,
   EmotionTheme,
   getMarkdownBgColors,
   getMarkdownTextColors,
 } from "~lib/theme"
-import { useEmotionTheme } from "~lib/hooks/useEmotionTheme"
 import streamlitLogo from "~lib/assets/img/streamlit-logo/streamlit-mark-color.svg"
 
 import {
@@ -718,14 +718,6 @@ export const RenderedMarkdown = memo(function RenderedMarkdown({
 }: Readonly<RenderedMarkdownProps>): ReactElement {
   const theme = useEmotionTheme()
 
-  const rehypePlugins: PluggableList = useMemo(
-    () =>
-      allowHTML
-        ? [rehypeKatex, [rehypeRaw, { passThrough: ["rb", "rt"] }]]
-        : [rehypeKatex],
-    [allowHTML]
-  )
-
   const colorMapping = useMemo(() => createColorMapping(theme), [theme])
 
   const remarkPlugins = useMemo(
@@ -735,6 +727,11 @@ export const RenderedMarkdown = memo(function RenderedMarkdown({
       createRemarkMaterialIcons(theme),
     ],
     [theme, colorMapping]
+  )
+
+  const rehypePlugins: PluggableList = useMemo(
+    () => (allowHTML ? [rehypeKatex, rehypeRaw] : [rehypeKatex]),
+    [allowHTML]
   )
 
   const renderers = useMemo(
