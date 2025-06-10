@@ -86,7 +86,7 @@ def test_multiselect_on_load(themed_app: Page, assert_snapshot: ImageCompareFunc
     # don't have any visually interesting differences.
     assert_snapshot(multiselect_elements.nth(11), name="st_multiselect-narrow_column")
     assert_snapshot(multiselect_elements.nth(12), name="st_multiselect-markdown_label")
-    assert_snapshot(multiselect_elements.nth(13), name="st_multiselect-maxHeight")
+    assert_snapshot(multiselect_elements.nth(16), name="st_multiselect-maxHeight")
 
 
 def test_help_tooltip_works(app: Page):
@@ -97,7 +97,8 @@ def test_help_tooltip_works(app: Page):
 def test_multiselect_initial_value(app: Page):
     """Should show the correct initial values."""
     text_elements = app.get_by_test_id("stText")
-    expect(text_elements).to_have_count(MULTISELECT_COUNT)
+    # -1 because the last multiselect does not have accompanying text element
+    expect(text_elements).to_have_count(MULTISELECT_COUNT - 1)
 
     expected = [
         "value 1: []",
