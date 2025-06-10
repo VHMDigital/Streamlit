@@ -18,7 +18,8 @@ import React from "react"
 
 import { act, renderHook } from "@testing-library/react"
 
-import { LibContext, LibContextProps } from "@streamlit/lib"
+import { LibContext } from "@streamlit/lib"
+import type { LibContextProps } from "@streamlit/lib"
 
 import { useViewportSize } from "./useViewportSize"
 
@@ -37,11 +38,11 @@ const wrapper = ({
   children,
 }: {
   children: React.ReactNode
-}): React.ReactElement =>
-  React.createElement(LibContext.Provider, {
-    value: mockContextValue,
-    children,
-  })
+}): React.ReactElement => (
+  <LibContext.Provider value={mockContextValue}>
+    {children}
+  </LibContext.Provider>
+)
 
 describe("useViewportSize", () => {
   const originalInnerWidth = window.innerWidth
