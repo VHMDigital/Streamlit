@@ -125,7 +125,6 @@ export const StyledReactPdfContainer =
       },
     })
   )
-
 export const StyledReactPdfPage = styled.div(({ theme }) => ({
   position: "relative",
   marginBottom: theme.spacing.sm,

@@ -14,6 +14,8 @@
 
 """PDF element unit test."""
 
+import io
+
 import pytest
 from parameterized import parameterized
 
@@ -148,3 +150,55 @@ class PdfTest(DeltaGeneratorTestCase):
             == WidthConfigFields.PIXEL_WIDTH.value
         )
         assert element.width_config.pixel_width == 600
+
+    def test_pdf_with_bytes_data(self):
+        """Test PDF with raw bytes data."""
+        # Create some dummy PDF bytes (not a real PDF, but sufficient for testing)
+        pdf_bytes = (
+            b"%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n>>\nendobj\nxref\n0 1\n0000000000 65535"
+            b"f \ntrailer\n<<\n/Size 1\n/Root 1 0 R\n>>\nstartxref\n9\n%%EOF"
+        )
+        st.pdf(pdf_bytes)
+
+        element = self.get_delta_from_queue().new_element
+        assert element.pdf.file_data == pdf_bytes
+        assert element.pdf.url == ""  # url should be empty when using file_data
+        assert element.pdf.height == 500  # default height
+
+    def test_pdf_with_bytesio_data(self):
+        """Test PDF with BytesIO data."""
+        # Create some dummy PDF bytes
+        pdf_bytes = (
+            b"%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n>>\nendobj\nxref\n0 1\n0000000000 65535"
+            b"f \ntrailer\n<<\n/Size 1\n/Root 1 0 R\n>>\nstartxref\n9\n%%EOF"
+        )
+        pdf_bytesio = io.BytesIO(pdf_bytes)
+        st.pdf(pdf_bytesio)
+
+        element = self.get_delta_from_queue().new_element
+        assert element.pdf.file_data == pdf_bytes
+        assert element.pdf.url == ""  # url should be empty when using file_data
+        assert element.pdf.height == 500  # default height
+
+    def test_pdf_with_file_like_object(self):
+        """Test PDF with file-like object (simulating UploadedFile)."""
+
+        # Create a mock file-like object
+        class MockUploadedFile:
+            def __init__(self, data):
+                self._data = data
+
+            def read(self):
+                return self._data
+
+        pdf_bytes = (
+            b"%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n>>\nendobj\nxref\n0 1\n0000000000 65535"
+            b"f \ntrailer\n<<\n/Size 1\n/Root 1 0 R\n>>\nstartxref\n9\n%%EOF"
+        )
+        mock_file = MockUploadedFile(pdf_bytes)
+        st.pdf(mock_file)
+
+        element = self.get_delta_from_queue().new_element
+        assert element.pdf.file_data == pdf_bytes
+        assert element.pdf.url == ""  # url should be empty when using file_data
+        assert element.pdf.height == 500  # default height

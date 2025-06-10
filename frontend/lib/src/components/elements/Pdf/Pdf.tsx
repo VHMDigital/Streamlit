@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { memo, ReactElement, useMemo, useState } from "react"
+import React, { memo, ReactElement, useMemo, useState, useEffect } from "react"
 import { Document, Page, pdfjs } from "react-pdf"
 
 // Import react-pdf stylesheets for proper text and annotation layer rendering
@@ -24,6 +24,10 @@ import "react-pdf/dist/Page/TextLayer.css"
 import { IPdf } from "@streamlit/protobuf"
 
 import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
+import {
+  DEFAULT_IFRAME_FEATURE_POLICY,
+  DEFAULT_IFRAME_SANDBOX_POLICY,
+} from "~lib/util/IFrameUtil"
 
 import {
   StyledPdf,
@@ -43,19 +47,76 @@ export interface PdfProps {
 }
 
 function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
-  const { url, widthConfig, height, useExtModule, hideToolbar } = element
+  const { widthConfig, height, useExtModule, hideToolbar } = element
 
   // State for react-pdf
   const [numPages, setNumPages] = useState<number>(0)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [blobUrl, setBlobUrl] = useState<string | null>(null)
 
-  // Build the media URL if it's not already a full URL
-  const pdfUrl = url?.startsWith("http")
-    ? url
-    : endpoints.buildMediaURL(url || "")
+  // Determine the PDF source
+  const { pdfUrl, pdfFileData } = useMemo((): {
+    pdfUrl: string | null
+    pdfFileData: { data: Uint8Array } | null
+  } => {
+    if (element.url) {
+      // Handle URL case
+      const url = element.url.startsWith("http")
+        ? element.url
+        : endpoints.buildMediaURL(element.url)
+      return { pdfUrl: url, pdfFileData: null }
+    } else if (element.fileData) {
+      // Handle file data case - for react-pdf, we can pass the data directly
+      // For iframe, we need to create a blob URL
+
+      if (useExtModule) {
+        // For react-pdf, return the raw data wrapped in the expected format
+        return { pdfUrl: null, pdfFileData: { data: element.fileData } }
+      } else {
+        // For iframe, create blob URL
+        try {
+          const blob = new Blob([element.fileData], {
+            type: "application/pdf",
+          })
+          const url = URL.createObjectURL(blob)
+          setBlobUrl(url)
+          return { pdfUrl: url, pdfFileData: null }
+        } catch (error) {
+          console.error("Error creating blob:", error)
+          return { pdfUrl: null, pdfFileData: null }
+        }
+      }
+    }
+    return { pdfUrl: null, pdfFileData: null }
+  }, [element.url, element.fileData, endpoints, useExtModule])
+
+  // Legacy pdfSource for compatibility
+  const pdfSource = pdfUrl || (pdfFileData ? "file-data" : "")
+
+  // Cleanup blob URL when component unmounts or source changes
+  useEffect(() => {
+    return () => {
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl)
+      }
+    }
+  }, [blobUrl])
 
   // Add toolbar parameter to URL for iframe rendering
-  const iframePdfUrl = hideToolbar ? `${pdfUrl}#toolbar=0` : pdfUrl
+  const iframePdfUrl = useMemo(() => {
+    if (!pdfUrl) return ""
+
+    // Add toolbar parameter if hideToolbar is true and we're not using external module
+    if (hideToolbar && !useExtModule) {
+      // For blob URLs, we can't add fragments, but that's okay since hideToolbar
+      // is mainly for iframe mode with external URLs
+      if (pdfUrl.startsWith("blob:")) {
+        return pdfUrl
+      }
+      return `${pdfUrl}#toolbar=0`
+    }
+    return pdfUrl
+  }, [pdfUrl, hideToolbar, useExtModule])
 
   // Memoize options to prevent re-renders
   const options = useMemo(
@@ -80,9 +141,30 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
         "CORS Error: This PDF cannot be loaded due to cross-origin restrictions. " +
           "Try with another PDF instead or uncheck 'Use external module'."
       )
+    } else if (error.message.includes("Unexpected server response (0)")) {
+      setLoadError(
+        "Blob Error: Failed to load PDF from blob data. The uploaded file may be corrupted or not a valid PDF."
+      )
     } else {
       setLoadError(`Failed to load PDF: ${error.message}`)
     }
+  }
+
+  if (!pdfSource) {
+    return (
+      <div
+        style={{
+          padding: "20px",
+          color: "#ff4b4b",
+          backgroundColor: "#fff2f2",
+          border: "1px solid #ffcccb",
+          borderRadius: "4px",
+          margin: "10px",
+        }}
+      >
+        <strong>Error:</strong> No PDF source provided (URL or file data).
+      </div>
+    )
   }
 
   if (useExtModule) {
@@ -111,7 +193,7 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
           </div>
         ) : (
           <Document
-            file={pdfUrl}
+            file={pdfFileData || pdfUrl || undefined}
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={onDocumentLoadError}
             options={options}
@@ -141,7 +223,6 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
     )
   }
 
-  // Use traditional iframe for rendering (default behavior)
   return (
     <StyledPdf
       className="stPdf"
@@ -150,7 +231,7 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
       height={height || 500}
       widthConfig={widthConfig || undefined}
       title="PDF Viewer"
-      sandbox="allow-scripts allow-forms allow-downloads allow-top-navigation-by-user-activation"
+      allow={DEFAULT_IFRAME_FEATURE_POLICY}
     />
   )
 }

@@ -20,7 +20,7 @@ from typing import TYPE_CHECKING, Union, cast
 
 from typing_extensions import TypeAlias
 
-from streamlit import runtime, url_util
+from streamlit import url_util
 from streamlit.elements.lib.form_utils import current_form_id
 from streamlit.elements.lib.layout_utils import LayoutConfig, validate_width
 from streamlit.elements.lib.utils import compute_and_register_element_id
@@ -94,13 +94,11 @@ class PdfMixin:
 
         pdf_proto = PdfProto()
         pdf_proto.id = element_id
-        coordinates = self.dg._get_delta_path_str()
 
         # Create layout config for width
         layout_config = LayoutConfig(width=width)
 
         _marshall_pdf(
-            coordinates,
             pdf_proto,
             data,
             height=height,
@@ -117,7 +115,6 @@ class PdfMixin:
 
 
 def _marshall_pdf(
-    coordinates: str,
     proto: PdfProto,
     data: PdfData,
     *,
@@ -141,45 +138,25 @@ def _marshall_pdf(
             # It's a URL
             proto.url = data
         else:
-            # It's a local file path - we need to serve it through media file manager
+            # It's a local file path - read and set as file_data
             try:
                 with open(data, "rb") as f:
                     file_data = f.read()
-                if runtime.exists():
-                    proto.url = runtime.get_instance().media_file_mgr.add(
-                        file_data, "application/pdf", coordinates
-                    )
-                else:
-                    proto.url = ""
+                proto.file_data = file_data
             except Exception:
                 raise ValueError(
                     "Could not read PDF file. Please check the URL or the file path."
                 )
     elif isinstance(data, bytes):
-        # Handle raw bytes
-        if runtime.exists():
-            proto.url = runtime.get_instance().media_file_mgr.add(
-                data, "application/pdf", coordinates
-            )
-        else:
-            proto.url = ""
+        # Handle raw bytes - set directly as file_data
+        proto.file_data = data
     elif hasattr(data, "read") and hasattr(data, "getvalue"):
-        # Handle BytesIO and similar
+        # Handle BytesIO and similar - set as file_data
         file_data = data.getvalue()
-        if runtime.exists():
-            proto.url = runtime.get_instance().media_file_mgr.add(
-                file_data, "application/pdf", coordinates
-            )
-        else:
-            proto.url = ""
+        proto.file_data = file_data
     elif hasattr(data, "read"):
-        # Handle other file-like objects (including UploadedFile)
+        # Handle other file-like objects (including UploadedFile) - set as file_data
         file_data = data.read()
-        if runtime.exists():
-            proto.url = runtime.get_instance().media_file_mgr.add(
-                file_data, "application/pdf", coordinates
-            )
-        else:
-            proto.url = ""
+        proto.file_data = file_data
     else:
         raise ValueError(f"Unsupported data type for PDF: {type(data)}")
