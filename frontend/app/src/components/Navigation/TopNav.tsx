@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 
 import groupBy from "lodash/groupBy"
 import Overflow from "rc-overflow"
@@ -56,73 +56,62 @@ const TopNav: React.FC<Props> = ({
     ? Object.values(navSections)
     : Object.values(navSections).flat()
 
-  return (
-    <Overflow<IAppPage | IAppPage[]>
-      component={StyledOverflowContainer}
-      itemKey={item =>
-        Array.isArray(item)
-          ? (item[0]?.sectionHeader ?? "")
-          : (item.pageScriptHash ?? "")
-      }
-      data={data}
-      maxCount={"responsive"}
-      renderItem={(item, _info) => {
-        if (Array.isArray(item)) {
-          return (
-            <TopNavSection
-              sections={[item]}
-              title={item[0].sectionHeader || ""}
-              handlePageChange={onPageChange}
-              endpoints={endpoints}
-              pageLinkBaseUrl={pageLinkBaseUrl}
-              currentPageScriptHash={currentPageScriptHash}
-            />
-          )
-        }
+  const itemKey = useCallback((item: IAppPage | IAppPage[]) => {
+    return Array.isArray(item)
+      ? (item[0]?.sectionHeader ?? "")
+      : (item.pageScriptHash ?? "")
+  }, [])
+
+  const renderItem = useCallback(
+    (item: IAppPage | IAppPage[], _info: unknown) => {
+      if (Array.isArray(item)) {
         return (
-          <StyledTopNavLinkContainer>
-            <SidebarNavLink
-              isTopNav={true}
-              isActive={currentPageScriptHash === item.pageScriptHash}
-              icon={item.icon}
-              pageUrl={endpoints.buildAppPageURL(pageLinkBaseUrl, item)}
-              onClick={e => {
-                e.preventDefault()
-                if (item.pageScriptHash) {
-                  onPageChange(item.pageScriptHash)
-                }
-              }}
-            >
-              {String(item.pageName)}
-            </SidebarNavLink>
-          </StyledTopNavLinkContainer>
+          <TopNavSection
+            sections={[item]}
+            title={item[0].sectionHeader || ""}
+            handlePageChange={onPageChange}
+            endpoints={endpoints}
+            pageLinkBaseUrl={pageLinkBaseUrl}
+            currentPageScriptHash={currentPageScriptHash}
+          />
         )
-      }}
-      renderRest={items => {
-        if (isNullOrUndefined(items)) {
-          return null
-        }
+      }
+      return (
+        <StyledTopNavLinkContainer>
+          <SidebarNavLink
+            isTopNav={true}
+            isActive={currentPageScriptHash === item.pageScriptHash}
+            icon={item.icon}
+            pageUrl={endpoints.buildAppPageURL(pageLinkBaseUrl, item)}
+            onClick={e => {
+              e.preventDefault()
+              if (item.pageScriptHash) {
+                onPageChange(item.pageScriptHash)
+              }
+            }}
+          >
+            {String(item.pageName)}
+          </SidebarNavLink>
+        </StyledTopNavLinkContainer>
+      )
+    },
+    [onPageChange, endpoints, pageLinkBaseUrl, currentPageScriptHash]
+  )
 
-        const totalNumPages = items.flat().length
-        const title = `${totalNumPages} more`
+  const renderRest = useCallback(
+    (items: (IAppPage | IAppPage[])[]) => {
+      if (isNullOrUndefined(items)) {
+        return null
+      }
 
-        if (Array.isArray(items[0])) {
-          return (
-            <TopNavSection
-              hideChevron={true}
-              sections={items as IAppPage[][]}
-              title={title}
-              handlePageChange={onPageChange}
-              endpoints={endpoints}
-              pageLinkBaseUrl={pageLinkBaseUrl}
-              currentPageScriptHash={currentPageScriptHash}
-            />
-          )
-        }
+      const totalNumPages = items.flat().length
+      const title = `${totalNumPages} more`
+
+      if (Array.isArray(items[0])) {
         return (
           <TopNavSection
             hideChevron={true}
-            sections={[items as IAppPage[]]}
+            sections={items as IAppPage[][]}
             title={title}
             handlePageChange={onPageChange}
             endpoints={endpoints}
@@ -130,7 +119,30 @@ const TopNav: React.FC<Props> = ({
             currentPageScriptHash={currentPageScriptHash}
           />
         )
-      }}
+      }
+      return (
+        <TopNavSection
+          hideChevron={true}
+          sections={[items as IAppPage[]]}
+          title={title}
+          handlePageChange={onPageChange}
+          endpoints={endpoints}
+          pageLinkBaseUrl={pageLinkBaseUrl}
+          currentPageScriptHash={currentPageScriptHash}
+        />
+      )
+    },
+    [onPageChange, endpoints, pageLinkBaseUrl, currentPageScriptHash]
+  )
+
+  return (
+    <Overflow<IAppPage | IAppPage[]>
+      component={StyledOverflowContainer}
+      itemKey={itemKey}
+      data={data}
+      maxCount={"responsive"}
+      renderItem={renderItem}
+      renderRest={renderRest}
     />
   )
 }
