@@ -24,7 +24,6 @@ import "react-pdf/dist/Page/TextLayer.css"
 import { IPdf } from "@streamlit/protobuf"
 
 import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
-import { DEFAULT_IFRAME_FEATURE_POLICY } from "~lib/util/IFrameUtil"
 
 import {
   StyledPdf,
@@ -224,12 +223,40 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
     <StyledPdf
       className="stPdf"
       data-testid="stPdf"
-      src={iframePdfUrl}
+      data={iframePdfUrl}
       height={height || 500}
       widthConfig={widthConfig || undefined}
       title="PDF Viewer"
       type="application/pdf"
-    />
+    >
+      <div
+        style={{
+          padding: "20px",
+          textAlign: "center",
+          backgroundColor: "#f0f2f6",
+          border: "1px solid #e1e5e9",
+          borderRadius: "4px",
+        }}
+      >
+        <p>PDF cannot be displayed in this environment.</p>
+        <a
+          href={iframePdfUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            color: "#ff4b4b",
+            textDecoration: "none",
+            fontWeight: "bold",
+          }}
+        >
+          📄 Open PDF in new tab
+        </a>
+        <br />
+        <small style={{ color: "#666", marginTop: "10px", display: "block" }}>
+          Tip: Use <code>use_ext_module=True</code> for better PDF embedding
+        </small>
+      </div>
+    </StyledPdf>
   )
 }
 

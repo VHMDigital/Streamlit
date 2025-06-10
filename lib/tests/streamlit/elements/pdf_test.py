@@ -36,7 +36,6 @@ class PdfTest(DeltaGeneratorTestCase):
         element = self.get_delta_from_queue().new_element
         assert element.pdf.url == url
         assert element.pdf.height == 500  # default height
-        assert element.pdf.use_ext_module is False  # default value
 
     def test_pdf_with_height(self):
         """Test PDF with custom height."""
@@ -46,25 +45,6 @@ class PdfTest(DeltaGeneratorTestCase):
         element = self.get_delta_from_queue().new_element
         assert element.pdf.url == url
         assert element.pdf.height == 600
-        assert element.pdf.use_ext_module is False
-
-    def test_pdf_with_use_ext_module_true(self):
-        """Test PDF with use_ext_module set to True."""
-        url = "https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf"
-        st.pdf(url, use_ext_module=True)
-
-        element = self.get_delta_from_queue().new_element
-        assert element.pdf.url == url
-        assert element.pdf.use_ext_module is True
-
-    def test_pdf_with_use_ext_module_false(self):
-        """Test PDF with use_ext_module set to False."""
-        url = "https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf"
-        st.pdf(url, use_ext_module=False)
-
-        element = self.get_delta_from_queue().new_element
-        assert element.pdf.url == url
-        assert element.pdf.use_ext_module is False
 
     def test_pdf_with_width_pixels(self):
         """Test PDF with width in pixels."""
@@ -135,21 +115,6 @@ class PdfTest(DeltaGeneratorTestCase):
             == WidthConfigFields.PIXEL_WIDTH.value
         )
         assert element.width_config.pixel_width == 400
-
-    def test_pdf_with_all_parameters(self):
-        """Test PDF with all parameters specified."""
-        url = "https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf"
-        st.pdf(url, width=600, height=400, use_ext_module=True)
-
-        element = self.get_delta_from_queue().new_element
-        assert element.pdf.url == url
-        assert element.pdf.height == 400
-        assert element.pdf.use_ext_module is True
-        assert (
-            element.width_config.WhichOneof("width_spec")
-            == WidthConfigFields.PIXEL_WIDTH.value
-        )
-        assert element.width_config.pixel_width == 600
 
     def test_pdf_with_bytes_data(self):
         """Test PDF with raw bytes data."""

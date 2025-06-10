@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import random
 
 import streamlit as st
 
@@ -55,16 +54,7 @@ with st.expander("📘 Project Background & Justification"):
             - "streamlit pdf viewer" is a top 250 search keyword on Google, with a clear upward trend.
     """
     )
-    st.header("Technical Implementation")
-    st.markdown(
-        """
-        The component can leverage two methods for rendering: the browser's fast native PDF
-        viewer or the robust and widely-used
-        [**`react-pdf`**](https://github.com/wojtekmaj/react-pdf) library.
-        This dual approach allows for flexibility—prioritizing either native speed or
-        cross-platform consistency.
-        """
-    )
+
 
 with st.expander("⚙️ Proposed API for `st.pdf`"):
     st.header("API")
@@ -95,17 +85,11 @@ if pdf_source_type == "Sample URLs":
         "Custom URL": None,  # Placeholder for custom input
     }
 
-    # Initialize random selection only once using session state
-    if "random_pdf_index" not in st.session_state:
-        st.session_state.random_pdf_index = random.randint(  # noqa: S311
-            0, len(TEST_URLS) - 2
-        )  # Exclude "Custom URL"
-
     # Dropdown to select a sample PDF or enter a custom URL
     selected_option = st.sidebar.selectbox(
         "Select a sample PDF to test:",
         options=list(TEST_URLS.keys()),
-        index=st.session_state.random_pdf_index,
+        index=0,
         help="Choose a pre-selected PDF or enter your own URL below.",
     )
 
@@ -157,28 +141,13 @@ height_value = st.sidebar.slider(
 st.sidebar.markdown("---")
 st.sidebar.subheader("Renderer Options")
 
-use_ext_module = st.sidebar.checkbox(
-    "Use external module (react-pdf)",
-    value=False,  # Back to False since we fixed the iframe issues
-    help="Render the PDF using the react-pdf library instead of the browser's default viewer. Recommended for better "
-    "compatibility with browser security policies.",
+
+hide_toolbar = st.sidebar.checkbox(
+    "Hide Toolbar",
+    value=False,
+    help="Hides the toolbar (zoom, download, etc.)",
 )
 
-hide_toolbar = False
-if not use_ext_module:
-    # This option is only relevant when using the external module
-    hide_toolbar = st.sidebar.checkbox(
-        "Hide Toolbar",
-        value=False,
-        help="Hides the toolbar (zoom, download, etc.) when using the react-pdf module.",
-    )
-
-# Add information about browser compatibility
-if not use_ext_module:
-    st.sidebar.info(
-        "⚠️ **Browser Note**: Some browsers (especially Chrome) may block PDF display in iframes for security reasons. "
-        "If you see a 'page blocked' message, try enabling the 'Use external module' option above."
-    )
 
 # --- PDF Display Area ---
 if pdf_to_display:
@@ -190,9 +159,9 @@ if pdf_to_display:
             pdf_to_display,
             width=width_value,
             height=height_value,
-            use_ext_module=use_ext_module,
             hide_toolbar=hide_toolbar,
         )
+
     except Exception as e:
         st.error(f"An error occurred while loading the PDF: {e}")
         if pdf_source_type == "Sample URLs":
