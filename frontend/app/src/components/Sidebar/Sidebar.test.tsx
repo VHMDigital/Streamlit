@@ -44,7 +44,7 @@ const mockEndpointProp = mockEndpoints({
   sendClientErrorToHost,
 })
 
-function RenderSidebar(props: Partial<SidebarProps> = {}): RenderResult {
+function renderSidebar(props: Partial<SidebarProps> = {}): RenderResult {
   const context = StreamlitContextProviderModule.useAppContext()
   return render(
     <Sidebar
@@ -94,7 +94,7 @@ describe("Sidebar Component", () => {
   })
 
   it("should render without crashing", () => {
-    RenderSidebar({})
+    renderSidebar({})
 
     expect(screen.getByTestId("stSidebar")).toBeInTheDocument()
   })
@@ -105,7 +105,7 @@ describe("Sidebar Component", () => {
         initialSidebarState: PageConfig.SidebarState.EXPANDED,
       })
     )
-    RenderSidebar({ isCollapsed: false })
+    renderSidebar({ isCollapsed: false })
 
     expect(screen.getByTestId("stSidebar")).toHaveAttribute(
       "aria-expanded",
@@ -119,7 +119,7 @@ describe("Sidebar Component", () => {
         initialSidebarState: PageConfig.SidebarState.COLLAPSED,
       })
     )
-    RenderSidebar({ isCollapsed: true })
+    renderSidebar({ isCollapsed: true })
 
     expect(screen.getByTestId("stSidebar")).toHaveAttribute(
       "aria-expanded",
@@ -134,7 +134,7 @@ describe("Sidebar Component", () => {
         initialSidebarState: PageConfig.SidebarState.EXPANDED,
       })
     )
-    RenderSidebar({
+    renderSidebar({
       isCollapsed: false,
       onToggleCollapse: mockOnToggleCollapse,
     })
@@ -161,7 +161,7 @@ describe("Sidebar Component", () => {
         initialSidebarState: PageConfig.SidebarState.COLLAPSED,
       })
     )
-    RenderSidebar({
+    renderSidebar({
       isCollapsed: true,
       onToggleCollapse: mockOnToggleCollapse,
     })
@@ -193,7 +193,7 @@ describe("Sidebar Component", () => {
       })
     )
 
-    RenderSidebar()
+    renderSidebar()
 
     // Hidden when not hovering near the top of sidebar
     expect(screen.getByTestId("stSidebarCollapseButton")).toHaveStyle(
@@ -216,7 +216,7 @@ describe("Sidebar Component", () => {
         appPages: [{ pageName: "streamlit_app", pageScriptHash: "page_hash" }],
       })
     )
-    RenderSidebar()
+    renderSidebar()
 
     expect(screen.getByTestId("stSidebarUserContent")).toHaveStyle(
       "padding-top: 0"
@@ -233,7 +233,7 @@ describe("Sidebar Component", () => {
         ],
       })
     )
-    RenderSidebar()
+    renderSidebar()
 
     expect(screen.getByTestId("stSidebarUserContent")).toHaveStyle(
       "padding-top: 1.5rem"
@@ -258,7 +258,7 @@ describe("Sidebar Component", () => {
         ],
       })
     )
-    RenderSidebar()
+    renderSidebar()
 
     expect(screen.getByTestId("stSidebarNav")).toBeInTheDocument()
 
@@ -279,7 +279,7 @@ describe("Sidebar Component", () => {
         ],
       })
     )
-    RenderSidebar()
+    renderSidebar()
 
     expect(screen.queryByTestId("stSidebarNav")).not.toBeInTheDocument()
   })
@@ -288,7 +288,7 @@ describe("Sidebar Component", () => {
     // Asserts behavior to prevent layout shifts when the scrollbars
     // appear and disappear.
     // @see https://github.com/streamlit/streamlit/issues/10310
-    RenderSidebar({})
+    renderSidebar({})
 
     const sidebarContent = screen.getByTestId("stSidebarContent")
     const styles = window.getComputedStyle(sidebarContent)
@@ -325,7 +325,7 @@ describe("Sidebar Component", () => {
 
     it("renders spacer if no logo provided", () => {
       // Mock returns a context with appLogo set to null by default
-      RenderSidebar()
+      renderSidebar()
       const sidebarLogoSpacer = within(
         screen.getByTestId("stSidebar")
       ).getByTestId("stLogoSpacer")
@@ -343,7 +343,7 @@ describe("Sidebar Component", () => {
         })
       )
       const sourceSpy = vi.spyOn(mockEndpointProp, "buildMediaURL")
-      RenderSidebar({
+      renderSidebar({
         isCollapsed: true,
       })
 
@@ -365,7 +365,7 @@ describe("Sidebar Component", () => {
         })
       )
       const sourceSpy = vi.spyOn(mockEndpointProp, "buildMediaURL")
-      RenderSidebar({
+      renderSidebar({
         isCollapsed: true,
       })
       const collapsedLogo = screen.getByTestId("stSidebarLogo")
@@ -386,7 +386,7 @@ describe("Sidebar Component", () => {
         })
       )
       const sourceSpy = vi.spyOn(mockEndpointProp, "buildMediaURL")
-      RenderSidebar({})
+      renderSidebar({})
       const sidebarLogoContainer = screen.getByTestId("stSidebarHeader")
       expect(sidebarLogoContainer).toBeInTheDocument()
       const sidebarLogo = within(sidebarLogoContainer).getByTestId(
@@ -408,7 +408,7 @@ describe("Sidebar Component", () => {
           appLogo: imageOnly,
         })
       )
-      RenderSidebar()
+      renderSidebar()
 
       const sidebarLogoLink = within(
         screen.getByTestId("stSidebar")
@@ -430,7 +430,7 @@ describe("Sidebar Component", () => {
           appLogo: imageWithLink,
         })
       )
-      RenderSidebar()
+      renderSidebar()
 
       const sidebarLogoLink = within(
         screen.getByTestId("stSidebar")
@@ -452,7 +452,7 @@ describe("Sidebar Component", () => {
           appLogo: logoWithSize,
         })
       )
-      RenderSidebar()
+      renderSidebar()
 
       const sidebarLogo = within(screen.getByTestId("stSidebar")).getByTestId(
         "stSidebarLogo"
@@ -470,7 +470,7 @@ describe("Sidebar Component", () => {
           appLogo: fullAppLogo,
         })
       )
-      RenderSidebar()
+      renderSidebar()
 
       const sidebarLogo = within(
         screen.getByTestId("stSidebarHeader")
