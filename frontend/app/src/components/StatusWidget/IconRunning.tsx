@@ -81,8 +81,8 @@ const IconRunning: React.FC<IconRunningProps> = ({
   const resolvedColor = color
     ? color
     : !hasLightBackgroundColor(theme)
-    ? theme.colors.white
-    : theme.colors.gray85
+      ? theme.colors.white
+      : theme.colors.gray85
   const ariaLabel = `Running ${currentIcon.name} icon`
   const sizeIcon = theme.sizes.appRunningMen
 
