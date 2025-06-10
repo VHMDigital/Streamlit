@@ -27,8 +27,7 @@ import { EmotionTheme, hasLightBackgroundColor } from "@streamlit/lib"
  * @returns The color of the text in the sidebar nav.
  */
 export const getNavTextColor = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
-  theme: any,
+  theme: EmotionTheme,
   isActive: boolean,
   disabled: boolean = false,
   isTopNav?: boolean
