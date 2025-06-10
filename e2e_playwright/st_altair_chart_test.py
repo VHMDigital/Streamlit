@@ -16,7 +16,6 @@ from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction
 from e2e_playwright.shared.app_utils import check_top_level_class
-from e2e_playwright.shared.react18_utils import wait_for_react_stability
 
 
 def test_altair_chart_displays_correctly(
@@ -24,9 +23,9 @@ def test_altair_chart_displays_correctly(
 ):
     expect(
         themed_app.get_by_test_id("stVegaLiteChart").locator("canvas")
-    ).to_have_count(13)
+    ).to_have_count(11)
     charts = themed_app.get_by_test_id("stVegaLiteChart")
-    expect(charts).to_have_count(13)
+    expect(charts).to_have_count(11)
     snapshot_names = [
         "st_altair_chart-scatter_chart_default_theme",
         "st_altair_chart-scatter_chart_streamlit_theme",
@@ -39,8 +38,6 @@ def test_altair_chart_displays_correctly(
         "st_altair_chart-grouped_layered_line_chart_streamlit_theme",
         "st_altair_chart-vconcat_width",
         "st_altair_chart-altair_chart_cut_off_legend_title_none",
-        "st_altair_chart-long_title_rendering_use_container_width_true",
-        "st_altair_chart-long_title_rendering_use_container_width_false",
     ]
     for i, name in enumerate(snapshot_names):
         # We use a higher threshold here to prevent some flakiness
@@ -56,14 +53,7 @@ def test_check_top_level_class(app: Page):
 
 def test_chart_tooltip_styling(app: Page, assert_snapshot: ImageCompareFunction):
     """Check that the chart tooltip styling is correct."""
-    # Wait for the charts to be rendered otherwise the tooltip may be hidden due
-    # to other things rendering on the page.
-    expect(app.get_by_test_id("stVegaLiteChart").locator("canvas")).to_have_count(13)
-    charts = app.get_by_test_id("stVegaLiteChart")
-    expect(charts).to_have_count(13)
-    wait_for_react_stability(app)
-
-    pie_chart = charts.nth(4)
+    pie_chart = app.get_by_test_id("stVegaLiteChart").nth(4)
     pie_chart.scroll_into_view_if_needed()
     pie_chart.locator("canvas").hover(position={"x": 60, "y": 60}, force=True)
     tooltip = app.locator("#vg-tooltip-element")
