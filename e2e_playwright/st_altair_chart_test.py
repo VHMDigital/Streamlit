@@ -16,6 +16,7 @@ from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction
 from e2e_playwright.shared.app_utils import check_top_level_class
+from e2e_playwright.shared.react18_utils import wait_for_react_stability
 
 
 def test_altair_chart_displays_correctly(
@@ -55,7 +56,14 @@ def test_check_top_level_class(app: Page):
 
 def test_chart_tooltip_styling(app: Page, assert_snapshot: ImageCompareFunction):
     """Check that the chart tooltip styling is correct."""
-    pie_chart = app.get_by_test_id("stVegaLiteChart").nth(4)
+    # Wait for the charts to be rendered otherwise the tooltip may be hidden due
+    # to other things rendering on the page.
+    expect(app.get_by_test_id("stVegaLiteChart").locator("canvas")).to_have_count(13)
+    charts = app.get_by_test_id("stVegaLiteChart")
+    expect(charts).to_have_count(13)
+    wait_for_react_stability(app)
+
+    pie_chart = charts.nth(4)
     pie_chart.scroll_into_view_if_needed()
     pie_chart.locator("canvas").hover(position={"x": 60, "y": 60}, force=True)
     tooltip = app.locator("#vg-tooltip-element")
