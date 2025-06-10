@@ -62,14 +62,11 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
         : endpoints.buildMediaURL(element.url)
       return { pdfUrl: url, pdfFileData: null }
     } else if (element.fileData) {
-      // Handle file data case - for react-pdf, we can pass the data directly
-      // For iframe, we need to create a blob URL
-
       if (useExtModule) {
         // For react-pdf, return the raw data wrapped in the expected format
         return { pdfUrl: null, pdfFileData: { data: element.fileData } }
       } else {
-        // For iframe, create blob URL
+        // For object, create blob URL
         try {
           const blob = new Blob([element.fileData], {
             type: "application/pdf",
