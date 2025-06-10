@@ -34,11 +34,7 @@ const mockContextValue = {
 } as unknown as LibContextProps
 
 // Wrapper component to provide context
-const wrapper = ({
-  children,
-}: {
-  children: React.ReactNode
-}): React.ReactElement => (
+const wrapper = ({ children }: { children: React.ReactNode }): JSX.Element => (
   <LibContext.Provider value={mockContextValue}>
     {children}
   </LibContext.Provider>
