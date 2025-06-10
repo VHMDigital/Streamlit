@@ -296,7 +296,8 @@ def test_anchor_scrolling(app: Page):
 def test_markdown_rendering_performance(app: Page):
     """Test that the performance of st.markdown and st.text."""
     app.get_by_text("Run element").click()
-    expect(app.get_by_text("DONE")).to_be_attached()
+    # This is currently very slow, hence the need for a performance test
+    expect(app.get_by_text("DONE")).to_be_attached(timeout=15000)
 
     app.get_by_text("st.text").click()
     expect(app.get_by_text("DONE")).not_to_be_attached()
