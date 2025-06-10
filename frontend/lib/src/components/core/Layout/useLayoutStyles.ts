@@ -206,7 +206,7 @@ export const useLayoutStyles = ({
       ...calculated_styles,
       ...styleOverrides,
     }
-  }, [element, subElement])
+  }, [element, subElement, styleOverrides])
 
   return layoutStyles
 }
