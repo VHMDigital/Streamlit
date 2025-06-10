@@ -17,6 +17,7 @@
 import React from "react"
 
 import { screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 
 import { render } from "@streamlit/lib"
 import { AppContextProps } from "@streamlit/app/src/components/AppContext"
@@ -129,12 +130,13 @@ describe("SidebarNavLink", () => {
     expect(container).toBeInTheDocument()
   })
 
-  it("calls onClick when clicked", () => {
+  it("calls onClick when clicked", async () => {
+    const user = userEvent.setup()
     const onClick = vi.fn()
     render(<SidebarNavLink {...getProps({ onClick })} />)
 
     const sidebarNavLink = screen.getByTestId("stSidebarNavLink")
-    sidebarNavLink.click()
+    await user.click(sidebarNavLink)
 
     expect(onClick).toHaveBeenCalled()
   })
