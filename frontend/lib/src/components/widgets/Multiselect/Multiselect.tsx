@@ -301,6 +301,7 @@ const Multiselect: FC<Props> = props => {
             },
             ControlContainer: {
               style: {
+                maxHeight: "10.25rem",
                 minHeight: theme.sizes.minElementHeight,
                 // Baseweb requires long-hand props, short-hand leads to weird bugs & warnings.
                 borderLeftWidth: theme.sizes.borderWidth,
@@ -319,6 +320,7 @@ const Multiselect: FC<Props> = props => {
             },
             ValueContainer: {
               style: () => ({
+                overflowY: "auto",
                 paddingLeft: theme.spacing.sm,
                 paddingTop: theme.spacing.none,
                 paddingBottom: theme.spacing.none,

@@ -84,6 +84,7 @@ def test_multiselect_on_load(themed_app: Page, assert_snapshot: ImageCompareFunc
     # don't have any visually interesting differences.
     assert_snapshot(multiselect_elements.nth(11), name="st_multiselect-narrow_column")
     assert_snapshot(multiselect_elements.nth(12), name="st_multiselect-markdown_label")
+    assert_snapshot(multiselect_elements.nth(13), name="st_multiselect-maxHeight")
 
 
 def test_help_tooltip_works(app: Page):
