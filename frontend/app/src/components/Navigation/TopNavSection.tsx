@@ -133,6 +133,7 @@ const TopNavSection = ({
             marginBottom: theme.spacing.lg,
 
             maxHeight: "70vh",
+            minWidth: "8rem",
             overflow: "auto",
             maxWidth: `calc(${theme.sizes.contentMaxWidth} - 2*${theme.spacing.lg})`,
 
