@@ -153,8 +153,13 @@ def test_html_with_css_file(app: Page):
     html_elements = app.get_by_test_id("stHtml")
     expect(html_elements).to_have_count(ST_HTML_ELEMENTS)
 
-    seventh_html = html_elements.nth(5)
-    expect(seventh_html.locator("style")).to_have_text(
+    # CSS file content goes to event container since it's style-only
+    event_container = app.get_by_test_id("stEvent")
+    style_only_html_elements = event_container.get_by_test_id("stHtml")
+    # The CSS file is the 2nd style-only element (index 1) in the event container
+    css_file_html = style_only_html_elements.nth(1)
+
+    expect(css_file_html.locator("style")).to_have_text(
         """
         #hello-world {
             color: red;
@@ -183,6 +188,11 @@ def test_html_width_examples(app: Page, assert_snapshot: ImageCompareFunction):
     html_elements = app.get_by_test_id("stHtml")
     expect(html_elements).to_have_count(ST_HTML_ELEMENTS)
 
-    assert_snapshot(html_elements.nth(7), name="st_html-width_content")
-    assert_snapshot(html_elements.nth(8), name="st_html-width_stretch")
-    assert_snapshot(html_elements.nth(9), name="st_html-width_300px")
+    # Width examples are in the main container since they contain actual content
+    main_container = app.get_by_test_id("stMain")
+    main_html_elements = main_container.get_by_test_id("stHtml")
+    # The width examples are the last 3 elements in the main container (indices 5, 6, 7)
+
+    assert_snapshot(main_html_elements.nth(5), name="st_html-width_content")
+    assert_snapshot(main_html_elements.nth(6), name="st_html-width_stretch")
+    assert_snapshot(main_html_elements.nth(7), name="st_html-width_300px")
