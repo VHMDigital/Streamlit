@@ -178,11 +178,11 @@ def test_html_with_css_file(app: Page):
     expect(heading_3).to_have_css("color", "rgb(0, 128, 0)")
 
 
-def test_html_width_examples(themed_app: Page, assert_snapshot: ImageCompareFunction):
+def test_html_width_examples(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that HTML elements with different width configurations are displayed correctly."""
-    html_elements = themed_app.get_by_test_id("stHtml")
+    html_elements = app.get_by_test_id("stHtml")
     expect(html_elements).to_have_count(ST_HTML_ELEMENTS)
 
-    assert_snapshot(html_elements.nth(6), name="st_html-width_content")
-    assert_snapshot(html_elements.nth(7), name="st_html-width_stretch")
-    assert_snapshot(html_elements.nth(8), name="st_html-width_300px")
+    assert_snapshot(html_elements.nth(7), name="st_html-width_content")
+    assert_snapshot(html_elements.nth(8), name="st_html-width_stretch")
+    assert_snapshot(html_elements.nth(9), name="st_html-width_300px")
