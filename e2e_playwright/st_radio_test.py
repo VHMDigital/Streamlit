@@ -52,7 +52,7 @@ def test_radio_width_examples(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that the radio width examples are correctly rendered."""
     radio_widgets = app.get_by_test_id("stRadio")
 
-    # Test width examples (last 4 radio widgets)
+    # Test width examples (last 3 radio widgets)
     assert_snapshot(radio_widgets.nth(14), name="st_radio-width_content")
     assert_snapshot(radio_widgets.nth(15), name="st_radio-width_stretch")
     assert_snapshot(radio_widgets.nth(16), name="st_radio-width_200px")
