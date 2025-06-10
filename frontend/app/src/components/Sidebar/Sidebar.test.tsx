@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from "react"
+import React, { ReactElement } from "react"
 
 import {
   fireEvent,
@@ -44,9 +44,9 @@ const mockEndpointProp = mockEndpoints({
   sendClientErrorToHost,
 })
 
-function renderSidebar(props: Partial<SidebarProps> = {}): RenderResult {
+function SidebarWrapper(props: Partial<SidebarProps> = {}): ReactElement {
   const context = StreamlitContextProviderModule.useAppContext()
-  return render(
+  return (
     <Sidebar
       endpoints={mockEndpointProp}
       hasElements
@@ -64,6 +64,10 @@ function renderSidebar(props: Partial<SidebarProps> = {}): RenderResult {
       {...props}
     />
   )
+}
+
+function renderSidebar(props: Partial<SidebarProps> = {}): RenderResult {
+  return render(<SidebarWrapper {...props} />)
 }
 
 function getContextOutput(context: Partial<AppContextProps>): AppContextProps {
