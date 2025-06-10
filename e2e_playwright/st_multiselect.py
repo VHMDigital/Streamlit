@@ -124,7 +124,7 @@ i16 = st.multiselect(
 )
 st.text(f"value 16: {i16}")
 
-options = (
+many_options = (
     "one",
     "two",
     "three",
@@ -159,6 +159,6 @@ options = (
 
 st.multiselect(
     "multiselect 17 - show maxHeight",
-    options=options,
-    default=options[0:28],
+    options=many_options,
+    default=many_options[0:28],
 )

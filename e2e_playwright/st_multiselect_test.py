@@ -23,6 +23,8 @@ from e2e_playwright.shared.app_utils import (
     get_element_by_key,
 )
 
+MULTISELECT_COUNT = 17
+
 
 def select_for_kth_multiselect(
     page: Page, option_text: str, k: int, close_after_selecting: bool
@@ -70,7 +72,7 @@ def del_from_kth_multiselect(page: Page, option_text: str, k: int):
 def test_multiselect_on_load(themed_app: Page, assert_snapshot: ImageCompareFunction):
     """Should show widgets correctly when loaded."""
     multiselect_elements = themed_app.get_by_test_id("stMultiSelect")
-    expect(multiselect_elements).to_have_count(16)
+    expect(multiselect_elements).to_have_count(MULTISELECT_COUNT)
 
     assert_snapshot(multiselect_elements.nth(0), name="st_multiselect-placeholder_help")
     assert_snapshot(multiselect_elements.nth(1), name="st_multiselect-format_func")
@@ -95,7 +97,7 @@ def test_help_tooltip_works(app: Page):
 def test_multiselect_initial_value(app: Page):
     """Should show the correct initial values."""
     text_elements = app.get_by_test_id("stText")
-    expect(text_elements).to_have_count(16)
+    expect(text_elements).to_have_count(MULTISELECT_COUNT)
 
     expected = [
         "value 1: []",
