@@ -118,7 +118,7 @@ st.radio(
 )
 
 st.radio(
-    "Radio with 300px width. Label is too long to fit in the width",
+    "Radio with 200px width. Label is too long to fit in the width",
     ["Choice 1", "Choice 2", "Choice 3"],
     width=200,
 )
