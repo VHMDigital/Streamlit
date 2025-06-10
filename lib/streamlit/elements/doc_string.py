@@ -337,13 +337,16 @@ def _get_current_line_of_code_as_str() -> str | None:
 
 def _get_help_call_code_context() -> list[str] | None:
     """
-    Search the call stack for the first frame where `st.help(...)` is called,
-    and return its code context.
+    Search the call stack for the first frame where a method-style call to `help(...)` is made,
+    such as `st.help(...)`, `streamlit.help(...)`, or `foo.help(...)`, and return its code context.
+
+    This is used to extract the line of code where the user called a help function,
+    for display in Streamlit's documentation widget.
 
     Returns
     -------
     list[str] or None
-        The code context (i.e., the line of code) where `st.help(...)` was invoked,
+        The code context (i.e., source line) where the `help(...)` method was invoked,
         or None if not found or not accessible.
     """
     for frame in inspect.stack():
@@ -351,8 +354,8 @@ def _get_help_call_code_context() -> list[str] | None:
         if not context:
             continue
 
-        # Search for the call to st.help in the code context
-        if "st.help" in context[0].replace(" ", ""):
+        # Search for the call to help in the code context
+        if re.search(r"\b[\w\.]*help\s*\(", context[0]):
             return context
 
     return None
