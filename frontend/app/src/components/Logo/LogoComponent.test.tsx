@@ -77,7 +77,6 @@ describe("LogoComponent", () => {
     )
 
     const logo = screen.getByTestId("stHeaderLogo")
-    expect(logo).toBeInTheDocument()
     expect(logo).toHaveAttribute("src", "https://example.com/logo.png")
   })
 
@@ -92,7 +91,6 @@ describe("LogoComponent", () => {
     )
 
     const logo = screen.getByTestId("stSidebarLogo")
-    expect(logo).toBeInTheDocument()
     expect(logo).toHaveAttribute("src", "https://example.com/logo.png")
   })
 
@@ -164,7 +162,7 @@ describe("LogoComponent", () => {
     )
 
     expect(screen.queryByTestId("stLogoLink")).not.toBeInTheDocument()
-    expect(screen.getByTestId("stHeaderLogo")).toBeInTheDocument()
+    screen.getByTestId("stHeaderLogo")
   })
 
   it("applies correct size classes", () => {

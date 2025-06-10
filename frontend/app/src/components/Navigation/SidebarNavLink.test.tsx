@@ -88,7 +88,7 @@ describe("SidebarNavLink", () => {
   it("renders with material icon", () => {
     render(<SidebarNavLink {...getProps({ icon: ":material/page:" })} />)
 
-    expect(screen.getByTestId("stSidebarNavLink")).toBeInTheDocument()
+    screen.getByTestId("stSidebarNavLink")
 
     const materialIcon = screen.getByTestId("stIconMaterial")
     expect(materialIcon).toHaveTextContent("page")
@@ -97,7 +97,7 @@ describe("SidebarNavLink", () => {
   it("renders with emoji icon", () => {
     render(<SidebarNavLink {...getProps({ icon: "🚀" })} />)
 
-    expect(screen.getByTestId("stSidebarNavLink")).toBeInTheDocument()
+    screen.getByTestId("stSidebarNavLink")
 
     const emojiIcon = screen.getByTestId("stIconEmoji")
     expect(emojiIcon).toHaveTextContent("🚀")
@@ -107,7 +107,6 @@ describe("SidebarNavLink", () => {
     render(<SidebarNavLink {...getProps()} />)
 
     const sidebarNavLink = screen.getByTestId("stSidebarNavLink")
-    expect(sidebarNavLink).toBeInTheDocument()
     expect(sidebarNavLink).not.toHaveAttribute("aria-current")
   })
 
@@ -126,8 +125,9 @@ describe("SidebarNavLink", () => {
 
     render(<SidebarNavLink {...getProps()} />)
 
-    const container = screen.getByTestId("stSidebarNavLinkContainer")
-    expect(container).toBeInTheDocument()
+    screen.getByTestId("stSidebarNavLinkContainer")
+    const sidebarNavLink = screen.getByTestId("stSidebarNavLink")
+    expect(sidebarNavLink).toHaveStyle("pointer-events: none")
   })
 
   it("calls onClick when clicked", async () => {
@@ -146,7 +146,6 @@ describe("SidebarNavLink", () => {
       render(<SidebarNavLink {...getProps({ isTopNav: true })} />)
 
       const sidebarNavLink = screen.getByTestId("stSidebarNavLink")
-      expect(sidebarNavLink).toBeInTheDocument()
       expect(sidebarNavLink).toHaveTextContent("Test")
     })
 
@@ -167,8 +166,9 @@ describe("SidebarNavLink", () => {
 
       render(<SidebarNavLink {...getProps({ isTopNav: true })} />)
 
-      const container = screen.getByTestId("stSidebarNavLinkContainer")
-      expect(container).toBeInTheDocument()
+      screen.getByTestId("stSidebarNavLinkContainer")
+      const sidebarNavLink = screen.getByTestId("stSidebarNavLink")
+      expect(sidebarNavLink).toHaveStyle("pointer-events: none")
     })
   })
 })
