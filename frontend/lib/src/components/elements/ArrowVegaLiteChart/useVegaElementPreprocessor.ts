@@ -112,9 +112,10 @@ const generateSpec = (
     spec.title.limit =
       // Preserve existing limit if it exists,
       spec.title.limit ??
-      // Otherwise, calculate the width -40 to give some padding, especially for
-      // the ... menu button
-      width - 40
+      // Otherwise, calculate the width - 40px to give some padding, especially
+      // for the ... menu button. If the width is less than 40px, we set it to
+      // 0 to avoid negative values.
+      Math.max(width - 40, 0)
   }
 
   if (isFullScreen) {
