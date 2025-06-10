@@ -18,10 +18,8 @@ import { useMemo } from "react"
 
 import { useTheme } from "@emotion/react"
 
-import { ElementFullscreenContext } from "~lib/components/shared/ElementFullscreen/ElementFullscreenContext"
 import { EmotionTheme } from "~lib/theme"
 import { isNullOrUndefined } from "~lib/util/utils"
-import { useRequiredContext } from "~lib/hooks/useRequiredContext"
 
 import { applyStreamlitTheme, applyThemeDefaults } from "./CustomTheme"
 import { VegaLiteChartElement } from "./arrowUtils"
@@ -106,6 +104,19 @@ const generateSpec = (
     spec.config = applyThemeDefaults(spec.config, theme)
   }
 
+  if (spec.title) {
+    if (typeof spec.title === "string") {
+      spec.title = { text: spec.title }
+    }
+
+    spec.title.limit =
+      // Preserve existing limit if it exists,
+      spec.title.limit ??
+      // Otherwise, calculate the width -40 to give some padding, especially for
+      // the ... menu button
+      width - 40
+  }
+
   if (isFullScreen) {
     spec.width = width
     spec.height = height
@@ -151,14 +162,12 @@ const generateSpec = (
  * and avoids further processing if unnecessary.
  */
 export const useVegaElementPreprocessor = (
-  element: VegaLiteChartElement
+  element: VegaLiteChartElement,
+  isFullScreen: boolean,
+  width: number,
+  height: number
 ): VegaLiteChartElement => {
   const theme = useTheme()
-  const {
-    expanded: isFullScreen,
-    width,
-    height,
-  } = useRequiredContext(ElementFullscreenContext)
 
   const {
     id,

@@ -139,3 +139,21 @@ cut_off_chart = (
 
 st.write("Altair chart cut off if legend title is None (Issue #9339)")
 st.altair_chart(cut_off_chart, use_container_width=True)
+
+"---"
+
+# Long title rendering
+
+df = pd.DataFrame({"x": [1, 2, 3, 4, 5], "y": [10, 20, 30, 40, 50]})
+
+chart = (
+    alt.Chart(
+        data=df,
+        title="Lorem ipsum dolor sit amet, consectetur adipiscing elit. " * 5,
+    )
+    .mark_line()
+    .encode(x="x", y="y")
+)
+
+st.altair_chart(chart, use_container_width=True)
+st.altair_chart(chart, use_container_width=False)
