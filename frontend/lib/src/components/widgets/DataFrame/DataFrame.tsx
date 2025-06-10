@@ -160,6 +160,7 @@ function DataFrame({
 
   const [isFocused, setIsFocused] = useState<boolean>(true)
   const [showSearch, setShowSearch] = useState(false)
+  const [searchRefreshKey, setSearchRefreshKey] = useState(0)
   const [hasVerticalScroll, setHasVerticalScroll] = useState<boolean>(false)
   const [hasHorizontalScroll, setHasHorizontalScroll] =
     useState<boolean>(false)
@@ -884,6 +885,7 @@ function DataFrame({
           className="stDataFrameGlideDataEditor"
           data-testid="stDataFrameGlideDataEditor"
           ref={dataEditorRef}
+          key={`dataframe-${searchRefreshKey}`}
           columns={glideColumns}
           rows={isEmptyTable ? 1 : numRows}
           minColumnWidth={gridTheme.minColumnWidth}
@@ -955,7 +957,13 @@ function DataFrame({
               // which can be confusing. So we clear all cell selections before sorting.
               clearSelection(true, true)
             }
+
             sortColumn(columnIdx, "auto")
+
+            // If search is active, force component refresh to update search highlights
+            if (showSearch) {
+              setSearchRefreshKey(prev => prev + 1)
+            }
           }}
           gridSelection={gridSelection}
           // We don't have to react to "onSelectionCleared" since
@@ -1135,7 +1143,13 @@ function DataFrame({
                       // which can be confusing. So we clear all cell selections before sorting.
                       clearSelection(true, true)
                     }
+
                     sortColumn(showMenu.columnIdx, direction, true)
+
+                    // If search is active, force component refresh to update search highlights
+                    if (showSearch) {
+                      setSearchRefreshKey(prev => prev + 1)
+                    }
                   }
                 : undefined
             }
