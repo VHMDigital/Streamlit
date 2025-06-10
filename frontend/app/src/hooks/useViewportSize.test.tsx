@@ -41,24 +41,13 @@ const wrapper = ({ children }: { children: React.ReactNode }): JSX.Element => (
 )
 
 describe("useViewportSize", () => {
-  const originalInnerWidth = window.innerWidth
-
   afterEach(() => {
-    // Restore original window.innerWidth
-    Object.defineProperty(window, "innerWidth", {
-      writable: true,
-      configurable: true,
-      value: originalInnerWidth,
-    })
+    vi.restoreAllMocks()
   })
 
   it("should return isMobile=true when window width is below theme breakpoint", () => {
     // Set window width below the md breakpoint (768px)
-    Object.defineProperty(window, "innerWidth", {
-      writable: true,
-      configurable: true,
-      value: 767,
-    })
+    vi.spyOn(window, "innerWidth", "get").mockReturnValue(767)
 
     const { result } = renderHook(() => useViewportSize(), { wrapper })
 
@@ -67,11 +56,7 @@ describe("useViewportSize", () => {
 
   it("should return isMobile=false when window width is at theme breakpoint", () => {
     // Set window width exactly at the md breakpoint (768px)
-    Object.defineProperty(window, "innerWidth", {
-      writable: true,
-      configurable: true,
-      value: 768,
-    })
+    vi.spyOn(window, "innerWidth", "get").mockReturnValue(768)
 
     const { result } = renderHook(() => useViewportSize(), { wrapper })
 
@@ -80,11 +65,7 @@ describe("useViewportSize", () => {
 
   it("should return isMobile=false when window width is above theme breakpoint", () => {
     // Set window width above the md breakpoint (768px)
-    Object.defineProperty(window, "innerWidth", {
-      writable: true,
-      configurable: true,
-      value: 1024,
-    })
+    vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024)
 
     const { result } = renderHook(() => useViewportSize(), { wrapper })
 
@@ -93,11 +74,9 @@ describe("useViewportSize", () => {
 
   it("should update isMobile when window is resized", () => {
     // Start with desktop width
-    Object.defineProperty(window, "innerWidth", {
-      writable: true,
-      configurable: true,
-      value: 1024,
-    })
+    const innerWidthSpy = vi
+      .spyOn(window, "innerWidth", "get")
+      .mockReturnValue(1024)
 
     const { result } = renderHook(() => useViewportSize(), { wrapper })
 
@@ -105,11 +84,7 @@ describe("useViewportSize", () => {
 
     // Resize to mobile width
     act(() => {
-      Object.defineProperty(window, "innerWidth", {
-        writable: true,
-        configurable: true,
-        value: 500,
-      })
+      innerWidthSpy.mockReturnValue(500)
       window.dispatchEvent(new Event("resize"))
     })
 
@@ -117,11 +92,7 @@ describe("useViewportSize", () => {
 
     // Resize back to desktop width
     act(() => {
-      Object.defineProperty(window, "innerWidth", {
-        writable: true,
-        configurable: true,
-        value: 1024,
-      })
+      innerWidthSpy.mockReturnValue(1024)
       window.dispatchEvent(new Event("resize"))
     })
 
