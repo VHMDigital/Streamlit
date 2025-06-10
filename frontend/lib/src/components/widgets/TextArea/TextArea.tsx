@@ -40,6 +40,7 @@ import {
   ValueWithSource,
 } from "~lib/hooks/useBasicWidgetState"
 import { useCalculatedWidth } from "~lib/hooks/useCalculatedWidth"
+import { useTextInputAutoExpand } from "~lib/hooks/useTextInputAutoExpand"
 
 export interface Props {
   disabled: boolean
@@ -102,6 +103,12 @@ const TextArea: FC<Props> = ({
    */
   const [focused, setFocused] = useState(false)
 
+  // Determine if we should use auto-expansion
+  const isAutoHeight = height === "auto"
+
+  // Create ref for auto-expansion
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
   /**
    * The value specified by the user via the UI. If the user didn't touch this
    * widget's UI, the default value is used.
@@ -133,6 +140,11 @@ const TextArea: FC<Props> = ({
 
   const theme: EmotionTheme = useTheme()
 
+  const autoExpand = useTextInputAutoExpand({
+    textareaRef,
+    dependencies: [element.placeholder],
+  })
+
   const commitWidgetValue = useCallback((): void => {
     setDirty(false)
     setValueWithSource({ value: uiValue, fromUi: true })
@@ -155,6 +167,7 @@ const TextArea: FC<Props> = ({
     setDirty,
     setUiValue,
     setValueWithSource,
+    additionalActions: isAutoHeight ? [autoExpand.updateScrollHeight] : [],
   })
 
   const onKeyDown = useSubmitFormViaEnterKey(
@@ -197,6 +210,7 @@ const TextArea: FC<Props> = ({
         )}
       </WidgetLabel>
       <UITextArea
+        inputRef={isAutoHeight ? textareaRef : undefined}
         value={uiValue ?? ""}
         placeholder={placeholder}
         onBlur={onBlur}
@@ -212,7 +226,8 @@ const TextArea: FC<Props> = ({
               lineHeight: theme.lineHeights.inputWidget,
 
               // The default height of the text area is calculated to perfectly fit 3 lines of text.
-              height: height ? height : "",
+              height: isAutoHeight ? autoExpand.height : height || "",
+              maxHeight: isAutoHeight ? autoExpand.maxHeight : "",
               minHeight: theme.sizes.largestElementHeight,
               resize: "vertical",
               "::placeholder": {
