@@ -410,7 +410,7 @@ describe("StreamlitMarkdown", () => {
       const tagName = markdown.nodeName.toLowerCase()
       expect(tagName).toBe("span")
       expect(markdown).toHaveStyle(`color: ${style}`)
-      expect(markdown).toHaveClass("colored-text")
+      expect(markdown).toHaveClass("stMarkdownColoredText")
 
       // Removes rendered StreamlitMarkdown component before next case run
       cleanup()
@@ -573,6 +573,19 @@ describe("CustomCodeTag Element", () => {
         'st.write("Hello")\n' +
         "</code></div>"
     )
+  })
+
+  it("should trim leading and final newlines", () => {
+    const props = getCustomCodeTagProps({
+      children: [
+        `
+      def hello():
+          print("Hello, Streamlit!")
+`,
+      ],
+    })
+    const { baseElement } = render(<CustomCodeTag {...props} />)
+    expect(baseElement).toMatchSnapshot()
   })
 })
 
