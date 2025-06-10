@@ -27,7 +27,7 @@ interface StyledReactPdfContainerProps {
   widthConfig?: streamlit.IWidthConfig
 }
 
-export const StyledPdf = styled.iframe<StyledPdfProps>(
+export const StyledPdf = styled.embed<StyledPdfProps>(
   ({ theme, widthConfig }) => ({
     width: widthConfig?.useStretch
       ? "100%"

@@ -165,7 +165,7 @@ use_ext_module = st.sidebar.checkbox(
 )
 
 hide_toolbar = False
-if use_ext_module:
+if not use_ext_module:
     # This option is only relevant when using the external module
     hide_toolbar = st.sidebar.checkbox(
         "Hide Toolbar",

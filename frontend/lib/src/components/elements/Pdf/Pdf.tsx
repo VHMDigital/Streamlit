@@ -228,7 +228,7 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
       height={height || 500}
       widthConfig={widthConfig || undefined}
       title="PDF Viewer"
-      allow={DEFAULT_IFRAME_FEATURE_POLICY}
+      type="application/pdf"
     />
   )
 }
