@@ -17,7 +17,7 @@ from playwright.sync_api import Page, expect
 from e2e_playwright.conftest import ImageCompareFunction
 
 
-def test_altair_chart_displays_correctly(
+def test_altair_chart_title_displays_correctly(
     app: Page, assert_snapshot: ImageCompareFunction
 ):
     expect(app.get_by_test_id("stVegaLiteChart").locator("canvas")).to_have_count(2)
