@@ -153,7 +153,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       return true
     }
 
-    const handleClickOutside = (event: globalThis.MouseEvent): void => {
+    const handleClickOutside = (event: MouseEvent): void => {
       if (sidebarRef && window) {
         const { current } = sidebarRef
         const { innerWidth } = window
