@@ -19,7 +19,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react"
 
@@ -220,21 +219,15 @@ function AppView(props: AppViewProps): ReactElement {
   }, [])
 
   // logo component to be used in the header when sidebar is closed
-  const logoElement = useMemo(() => {
-    if (!appLogo) {
-      return null
-    }
-
-    return (
-      <LogoComponent
-        appLogo={appLogo}
-        endpoints={endpoints}
-        collapsed={isSidebarCollapsed || !showSidebar}
-        componentName="Header Logo"
-        dataTestId="stHeaderLogo"
-      />
-    )
-  }, [appLogo, endpoints, isSidebarCollapsed, showSidebar])
+  const logoElement = appLogo ? (
+    <LogoComponent
+      appLogo={appLogo}
+      endpoints={endpoints}
+      collapsed={isSidebarCollapsed || !showSidebar}
+      componentName="Header Logo"
+      dataTestId="stHeaderLogo"
+    />
+  ) : null
 
   // Determine if the header should have transparent background
   // Only transparent when no content is shown at all
