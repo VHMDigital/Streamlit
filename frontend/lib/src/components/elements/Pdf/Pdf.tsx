@@ -24,10 +24,7 @@ import "react-pdf/dist/Page/TextLayer.css"
 import { IPdf } from "@streamlit/protobuf"
 
 import { StreamlitEndpoints } from "~lib/StreamlitEndpoints"
-import {
-  DEFAULT_IFRAME_FEATURE_POLICY,
-  DEFAULT_IFRAME_SANDBOX_POLICY,
-} from "~lib/util/IFrameUtil"
+import { DEFAULT_IFRAME_FEATURE_POLICY } from "~lib/util/IFrameUtil"
 
 import {
   StyledPdf,
