@@ -84,25 +84,6 @@ describe("#useLayoutStyles", () => {
       })
     })
 
-    describe("that is an image list", () => {
-      const useContainerWidth = false
-
-      it.each([
-        [undefined, getDefaultStyles({ width: "100%" })],
-        [0, getDefaultStyles({ width: "100%" })],
-        [-100, getDefaultStyles({ width: "100%" })],
-        [NaN, getDefaultStyles({ width: "100%" })],
-        [100, getDefaultStyles({ width: "100%" })],
-      ])("and with a width value of %s, returns %o", (width, expected) => {
-        const element = new MockElement({ type: "imgs" })
-        const subElement = { width, useContainerWidth }
-        const { result } = renderHook(() =>
-          useLayoutStyles({ element, subElement })
-        )
-        expect(result.current).toEqual(expected)
-      })
-    })
-
     describe("that has widthConfig set", () => {
       it.each([
         [
@@ -402,33 +383,6 @@ describe("#useLayoutStyles", () => {
       })
     })
 
-    describe("with text area element type", () => {
-      it.each([
-        [
-          new streamlit.HeightConfig({ useStretch: true }),
-          getDefaultStyles({ height: "100%" }),
-        ],
-        [
-          new streamlit.HeightConfig({ useContent: true }),
-          getDefaultStyles({ height: "auto" }),
-        ],
-        [
-          new streamlit.HeightConfig({ pixelHeight: 100 }),
-          getDefaultStyles({ height: "auto" }),
-        ],
-        [null, getDefaultStyles({ height: "auto" })],
-        [undefined, getDefaultStyles({ height: "auto" })],
-      ])("and with heightConfig %s, returns %o", (heightConfig, expected) => {
-        const element = new MockElement({
-          type: "textArea",
-          heightConfig,
-        })
-
-        const { result } = renderHook(() => useLayoutStyles({ element }))
-        expect(result.current).toEqual(expected)
-      })
-    })
-
     describe("with height included along with heightConfig", () => {
       it.each([
         [
@@ -546,7 +500,6 @@ describe("#useLayoutStyles", () => {
           getDefaultStyles({
             width: "100px",
             height: "auto",
-            overflow: "auto",
           }),
         ],
       ])(
@@ -606,6 +559,86 @@ describe("#useLayoutStyles", () => {
           expect(result.current).toEqual(expected)
         }
       )
+    })
+
+    describe("with styleOverrides", () => {
+      it("applies style overrides to computed styles", () => {
+        const element = new MockElement({
+          widthConfig: new streamlit.WidthConfig({ pixelWidth: 200 }),
+          heightConfig: new streamlit.HeightConfig({ pixelHeight: 300 }),
+        })
+
+        const styleOverrides = {
+          width: "50%",
+          height: "150px",
+          overflow: "hidden",
+        }
+
+        const { result } = renderHook(() =>
+          useLayoutStyles({ element, styleOverrides })
+        )
+
+        expect(result.current).toEqual({
+          width: "50%", // overridden from calculated "200px"
+          height: "150px", // overridden from calculated "300px"
+          overflow: "hidden", // overridden from calculated "auto"
+        })
+      })
+
+      it("partially overrides computed styles", () => {
+        const element = new MockElement({
+          widthConfig: new streamlit.WidthConfig({ pixelWidth: 200 }),
+          heightConfig: new streamlit.HeightConfig({ pixelHeight: 300 }),
+        })
+
+        const styleOverrides = {
+          width: "75%",
+        }
+
+        const { result } = renderHook(() =>
+          useLayoutStyles({ element, styleOverrides })
+        )
+
+        expect(result.current).toEqual({
+          width: "75%", // overridden
+          height: "300px", // computed value preserved
+          overflow: "auto", // computed value preserved
+        })
+      })
+
+      it("handles empty styleOverrides", () => {
+        const element = new MockElement({
+          widthConfig: new streamlit.WidthConfig({ pixelWidth: 100 }),
+        })
+
+        const styleOverrides = {}
+
+        const { result } = renderHook(() =>
+          useLayoutStyles({ element, styleOverrides })
+        )
+
+        expect(result.current).toEqual({
+          width: "100px",
+          height: "auto",
+          overflow: "visible",
+        })
+      })
+
+      it("handles undefined styleOverrides", () => {
+        const element = new MockElement({
+          widthConfig: new streamlit.WidthConfig({ pixelWidth: 100 }),
+        })
+
+        const { result } = renderHook(() =>
+          useLayoutStyles({ element, styleOverrides: undefined })
+        )
+
+        expect(result.current).toEqual({
+          width: "100px",
+          height: "auto",
+          overflow: "visible",
+        })
+      })
     })
   })
 })
