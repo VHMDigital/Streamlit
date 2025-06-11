@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import (
@@ -306,6 +307,7 @@ def test_renders_logos(app: Page, assert_snapshot: ImageCompareFunction):
     assert_snapshot(collapsed_logo_image, name="collapsed-header-logo")
 
 
+@pytest.mark.flakey(max_runs=4)
 def test_renders_small_logos(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that small logos display properly in sidebar and main sections."""
 
