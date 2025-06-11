@@ -324,7 +324,7 @@ describe("AppView element", () => {
   })
 
   describe("top padding logic", () => {
-    const getMainBlockContainerStyle = () => {
+    const getMainBlockContainerStyle = (): CSSStyleDeclaration => {
       return window.getComputedStyle(
         screen.getByTestId("stMainBlockContainer")
       )
