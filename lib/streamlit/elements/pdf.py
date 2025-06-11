@@ -22,14 +22,21 @@ from typing_extensions import TypeAlias
 
 from streamlit import url_util
 from streamlit.elements.lib.form_utils import current_form_id
-from streamlit.elements.lib.layout_utils import LayoutConfig, validate_width
+from streamlit.elements.lib.layout_utils import (
+    LayoutConfig,
+    validate_height,
+    validate_width,
+)
 from streamlit.elements.lib.utils import compute_and_register_element_id
 from streamlit.proto.Pdf_pb2 import Pdf as PdfProto
 from streamlit.runtime.metrics_util import gather_metrics
 
 if TYPE_CHECKING:
     from streamlit.delta_generator import DeltaGenerator
-    from streamlit.elements.lib.layout_utils import WidthWithoutContent
+    from streamlit.elements.lib.layout_utils import (
+        HeightWithoutContent,
+        WidthWithoutContent,
+    )
 
 PdfData: TypeAlias = Union[str, Path, bytes, io.BytesIO]
 
@@ -40,7 +47,7 @@ class PdfMixin:
         self,
         data: PdfData,
         *,
-        height: int = 500,
+        height: HeightWithoutContent = 500,
         width: WidthWithoutContent = "stretch",
         use_ext_module: bool = False,
         hide_toolbar: bool = True,
@@ -55,8 +62,8 @@ class PdfMixin:
             - A path to a local PDF file.
             - A file-like object, e.g. a file opened with `open` or an `UploadedFile` returned by `st.file_uploader`.
             - Raw bytes data.
-        height : int
-            Height of the PDF viewer in pixels.
+        height : int or "stretch"
+            Height of the PDF viewer. Can be "stretch" for full height or an integer for pixel height.
         width : int or "stretch"
             Desired width of the PDF viewer. Can be "stretch" for full width or an integer for pixel width.
         use_ext_module : bool
@@ -76,7 +83,8 @@ class PdfMixin:
         >>> st.pdf("https://example.com/sample.pdf", use_ext_module=True)
         >>> st.pdf("https://example.com/sample.pdf", hide_toolbar=False)
         """
-        # Validate width parameter
+        # Validate height and width parameters
+        validate_height(height, allow_content=False)
         validate_width(width, allow_content=False)
 
         # Compute element ID first, like other elements do
@@ -95,13 +103,12 @@ class PdfMixin:
         pdf_proto = PdfProto()
         pdf_proto.id = element_id
 
-        # Create layout config for width
-        layout_config = LayoutConfig(width=width)
+        # Create layout config for both width and height
+        layout_config = LayoutConfig(width=width, height=height)
 
         _marshall_pdf(
             pdf_proto,
             data,
-            height=height,
             use_ext_module=use_ext_module,
             hide_toolbar=hide_toolbar,
         )
@@ -118,14 +125,12 @@ def _marshall_pdf(
     proto: PdfProto,
     data: PdfData,
     *,
-    height: int = 500,
     use_ext_module: bool = False,
     hide_toolbar: bool = True,
 ) -> None:
     """Marshall a PDF protobuf element."""
 
-    # Set height, use_ext_module, and hide_toolbar
-    proto.height = height
+    # Set use_ext_module and hide_toolbar
     proto.use_ext_module = use_ext_module
     proto.hide_toolbar = hide_toolbar
 

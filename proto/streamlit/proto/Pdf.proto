@@ -20,6 +20,7 @@ option java_package = "com.snowflake.apps.streamlit";
 option java_outer_classname = "PdfProto";
 
 import "streamlit/proto/WidthConfig.proto";
+import "streamlit/proto/HeightConfig.proto";
 
 message Pdf {
   string id = 1;
@@ -28,7 +29,7 @@ message Pdf {
     bytes file_data = 7;
   }
   optional streamlit.WidthConfig width_config = 3;
-  int32 height = 4;
+  optional streamlit.HeightConfig height_config = 4;
   bool use_ext_module = 5;
   bool hide_toolbar = 6;
 }

@@ -43,7 +43,7 @@ export interface PdfProps {
 }
 
 function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
-  const { widthConfig, height, useExtModule, hideToolbar } = element
+  const { widthConfig, useExtModule, hideToolbar } = element
 
   // State for react-pdf
   const [numPages, setNumPages] = useState<number>(0)
@@ -166,7 +166,6 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
       <StyledReactPdfContainer
         className="stPdf"
         data-testid="stPdf"
-        height={height || 500}
         widthConfig={widthConfig || undefined}
       >
         {loadError ? (
@@ -220,39 +219,26 @@ function Pdf({ element, endpoints }: Readonly<PdfProps>): ReactElement {
     <StyledPdf
       className="stPdf"
       data-testid="stPdf"
-      data={iframePdfUrl}
-      height={height || 500}
       widthConfig={widthConfig || undefined}
-      title="PDF Viewer"
-      type="application/pdf"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+      }}
     >
-      <div
+      <iframe
+        src={iframePdfUrl}
+        title="PDF Viewer"
         style={{
-          padding: "20px",
-          textAlign: "center",
-          backgroundColor: "#f0f2f6",
-          border: "1px solid #e1e5e9",
-          borderRadius: "4px",
+          width: "100%",
+          height: "100%",
+          border: "none",
+          flex: 1,
+          minHeight: 0,
         }}
-      >
-        <p>PDF cannot be displayed in this environment.</p>
-        <a
-          href={iframePdfUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            color: "#ff4b4b",
-            textDecoration: "none",
-            fontWeight: "bold",
-          }}
-        >
-          📄 Open PDF in new tab
-        </a>
-        <br />
-        <small style={{ color: "#666", marginTop: "10px", display: "block" }}>
-          Tip: Use <code>use_ext_module=True</code> for better PDF embedding
-        </small>
-      </div>
+        onError={() => {
+          console.error("Failed to load PDF in iframe")
+        }}
+      />
     </StyledPdf>
   )
 }
