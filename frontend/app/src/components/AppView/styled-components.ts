@@ -60,11 +60,11 @@ export const StyledAppViewMain = styled.section<StyledAppViewMainProps>(
     "@media not print": {
       [`@media (max-width: ${theme.breakpoints.md})`]: {
         position: "absolute",
-        top: theme.sizes.headerHeight,
+        top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        height: `calc(100vh - ${theme.sizes.headerHeight})`,
+        height: "100vh",
       },
     },
 
@@ -122,9 +122,8 @@ export interface StyledAppViewBlockContainerProps {
   isWideMode: boolean
   hasBottom: boolean
   showPadding: boolean
-  isEmbedded: boolean
-  hasSidebar: boolean
   hasHeader: boolean
+  showToolbar: boolean
 }
 
 export const StyledAppViewBlockContainer =
@@ -133,18 +132,23 @@ export const StyledAppViewBlockContainer =
       hasBottom,
       isWideMode,
       showPadding,
-      hasSidebar,
-      isEmbedded,
       hasHeader,
+      showToolbar,
       theme,
     }) => {
       const littlePadding = "2.25rem"
 
-      const shouldGet6RemTopPadding =
-        showPadding || (isEmbedded && hasSidebar) || hasHeader
-      const topEmbedPadding: string = shouldGet6RemTopPadding
-        ? `6rem`
-        : littlePadding
+      // Top padding logic per specification:
+      // - 6rem by default (non-embedded)
+      // - 6rem if embedded with show_padding OR show_toolbar
+      // - 2.25rem if embedded with no header and no toolbar
+      // - 4.5rem if embedded with header but no toolbar
+      const topPadding =
+        showPadding || showToolbar
+          ? "6rem"
+          : hasHeader
+            ? "4.5rem"
+            : littlePadding
 
       const bottomEmbedPadding =
         showPadding && !hasBottom ? "10rem" : theme.spacing.lg
@@ -153,7 +157,7 @@ export const StyledAppViewBlockContainer =
         width: theme.sizes.full,
         paddingLeft: theme.spacing.lg,
         paddingRight: theme.spacing.lg,
-        paddingTop: topEmbedPadding,
+        paddingTop: topPadding,
         paddingBottom: bottomEmbedPadding,
         maxWidth: theme.sizes.contentMaxWidth,
         ...(isWideMode && applyWideModePadding(theme)),

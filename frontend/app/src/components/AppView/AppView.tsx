@@ -135,7 +135,7 @@ function AppView(props: AppViewProps): ReactElement {
     return () => window.removeEventListener("hashchange", listener, false)
   }, [sendMessageToHost])
 
-  const { initialSidebarState, widgetsDisabled } = useAppContext()
+  const { initialSidebarState, widgetsDisabled, showToolbar } = useAppContext()
 
   const {
     addScriptFinishedHandler,
@@ -309,9 +309,8 @@ function AppView(props: AppViewProps): ReactElement {
                 isWideMode={wideMode}
                 showPadding={showPadding}
                 hasBottom={hasBottomElements}
-                isEmbedded={embedded}
-                hasSidebar={showSidebar}
                 hasHeader={hasHeaderUserContent}
+                showToolbar={showToolbar}
               >
                 {renderBlock(elements.main)}
               </StyledAppViewBlockContainer>

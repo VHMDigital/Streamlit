@@ -323,59 +323,292 @@ describe("AppView element", () => {
     expect(style.overflow).toEqual("auto")
   })
 
-  describe("handles padding an embedded app", () => {
-    it("embedded triggers default padding", () => {
-      render(<AppView {...getProps({ embedded: true })} />)
-      const style = window.getComputedStyle(
+  describe("top padding logic", () => {
+    const getMainBlockContainerStyle = () => {
+      return window.getComputedStyle(
         screen.getByTestId("stMainBlockContainer")
       )
-      expect(style.paddingTop).toEqual("2.25rem")
-      expect(style.paddingBottom).toEqual("1rem")
-    })
+    }
 
-    it("showPadding triggers expected padding", () => {
-      render(<AppView {...getProps({ embedded: true, showPadding: true })} />)
-      const style = window.getComputedStyle(
-        screen.getByTestId("stMainBlockContainer")
-      )
-      expect(style.paddingTop).toEqual("6rem")
-      expect(style.paddingBottom).toEqual("10rem")
-    })
-
-    it("hasSidebar triggers expected top padding", () => {
-      const sidebarElement = new ElementNode(
-        makeElementWithInfoText("sidebar!"),
-        ForwardMsgMetadata.create({}),
-        "no script run id",
-        FAKE_SCRIPT_HASH
-      )
-
-      const sidebar = new BlockNode(
-        FAKE_SCRIPT_HASH,
-        [sidebarElement],
-        new BlockProto({ allowEmpty: true })
-      )
-
-      const empty = new BlockNode(
-        FAKE_SCRIPT_HASH,
-        [],
-        new BlockProto({ allowEmpty: true })
-      )
-
-      const props = getProps({
-        elements: new AppRoot(
-          FAKE_SCRIPT_HASH,
-          new BlockNode(FAKE_SCRIPT_HASH, [empty, sidebar, empty, empty])
-        ),
-        embedded: true,
+    describe("non-embedded apps", () => {
+      it("uses 6rem top padding by default", () => {
+        render(<AppView {...getProps({ embedded: false })} />)
+        const style = getMainBlockContainerStyle()
+        expect(style.paddingTop).toEqual("6rem")
       })
 
-      render(<AppView {...props} />)
-      const style = window.getComputedStyle(
-        screen.getByTestId("stMainBlockContainer")
-      )
-      expect(style.paddingTop).toEqual("6rem")
-      expect(style.paddingBottom).toEqual("1rem")
+      it("uses 6rem top padding regardless of showPadding", () => {
+        render(
+          <AppView {...getProps({ embedded: false, showPadding: true })} />
+        )
+        const style = getMainBlockContainerStyle()
+        expect(style.paddingTop).toEqual("6rem")
+      })
+
+      it("uses 6rem top padding regardless of showToolbar", () => {
+        vi.spyOn(
+          StreamlitContextProviderModule,
+          "useAppContext"
+        ).mockReturnValue(getContextOutput({ showToolbar: true }))
+
+        render(<AppView {...getProps({ embedded: false })} />)
+        const style = getMainBlockContainerStyle()
+        expect(style.paddingTop).toEqual("6rem")
+      })
+    })
+
+    describe("embedded apps", () => {
+      describe("with show_padding option", () => {
+        it("uses 6rem top padding when showPadding=true", () => {
+          render(
+            <AppView {...getProps({ embedded: true, showPadding: true })} />
+          )
+          const style = getMainBlockContainerStyle()
+          expect(style.paddingTop).toEqual("6rem")
+          expect(style.paddingBottom).toEqual("10rem")
+        })
+
+        it("uses 6rem top padding when showPadding=true regardless of header content", () => {
+          // Create elements that would trigger hasHeader=true
+          const logo = LogoProto.create({
+            image: "https://example.com/logo.png",
+          })
+
+          render(
+            <AppView
+              {...getProps({
+                embedded: true,
+                showPadding: true,
+                appLogo: logo,
+                navigationPosition: Navigation.Position.TOP,
+                appPages: [
+                  { pageName: "page1", pageScriptHash: "hash1" },
+                  { pageName: "page2", pageScriptHash: "hash2" },
+                ],
+              })}
+            />
+          )
+
+          const style = getMainBlockContainerStyle()
+          expect(style.paddingTop).toEqual("6rem")
+        })
+      })
+
+      describe("with show_toolbar option", () => {
+        it("uses 6rem top padding when showToolbar=true", () => {
+          vi.spyOn(
+            StreamlitContextProviderModule,
+            "useAppContext"
+          ).mockReturnValue(getContextOutput({ showToolbar: true }))
+
+          render(<AppView {...getProps({ embedded: true })} />)
+          const style = getMainBlockContainerStyle()
+          expect(style.paddingTop).toEqual("6rem")
+        })
+
+        it("uses 6rem top padding when showToolbar=true regardless of header content", () => {
+          vi.spyOn(
+            StreamlitContextProviderModule,
+            "useAppContext"
+          ).mockReturnValue(getContextOutput({ showToolbar: true }))
+
+          // Create elements that would trigger hasHeader=true
+          const logo = LogoProto.create({
+            image: "https://example.com/logo.png",
+          })
+
+          render(
+            <AppView
+              {...getProps({
+                embedded: true,
+                appLogo: logo,
+                navigationPosition: Navigation.Position.TOP,
+                appPages: [
+                  { pageName: "page1", pageScriptHash: "hash1" },
+                  { pageName: "page2", pageScriptHash: "hash2" },
+                ],
+              })}
+            />
+          )
+
+          const style = getMainBlockContainerStyle()
+          expect(style.paddingTop).toEqual("6rem")
+        })
+      })
+
+      describe("with both show_padding and show_toolbar options", () => {
+        it("uses 6rem top padding when both showPadding=true and showToolbar=true", () => {
+          vi.spyOn(
+            StreamlitContextProviderModule,
+            "useAppContext"
+          ).mockReturnValue(getContextOutput({ showToolbar: true }))
+
+          render(
+            <AppView {...getProps({ embedded: true, showPadding: true })} />
+          )
+          const style = getMainBlockContainerStyle()
+          expect(style.paddingTop).toEqual("6rem")
+        })
+      })
+
+      describe("without show_padding or show_toolbar options", () => {
+        beforeEach(() => {
+          vi.spyOn(
+            StreamlitContextProviderModule,
+            "useAppContext"
+          ).mockReturnValue(getContextOutput({ showToolbar: false }))
+        })
+
+        it("uses 2.25rem top padding when no header content", () => {
+          render(
+            <AppView
+              {...getProps({
+                embedded: true,
+                showPadding: false,
+                appLogo: null,
+                appPages: [{ pageName: "page1", pageScriptHash: "hash1" }], // Single page, no nav
+                navigationPosition: Navigation.Position.SIDEBAR,
+              })}
+            />
+          )
+
+          const style = getMainBlockContainerStyle()
+          expect(style.paddingTop).toEqual("2.25rem")
+          expect(style.paddingBottom).toEqual("1rem")
+        })
+
+        it("uses 4.5rem top padding when header content exists (logo)", () => {
+          const logo = LogoProto.create({
+            image: "https://example.com/logo.png",
+          })
+
+          render(
+            <AppView
+              {...getProps({
+                embedded: true,
+                showPadding: false,
+                appLogo: logo,
+              })}
+            />
+          )
+
+          const style = getMainBlockContainerStyle()
+          expect(style.paddingTop).toEqual("4.5rem")
+          expect(style.paddingBottom).toEqual("1rem")
+        })
+
+        it("uses 4.5rem top padding when header content exists (navigation)", () => {
+          render(
+            <AppView
+              {...getProps({
+                embedded: true,
+                showPadding: false,
+                appLogo: null,
+                navigationPosition: Navigation.Position.TOP,
+                appPages: [
+                  { pageName: "page1", pageScriptHash: "hash1" },
+                  { pageName: "page2", pageScriptHash: "hash2" },
+                ],
+              })}
+            />
+          )
+
+          const style = getMainBlockContainerStyle()
+          expect(style.paddingTop).toEqual("4.5rem")
+          expect(style.paddingBottom).toEqual("1rem")
+        })
+
+        it("uses 4.5rem top padding when header content exists (sidebar expand button)", () => {
+          const sidebarElement = new ElementNode(
+            makeElementWithInfoText("sidebar!"),
+            ForwardMsgMetadata.create({}),
+            "no script run id",
+            FAKE_SCRIPT_HASH
+          )
+
+          const sidebar = new BlockNode(
+            FAKE_SCRIPT_HASH,
+            [sidebarElement],
+            new BlockProto({ allowEmpty: true })
+          )
+
+          const empty = new BlockNode(
+            FAKE_SCRIPT_HASH,
+            [],
+            new BlockProto({ allowEmpty: true })
+          )
+
+          // Mock collapsed sidebar state to trigger expand button
+          vi.spyOn(
+            StreamlitContextProviderModule,
+            "useAppContext"
+          ).mockReturnValue(
+            getContextOutput({
+              showToolbar: false,
+              initialSidebarState: PageConfig.SidebarState.COLLAPSED,
+            })
+          )
+
+          const props = getProps({
+            elements: new AppRoot(
+              FAKE_SCRIPT_HASH,
+              new BlockNode(FAKE_SCRIPT_HASH, [empty, sidebar, empty, empty])
+            ),
+            embedded: true,
+            showPadding: false,
+          })
+
+          render(<AppView {...props} />)
+          const style = getMainBlockContainerStyle()
+          expect(style.paddingTop).toEqual("4.5rem")
+          expect(style.paddingBottom).toEqual("1rem")
+        })
+      })
+    })
+
+    describe("edge cases", () => {
+      it("prioritizes showPadding over header content", () => {
+        const logo = LogoProto.create({
+          image: "https://example.com/logo.png",
+        })
+
+        render(
+          <AppView
+            {...getProps({
+              embedded: true,
+              showPadding: true,
+              appLogo: logo,
+            })}
+          />
+        )
+
+        const style = getMainBlockContainerStyle()
+        expect(style.paddingTop).toEqual("6rem")
+      })
+
+      it("prioritizes showToolbar over header content", () => {
+        vi.spyOn(
+          StreamlitContextProviderModule,
+          "useAppContext"
+        ).mockReturnValue(getContextOutput({ showToolbar: true }))
+
+        const logo = LogoProto.create({
+          image: "https://example.com/logo.png",
+        })
+
+        render(
+          <AppView
+            {...getProps({
+              embedded: true,
+              showPadding: false,
+              appLogo: logo,
+            })}
+          />
+        )
+
+        const style = getMainBlockContainerStyle()
+        expect(style.paddingTop).toEqual("6rem")
+      })
     })
   })
 
