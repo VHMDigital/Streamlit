@@ -41,8 +41,10 @@ export const StyledElementContainerLayoutWrapper: FC<
     // The st.text_area element has a legacy implementation where the height
     // is measuring only the input box so the pixel height must be set in the element
     // and the container must be allowed to expand.
+    // The difference between content and stretch is so that this element will
+    // behave correctly inside containers.
     styleOverrides = {
-      height: "100%",
+      height: node.element.heightConfig?.useContent ? "auto" : "100%",
     }
   } else if (
     node.element.type === "iframe" ||
