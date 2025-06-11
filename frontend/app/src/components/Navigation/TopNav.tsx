@@ -50,6 +50,7 @@ const TopNav: React.FC<Props> = ({
     return groupBy(appPages, "sectionHeader")
   }, [appPages])
 
+  // NOTE: this is > 1, not > 0 which is why the line 56-58 ternary is needed
   const hasSections = Object.keys(navSections).length > 1
 
   const data = hasSections
