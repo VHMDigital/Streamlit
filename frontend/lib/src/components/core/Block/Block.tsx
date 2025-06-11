@@ -131,6 +131,7 @@ const ChildRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
 
 interface ContainerContentsWrapperProps extends BaseBlockProps {
   node: BlockNode
+  height: React.CSSProperties["height"]
 }
 
 export const ContainerContentsWrapper = (
@@ -140,6 +141,7 @@ export const ContainerContentsWrapper = (
     direction: Direction.VERTICAL,
     flex: 1,
     gap: streamlit.GapSize.SMALL,
+    height: props.height,
   }
 
   const userKey = getKeyFromId(props.node.deltaBlock.id)
@@ -298,6 +300,7 @@ const BlockNodeRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
     <ContainerContentsWrapper
       {...childProps}
       disableFullscreenMode={disableFullscreenMode}
+      height="100%"
     />
   )
 
@@ -392,7 +395,7 @@ const BlockNodeRenderer = (props: BlockPropsWithoutWidth): ReactElement => {
       mappedChildProps: JSX.IntrinsicAttributes & BlockPropsWithoutWidth
     ): ReactElement => {
       // avoid circular dependency where Tab uses VerticalBlock but VerticalBlock uses tabs
-      return <ContainerContentsWrapper {...mappedChildProps} />
+      return <ContainerContentsWrapper {...mappedChildProps} height="100%" />
     }
     // We can't use StyledLayoutWrapper for tabs currently because of the horizontal scrolling
     // management that is handled in the Tabs component. TODO(lwilby): Investigate whether it makes

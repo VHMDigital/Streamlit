@@ -42,7 +42,7 @@ export const StyledElementContainerLayoutWrapper: FC<
     // is measuring only the input box so the pixel height must be set in the element
     // and the container must be allowed to expand.
     styleOverrides = {
-      height: "auto",
+      height: "100%",
     }
   } else if (
     node.element.type === "iframe" ||

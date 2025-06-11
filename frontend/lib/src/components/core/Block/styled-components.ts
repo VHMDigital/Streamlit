@@ -172,11 +172,12 @@ export interface StyledFlexContainerBlockProps {
   gap?: streamlit.GapSize | undefined
   flex?: React.CSSProperties["flex"]
   wrap?: boolean
+  height?: React.CSSProperties["height"]
 }
 
 export const StyledFlexContainerBlock =
   styled.div<StyledFlexContainerBlockProps>(
-    ({ theme, direction, gap, flex, wrap }) => {
+    ({ theme, direction, gap, flex, wrap, height }) => {
       let gapWidth
       if (gap !== undefined) {
         gapWidth = translateGapWidth(gap, theme)
@@ -187,7 +188,7 @@ export const StyledFlexContainerBlock =
         gap: gapWidth,
         width: "100%",
         maxWidth: "100%",
-        height: "auto",
+        height: height || "auto",
         flexDirection: direction,
         flex,
         flexWrap: wrap ? "wrap" : "nowrap",
