@@ -22,6 +22,6 @@ export const StyledHeaderDecoration = styled.div(({ theme }) => ({
   right: theme.spacing.none,
   left: theme.spacing.none,
   height: theme.sizes.headerDecorationHeight,
-  backgroundImage: `linear-gradient(90deg, ${theme.colors.red70}, #fffd80)`,
+  backgroundImage: `linear-gradient(90deg, ${theme.colors.red70}, ${theme.colors.yellow40})`,
   zIndex: theme.zIndices.headerDecoration,
 }))
