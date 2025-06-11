@@ -177,7 +177,11 @@ repos:
           |\.snap$
       - id: check-added-large-files
       - id: check-json
-        exclude: .vscode/launch.json
+        exclude: |
+          (?x)
+          .vscode/launch.json
+          |frontend/app/tsconfig.json
+          |frontend/lib/tsconfig.json
       - id: check-toml
       - id: check-yaml
         exclude: lib/conda-recipe/meta.yaml
