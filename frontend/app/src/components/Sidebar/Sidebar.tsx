@@ -23,7 +23,12 @@ import React, {
 } from "react"
 
 import { useTheme } from "@emotion/react"
-import { Resizable } from "re-resizable"
+import {
+  NumberSize,
+  Resizable,
+  ResizeCallback,
+  ResizeDirection,
+} from "re-resizable"
 
 import { SidebarNav } from "@streamlit/app/src/components/Navigation"
 import { StreamlitEndpoints } from "@streamlit/connection"
@@ -123,17 +128,20 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   }, [])
 
-  const onResizeStop = useCallback(
+  const onResizeStop = useCallback<ResizeCallback>(
     (
-      _e: unknown,
-      _direction: unknown,
-      _ref: unknown,
-      d: { width: number }
+      _e: MouseEvent | TouchEvent,
+      _direction: ResizeDirection,
+      ref: HTMLElement,
+      _d: NumberSize
     ) => {
-      const newWidth = parseInt(sidebarWidth, 10) + d.width
-      initializeSidebarWidth(newWidth)
+      // Use the actual ref width, not the delta, to avoid stale delta values
+      if (ref) {
+        const newWidth = ref.clientWidth || ref.offsetWidth
+        initializeSidebarWidth(newWidth)
+      }
     },
-    [initializeSidebarWidth, sidebarWidth]
+    [initializeSidebarWidth]
   )
 
   useEffect(() => {
@@ -179,13 +187,11 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   }, [lastInnerWidth, mediumBreakpointPx, isCollapsed, onToggleCollapse])
 
-  function resetSidebarWidth(event: React.MouseEvent<HTMLDivElement>): void {
+  function resetSidebarWidth(): void {
     // Double clicking on the resize handle resets sidebar to default width
-    if (event.detail === 2) {
-      setSidebarWidth(DEFAULT_WIDTH)
-      if (localStorageAvailable()) {
-        window.localStorage.setItem("sidebarWidth", DEFAULT_WIDTH)
-      }
+    setSidebarWidth(DEFAULT_WIDTH)
+    if (localStorageAvailable()) {
+      window.localStorage.setItem("sidebarWidth", DEFAULT_WIDTH)
     }
   }
 
@@ -232,7 +238,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         },
       }}
       handleComponent={{
-        right: <StyledResizeHandle onClick={resetSidebarWidth} />,
+        right: <StyledResizeHandle onDoubleClick={resetSidebarWidth} />,
       }}
       size={{
         width: sidebarWidth,
