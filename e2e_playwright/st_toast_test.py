@@ -93,6 +93,9 @@ def test_toast_with_material_icon_rendering(
 
 def test_toast_above_dialog(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that toasts are correctly rendered above dialog."""
+    # Set viewport size to better show dialog/toast interaction
+    app.set_viewport_size({"width": 650, "height": 958})
+
     app.keyboard.press("r")
     wait_for_app_loaded(app)
     app.wait_for_timeout(250)
