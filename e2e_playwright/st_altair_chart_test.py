@@ -22,7 +22,9 @@ def test_altair_chart_displays_correctly(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
     expect(
-        themed_app.get_by_test_id("stVegaLiteChart").locator("canvas")
+        themed_app.get_by_test_id("stVegaLiteChart").locator(
+            "[role='graphics-document']"
+        )
     ).to_have_count(11)
     charts = themed_app.get_by_test_id("stVegaLiteChart")
     expect(charts).to_have_count(11)
@@ -55,7 +57,9 @@ def test_chart_tooltip_styling(app: Page, assert_snapshot: ImageCompareFunction)
     """Check that the chart tooltip styling is correct."""
     pie_chart = app.get_by_test_id("stVegaLiteChart").nth(4)
     pie_chart.scroll_into_view_if_needed()
-    pie_chart.locator("canvas").hover(position={"x": 60, "y": 60}, force=True)
+    pie_chart.locator("[role='graphics-document']").hover(
+        position={"x": 60, "y": 60}, force=True
+    )
     tooltip = app.locator("#vg-tooltip-element")
     expect(tooltip).to_be_visible()
 

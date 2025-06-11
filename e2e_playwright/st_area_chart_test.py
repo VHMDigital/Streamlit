@@ -26,7 +26,9 @@ def test_area_chart_rendering(app: Page, assert_snapshot: ImageCompareFunction):
     expect(area_chart_elements).to_have_count(TOTAL_AREA_CHARTS)
 
     # Also make sure that all canvas objects are rendered:
-    expect(area_chart_elements.locator("canvas")).to_have_count(TOTAL_AREA_CHARTS)
+    expect(area_chart_elements.locator("[role='graphics-document']")).to_have_count(
+        TOTAL_AREA_CHARTS
+    )
 
     # TODO: separate into semantically named snapshots
     for i, element in enumerate(area_chart_elements.all()):
@@ -43,7 +45,9 @@ def test_themed_area_chart_rendering(
     expect(area_chart_elements).to_have_count(TOTAL_AREA_CHARTS)
 
     # Also make sure that all canvas objects are rendered:
-    expect(area_chart_elements.locator("canvas")).to_have_count(TOTAL_AREA_CHARTS)
+    expect(area_chart_elements.locator("[role='graphics-document']")).to_have_count(
+        TOTAL_AREA_CHARTS
+    )
 
     # Only test a single chart per built-in chart type:
     assert_snapshot(area_chart_elements.nth(1), name="st_area_chart_themed")
@@ -67,7 +71,7 @@ def test_add_rows_preserves_styling(app: Page, assert_snapshot: ImageCompareFunc
     wait_for_app_run(app)
 
     # Wait for the chart to update
-    chart_canvas = add_rows_chart.locator("canvas")
+    chart_canvas = add_rows_chart.locator("[role='graphics-document']")
     expect(chart_canvas).to_be_visible()
 
     # Check that the chart has the correct styling params

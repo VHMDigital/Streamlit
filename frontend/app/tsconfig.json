@@ -5,7 +5,10 @@
     "paths": {
       "~lib/*": ["../lib/src/*"],
       "@streamlit/lib": ["../lib/src"],
-      "@streamlit/app": ["./src"]
+      "@streamlit/app": ["./src"],
+      // TODO: #moduleResolutionBundler
+      // We need to change tsconfig.json to use "moduleResolution": "bundler" to properly handle this. When we do that, we can remove this.
+      "vega-embed": ["../node_modules/vega-embed/build/embed.d.ts"]
     }
   },
   "include": ["src/**/*", "../lib/declarations.d.ts", "../lib/emotion.d.ts"]
