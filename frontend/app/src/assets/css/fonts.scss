@@ -134,28 +134,10 @@
 
 @font-face {
   font-family: "Source Serif";
-  font-weight: 400;
+  font-weight: 100 900;
   font-style: regular;
   /* IMPORTANT: Always use a relative path! */
-  src: url("../fonts/Source_Serif/SourceSerif-Regular.ttf.woff2")
-    format("woff2");
-}
-
-@font-face {
-  font-family: "Source Serif";
-  font-weight: 600;
-  font-style: regular;
-  /* IMPORTANT: Always use a relative path! */
-  src: url("../fonts/Source_Serif/SourceSerif-Semibold.ttf.woff2")
-    format("woff2");
-}
-
-@font-face {
-  font-family: "Source Serif";
-  font-weight: 700;
-  font-style: regular;
-  /* IMPORTANT: Always use a relative path! */
-  src: url("../fonts/Source_Serif/SourceSerif-Bold.ttf.woff2")
+  src: url("../fonts/Source_Serif/SourceSerifVariable-Roman.ttf.woff2")
     format("woff2");
 }
 
@@ -163,27 +145,9 @@
 
 @font-face {
   font-family: "Source Serif";
-  font-weight: 400;
+  font-weight: 100 900;
   font-style: italic;
   /* IMPORTANT: Always use a relative path! */
-  src: url("../fonts/Source_Serif/SourceSerif-It.ttf.woff2")
-    format("woff2");
-}
-
-@font-face {
-  font-family: "Source Serif";
-  font-weight: 600;
-  font-style: italic;
-  /* IMPORTANT: Always use a relative path! */
-  src: url("../fonts/Source_Serif/SourceSerif-SemiboldIt.ttf.woff2")
-    format("woff2");
-}
-
-@font-face {
-  font-family: "Source Serif";
-  font-weight: 700;
-  font-style: italic;
-  /* IMPORTANT: Always use a relative path! */
-  src: url("../fonts/Source_Serif/SourceSerif-BoldIt.ttf.woff2")
+  src: url("../fonts/Source_Serif/SourceSerifVariable-Italic.ttf.woff2")
     format("woff2");
 }
