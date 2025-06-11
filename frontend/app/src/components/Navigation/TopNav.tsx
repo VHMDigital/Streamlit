@@ -50,7 +50,11 @@ const TopNav: React.FC<Props> = ({
     return groupBy(appPages, "sectionHeader")
   }, [appPages])
 
-  const data = Object.values(navSections).flat()
+  const hasSections = Object.keys(navSections).length > 1
+
+  const data = hasSections
+    ? Object.values(navSections)
+    : Object.values(navSections).flat()
 
   const itemKey = useCallback((item: IAppPage | IAppPage[]) => {
     return Array.isArray(item)
