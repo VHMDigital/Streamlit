@@ -57,6 +57,8 @@ const pickOption = async (
   // Find the desired option and click on it to select
   const valueElement = screen.getByText(value)
   await user.click(valueElement)
+  // Select outside the widget to close the dropdown
+  await user.click(document.body)
 }
 
 describe("Selectbox widget", () => {
