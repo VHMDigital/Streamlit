@@ -305,6 +305,8 @@ def test_markdown_rendering_performance(app: Page):
 
     app.get_by_text("Run element").click()
     expect(app.get_by_text("DONE")).to_be_attached()
+
+
 def test_markdown_width_examples(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
