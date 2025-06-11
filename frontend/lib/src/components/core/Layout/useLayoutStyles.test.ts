@@ -54,7 +54,7 @@ describe("#useLayoutStyles", () => {
         [0, getDefaultStyles({})],
         [-100, getDefaultStyles({})],
         [NaN, getDefaultStyles({})],
-        [100, getDefaultStyles({ width: 100 })],
+        [100, getDefaultStyles({ width: "100px" })],
       ])("and with a width value of %s, returns %o", (width, expected) => {
         const element = new MockElement()
         const subElement = { width, useContainerWidth }
@@ -128,7 +128,7 @@ describe("#useLayoutStyles", () => {
         [
           new streamlit.WidthConfig({ pixelWidth: 100 }),
           false,
-          getDefaultStyles({ width: 100 }),
+          getDefaultStyles({ width: "100px" }),
         ],
         [
           new streamlit.WidthConfig({ pixelWidth: 100 }),
@@ -153,7 +153,7 @@ describe("#useLayoutStyles", () => {
         [0, false, getDefaultStyles({})],
         [-100, false, getDefaultStyles({})],
         [NaN, false, getDefaultStyles({})],
-        [100, false, getDefaultStyles({ width: 100 })],
+        [100, false, getDefaultStyles({ width: "100px" })],
         [0, true, getDefaultStyles({ width: "100%" })],
         [-100, true, getDefaultStyles({ width: "100%" })],
         [NaN, true, getDefaultStyles({ width: "100%" })],
@@ -219,7 +219,7 @@ describe("#useLayoutStyles", () => {
             width: 100,
           },
           false,
-          getDefaultStyles({ width: 200 }),
+          getDefaultStyles({ width: "200px" }),
         ],
         [
           {
@@ -275,13 +275,13 @@ describe("#useLayoutStyles", () => {
 
     describe("with width defined on subElement but element.widthConfig is null or undefined", () => {
       it.each([
-        [100, false, null, getDefaultStyles({ width: 100 })],
-        [200, false, null, getDefaultStyles({ width: 200 })],
+        [100, false, null, getDefaultStyles({ width: "100px" })],
+        [200, false, null, getDefaultStyles({ width: "200px" })],
         [100, true, null, getDefaultStyles({ width: "100%" })],
         [0, false, null, getDefaultStyles({})],
         [-100, false, null, getDefaultStyles({})],
-        [100, false, undefined, getDefaultStyles({ width: 100 })],
-        [200, false, undefined, getDefaultStyles({ width: 200 })],
+        [100, false, undefined, getDefaultStyles({ width: "100px" })],
+        [200, false, undefined, getDefaultStyles({ width: "200px" })],
         [100, true, undefined, getDefaultStyles({ width: "100%" })],
         [0, false, undefined, getDefaultStyles({})],
         [-100, false, undefined, getDefaultStyles({})],
@@ -317,7 +317,7 @@ describe("#useLayoutStyles", () => {
         ],
         [
           new streamlit.HeightConfig({ pixelHeight: 100 }),
-          getDefaultStyles({ height: 100, overflow: "auto" }),
+          getDefaultStyles({ height: "100px", overflow: "auto" }),
         ],
       ])(
         "and with a heightConfig value of %o, returns %o",
@@ -348,13 +348,21 @@ describe("#useLayoutStyles", () => {
 
     describe("with height defined on subElement but element.heightConfig is null or undefined", () => {
       it.each([
-        [100, null, getDefaultStyles({ height: 100, overflow: "auto" })],
-        [200, null, getDefaultStyles({ height: 200, overflow: "auto" })],
+        [100, null, getDefaultStyles({ height: "100px", overflow: "auto" })],
+        [200, null, getDefaultStyles({ height: "200px", overflow: "auto" })],
         [0, null, getDefaultStyles({})],
         [-100, null, getDefaultStyles({})],
         [NaN, null, getDefaultStyles({})],
-        [100, undefined, getDefaultStyles({ height: 100, overflow: "auto" })],
-        [200, undefined, getDefaultStyles({ height: 200, overflow: "auto" })],
+        [
+          100,
+          undefined,
+          getDefaultStyles({ height: "100px", overflow: "auto" }),
+        ],
+        [
+          200,
+          undefined,
+          getDefaultStyles({ height: "200px", overflow: "auto" }),
+        ],
         [0, undefined, getDefaultStyles({})],
         [-100, undefined, getDefaultStyles({})],
         [NaN, undefined, getDefaultStyles({})],
@@ -383,7 +391,7 @@ describe("#useLayoutStyles", () => {
         [0, getDefaultStyles({})],
         [-100, getDefaultStyles({})],
         [NaN, getDefaultStyles({})],
-        [100, getDefaultStyles({ height: 100, overflow: "auto" })],
+        [100, getDefaultStyles({ height: "100px", overflow: "auto" })],
       ])("and with a height value of %s, returns %o", (height, expected) => {
         const element = new MockElement()
         const subElement = { height }
@@ -442,7 +450,7 @@ describe("#useLayoutStyles", () => {
             heightConfig: new streamlit.HeightConfig({ pixelHeight: 200 }),
             height: 100,
           },
-          getDefaultStyles({ height: 200, overflow: "auto" }),
+          getDefaultStyles({ height: "200px", overflow: "auto" }),
         ],
         [
           {
@@ -488,7 +496,11 @@ describe("#useLayoutStyles", () => {
             widthConfig: new streamlit.WidthConfig({ pixelWidth: 200 }),
             heightConfig: new streamlit.HeightConfig({ pixelHeight: 300 }),
           },
-          getDefaultStyles({ width: 200, height: 300, overflow: "auto" }),
+          getDefaultStyles({
+            width: "200px",
+            height: "300px",
+            overflow: "auto",
+          }),
         ],
         [
           {
@@ -515,15 +527,27 @@ describe("#useLayoutStyles", () => {
       it.each([
         [
           { width: 200, height: 300 },
-          getDefaultStyles({ width: 200, height: 300, overflow: "auto" }),
+          getDefaultStyles({
+            width: "200px",
+            height: "300px",
+            overflow: "auto",
+          }),
         ],
         [
           { width: 0, height: 100 },
-          getDefaultStyles({ width: "auto", height: 100, overflow: "auto" }),
+          getDefaultStyles({
+            width: "auto",
+            height: "100px",
+            overflow: "auto",
+          }),
         ],
         [
           { width: 100, height: 0 },
-          getDefaultStyles({ width: 100, height: "auto" }),
+          getDefaultStyles({
+            width: "100px",
+            height: "auto",
+            overflow: "auto",
+          }),
         ],
       ])(
         "and with subElement props %o, returns %o",
@@ -561,7 +585,7 @@ describe("#useLayoutStyles", () => {
               pixelWidth: 150,
             }),
           },
-          getDefaultStyles({ width: 150, height: "auto" }),
+          getDefaultStyles({ width: "150px", height: "auto" }),
         ],
       ])(
         "and with subElement widthConfig %o, returns %o",

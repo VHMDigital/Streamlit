@@ -193,7 +193,7 @@ export const useLayoutStyles = ({
       height = "auto"
     } else if (heightType === DimensionType.PIXEL) {
       height = `${commandHeight}px`
-      overflow = "visible"
+      overflow = "auto"
     }
 
     const calculated_styles = {
