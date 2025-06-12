@@ -167,11 +167,25 @@ describe("Multiselect widget", () => {
       expect(placeholder).toBeInTheDocument()
     })
 
-    it("renders with empty options when acceptNewOptions is true", () => {
+    it("renders with custom placeholder when options are empty and acceptNewOptions is true", () => {
       const props = getProps({
         default: [],
         options: [],
         acceptNewOptions: true,
+        placeholder: "Custom empty placeholder",
+      })
+      render(<Multiselect {...props} />)
+
+      expect(screen.getByText("Custom empty placeholder")).toBeInTheDocument()
+      expect(screen.getByRole("combobox")).not.toBeDisabled()
+    })
+
+    it("renders with default 'Please select' placeholder when options are empty, acceptNewOptions is true, and no placeholder is provided", () => {
+      const props = getProps({
+        default: [],
+        options: [],
+        acceptNewOptions: true,
+        placeholder: "", // Explicitly set to empty string to test default
       })
       render(<Multiselect {...props} />)
 

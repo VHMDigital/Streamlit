@@ -208,7 +208,11 @@ const Multiselect: FC<Props> = props => {
       // When a user cannot add new options and there are no options to select from, we disable the selectbox
       disabled = true
     } else {
-      placeholder = "Add options"
+      // If acceptNewOptions is true and options are empty, we should respect the provided placeholder.
+      // If no placeholder is provided, then default to "Add options".
+      if (!placeholder) {
+        placeholder = "Add options"
+      }
     }
   }
   const selectOptions: MultiselectOption[] = options.map(
