@@ -466,7 +466,8 @@ class MultiSelectMixin:
         proto.disabled = disabled
         proto.label = label
         proto.max_selections = max_selections or 0
-        proto.placeholder = placeholder
+        if placeholder is not None:
+            proto.placeholder = placeholder
         proto.label_visibility.value = get_label_visibility_proto_value(
             label_visibility
         )
