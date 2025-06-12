@@ -73,7 +73,6 @@ const Header = ({
 
   return (
     <StyledHeader
-      tabIndex={-1} // required for testing
       className="stAppHeader"
       data-testid="stHeader"
       isTransparentBackground={isTransparentBackground}
