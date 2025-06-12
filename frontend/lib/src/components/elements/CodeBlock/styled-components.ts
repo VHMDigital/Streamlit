@@ -26,7 +26,7 @@ const codeLink: CSSObject = {
 
 export const StyledInlineCode = styled.code(({ theme }) => ({
   padding: "0.2em 0.4em",
-  wordWrap: "break-word",
+  overflowWrap: "break-word",
   whiteSpace: "pre-wrap",
   margin: 0,
   borderRadius: theme.radii.md,
@@ -58,8 +58,7 @@ const codeBlockStyle = (
   overflowX: "auto",
   padding: 0,
   whiteSpace: wrapLines ? "pre-wrap" : "pre",
-  wordBreak: wrapLines ? "break-word" : "normal",
-  wordWrap: "normal",
+  overflowWrap: wrapLines ? "break-word" : "normal",
   ...codeLink,
 })
 
