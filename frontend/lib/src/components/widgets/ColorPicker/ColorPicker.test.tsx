@@ -101,19 +101,19 @@ describe("ColorPicker widget", () => {
 
     render(<ColorPicker {...props} />)
 
-    const newColor = "#e91e63"
-    const colorBlock = screen.getByTestId("stColorPickerBlock")
     // Open the color picker
+    const colorBlock = screen.getByTestId("stColorPickerBlock")
     await user.click(colorBlock)
 
-    // Change the color
+    // Clear the color input text field
     const colorInput = screen.getByRole("textbox")
-    // Remove existing color characters (6 backspaces) to leave the #
-    // and then enter the newColor code
-    await user.type(
-      colorInput,
-      `{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}e91e63"`
-    )
+    await user.tripleClick(colorInput)
+    await user.keyboard("{backspace}")
+
+    // Enter the new color in the input field
+    const newColor = "#e91e63"
+    await user.type(colorInput, newColor)
+
     // Close out of the popover
     await user.click(colorBlock)
 
@@ -135,17 +135,17 @@ describe("ColorPicker widget", () => {
 
     render(<ColorPicker {...props} />)
 
-    // Choose a new color
-    const newColor = "#e91e63"
-    const colorBlock = screen.getByTestId("stColorPickerBlock")
     // Open the color picker
+    const colorBlock = screen.getByTestId("stColorPickerBlock")
     await user.click(colorBlock)
 
+    // Clear the color input text field
     const colorInput = screen.getByRole("textbox")
-    // Remove existing color characters (6 backspaces) to leave the #
-    // and then enter the newColor code
     await user.tripleClick(colorInput)
     await user.keyboard("{backspace}")
+
+    // Enter the new color in the input field
+    const newColor = "#e91e63"
     await user.type(colorInput, newColor)
 
     // Close out of the popover
