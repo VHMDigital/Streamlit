@@ -39,6 +39,7 @@ describe("ColorPicker widget", () => {
   it("renders without crashing", () => {
     const props = getProps()
     render(<BaseColorPicker {...props} />)
+
     const colorPicker = screen.getByTestId("stColorPicker")
     expect(colorPicker).toBeInTheDocument()
     expect(colorPicker).toHaveClass("stColorPicker")
