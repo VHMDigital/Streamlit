@@ -27,6 +27,7 @@ export const StyledInputContainer = styled.div(({ theme }) => ({
   borderWidth: theme.sizes.borderWidth,
   borderStyle: "solid",
   borderColor: theme.colors.widgetBorderColor ?? theme.colors.secondaryBg,
+  backgroundColor: theme.colors.transparent,
   transitionDuration: "200ms",
   transitionProperty: "border",
   transitionTimingFunction: "cubic-bezier(0.2, 0.8, 0.4, 1)",
@@ -53,7 +54,6 @@ export const StyledInputControls = styled.div({
 })
 
 export const StyledInputControl = styled.button(({ theme }) => ({
-  margin: theme.spacing.none,
   border: "none",
   height: theme.sizes.full,
   display: "flex",
@@ -61,8 +61,8 @@ export const StyledInputControl = styled.button(({ theme }) => ({
   width: theme.sizes.numberInputControlsWidth,
   justifyContent: "center",
   color: theme.colors.bodyText,
-  transition: "color 300ms, backgroundColor 300ms",
   backgroundColor: theme.colors.secondaryBg,
+  transition: "color 300ms, backgroundColor 300ms",
   "&:hover:enabled, &:focus:enabled": {
     color: theme.colors.white,
     backgroundColor: theme.colors.primary,

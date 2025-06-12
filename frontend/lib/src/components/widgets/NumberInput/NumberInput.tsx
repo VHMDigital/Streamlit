@@ -23,6 +23,7 @@ import React, {
   useState,
 } from "react"
 
+import { ErrorOutline } from "@emotion-icons/material-outlined"
 import { Minus, Plus } from "@emotion-icons/open-iconic"
 import { useTheme } from "@emotion/react"
 import { Input as UIInput } from "baseui/input"
@@ -39,14 +40,18 @@ import {
 import { useFormClearHelper } from "~lib/components/widgets/Form"
 import { Source, WidgetStateManager } from "~lib/WidgetStateManager"
 import TooltipIcon from "~lib/components/shared/TooltipIcon"
-import { Placement } from "~lib/components/shared/Tooltip"
+import Tooltip, { Placement } from "~lib/components/shared/Tooltip"
 import Icon, { DynamicIcon } from "~lib/components/shared/Icon"
+import {
+  convertRemToPx,
+  EmotionTheme,
+  hasLightBackgroundColor,
+} from "~lib/theme"
 import InputInstructions from "~lib/components/shared/InputInstructions/InputInstructions"
 import {
   StyledWidgetLabelHelp,
   WidgetLabel,
 } from "~lib/components/widgets/BaseWidget"
-import { convertRemToPx, EmotionTheme } from "~lib/theme"
 import { useCalculatedWidth } from "~lib/hooks/useCalculatedWidth"
 
 import {
@@ -101,6 +106,21 @@ const NumberInput: React.FC<Props> = ({
   const [isFocused, setIsFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
   const id = useRef(uniqueId("number_input_"))
+  const [error, setError] = useState<"BelowMin" | "AboveMax" | null>(null)
+
+  useEffect(() => {
+    if (value !== null) {
+      if (value < min) {
+        setError("BelowMin")
+      } else if (value > max) {
+        setError("AboveMax")
+      } else {
+        setError(null)
+      }
+    } else {
+      setError(null)
+    }
+  }, [value, min, max])
 
   const canDec = canDecrement(value, step, min)
   const canInc = canIncrement(value, step, max)
@@ -120,17 +140,11 @@ const NumberInput: React.FC<Props> = ({
   }, [element.dataType, element.step])
 
   const commitValue = useCallback(
-    ({
-      value: valueArg,
-      source,
-    }: {
-      value: number | null
-      source: Source
-    }) => {
-      if (notNullOrUndefined(valueArg) && (min > valueArg || valueArg > max)) {
-        inputRef.current?.reportValidity()
+    ({ value, source }: { value: number | null; source: Source }) => {
+      if (notNullOrUndefined(value) && (min > value || value > max)) {
+        setError(value < min ? "BelowMin" : "AboveMax")
       } else {
-        const newValue = valueArg ?? elementDefault ?? null
+        const newValue = value ?? elementDefault ?? null
 
         switch (elementDataType) {
           case NumberInputProto.DataType.INT:
@@ -163,12 +177,12 @@ const NumberInput: React.FC<Props> = ({
             step,
           })
         )
+        setError(null)
       }
     },
     [
       min,
       max,
-      inputRef,
       widgetMgr,
       fragmentId,
       step,
@@ -360,9 +374,13 @@ const NumberInput: React.FC<Props> = ({
           </StyledWidgetLabelHelp>
         )}
       </WidgetLabel>
+
       <StyledInputContainer
         className={isFocused ? "focused" : ""}
         data-testid="stNumberInputContainer"
+        style={{
+          ...(error && { backgroundColor: theme.colors.dangerBg }), // Light red background when error
+        }}
       >
         <UIInput
           type="number"
@@ -388,6 +406,7 @@ const NumberInput: React.FC<Props> = ({
             )
           }
           id={id.current}
+          error={!!error}
           overrides={{
             ClearIconContainer: {
               style: {
@@ -431,12 +450,21 @@ const NumberInput: React.FC<Props> = ({
                 paddingLeft: theme.spacing.md,
                 paddingBottom: theme.spacing.sm,
                 paddingTop: theme.spacing.sm,
+                ...(error && {
+                  //backgroundColor: theme.colors.dangerBg, // Light red background when error
+                  color: hasLightBackgroundColor(theme) // font color according to background
+                    ? theme.colors.red100
+                    : theme.colors.red20,
+                }),
               },
             },
             InputContainer: {
               style: () => ({
                 borderTopRightRadius: 0,
                 borderBottomRightRadius: 0,
+                ...(error && {
+                  backgroundColor: theme.colors.transparent, // Light red background when error
+                }),
               }),
             },
             Root: {
@@ -452,6 +480,9 @@ const NumberInput: React.FC<Props> = ({
                 borderBottomWidth: 0,
                 paddingRight: 0,
                 paddingLeft: icon ? theme.spacing.sm : 0,
+                ...(error && {
+                  backgroundColor: theme.colors.transparent, // so the red background color can be seen
+                }),
               },
             },
             StartEnhancer: {
@@ -462,9 +493,48 @@ const NumberInput: React.FC<Props> = ({
                 minWidth: theme.iconSizes.lg,
                 // Material icons color changed as inactionable
                 color: isMaterialIcon ? theme.colors.fadedText60 : "inherit",
+                backgroundColor: theme.colors.transparent, // so the red background color can be seen
+              },
+            },
+            // Tooltip icon space
+            EndEnhancer: {
+              style: {
+                color: hasLightBackgroundColor(theme) // font color according to background
+                  ? theme.colors.red100
+                  : theme.colors.red20,
+                backgroundColor: theme.colors.transparent, // so the red background color can be seen
               },
             },
           }}
+          // Tooltip icon for error message
+          endEnhancer={
+            error && (
+              <Tooltip
+                content={
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span>
+                      <strong style={{ fontWeight: theme.fontWeights.bold }}>
+                        Error
+                      </strong>
+                      :{" "}
+                      {error === "BelowMin"
+                        ? `Value must be greater than or equal to ${min}.`
+                        : `Value must be lower than or equal to ${max}.`}
+                    </span>
+                  </div>
+                }
+                placement={Placement.TOP_RIGHT}
+                error
+              >
+                <Icon content={ErrorOutline} size="lg" />
+              </Tooltip>
+            )
+          }
         />
         {/* We only want to show the increment/decrement controls when there is sufficient room to display the value and these controls. */}
         {width > numberInputControlBreakpoint && (
@@ -474,6 +544,9 @@ const NumberInput: React.FC<Props> = ({
               onClick={decrement}
               disabled={!canDec || disabled}
               tabIndex={-1}
+              style={{
+                ...(error && { backgroundColor: theme.colors.transparent }), // so the red background color can be seen
+              }}
             >
               <Icon
                 content={Minus}
@@ -486,6 +559,9 @@ const NumberInput: React.FC<Props> = ({
               onClick={increment}
               disabled={!canInc || disabled}
               tabIndex={-1}
+              style={{
+                ...(error && { backgroundColor: theme.colors.transparent }), // so the red background color can be seen
+              }}
             >
               <Icon
                 content={Plus}
@@ -496,16 +572,17 @@ const NumberInput: React.FC<Props> = ({
           </StyledInputControls>
         )}
       </StyledInputContainer>
-      {shouldShowInstructions && (
-        <StyledInstructionsContainer clearable={clearable}>
-          <InputInstructions
-            dirty={dirty}
-            value={formattedValue ?? ""}
-            inForm={inForm}
-            allowEnterToSubmit={allowEnterToSubmit}
-          />
-        </StyledInstructionsContainer>
-      )}
+      {!error &&
+        shouldShowInstructions && ( // Show instructions only when focused and width is sufficient and no error
+          <StyledInstructionsContainer clearable={clearable}>
+            <InputInstructions
+              dirty={dirty}
+              value={formattedValue ?? ""}
+              inForm={inForm}
+              allowEnterToSubmit={allowEnterToSubmit}
+            />
+          </StyledInstructionsContainer>
+        )}
     </div>
   )
 }
