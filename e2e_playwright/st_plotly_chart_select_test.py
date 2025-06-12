@@ -27,7 +27,7 @@ def _check_toolbar_visibility(chart_element: Locator):
     """Check that the toolbar is visible."""
 
     fullscreen_button = chart_element.locator(
-        ".modebar-group::has([data-title='Fullscreen'])"
+        ".modebar-group:has([data-title='Fullscreen'])"
     )
     expect(fullscreen_button).to_be_visible()
     expect(fullscreen_button).to_have_css("opacity", "0")
