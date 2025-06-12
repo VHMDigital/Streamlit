@@ -57,8 +57,8 @@ const codeBlockStyle = (
   margin: 0,
   overflowX: "auto",
   padding: 0,
-  whiteSpace: wrapLines ? "pre-wrap" : undefined,
-  wordBreak: wrapLines ? "break-word" : undefined,
+  whiteSpace: wrapLines ? "pre-wrap" : "pre",
+  wordBreak: wrapLines ? "break-word" : "normal",
   wordWrap: "normal",
   ...codeLink,
 })
