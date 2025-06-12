@@ -138,6 +138,7 @@ describe("Sidebar Component", () => {
         initialSidebarState: PageConfig.SidebarState.EXPANDED,
       })
     )
+    const user = userEvent.setup()
     renderSidebar({
       isCollapsed: false,
       onToggleCollapse: mockOnToggleCollapse,
@@ -148,12 +149,14 @@ describe("Sidebar Component", () => {
       "true"
     )
 
+    // Hover over the sidebar header so the collapse button is visible
+    await user.hover(screen.getByTestId("stSidebarHeader"))
+
     // Click the close sidebar <
-    await userEvent.hover(screen.getByTestId("stSidebarHeader"))
     const sidebarCollapseButton = within(
       screen.getByTestId("stSidebarCollapseButton")
     ).getByRole("button")
-    await userEvent.click(sidebarCollapseButton)
+    await user.click(sidebarCollapseButton)
 
     expect(mockOnToggleCollapse).toHaveBeenCalledWith(true)
   })
@@ -165,6 +168,7 @@ describe("Sidebar Component", () => {
         initialSidebarState: PageConfig.SidebarState.COLLAPSED,
       })
     )
+    const user = userEvent.setup()
     renderSidebar({
       isCollapsed: true,
       onToggleCollapse: mockOnToggleCollapse,
@@ -181,12 +185,13 @@ describe("Sidebar Component", () => {
     const collapseButton = within(
       screen.getByTestId("stSidebarCollapseButton")
     ).getByRole("button")
-    await userEvent.click(collapseButton)
+    await user.click(collapseButton)
 
     expect(mockOnToggleCollapse).toHaveBeenCalledWith(false)
   })
 
   it("shows/hides the collapse arrow when hovering over top of sidebar", async () => {
+    const user = userEvent.setup()
     // Update the mock to return a context with appPages
     vi.spyOn(StreamlitContextProviderModule, "useAppContext").mockReturnValue(
       getContextOutput({
@@ -204,8 +209,8 @@ describe("Sidebar Component", () => {
       "display: none"
     )
 
-    // Hover over the sidebar header
-    await userEvent.hover(screen.getByTestId("stSidebarHeader"))
+    // Hover over the sidebar header so the collapse button is visible
+    await user.hover(screen.getByTestId("stSidebarHeader"))
 
     // Displays the collapse <
     expect(screen.getByTestId("stSidebarCollapseButton")).toHaveStyle(
@@ -481,6 +486,8 @@ describe("Sidebar Component", () => {
       ).getByTestId("stSidebarLogo")
       expect(sidebarLogo).toBeInTheDocument()
 
+      // Trigger the onerror event for the logo
+      // need lower level fireEvent here
       fireEvent.error(sidebarLogo)
 
       expect(sendClientErrorToHost).toHaveBeenCalledWith(
