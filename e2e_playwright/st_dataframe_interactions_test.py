@@ -48,6 +48,8 @@ def test_dataframe_toolbar_on_hover(
     """Test that the toolbar is shown when hovering over a dataframe."""
     dataframe_element = themed_app.get_by_test_id("stDataFrame").nth(0)
     expect(dataframe_element).to_be_visible()
+    dataframe_element.scroll_into_view_if_needed()
+
     dataframe_toolbar = dataframe_element.get_by_test_id("stElementToolbar")
     expect(dataframe_toolbar).to_be_attached()
 
@@ -55,7 +57,7 @@ def test_dataframe_toolbar_on_hover(
     expect(dataframe_toolbar).to_have_css("opacity", "0")
 
     # Hover over dataframe
-    dataframe_element.scroll_into_view_if_needed()
+
     dataframe_element.hover()
 
     # Check that it is visible
