@@ -643,6 +643,7 @@ const RawElementNodeRenderer = (
         <TextArea
           key={textAreaProto.id}
           element={textAreaProto}
+          outerElement={node.element}
           {...widgetProps}
         />
       )

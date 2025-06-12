@@ -20,7 +20,7 @@ import { Textarea as UITextArea } from "baseui/textarea"
 import { useTheme } from "@emotion/react"
 import uniqueId from "lodash/uniqueId"
 
-import { TextArea as TextAreaProto } from "@streamlit/protobuf"
+import { Element, TextArea as TextAreaProto } from "@streamlit/protobuf"
 
 import { WidgetStateManager } from "~lib/WidgetStateManager"
 import useUpdateUiValue from "~lib/hooks/useUpdateUiValue"
@@ -40,12 +40,18 @@ import {
   ValueWithSource,
 } from "~lib/hooks/useBasicWidgetState"
 import { useCalculatedWidth } from "~lib/hooks/useCalculatedWidth"
+import { useTextInputAutoExpand } from "~lib/hooks/useTextInputAutoExpand"
+import { useLayoutStyles } from "~lib/components/core/Layout/useLayoutStyles"
+
+import { StyledTextAreaContainer } from "./styled-components"
 
 export interface Props {
   disabled: boolean
   element: TextAreaProto
   widgetMgr: WidgetStateManager
   fragmentId?: string
+  // needed for height
+  outerElement: Element
 }
 
 type TextAreaValue = string | null
@@ -79,7 +85,13 @@ const updateWidgetMgrState = (
   )
 }
 
-const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
+const TextArea: FC<Props> = ({
+  disabled,
+  element,
+  widgetMgr,
+  fragmentId,
+  outerElement,
+}) => {
   const id = useRef(uniqueId("text_area_")).current
 
   const [width, elementRef] = useCalculatedWidth()
@@ -92,6 +104,16 @@ const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
    * Whether the area is currently focused.
    */
   const [focused, setFocused] = useState(false)
+
+  const styles = useLayoutStyles({
+    element: outerElement,
+  })
+
+  // Determine if we should use auto-expansion
+  const isAutoHeight = outerElement.heightConfig?.useContent ?? false
+
+  // Create ref for auto-expansion
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   /**
    * The value specified by the user via the UI. If the user didn't touch this
@@ -124,6 +146,11 @@ const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
 
   const theme: EmotionTheme = useTheme()
 
+  const autoExpand = useTextInputAutoExpand({
+    textareaRef,
+    dependencies: [element.placeholder],
+  })
+
   const commitWidgetValue = useCallback((): void => {
     setDirty(false)
     setValueWithSource({ value: uiValue, fromUi: true })
@@ -146,6 +173,7 @@ const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
     setDirty,
     setUiValue,
     setValueWithSource,
+    additionalActions: isAutoHeight ? [autoExpand.updateScrollHeight] : [],
   })
 
   const onKeyDown = useSubmitFormViaEnterKey(
@@ -157,7 +185,7 @@ const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
     true
   )
 
-  const { height, placeholder, formId } = element
+  const { placeholder, formId } = element
 
   // Show "Please enter" instructions if in a form & allowed, or not in form and state is dirty.
   const allowEnterToSubmit = isInForm({ formId })
@@ -169,7 +197,11 @@ const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
     focused && width > theme.breakpoints.hideWidgetDetails
 
   return (
-    <div className="stTextArea" data-testid="stTextArea" ref={elementRef}>
+    <StyledTextAreaContainer
+      className="stTextArea"
+      data-testid="stTextArea"
+      ref={elementRef}
+    >
       <WidgetLabel
         label={element.label}
         disabled={disabled}
@@ -187,7 +219,9 @@ const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
           </StyledWidgetLabelHelp>
         )}
       </WidgetLabel>
+
       <UITextArea
+        inputRef={isAutoHeight ? textareaRef : undefined}
         value={uiValue ?? ""}
         placeholder={placeholder}
         onBlur={onBlur}
@@ -201,9 +235,9 @@ const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
           Input: {
             style: {
               lineHeight: theme.lineHeights.inputWidget,
-
               // The default height of the text area is calculated to perfectly fit 3 lines of text.
-              height: height ? `${height}px` : "",
+              height: isAutoHeight ? autoExpand.height : "",
+              maxHeight: isAutoHeight ? autoExpand.maxHeight : "",
               minHeight: theme.sizes.largestElementHeight,
               resize: "vertical",
               "::placeholder": {
@@ -226,10 +260,13 @@ const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
               borderRightWidth: theme.sizes.borderWidth,
               borderTopWidth: theme.sizes.borderWidth,
               borderBottomWidth: theme.sizes.borderWidth,
+              height: styles.height,
+              maxHeight: "100%",
             },
           },
         }}
       />
+
       {shouldShowInstructions && (
         <InputInstructions
           dirty={dirty}
@@ -240,7 +277,7 @@ const TextArea: FC<Props> = ({ disabled, element, widgetMgr, fragmentId }) => {
           allowEnterToSubmit={allowEnterToSubmit}
         />
       )}
-    </div>
+    </StyledTextAreaContainer>
   )
 }
 
