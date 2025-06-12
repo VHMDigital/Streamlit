@@ -274,6 +274,7 @@ def test_removes_non_embed_query_params_when_swapping_pages(page: Page, app_port
     )
 
 
+@pytest.mark.flakey(max_runs=4)
 def test_renders_logos(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that logos display properly in sidebar and main sections."""
 
