@@ -183,7 +183,6 @@ def test_match_snapshot_for_columns_with_elements_above(
     assert_snapshot(container, name="st_markdown-headers_in_labeled_columns")
 
 
-@pytest.mark.flakey(max_runs=4)
 def test_match_snapshot_for_column_beside_widget(
     app: Page, assert_snapshot: ImageCompareFunction
 ):
