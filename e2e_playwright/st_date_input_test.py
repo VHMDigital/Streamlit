@@ -269,7 +269,10 @@ def test_resets_to_default_single_value_if_calendar_closed_empty(app: Page):
     date_input_field.focus()
     date_input_field.clear()
 
-    date_input_field.blur()
+    # Click on the large markdown element at the end to submit the cleared value
+    app.get_by_text(
+        "This is a block of text. We can click on it to trigger a click outside of the element to submit the value."
+    ).click()
 
     # Value should be reset to default
     expect(app.get_by_test_id("stMarkdown").first).to_have_text(
@@ -306,7 +309,10 @@ def test_range_is_empty_if_calendar_closed_empty(app: Page):
     date_input_field.focus()
     date_input_field.clear()
 
-    date_input_field.blur()
+    # Click on the large markdown element at the end to submit the cleared value
+    app.get_by_text(
+        "This is a block of text. We can click on it to trigger a click outside of the element to submit the value."
+    ).click()
 
     # Range should be empty
     expect(app.get_by_test_id("stMarkdown").nth(4)).to_have_text(
