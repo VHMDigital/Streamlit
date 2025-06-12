@@ -216,7 +216,6 @@ export const StyledIFrameResizerAnchor = styled.div(({ theme }) => ({
 }))
 
 export const StyledMainContent = styled.div({
-  position: "relative",
   width: "100%",
   height: "100vh",
   display: "flex",
