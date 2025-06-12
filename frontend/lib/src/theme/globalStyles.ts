@@ -216,6 +216,7 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
       background: transparent;
       border-radius: 100px;
       width: 6px;
+      height: 6px;
     }
 
     ::-webkit-scrollbar-thumb:vertical,
