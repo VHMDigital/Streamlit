@@ -988,7 +988,7 @@ def _populate_theme_msg(msg: CustomThemeConfig, section: str = "theme") -> None:
         for font_face in font_faces:
             try:
                 if "weight" in font_face:
-                    font_face["string_weight"] = str(font_face["weight"])
+                    font_face["weight_range"] = str(font_face["weight"])
                     del font_face["weight"]
                 msg.font_faces.append(ParseDict(font_face, FontFace()))
             except Exception as e:  # noqa: PERF203

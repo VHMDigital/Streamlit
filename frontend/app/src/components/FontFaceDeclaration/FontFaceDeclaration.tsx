@@ -27,8 +27,10 @@ const FontFaceDeclaration = ({
 }: FontFaceDeclarationProps): ReactElement => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
   const fontMarkup = fontFaces.map((font: any) => {
-    const { family, weight, stringWeight, url, style, unicodeRange } = font
-    const resolvedWeight = weight || stringWeight
+    const { family, weight, weightRange, url, style, unicodeRange } = font
+    // weight is deprecated in favour of weightRange, but we support it for
+    // backwards compatibility.
+    const resolvedWeight = weightRange || weight
     return `
       @font-face {
         font-family: ${family};

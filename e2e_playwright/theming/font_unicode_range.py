@@ -15,32 +15,25 @@
 
 import streamlit as st
 
+st.set_page_config(initial_sidebar_state="expanded")
 
-def run_font_unicode_range_test():
-    st.set_page_config(initial_sidebar_state="expanded")
+st.header("Tagesschrift Font Test")
 
-    st.header("Tagesschrift Font Test")
+# Test basic latin characters
+with st.container(key="basic_latin_container"):
+    st.markdown("These are basic latin characters in Tagesschrift")
 
-    # Test basic latin characters
-    with st.container(key="basic_latin_container"):
-        st.markdown("These are basic latin characters in Tagesschrift")
+# Test extended latin characters
+with st.container(key="extended_latin_container"):
+    st.markdown("ĀāĂăĄąĆćĊċČč")
 
-    # Test extended latin characters
-    with st.container(key="extended_latin_container"):
-        st.markdown("ĀāĂăĄąĆćĊċČč")
+# Test mixed formatting
+with st.container(key="mixed_latin_container"):
+    st.markdown("This conŧāins basic and exŧendeđ lăŧin chąřacters in ŤĄĠĖŞŠČĦŘİŤ")
 
-    # Test mixed formatting
-    with st.container(key="mixed_latin_container"):
-        st.markdown("This conŧāins basic and exŧendeđ lăŧin chąřacters in ŤĄĠĖŞŠČĦŘİŤ")
-
-    # Test Chirmera font with numbers and letters from different files
-    with st.sidebar:
-        st.markdown("This is normal text with numbers 0123456789.")
-        st.markdown("*This is italic text with numbers 0123456789.*")
-        st.markdown("**This is bold text with numbers 0123456789.**")
-        st.markdown("***This is bold-italic text with numbers 0123456789.***")
-
-
-# Run the app when this file is run directly
-if __name__ == "__main__":
-    run_font_unicode_range_test()
+# Test Chirmera font with numbers and letters from different files
+with st.sidebar:
+    st.markdown("This is normal text with numbers 0123456789.")
+    st.markdown("*This is italic text with numbers 0123456789.*")
+    st.markdown("**This is bold text with numbers 0123456789.**")
+    st.markdown("***This is bold-italic text with numbers 0123456789.***")
