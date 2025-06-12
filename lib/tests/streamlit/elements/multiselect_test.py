@@ -144,7 +144,8 @@ class Multiselectbox(DeltaGeneratorTestCase):
         assert c.label == "the label"
         assert c.default[:] == expected
         assert c.options == ["Coffee", "Tea", "Water"]
-        assert c.placeholder == "Choose an option"
+        # Default placeholders are now handled on the frontend side
+        # Backend only passes through custom user-provided placeholders
 
     @parameterized.expand(
         [
