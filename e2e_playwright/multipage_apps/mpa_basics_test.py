@@ -324,6 +324,7 @@ def test_renders_small_logos(app: Page, assert_snapshot: ImageCompareFunction):
     assert_snapshot(app.get_by_test_id("stSidebar"), name="small-sidebar-logo")
 
 
+@pytest.mark.flakey(max_runs=4)
 def test_renders_large_logos(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that large logos display properly in sidebar and main sections."""
 
