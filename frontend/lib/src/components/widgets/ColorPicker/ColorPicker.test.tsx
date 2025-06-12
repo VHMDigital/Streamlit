@@ -144,10 +144,10 @@ describe("ColorPicker widget", () => {
     const colorInput = screen.getByRole("textbox")
     // Remove existing color characters (6 backspaces) to leave the #
     // and then enter the newColor code
-    await user.type(
-      colorInput,
-      `{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}e91e63"`
-    )
+    await user.tripleClick(colorInput)
+    await user.keyboard("{backspace}")
+    await user.type(colorInput, newColor)
+
     // Close out of the popover
     await user.click(colorBlock)
 
