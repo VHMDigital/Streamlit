@@ -31,3 +31,4 @@ def test_dataframe_pd_styler(themed_app: Page, assert_snapshot: ImageCompareFunc
     assert_snapshot(elements.nth(3), name="st_dataframe-styler_gradient")
     assert_snapshot(elements.nth(4), name="st_dataframe-styler_link_display_value")
     assert_snapshot(elements.nth(5), name="st_dataframe-column_config_over_styler")
+    assert_snapshot(elements.nth(6), name="st_dataframe-styler_text_color")
