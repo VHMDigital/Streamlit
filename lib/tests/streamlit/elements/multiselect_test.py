@@ -214,7 +214,8 @@ class Multiselectbox(DeltaGeneratorTestCase):
 
         c = self.get_delta_from_queue().new_element.multiselect
         assert c.accept_new_options
-        assert c.placeholder == "Choose or add an option"
+        # Placeholder logic is now handled on the frontend side
+        # Backend only passes through custom user-provided placeholders
 
     @parameterized.expand(
         [

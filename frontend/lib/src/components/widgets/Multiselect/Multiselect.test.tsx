@@ -160,7 +160,11 @@ describe("Multiselect widget", () => {
     })
 
     it("renders with empty options", () => {
-      const props = getProps({ default: [], options: [] })
+      const props = getProps({
+        default: [],
+        options: [],
+        placeholder: undefined, // No placeholder provided to test default logic
+      })
       render(<Multiselect {...props} />)
 
       const placeholder = screen.getByText("No options to select")
@@ -180,17 +184,41 @@ describe("Multiselect widget", () => {
       expect(screen.getByRole("combobox")).not.toBeDisabled()
     })
 
-    it("renders with default placeholder when options are empty, acceptNewOptions is true, and no placeholder is provided", () => {
+    it("renders with default placeholder when options are empty, acceptNewOptions is true, and backend default placeholder is provided", () => {
       const props = getProps({
         default: [],
         options: [],
         acceptNewOptions: true,
-        placeholder: "", // Explicitly set to empty string to test default
+        placeholder: undefined, // No placeholder provided to test default logic
       })
       render(<Multiselect {...props} />)
 
       expect(screen.getByText("Add options")).toBeInTheDocument()
       expect(screen.getByRole("combobox")).not.toBeDisabled()
+    })
+
+    it("renders with appropriate default placeholder when options are available", () => {
+      const props = getProps({
+        default: [],
+        options: ["a", "b", "c"],
+        acceptNewOptions: false,
+        placeholder: undefined, // No placeholder provided to test default logic
+      })
+      render(<Multiselect {...props} />)
+
+      expect(screen.getByText("Choose an option")).toBeInTheDocument()
+    })
+
+    it("renders with appropriate default placeholder when options are available and acceptNewOptions is true", () => {
+      const props = getProps({
+        default: [],
+        options: ["a", "b", "c"],
+        acceptNewOptions: true,
+        placeholder: undefined, // No placeholder provided to test default logic
+      })
+      render(<Multiselect {...props} />)
+
+      expect(screen.getByText("Choose or add an option")).toBeInTheDocument()
     })
   })
 

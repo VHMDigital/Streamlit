@@ -202,15 +202,22 @@ const Multiselect: FC<Props> = props => {
   const { options } = element
   let disabled = props.disabled
   let placeholder = element.placeholder
-  if (options.length === 0) {
-    if (!element.acceptNewOptions) {
-      placeholder = "No options to select"
-      // When a user cannot add new options and there are no options to select from, we disable the selectbox
-      disabled = true
-    } else if (!placeholder) {
-      // If acceptNewOptions is true and options are empty, we should respect the provided placeholder.
-      // If no placeholder is provided, then default to "Add options".
-      placeholder = "Add options"
+
+  // If no custom placeholder provided, determine appropriate default based on widget state
+  if (!placeholder) {
+    if (options.length === 0) {
+      if (!element.acceptNewOptions) {
+        placeholder = "No options to select"
+        // When a user cannot add new options and there are no options to select from, we disable the selectbox
+        disabled = true
+      } else {
+        placeholder = "Add options"
+      }
+    } else {
+      // For non-empty options, set appropriate default placeholder
+      placeholder = element.acceptNewOptions
+        ? "Choose or add an option"
+        : "Choose an option"
     }
   }
   const selectOptions: MultiselectOption[] = options.map(

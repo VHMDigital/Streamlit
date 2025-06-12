@@ -343,14 +343,17 @@ class SelectboxMixin:
             An optional dict of kwargs to pass to the callback.
 
         placeholder : str or None
-            A string to display when no options are selected.
-            If this is ``None`` (default), the widget displays one of the two
-            following placeholder strings:
+            A string to display when no option is selected. If this is
+            ``None`` (default), the widget displays appropriate default
+            placeholder text based on the widget's configuration:
 
-            - "Choose an option" is displayed if you set
-              ``accept_new_options=False``.
+            - "Choose an option" is displayed for standard selectbox widgets.
             - "Choose or add an option" is displayed if you set
               ``accept_new_options=True``.
+            - "Add an option" is displayed when no options are available and
+              ``accept_new_options=True``.
+            - "No options to select" is displayed when no options are available
+              and ``accept_new_options=False``.
 
         disabled : bool
             An optional boolean that disables the selectbox if set to ``True``.
@@ -506,12 +509,9 @@ class SelectboxMixin:
                 "and less than the length of options."
             )
 
-        if placeholder is None:
-            placeholder = (
-                "Choose an option"
-                if not accept_new_options
-                else "Choose or add an option"
-            )
+        # Default placeholders are now handled on the frontend side
+        # Only pass through custom user-provided placeholders
+        # This improves internationalization and consistency
 
         formatted_options, formatted_option_to_option_index = create_mappings(
             opt, format_func
