@@ -172,7 +172,7 @@ export default tseslint.config([
           selector: "CallExpression[callee.name='withTheme']",
           message:
             "The use of withTheme HOC is not allowed for functional components. " +
-            "Please use the useTheme hook instead.",
+            "Please use the useEmotionTheme hook instead.",
         },
       ],
       "no-restricted-globals": [

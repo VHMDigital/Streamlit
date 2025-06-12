@@ -31,9 +31,10 @@ import { type Element, type Root } from "hast"
 import xxhash from "xxhashjs"
 import slugify from "@sindresorhus/slugify"
 import { visit } from "unist-util-visit"
-import { useTheme } from "@emotion/react"
-import ReactMarkdown from "react-markdown"
-import { Components, Options as ReactMarkdownProps } from "react-markdown"
+import ReactMarkdown, {
+  Components,
+  Options as ReactMarkdownProps,
+} from "react-markdown"
 import { PluggableList } from "unified"
 import once from "lodash/once"
 import omit from "lodash/omit"
@@ -52,7 +53,6 @@ import IsDialogContext from "~lib/components/core/IsDialogContext"
 import IsSidebarContext from "~lib/components/core/IsSidebarContext"
 import ErrorBoundary from "~lib/components/shared/ErrorBoundary"
 import { InlineTooltipIcon } from "~lib/components/shared/TooltipIcon"
-import { useEmotionTheme } from "~lib/hooks/useEmotionTheme"
 import {
   convertRemToPx,
   EmotionTheme,
@@ -60,6 +60,7 @@ import {
   getMarkdownTextColors,
 } from "~lib/theme"
 import streamlitLogo from "~lib/assets/img/streamlit-logo/streamlit-mark-color.svg"
+import { useEmotionTheme } from "~lib/hooks/useEmotionTheme"
 
 import {
   StyledHeadingActionElements,
@@ -343,7 +344,7 @@ export const CustomCodeTag: FC<CustomCodeTagProps> = ({
   ...props
 }) => {
   const match = /language-(\w+)/.exec(className || "")
-  // eslint-disable-next-line @typescript-eslint/no-base-to-string
+
   const codeText = String(children).replace(/^\n/, "").replace(/\n$/, "")
 
   const language = (match && match[1]) || ""
@@ -729,10 +730,15 @@ export const RenderedMarkdown = memo(function RenderedMarkdown({
     [theme, colorMapping]
   )
 
-  const rehypePlugins: PluggableList = useMemo(
-    () => (allowHTML ? [rehypeKatex, rehypeRaw] : [rehypeKatex]),
-    [allowHTML]
-  )
+  const rehypePlugins = useMemo<PluggableList>(() => {
+    const plugins: PluggableList = [rehypeSetCodeInlineProperty, rehypeKatex]
+
+    if (allowHTML) {
+      plugins.push(rehypeRaw)
+    }
+
+    return plugins
+  }, [allowHTML])
 
   const renderers = useMemo(
     () =>
