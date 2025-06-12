@@ -15,32 +15,27 @@
  */
 
 import React, {
-  createElement,
   CSSProperties,
-  FC,
-  FunctionComponent,
-  HTMLProps,
+  type FC,
+  type HTMLProps,
   memo,
-  PropsWithChildren,
-  ReactElement,
-  ReactNode,
+  type ReactElement,
+  type ReactNode,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react"
 
+import { type Element, type Root } from "hast"
 import xxhash from "xxhashjs"
 import slugify from "@sindresorhus/slugify"
 import { visit } from "unist-util-visit"
-import { useTheme } from "@emotion/react"
-import ReactMarkdown from "react-markdown"
-import { PluggableList } from "react-markdown/lib/react-markdown"
-import {
+import ReactMarkdown, {
   Components,
-  ReactMarkdownProps,
-} from "react-markdown/lib/ast-to-react"
+  Options as ReactMarkdownProps,
+} from "react-markdown"
+import { PluggableList } from "unified"
 import once from "lodash/once"
 import omit from "lodash/omit"
 import remarkDirective from "remark-directive"
@@ -64,8 +59,8 @@ import {
   getMarkdownBgColors,
   getMarkdownTextColors,
 } from "~lib/theme"
-import { LibContext } from "~lib/components/core/LibContext"
 import streamlitLogo from "~lib/assets/img/streamlit-logo/streamlit-mark-color.svg"
+import { useEmotionTheme } from "~lib/hooks/useEmotionTheme"
 
 import {
   StyledHeadingActionElements,
@@ -124,6 +119,27 @@ export interface Props {
 }
 
 /**
+ * A rehype plugin to add an `inline` property to code blocks.
+ * This is used to distinguish between inline code and code blocks.
+ * It is needed for versions of react-markdown from v9 onwards.
+ */
+function rehypeSetCodeInlineProperty() {
+  return (tree: Root) => {
+    visit(tree, "element", (node: Element, _index, parent) => {
+      if (node.tagName !== "code") {
+        return
+      }
+
+      if (parent && parent.type === "element" && parent.tagName === "pre") {
+        node.properties = { ...node.properties, inline: false }
+      } else {
+        node.properties = { ...node.properties, inline: true }
+      }
+    })
+  }
+}
+
+/**
  * Creates a URL-friendly anchor ID from a text string.
  *
  * @param text {string | null} - The text to convert into an anchor ID. Can be null.
@@ -174,12 +190,12 @@ interface HeadingActionElements {
   hideAnchor?: boolean
 }
 
-const HeaderActionElements: FunctionComponent<HeadingActionElements> = ({
+const HeaderActionElements: FC<HeadingActionElements> = ({
   elementId,
   help,
   hideAnchor,
 }) => {
-  const theme: EmotionTheme = useTheme()
+  const theme = useEmotionTheme()
   if (!help && hideAnchor) {
     return <></>
   }
@@ -206,35 +222,20 @@ interface HeadingWithActionElementsProps {
   help?: string
 }
 
-export const HeadingWithActionElements: FunctionComponent<
-  PropsWithChildren<HeadingWithActionElementsProps>
-> = ({ tag, anchor: propsAnchor, help, hideAnchor, children, tagProps }) => {
+export const HeadingWithActionElements: FC<HeadingWithActionElementsProps> = ({
+  tag,
+  anchor: propsAnchor,
+  help,
+  hideAnchor,
+  children,
+  tagProps,
+}) => {
   const isInSidebar = useContext(IsSidebarContext)
   const isInDialog = useContext(IsDialogContext)
   const [elementId, setElementId] = useState(propsAnchor)
-  const [target, setTarget] = useState<HTMLElement | null>(null)
-
-  const { addScriptFinishedHandler, removeScriptFinishedHandler } =
-    useContext(LibContext)
-  const onScriptFinished = useCallback(() => {
-    if (target !== null) {
-      // wait a bit for everything on page to finish loading
-      window.setTimeout(() => {
-        scrollNodeIntoView(target)
-      }, 300)
-    }
-  }, [target])
-
-  useEffect(() => {
-    addScriptFinishedHandler(onScriptFinished)
-    return () => {
-      removeScriptFinishedHandler(onScriptFinished)
-    }
-  }, [addScriptFinishedHandler, removeScriptFinishedHandler, onScriptFinished])
 
   const ref = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
-    (node: any) => {
+    (node: HTMLElement | null) => {
       if (node === null) {
         return
       }
@@ -243,7 +244,7 @@ export const HeadingWithActionElements: FunctionComponent<
       setElementId(anchor)
       const windowHash = window.location.hash.slice(1)
       if (windowHash && windowHash === anchor) {
-        setTarget(node)
+        scrollNodeIntoView(node)
       }
     },
     [propsAnchor]
@@ -259,19 +260,15 @@ export const HeadingWithActionElements: FunctionComponent<
   )
 
   const attributes = isInSidebarOrDialog ? {} : { ref, id: elementId }
+  const Tag = tag
   // We nest the action-elements (tooltip, link-icon) into the header element (e.g. h1),
   // so that it appears inline. For context: we also tried setting the h's display attribute to 'inline', but
   // then we would need to add padding to the outer container and fiddle with the vertical alignment.
-  const headerElementWithActions = createElement(
-    tag,
-    {
-      ...tagProps,
-      ...attributes,
-    },
-    <>
+  const headerElementWithActions = (
+    <Tag {...tagProps} {...attributes}>
       {children}
       {actionElements}
-    </>
+    </Tag>
   )
 
   // we don't want to apply styling, so return the "raw" header
@@ -287,11 +284,17 @@ export const HeadingWithActionElements: FunctionComponent<
 }
 
 type HeadingProps = JSX.IntrinsicElements["h1"] &
-  ReactMarkdownProps & { level: number; "data-anchor"?: string }
+  ReactMarkdownProps & {
+    level: number
+    "data-anchor"?: string
+    node: Element
+  }
 
-export const CustomHeading: FunctionComponent<
-  PropsWithChildren<HeadingProps>
-> = ({ node, children, ...rest }) => {
+export const CustomHeading: FC<HeadingProps> = ({
+  node,
+  children,
+  ...rest
+}) => {
   const anchor = rest["data-anchor"]
   return (
     <HeadingWithActionElements
@@ -334,12 +337,15 @@ export type CustomCodeTagProps = JSX.IntrinsicElements["code"] &
 /**
  * Renders code tag with highlighting based on requested language.
  */
-export const CustomCodeTag: FunctionComponent<
-  PropsWithChildren<CustomCodeTagProps>
-> = ({ inline, className, children, ...props }) => {
+export const CustomCodeTag: FC<CustomCodeTagProps> = ({
+  inline,
+  className,
+  children,
+  ...props
+}) => {
   const match = /language-(\w+)/.exec(className || "")
-  // eslint-disable-next-line @typescript-eslint/no-base-to-string
-  const codeText = String(children).trim().replace(/\n$/, "")
+
+  const codeText = String(children).replace(/^\n/, "").replace(/\n$/, "")
 
   const language = (match && match[1]) || ""
   return !inline ? (
@@ -356,16 +362,14 @@ export const CustomCodeTag: FunctionComponent<
 /**
  * Renders pre tag with added margin.
  */
-export const CustomPreTag: FunctionComponent<
-  PropsWithChildren<ReactMarkdownProps>
-> = ({ children }) => {
+export const CustomPreTag: FC<ReactMarkdownProps> = ({ children }) => {
   return (
     <StyledPreWrapper data-testid="stMarkdownPre">{children}</StyledPreWrapper>
   )
 }
 
 // These are common renderers that don't depend on props or context
-const BASE_RENDERERS: Components = {
+const BASE_RENDERERS = {
   pre: CustomPreTag,
   code: CustomCodeTag,
   h1: CustomHeading,
@@ -674,8 +678,8 @@ const LINKS_DISALLOWED_ELEMENTS = [...LABEL_DISALLOWED_ELEMENTS, "a"]
 
 interface LinkProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Replace 'any' with a more specific type.
-  node: any
-  children: ReactNode[]
+  node?: any
+  children?: ReactNode
   href?: string
   title?: string
   target?: string
@@ -713,7 +717,7 @@ export const RenderedMarkdown = memo(function RenderedMarkdown({
   isLabel,
   disableLinks,
 }: Readonly<RenderedMarkdownProps>): ReactElement {
-  const theme: EmotionTheme = useTheme()
+  const theme = useEmotionTheme()
 
   const colorMapping = useMemo(() => createColorMapping(theme), [theme])
 
@@ -726,17 +730,23 @@ export const RenderedMarkdown = memo(function RenderedMarkdown({
     [theme, colorMapping]
   )
 
-  const rehypePlugins: PluggableList = useMemo(
-    () => (allowHTML ? [rehypeKatex, rehypeRaw] : [rehypeKatex]),
-    [allowHTML]
-  )
+  const rehypePlugins = useMemo<PluggableList>(() => {
+    const plugins: PluggableList = [rehypeSetCodeInlineProperty, rehypeKatex]
+
+    if (allowHTML) {
+      plugins.push(rehypeRaw)
+    }
+
+    return plugins
+  }, [allowHTML])
 
   const renderers = useMemo(
-    () => ({
-      ...BASE_RENDERERS,
-      a: LinkWithTargetBlank,
-      ...(overrideComponents || {}),
-    }),
+    () =>
+      ({
+        ...BASE_RENDERERS,
+        a: LinkWithTargetBlank,
+        ...(overrideComponents || {}),
+      }) as Components,
     [overrideComponents]
   )
 
@@ -756,7 +766,7 @@ export const RenderedMarkdown = memo(function RenderedMarkdown({
         remarkPlugins={remarkPlugins}
         rehypePlugins={rehypePlugins}
         components={renderers}
-        transformLinkUri={transformLinkUri}
+        urlTransform={transformLinkUri}
         disallowedElements={disallowed}
         // unwrap and render children from invalid markdown
         unwrapDisallowed={true}
