@@ -99,8 +99,7 @@ describe("Opened ThemeCreatorDialog", () => {
     const newColor = "#e91e63"
     const colorInput = screen.getByRole("textbox")
 
-    await user.tripleClick(colorInput)
-    await user.keyboard("{backspace}")
+    await user.clear(colorInput)
     await user.type(colorInput, newColor)
 
     // Close out of the popover
