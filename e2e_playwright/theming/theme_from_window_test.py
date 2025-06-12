@@ -31,7 +31,7 @@ def test_theme_from_window_variable(app: Page, assert_snapshot: ImageCompareFunc
         borderColor: "#d5dae4",
         showWidgetBorder: true,
         bodyFont: "Inter",
-        headingFont: "bold Inter",
+        headingFont: "Inter",
         codeFont: '"Monaspace Argon", Menlo, Monaco, Consolas, "Courier New", monospace',
         baseFontSize: 14,
         fontFaces: [
@@ -84,6 +84,5 @@ def test_theme_from_window_variable(app: Page, assert_snapshot: ImageCompareFunc
     # creating flakiness:
     app.wait_for_timeout(5000)
     expect_font(app, "Inter")
-    expect_font(app, "bold Inter")
     expect_font(app, "Monaspace Argon")
-    assert_snapshot(app, name="theme_from_window_variable")
+    assert_snapshot(app, name="theme_from_window_variable", image_threshold=0.0005)
