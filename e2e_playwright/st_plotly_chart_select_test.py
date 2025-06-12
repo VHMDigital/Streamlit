@@ -110,7 +110,6 @@ def test_box_select_on_stacked_bar_chart_displays_a_df(app: Page):
     expect(app.get_by_test_id("stDataFrame")).to_have_count(1)
 
 
-@pytest.mark.flaky(reruns=3)
 @pytest.mark.only_browser(
     "chromium"
 )  # Flaky on WebKit and Firefox, but manually tested

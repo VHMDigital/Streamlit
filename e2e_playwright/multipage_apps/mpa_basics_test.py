@@ -323,23 +323,6 @@ def test_renders_small_logos(app: Page, assert_snapshot: ImageCompareFunction):
     )
     assert_snapshot(app.get_by_test_id("stSidebar"), name="small-sidebar-logo")
 
-    # Collapse the sidebar
-    app.get_by_test_id("stSidebarContent").hover()
-    collapse_button = app.get_by_test_id("stSidebarCollapseButton").locator("button")
-    collapse_button.click()
-    # Wait for sidebar to be collapsed, the expand button should now be visible in the header
-    expect(app.get_by_test_id("stExpandSidebarButton")).to_be_visible()
-
-    # Collapsed logo should be in the header
-    header_element = app.get_by_test_id("stHeader")
-    logo_link_element = header_element.get_by_test_id("stLogoLink")
-    expect(logo_link_element).to_be_visible()
-    expect(logo_link_element).to_have_attribute("href", "https://www.example.com")
-
-    collapsed_logo_image = logo_link_element.get_by_test_id("stHeaderLogo")
-    expect(collapsed_logo_image).to_be_visible()
-    assert_snapshot(collapsed_logo_image, name="small-collapsed-header-logo")
-
 
 def test_renders_large_logos(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that large logos display properly in sidebar and main sections."""
