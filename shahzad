@@ -1,0 +1,157 @@
+import streamlit as st
+import pandas as pd
+import zipfile
+import json
+import re
+import string
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# ---------------- TF-IDF Backend Logic ----------------
+
+def load_and_flatten_jsons(uploaded_zip):
+    records = []
+    with zipfile.ZipFile(uploaded_zip, 'r') as zipf:
+        for file in zipf.namelist():
+            if file.endswith(".json"):
+                with zipf.open(file) as f:
+                    try:
+                        data = json.load(f)
+                        flat_record = {
+                            "name": data.get("details", {}).get("name", "N/A"),
+                            "resume": data.get("input", {}).get("resume", ""),
+                            "details": data.get("details", {})
+                        }
+                        records.append(flat_record)
+                    except:
+                        st.warning(f"⚠️ Invalid JSON skipped: {file}")
+    return pd.DataFrame(records)
+
+
+def clean_text(text):
+    if not isinstance(text, str):
+        return ""
+    text = text.lower()
+    text = re.sub(r'\d+', '', text)
+    text = text.translate(str.maketrans('', '', string.punctuation))
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
+
+
+def vectorize_texts(resumes, job_description):
+    cleaned_resumes = [clean_text(r) for r in resumes]
+    cleaned_jd = clean_text(job_description)
+
+    corpus = cleaned_resumes + [cleaned_jd]
+    vectorizer = TfidfVectorizer(stop_words='english')
+    vectors = vectorizer.fit_transform(corpus)
+
+    resume_vectors = vectors[:-1]
+    jd_vector = vectors[-1]
+
+    return resume_vectors, jd_vector
+
+
+def rank_resumes(df, job_description, top_k=5):
+    resume_vectors, jd_vector = vectorize_texts(df['resume'].tolist(), job_description)
+    similarity_scores = cosine_similarity(resume_vectors, jd_vector).flatten()
+
+    df['score'] = similarity_scores * 100
+    df_sorted = df.sort_values(by='score', ascending=False).head(top_k)
+
+    results = []
+    for _, row in df_sorted.iterrows():
+        results.append({
+            "name": row['name'],
+            "score": round(row['score'], 2),
+            "snippet": row['resume'][:300] + "...",
+            "details": row['details']
+        })
+    return results
+
+# ---------------- Streamlit App ----------------
+
+st.set_page_config(page_title="Smart Resume Matcher", layout="wide")
+
+st.markdown("""
+    <style>
+        .main { background-color: #f8f9fa; }
+        .stProgress > div > div {
+            background-image: linear-gradient(to right, #4facfe, #00f2fe);
+        }
+        .resume-box {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 10px;
+            box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #264653;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+st.title("🔍 Smart Resume Matcher with Enhanced UI")
+
+uploaded_file = st.file_uploader("📂 Upload a ZIP file containing JSON resumes", type=["zip"])
+
+if uploaded_file:
+    df = load_and_flatten_jsons(uploaded_file)
+
+    if df.empty or 'resume' not in df.columns or 'details' not in df.columns:
+        st.error("❌ Failed to load resumes. Ensure the JSONs include 'input.resume' and 'details'.")
+        st.stop()
+
+    st.success(f"✔️ Loaded {len(df)} resumes.")
+
+    with st.expander("✏️ Enter Job Description", expanded=True):
+        job_description = st.text_area("Paste the job description below:", height=200)
+
+    if job_description.strip():
+        top_k = st.slider("How many top resumes to display?", min_value=1, max_value=20, value=5)
+
+        if st.button("🚀 Run Matching"):
+            with st.spinner("Scoring resumes... please wait."):
+                results = rank_resumes(df, job_description, top_k=top_k)
+
+            st.subheader("🏆 Top Matching Resumes")
+            st.info(f"🧾 Processed {len(df)} resumes. Showing top {top_k} matches.")
+
+            def get_score_badge(score):
+                if score >= 80:
+                    return "🟢 Excellent"
+                elif score >= 60:
+                    return "🟡 Good"
+                else:
+                    return "🔴 Needs Improvement"
+
+            for idx, res in enumerate(results, 1):
+                with st.container():
+                    st.markdown(f"### #{idx}. {res['name']}")
+                    col1, col2 = st.columns([1, 2])
+
+                    with col1:
+                        st.metric(label="📈 Match Score", value=f"{res['score']}%")
+                        st.caption(get_score_badge(res['score']))
+                        st.progress(res['score'] / 100)
+
+                    with col2:
+                        st.markdown("*📝 Resume Snippet:*")
+                        st.code(res['snippet'])
+
+                    with st.expander("📋 View Full Details"):
+                        st.json(res['details'])
+
+            # Download results
+            download_df = pd.DataFrame(results)
+            csv = download_df.to_csv(index=False)
+            st.download_button(
+                label="📥 Download Top Matches as CSV",
+                data=csv,
+                file_name='top_matched_resumes.csv',
+                mime='text/csv'
+            )
