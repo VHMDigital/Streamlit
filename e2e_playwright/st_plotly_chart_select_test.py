@@ -30,7 +30,7 @@ def _check_toolbar_visibility(chart_element: Locator):
         ".modebar-group:has([data-title='Fullscreen'])"
     )
     expect(fullscreen_button).to_be_visible()
-    expect(fullscreen_button).to_have_css("opacity", "0")
+    expect(fullscreen_button).to_have_css("opacity", "1")
 
 
 def test_box_select_on_scatter_chart_displays_a_df(app: Page):
