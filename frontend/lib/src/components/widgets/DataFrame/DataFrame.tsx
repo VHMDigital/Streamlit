@@ -160,7 +160,6 @@ function DataFrame({
 
   const [isFocused, setIsFocused] = useState<boolean>(true)
   const [showSearch, setShowSearch] = useState(false)
-  const [searchRefreshKey, setSearchRefreshKey] = useState(0)
   const [hasVerticalScroll, setHasVerticalScroll] = useState<boolean>(false)
   const [hasHorizontalScroll, setHasHorizontalScroll] =
     useState<boolean>(false)
@@ -885,7 +884,6 @@ function DataFrame({
           className="stDataFrameGlideDataEditor"
           data-testid="stDataFrameGlideDataEditor"
           ref={dataEditorRef}
-          key={`dataframe-${searchRefreshKey}`}
           columns={glideColumns}
           rows={isEmptyTable ? 1 : numRows}
           minColumnWidth={gridTheme.minColumnWidth}
@@ -933,6 +931,7 @@ function DataFrame({
             }
           }}
           showSearch={showSearch}
+          searchResults={!showSearch ? [] : undefined}
           onSearchClose={() => {
             setShowSearch(false)
             clearTooltip()
@@ -943,6 +942,11 @@ function DataFrame({
               // Deactivate sorting for empty state, for large dataframes, or
               // when column selection is activated.
               return
+            }
+
+            // Hide search before sorting to clear search results
+            if (showSearch) {
+              setShowSearch(false)
             }
 
             if (isRowSelectionActivated && isRowSelected) {
@@ -959,11 +963,6 @@ function DataFrame({
             }
 
             sortColumn(columnIdx, "auto")
-
-            // If search is active, force component refresh to update search highlights
-            if (showSearch) {
-              setSearchRefreshKey(prev => prev + 1)
-            }
           }}
           gridSelection={gridSelection}
           // We don't have to react to "onSelectionCleared" since
@@ -1133,6 +1132,11 @@ function DataFrame({
             onSortColumn={
               isSortingEnabled
                 ? (direction: "asc" | "desc" | undefined) => {
+                    // Hide search before sorting to clear search results
+                    if (showSearch) {
+                      setShowSearch(false)
+                    }
+
                     if (isRowSelectionActivated && isRowSelected) {
                       // Keeping row selections when sorting columns is not supported at the moment.
                       // So we need to clear the selected rows before we do the sorting (Issue #11345).
@@ -1145,11 +1149,6 @@ function DataFrame({
                     }
 
                     sortColumn(showMenu.columnIdx, direction, true)
-
-                    // If search is active, force component refresh to update search highlights
-                    if (showSearch) {
-                      setSearchRefreshKey(prev => prev + 1)
-                    }
                   }
                 : undefined
             }
