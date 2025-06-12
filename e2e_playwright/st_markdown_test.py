@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 from playwright.sync_api import Locator, Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction
@@ -225,7 +226,7 @@ def test_latex_elements(themed_app: Page, assert_snapshot: ImageCompareFunction)
     latex_elements = get_element_by_key(themed_app, "latex_elements").get_by_test_id(
         "stMarkdown"
     )
-    expect(latex_elements).to_have_count(5)
+    expect(latex_elements).to_have_count(8)
 
     assert_snapshot(latex_elements.nth(0), name="st_latex-latex")
     expect(latex_elements.nth(0)).to_contain_text("LATEX")
@@ -240,6 +241,10 @@ def test_latex_elements(themed_app: Page, assert_snapshot: ImageCompareFunction)
 
     expect(latex_elements.nth(4)).to_contain_text("this is a very long formula")
     assert_snapshot(latex_elements.nth(4), name="st_latex-long-help")
+
+    assert_snapshot(latex_elements.nth(5), name="st_latex-width_pixels")
+    assert_snapshot(latex_elements.nth(6), name="st_latex-width_stretch")
+    assert_snapshot(latex_elements.nth(7), name="st_latex-width_content")
 
 
 def test_badge_elements(themed_app: Page, assert_snapshot: ImageCompareFunction):
@@ -277,3 +282,25 @@ def test_large_image_in_markdown(app: Page, assert_snapshot: ImageCompareFunctio
 def test_check_top_level_class(app: Page):
     """Check that the top level class is correctly set."""
     check_top_level_class(app, "stMarkdown")
+
+
+@pytest.mark.app_hash("bold-header1")
+def test_anchor_scrolling(app: Page):
+    """Test that anchor scrolling works correctly."""
+    # The app fixture navigates to http://localhost:{app_port}/#bold-header1
+    # which should scroll to the header.
+    expect(app.get_by_text("Bold header1")).to_be_in_viewport()
+
+
+@pytest.mark.performance
+def test_markdown_rendering_performance(app: Page):
+    """Test that the performance of st.markdown and st.text."""
+    app.get_by_text("Run element").click()
+    # This is currently very slow, hence the need for a performance test
+    expect(app.get_by_text("DONE")).to_be_attached(timeout=15000)
+
+    app.get_by_text("st.text").click()
+    expect(app.get_by_text("DONE")).not_to_be_attached()
+
+    app.get_by_text("Run element").click()
+    expect(app.get_by_text("DONE")).to_be_attached()

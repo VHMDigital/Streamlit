@@ -17,7 +17,6 @@
 import React, { ReactElement } from "react"
 
 import ReactMarkdown from "react-markdown"
-// eslint-disable-next-line testing-library/no-manual-cleanup
 import { cleanup, screen } from "@testing-library/react"
 import { transparentize } from "color2k"
 
@@ -411,7 +410,7 @@ describe("StreamlitMarkdown", () => {
       const tagName = markdown.nodeName.toLowerCase()
       expect(tagName).toBe("span")
       expect(markdown).toHaveStyle(`color: ${style}`)
-      expect(markdown).toHaveClass("colored-text")
+      expect(markdown).toHaveClass("stMarkdownColoredText")
 
       // Removes rendered StreamlitMarkdown component before next case run
       cleanup()
@@ -512,13 +511,10 @@ describe("StreamlitMarkdown", () => {
 const getCustomCodeTagProps = (
   props: Partial<CustomCodeTagProps> = {}
 ): CustomCodeTagProps => ({
-  children: [
-    `import streamlit as st
+  children: `import streamlit as st
 
 st.write("Hello")
 `,
-  ],
-  node: { type: "element", tagName: "tagName", children: [] },
   ...props,
 })
 
@@ -541,7 +537,7 @@ describe("CustomCodeTag Element", () => {
 
   it("should render copy button when code block has content", () => {
     const props = getCustomCodeTagProps({
-      children: ["i am not empty"],
+      children: "i am not empty",
     })
     render(<CustomCodeTag {...props} />)
     const copyButton = screen.getByTitle("Copy to clipboard")
@@ -551,11 +547,11 @@ describe("CustomCodeTag Element", () => {
 
   it("should not render copy button when code block is empty", () => {
     const props = getCustomCodeTagProps({
-      children: [""],
+      children: "",
     })
     render(<CustomCodeTag {...props} />)
     // queryBy returns null vs. error
-    const copyButton = screen.queryByRole("button") // eslint-disable-line testing-library/prefer-presence-queries
+    const copyButton = screen.queryByRole("button")
 
     expect(copyButton).toBeNull()
   })
@@ -574,6 +570,17 @@ describe("CustomCodeTag Element", () => {
         'st.write("Hello")\n' +
         "</code></div>"
     )
+  })
+
+  it("should trim leading and final newlines", () => {
+    const props = getCustomCodeTagProps({
+      children: `
+      def hello():
+          print("Hello, Streamlit!")
+`,
+    })
+    const { baseElement } = render(<CustomCodeTag {...props} />)
+    expect(baseElement).toMatchSnapshot()
   })
 })
 

@@ -96,7 +96,7 @@ export const StyledBaseButton = styled.button<RequiredBaseButtonProps>(
       justifyContent: "center",
       fontWeight: theme.fontWeights.normal,
       padding: `${theme.spacing.xs} ${theme.spacing.md}`,
-      borderRadius: theme.radii.default,
+      borderRadius: theme.radii.button,
       minHeight: theme.sizes.minElementHeight,
       margin: theme.spacing.none,
       lineHeight: theme.lineHeights.base,
@@ -111,7 +111,7 @@ export const StyledBaseButton = styled.button<RequiredBaseButtonProps>(
         // override text color on hover for colored text - note since text color applied
         // as inline style (highest specificity) we need to use !important
         // use inherit to handle all button types
-        "span.colored-text": {
+        "span.stMarkdownColoredText": {
           color: "inherit !important",
         },
       },
@@ -392,12 +392,12 @@ export const StyledSegmentedControlButton = styled(
     marginRight: `-${theme.sizes.borderWidth}`, // Add negative margin to overlap borders
 
     "&:first-child": {
-      borderTopLeftRadius: theme.radii.default,
-      borderBottomLeftRadius: theme.radii.default,
+      borderTopLeftRadius: theme.radii.button,
+      borderBottomLeftRadius: theme.radii.button,
     },
     "&:last-child": {
-      borderTopRightRadius: theme.radii.default,
-      borderBottomRightRadius: theme.radii.default,
+      borderTopRightRadius: theme.radii.button,
+      borderBottomRightRadius: theme.radii.button,
       marginRight: theme.spacing.none, // Reset margin for the last child
     },
     "&:hover": {

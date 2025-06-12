@@ -14,12 +14,18 @@
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING, cast
 
-from streamlit.elements.lib.layout_utils import WidthWithoutContent, validate_width
+from streamlit.elements.lib.layout_utils import (
+    Height,
+    LayoutConfig,
+    WidthWithoutContent,
+    validate_height,
+    validate_width,
+)
 from streamlit.proto.Code_pb2 import Code as CodeProto
 from streamlit.runtime.metrics_util import gather_metrics
-from streamlit.string_util import clean_text
 
 if TYPE_CHECKING:
     from streamlit.delta_generator import DeltaGenerator
@@ -35,7 +41,7 @@ class CodeMixin:
         *,
         line_numbers: bool = False,
         wrap_lines: bool = False,
-        height: int | None = None,
+        height: Height = "content",
         width: WidthWithoutContent = "stretch",
     ) -> DeltaGenerator:
         """Display a code block with optional syntax highlighting.
@@ -107,21 +113,16 @@ class CodeMixin:
             height: 380px
         """
         code_proto = CodeProto()
-        code_proto.code_text = clean_text(body)
+        code_proto.code_text = re.sub(r"\n\Z", "", re.sub(r"\A\n", "", str(body)))
         code_proto.language = language or "plaintext"
         code_proto.show_line_numbers = line_numbers
         code_proto.wrap_lines = wrap_lines
-        if height:
-            code_proto.height = height
 
-        # Set width configuration
+        validate_height(height, allow_content=True)
         validate_width(width)
-        if isinstance(width, int):
-            code_proto.width_config.pixel_width = width
-        else:
-            code_proto.width_config.use_stretch = True
+        layout_config = LayoutConfig(height=height, width=width)
 
-        return self.dg._enqueue("code", code_proto)
+        return self.dg._enqueue("code", code_proto, layout_config=layout_config)
 
     @property
     def dg(self) -> DeltaGenerator:

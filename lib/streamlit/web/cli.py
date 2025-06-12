@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import os
 import sys
-from typing import TYPE_CHECKING, Any, Callable, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Final, TypeVar
 
 # We cannot lazy-load click here because its used via decorators.
 import click
@@ -34,9 +34,9 @@ from streamlit.web.cache_storage_manager_config import (
 if TYPE_CHECKING:
     from streamlit.config_option import ConfigOption
 
-ACCEPTED_FILE_EXTENSIONS = ("py", "py3")
+ACCEPTED_FILE_EXTENSIONS: Final = ("py", "py3")
 
-LOG_LEVELS = ("error", "warning", "info", "debug")
+LOG_LEVELS: Final = ("error", "warning", "info", "debug")
 
 
 def _convert_config_option_to_click_option(
@@ -105,8 +105,8 @@ def configurator_options(func: F) -> F:
             help=parsed_parameter["description"],
             type=parsed_parameter["type"],
             multiple=parsed_parameter["multiple"],
-            **click_option_kwargs,
-        )  # type: ignore
+            **click_option_kwargs,  # type: ignore
+        )
         func = config_option(func)
     return func
 
@@ -140,8 +140,8 @@ def main(log_level: str = "info") -> None:
     if log_level:
         from streamlit.logger import get_logger
 
-        LOGGER = get_logger(__name__)
-        LOGGER.warning(
+        logger: Final = get_logger(__name__)
+        logger.warning(
             "Setting the log level using the --log_level flag is unsupported."
             "\nUse the --logger.level flag (after your streamlit command) instead."
         )
@@ -188,7 +188,6 @@ def main_hello(**kwargs: Any) -> None:
     """Runs the Hello World script."""
     from streamlit.hello import streamlit_app
 
-    bootstrap.load_config_options(flag_options=kwargs)
     filename = streamlit_app.__file__
     _main_run(filename, flag_options=kwargs)
 
@@ -205,8 +204,6 @@ def main_run(target: str, args: list[str] | None = None, **kwargs: Any) -> None:
 
     """
     from streamlit import url_util
-
-    bootstrap.load_config_options(flag_options=kwargs)
 
     _, extension = os.path.splitext(target)
     if extension[1:] not in ACCEPTED_FILE_EXTENSIONS:
@@ -262,6 +259,12 @@ def _main_run(
     args: list[str] | None = None,
     flag_options: dict[str, Any] | None = None,
 ) -> None:
+    # Set the main script path to use it for config & secret files
+    # While its a bit suboptimal, we need to store this into a module-level
+    # variable before we load the config options via `load_config_options`
+    _config._main_script_path = os.path.abspath(file)
+
+    bootstrap.load_config_options(flag_options=flag_options or {})
     if args is None:
         args = []
 

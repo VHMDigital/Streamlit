@@ -108,6 +108,7 @@ class ConfigOption:
         replaced_by: str | None = None,
         type_: type = str,
         sensitive: bool = False,
+        multiple: bool = False,
     ) -> None:
         """Create a ConfigOption with the given name.
 
@@ -142,6 +143,8 @@ class ConfigOption:
             Useful to cast the config params sent by cmd option parameter.
         sensitive: bool
             Sensitive configuration options cannot be set by CLI parameter.
+        multiple: bool
+            Whether this config option can have multiple values.
         """
         # Parse out the section and name.
         self.key = key
@@ -183,13 +186,12 @@ class ConfigOption:
         self.where_defined = ConfigOption.DEFAULT_DEFINITION
         self.type = type_
         self.sensitive = sensitive
-        # infer multiple values if the default value is a list or tuple
-        self.multiple = isinstance(default_val, (list, tuple))
+        self.multiple = multiple
 
         if self.replaced_by:
             self.deprecated = True
             if deprecation_text is None:
-                deprecation_text = "Replaced by %s." % self.replaced_by
+                deprecation_text = f"Replaced by {self.replaced_by}."
 
         if self.deprecated:
             if not expiration_date:
@@ -261,8 +263,7 @@ class ConfigOption:
                 # Import here to avoid circular imports
                 from streamlit.logger import get_logger
 
-                LOGGER = get_logger(__name__)
-                LOGGER.error(
+                get_logger(__name__).error(
                     textwrap.dedent(
                         f"""
                     ════════════════════════════════════════════════
@@ -279,8 +280,7 @@ class ConfigOption:
                 # Import here to avoid circular imports
                 from streamlit.logger import get_logger
 
-                LOGGER = get_logger(__name__)
-                LOGGER.warning(
+                get_logger(__name__).warning(
                     textwrap.dedent(
                         f"""s
                     ════════════════════════════════════════════════
