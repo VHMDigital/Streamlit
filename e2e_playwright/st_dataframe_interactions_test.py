@@ -349,13 +349,17 @@ def _test_csv_download(
     click_enter_on_file_picker: bool = False,
 ):
     dataframe_element = locator.get_by_test_id("stDataFrame").nth(0)
+    expect(dataframe_element).to_be_visible()
     dataframe_toolbar = dataframe_element.get_by_test_id("stElementToolbar")
+    expect(dataframe_toolbar).to_be_visible()
 
     download_csv_toolbar_button = dataframe_toolbar.get_by_test_id(
         "stElementToolbarButton"
     ).get_by_label("Download as CSV")
+    expect(download_csv_toolbar_button).to_be_visible()
 
     # Activate toolbar:
+    dataframe_element.scroll_into_view_if_needed()
     dataframe_element.hover()
     # Check that it is visible
     expect(dataframe_toolbar).to_have_css("opacity", "1")
