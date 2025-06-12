@@ -16,10 +16,8 @@
 
 import React, { MouseEvent, ReactElement } from "react"
 
-import { useTheme } from "@emotion/react"
-
 import { useAppContext } from "@streamlit/app/src/components/StreamlitContextProvider"
-import { DynamicIcon, EmotionTheme, isMaterialIcon } from "@streamlit/lib"
+import { DynamicIcon, isMaterialIcon, useEmotionTheme } from "@streamlit/lib"
 
 import {
   StyledSidebarLinkText,
@@ -45,7 +43,7 @@ const SidebarNavLink = ({
   isTopNav,
   children,
 }: SidebarNavLinkProps): ReactElement => {
-  const theme: EmotionTheme = useTheme()
+  const theme = useEmotionTheme()
   // If connection state not connected, or host has disabled inputs,
   // disable sidebar nav links
   const { widgetsDisabled: disableSidebarNavLinks } = useAppContext()

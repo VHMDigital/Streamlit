@@ -22,7 +22,6 @@ import React, {
   useState,
 } from "react"
 
-import { useTheme } from "@emotion/react"
 import {
   NumberSize,
   Resizable,
@@ -36,8 +35,8 @@ import {
   BaseButton,
   BaseButtonKind,
   DynamicIcon,
-  EmotionTheme,
   IsSidebarContext,
+  useEmotionTheme,
 } from "@streamlit/lib"
 import { IAppPage, Logo } from "@streamlit/protobuf"
 import { localStorageAvailable } from "@streamlit/utils"
@@ -90,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,
   onToggleCollapse,
 }): ReactElement => {
-  const theme: EmotionTheme = useTheme()
+  const theme = useEmotionTheme()
   const mediumBreakpointPx = calculateMaxBreakpoint(theme.breakpoints.md)
 
   const sidebarRef = useRef<HTMLDivElement>(null)
