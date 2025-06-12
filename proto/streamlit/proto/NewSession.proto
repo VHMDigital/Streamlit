@@ -186,9 +186,9 @@ message FontFace {
   string family = 2;
   // DEPRECATED: Use weight_range instead which supports single weights & weight ranges.
   int32 weight = 3 [deprecated = true];
-  string weight_range = 6;
+  string weight_range = 5;
   string style = 4;
-  string unicode_range = 5;
+  string unicode_range = 6;
 }
 
 // DEPRECATED: Please use the base_radius theme config instead.
