@@ -55,6 +55,7 @@ def test_dataframe_toolbar_on_hover(
     expect(dataframe_toolbar).to_have_css("opacity", "0")
 
     # Hover over dataframe
+    dataframe_element.scroll_into_view_if_needed()
     dataframe_element.hover()
 
     # Check that it is visible
