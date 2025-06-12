@@ -84,7 +84,7 @@ def configure_sour_gummy_font():
 
 
 @pytest.mark.usefixtures("configure_sour_gummy_font")
-def test_font_unicode_ranges(app: Page, assert_snapshot: ImageCompareFunction):
+def test_font_weights(app: Page, assert_snapshot: ImageCompareFunction):
     # Make sure that all elements are rendered and no skeletons are shown
     expect(app.get_by_test_id("stSkeleton")).to_have_count(0, timeout=25000)
 
