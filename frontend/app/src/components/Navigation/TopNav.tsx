@@ -47,7 +47,7 @@ const TopNav: React.FC<Props> = ({
   onPageChange,
 }) => {
   const navSections = useMemo(() => {
-    return groupBy(appPages, "sectionHeader")
+    return groupBy(appPages, p => p.sectionHeader)
   }, [appPages])
 
   // NOTE: this is > 1, not > 0 which is why the line 56-58 ternary is needed
