@@ -180,7 +180,7 @@ describe("Multiselect widget", () => {
       expect(screen.getByRole("combobox")).not.toBeDisabled()
     })
 
-    it("renders with default 'Please select' placeholder when options are empty, acceptNewOptions is true, and no placeholder is provided", () => {
+    it("renders with default placeholder when options are empty, acceptNewOptions is true, and no placeholder is provided", () => {
       const props = getProps({
         default: [],
         options: [],
