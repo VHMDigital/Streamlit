@@ -19,17 +19,12 @@ syntax = "proto3";
 option java_package = "com.snowflake.apps.streamlit";
 option java_outer_classname = "PdfProto";
 
-import "streamlit/proto/WidthConfig.proto";
-import "streamlit/proto/HeightConfig.proto";
-
 message Pdf {
   string id = 1;
   oneof data {
     string url = 2;
     bytes file_data = 7;
   }
-  optional streamlit.WidthConfig width_config = 3;
-  optional streamlit.HeightConfig height_config = 4;
   bool use_ext_module = 5;
   bool hide_toolbar = 6;
 }
