@@ -31,7 +31,7 @@ with st.container(key="extended_latin_container"):
 with st.container(key="mixed_latin_container"):
     st.markdown("This conŧāins basic and exŧendeđ lăŧin chąřacters in ŤĄĠĖŞŠČĦŘİŤ")
 
-# Test Chirmera font with numbers and letters from different files
+# Test Chimera font with numbers and letters from different files
 with st.sidebar:
     st.markdown("This is normal text with numbers 0123456789.")
     st.markdown("*This is italic text with numbers 0123456789.*")
