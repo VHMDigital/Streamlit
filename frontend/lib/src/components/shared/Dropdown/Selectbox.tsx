@@ -53,7 +53,7 @@ export interface Props {
   label?: string | null
   labelVisibility?: LabelVisibilityOptions
   help?: string
-  placeholder?: string
+  placeholder?: string | null
   clearable?: boolean
   acceptNewOptions?: boolean | null
 }
