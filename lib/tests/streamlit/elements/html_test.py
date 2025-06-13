@@ -216,7 +216,7 @@ class StHtmlAPITest(DeltaGeneratorTestCase):
                 assert str(exc.value) == expected_error_message
 
     def test_st_html_default_width(self):
-        """Test that st.html defaults to content width."""
+        """Test that st.html defaults to stretch width."""
         st.html("<p>test html</p>")
 
         el = self.get_delta_from_queue().new_element
