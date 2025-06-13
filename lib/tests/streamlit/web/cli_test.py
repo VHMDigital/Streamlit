@@ -440,6 +440,7 @@ class CliTest(unittest.TestCase):
             # Assert that the email prompt was shown
             mock_prompt.assert_called_once()
             assert result.exit_code == 0
+
     def test_help_command(self):
         """Tests the help command redirects to using the --help flag"""
         with patch.object(sys, "argv", ["streamlit", "help"]) as args:
