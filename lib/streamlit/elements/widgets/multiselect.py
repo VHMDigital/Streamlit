@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from textwrap import dedent
 from typing import TYPE_CHECKING, Any, Callable, Generic, Literal, cast, overload
@@ -168,7 +167,6 @@ class MultiSelectMixin:
         *,  # keyword-only arguments:
         max_selections: int | None = None,
         placeholder: str | None = None,
-        custom_placeholder: str | None = None,
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: Literal[False] = False,
@@ -189,7 +187,6 @@ class MultiSelectMixin:
         *,  # keyword-only arguments:
         max_selections: int | None = None,
         placeholder: str | None = None,
-        custom_placeholder: str | None = None,
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: Literal[True] = True,
@@ -210,7 +207,6 @@ class MultiSelectMixin:
         *,  # keyword-only arguments:
         max_selections: int | None = None,
         placeholder: str | None = None,
-        custom_placeholder: str | None = None,
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: bool = False,
@@ -231,7 +227,6 @@ class MultiSelectMixin:
         *,  # keyword-only arguments:
         max_selections: int | None = None,
         placeholder: str | None = None,
-        custom_placeholder: str | None = None,
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: Literal[False, True] | bool = False,
@@ -271,10 +266,6 @@ class MultiSelectMixin:
             The max number of options that can be selected. If None,
             there will be no limit.
         placeholder : str or None
-            **Deprecated.** Use ``custom_placeholder`` instead.
-            A string to display when no options are selected. Defaults to
-            "Choose an option".
-        custom_placeholder : str or None
             A string to display when no options are selected. If None,
             a default placeholder will be used based on the widget state.
         disabled : bool
@@ -348,18 +339,6 @@ class MultiSelectMixin:
            height: 350px
 
         """
-        # Handle deprecation warning for placeholder parameter
-        if placeholder is not None:
-            warnings.warn(
-                "The 'placeholder' parameter is deprecated and will be removed in a future version. "
-                "Use 'custom_placeholder' instead.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            # If both are provided, custom_placeholder takes precedence
-            if custom_placeholder is None:
-                custom_placeholder = placeholder
-
         ctx = get_script_run_ctx()
         return self._multiselect(
             label=label,
@@ -373,7 +352,6 @@ class MultiSelectMixin:
             kwargs=kwargs,
             max_selections=max_selections,
             placeholder=placeholder,
-            custom_placeholder=custom_placeholder,
             disabled=disabled,
             label_visibility=label_visibility,
             accept_new_options=accept_new_options,
@@ -394,7 +372,6 @@ class MultiSelectMixin:
         *,  # keyword-only arguments:
         max_selections: int | None = None,
         placeholder: str | None = None,
-        custom_placeholder: str | None = None,
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         accept_new_options: bool = False,
@@ -434,7 +411,6 @@ class MultiSelectMixin:
             help=help,
             max_selections=max_selections,
             placeholder=placeholder,
-            custom_placeholder=custom_placeholder,
             accept_new_options=accept_new_options,
         )
 
@@ -445,10 +421,9 @@ class MultiSelectMixin:
         proto.disabled = disabled
         proto.label = label
         proto.max_selections = max_selections or 0
+        # Map user's placeholder to the new proto field, keep old field for backwards compatibility
         if placeholder is not None:
-            proto.placeholder = placeholder
-        if custom_placeholder is not None:
-            proto.custom_placeholder = custom_placeholder
+            proto.custom_placeholder = placeholder
         proto.label_visibility.value = get_label_visibility_proto_value(
             label_visibility
         )

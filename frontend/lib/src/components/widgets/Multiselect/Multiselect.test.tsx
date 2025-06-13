@@ -222,7 +222,7 @@ describe("Multiselect widget", () => {
     })
 
     // Test backwards compatibility with deprecated placeholder field
-    it("falls back to deprecated placeholder field when custom_placeholder is not provided", () => {
+    it("falls back to deprecated placeholder field when customPlaceholder is not provided", () => {
       const props = getProps({
         default: [],
         customPlaceholder: undefined,
@@ -233,7 +233,7 @@ describe("Multiselect widget", () => {
       expect(screen.getByText("Deprecated placeholder")).toBeInTheDocument()
     })
 
-    it("prioritizes custom_placeholder over deprecated placeholder field", () => {
+    it("prioritizes customPlaceholder over deprecated placeholder field", () => {
       const props = getProps({
         default: [],
         customPlaceholder: "New placeholder",

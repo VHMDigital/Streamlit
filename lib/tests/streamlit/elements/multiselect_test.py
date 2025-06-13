@@ -317,58 +317,7 @@ class Multiselectbox(DeltaGeneratorTestCase):
         )
 
         c = self.get_delta_from_queue().new_element.multiselect
-        assert c.placeholder == "Select your beverage"
-
-    def test_custom_placeholder(self):
-        """Test that it can be called with custom_placeholder params."""
-        st.multiselect(
-            "the label",
-            ["Coffee", "Tea", "Water"],
-            custom_placeholder="Select your beverage",
-        )
-
-        c = self.get_delta_from_queue().new_element.multiselect
         assert c.custom_placeholder == "Select your beverage"
-
-    def test_placeholder_deprecation_warning(self):
-        """Test that using placeholder parameter shows deprecation warning."""
-        import warnings
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            st.multiselect(
-                "the label",
-                ["Coffee", "Tea", "Water"],
-                placeholder="Select your beverage",
-            )
-
-            assert len(w) == 1
-            assert issubclass(w[0].category, DeprecationWarning)
-            assert "placeholder" in str(w[0].message)
-            assert "custom_placeholder" in str(w[0].message)
-
-    def test_custom_placeholder_takes_precedence(self):
-        """Test that custom_placeholder takes precedence over deprecated placeholder."""
-        import warnings
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            st.multiselect(
-                "the label",
-                ["Coffee", "Tea", "Water"],
-                placeholder="Old placeholder",
-                custom_placeholder="New placeholder",
-            )
-
-            c = self.get_delta_from_queue().new_element.multiselect
-            assert c.custom_placeholder == "New placeholder"
-            assert (
-                c.placeholder == "Old placeholder"
-            )  # Still set for backwards compatibility
-
-            # Should still show deprecation warning
-            assert len(w) == 1
-            assert issubclass(w[0].category, DeprecationWarning)
 
     def test_shows_cached_widget_replay_warning(self):
         """Test that a warning is shown when this widget is used inside a cached function."""
