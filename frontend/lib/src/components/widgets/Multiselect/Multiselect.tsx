@@ -201,7 +201,7 @@ const Multiselect: FC<Props> = props => {
 
   const { options } = element
   let disabled = props.disabled
-  let placeholder = element.placeholder
+  let placeholder = element.customPlaceholder || element.placeholder
 
   // If no custom placeholder provided, determine appropriate default based on widget state
   if (!placeholder) {

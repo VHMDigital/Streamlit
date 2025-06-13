@@ -40,7 +40,7 @@ const getProps = (
     label: "Label",
     default: [0],
     options: ["a", "b", "c"],
-    placeholder: "Please select",
+    customPlaceholder: "Please select",
     ...elementProps,
   }),
   disabled: false,
@@ -163,7 +163,7 @@ describe("Multiselect widget", () => {
       const props = getProps({
         default: [],
         options: [],
-        placeholder: undefined, // No placeholder provided to test default logic
+        customPlaceholder: undefined, // No placeholder provided to test default logic
       })
       render(<Multiselect {...props} />)
 
@@ -176,7 +176,7 @@ describe("Multiselect widget", () => {
         default: [],
         options: [],
         acceptNewOptions: true,
-        placeholder: "Custom empty placeholder",
+        customPlaceholder: "Custom empty placeholder",
       })
       render(<Multiselect {...props} />)
 
@@ -189,7 +189,7 @@ describe("Multiselect widget", () => {
         default: [],
         options: [],
         acceptNewOptions: true,
-        placeholder: undefined, // No placeholder provided to test default logic
+        customPlaceholder: undefined, // No placeholder provided to test default logic
       })
       render(<Multiselect {...props} />)
 
@@ -202,7 +202,7 @@ describe("Multiselect widget", () => {
         default: [],
         options: ["a", "b", "c"],
         acceptNewOptions: false,
-        placeholder: undefined, // No placeholder provided to test default logic
+        customPlaceholder: undefined, // No placeholder provided to test default logic
       })
       render(<Multiselect {...props} />)
 
@@ -214,11 +214,37 @@ describe("Multiselect widget", () => {
         default: [],
         options: ["a", "b", "c"],
         acceptNewOptions: true,
-        placeholder: undefined, // No placeholder provided to test default logic
+        customPlaceholder: undefined, // No placeholder provided to test default logic
       })
       render(<Multiselect {...props} />)
 
       expect(screen.getByText("Choose or add an option")).toBeInTheDocument()
+    })
+
+    // Test backwards compatibility with deprecated placeholder field
+    it("falls back to deprecated placeholder field when custom_placeholder is not provided", () => {
+      const props = getProps({
+        default: [],
+        customPlaceholder: undefined,
+        placeholder: "Deprecated placeholder",
+      })
+      render(<Multiselect {...props} />)
+
+      expect(screen.getByText("Deprecated placeholder")).toBeInTheDocument()
+    })
+
+    it("prioritizes custom_placeholder over deprecated placeholder field", () => {
+      const props = getProps({
+        default: [],
+        customPlaceholder: "New placeholder",
+        placeholder: "Deprecated placeholder",
+      })
+      render(<Multiselect {...props} />)
+
+      expect(screen.getByText("New placeholder")).toBeInTheDocument()
+      expect(
+        screen.queryByText("Deprecated placeholder")
+      ).not.toBeInTheDocument()
     })
   })
 
