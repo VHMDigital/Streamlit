@@ -119,8 +119,8 @@ class MarkdownMixin:
 
         width : int or "stretch" or "content"
             The width of the markdown element. Can be an integer (pixels),
-            "stretch" to use the full width of the container, or "content"
-            (default) to size based on the content.
+            "stretch" (default) to use the full width of the container, or "content"
+            to size based on the content.
 
         Examples
         --------
@@ -206,9 +206,9 @@ class MarkdownMixin:
             parameter of ``st.markdown``.
 
         width : int or "stretch" or "content"
-            The width of the caption. Can be an integer (pixels), "stretch" to
-            use the full width of the container, or "content" (default) to size
-            based on the content.
+            The width of the caption. Can be an integer (pixels), "stretch"
+            (default) to use the full width of the container, or "content" to
+            size based on the content.
 
         Examples
         --------
