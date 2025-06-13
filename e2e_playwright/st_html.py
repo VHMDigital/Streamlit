@@ -73,14 +73,16 @@ st.write("# Hello, World!")
 st.write("## Random")
 st.write("### Corgis")
 
+
 st.html(
     """
     <div style="background-color: lightblue; padding: 10px; border: 1px solid blue;">
-        This HTML element uses content width (default)
+        This HTML element uses content width
     </div>
     """,
     width="content",
 )
+
 
 st.html(
     """
