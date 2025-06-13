@@ -566,6 +566,14 @@ def test_logo_source_errors(app: Page, app_port: int):
     wait_until(
         app,
         lambda: any(
+            "Client Error: Header Logo source error" in message for message in messages
+        ),
+    )
+
+    # Wait until the expected error is logged, indicating CLIENT_ERROR was sent
+    wait_until(
+        app,
+        lambda: any(
             "Client Error: Sidebar Logo source error" in message for message in messages
         ),
     )
