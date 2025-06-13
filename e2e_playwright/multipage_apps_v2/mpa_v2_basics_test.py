@@ -566,14 +566,17 @@ def test_logo_source_errors(app: Page, app_port: int):
     wait_until(
         app,
         lambda: any(
-            "Client Error: Header Logo source error" in message for message in messages
+            "Client Error: Sidebar Logo source error" in message for message in messages
         ),
     )
+
+    app.get_by_test_id("stSidebarContent").hover()
+    app.get_by_test_id("stSidebarCollapseButton").locator("button").click()
 
     # Wait until the expected error is logged, indicating CLIENT_ERROR was sent
     wait_until(
         app,
         lambda: any(
-            "Client Error: Sidebar Logo source error" in message for message in messages
+            "Client Error: Header Logo source error" in message for message in messages
         ),
     )
