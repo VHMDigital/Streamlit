@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction
@@ -61,16 +60,13 @@ def test_html_style_tags(themed_app: Page, assert_snapshot: ImageCompareFunction
     assert_snapshot(third_html, name="st_html-style_tags")
 
 
-@pytest.mark.skip(reason="Skip for now.")
 def test_html_style_tag_spacing(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
     """Test that non-rendered html doesn't cause unnecessary spacing."""
-    html_elements = themed_app.get_by_test_id("stHtml")
-    expect(html_elements).to_have_count(ST_HTML_ELEMENTS)
-
+    expander = get_expander(themed_app, "HTML Elements for Spacing Test")
     assert_snapshot(
-        get_expander(themed_app, "HTML Elements for Spacing Test"),
+        expander,
         name="st_html-style_tag_spacing",
     )
 

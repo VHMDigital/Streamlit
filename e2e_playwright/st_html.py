@@ -48,17 +48,18 @@ st.html(
     """
 )
 # Test that non-rendered HTML doesn't cause extra spacing
-st.write("Before tag:")
-st.html(
-    """
-    <style>
-        #style-test {
-            color: purple;
-        }
-    </style>
-    """
-)
-st.write("After tag")
+with st.expander("HTML Elements for Spacing Test"):
+    st.write("Before tag:")
+    st.html(
+        """
+        <style>
+            #style-test {
+                color: purple;
+            }
+        </style>
+        """
+    )
+    st.write("After tag")
 st.write("## Style test")
 # Test that we can load HTML files from str paths
 HTML_PATH = TEST_ASSETS_DIR / "test_div.html"
