@@ -33,25 +33,13 @@ interface Extent {
 }
 
 function estimateZoom(extent: Extent, mapWidthPx: number = 1024): number {
-  // Web Mercator full extent width (in meters)
   const MAX_EXTENT_WIDTH = 40075016.68557849
-
-  // Tile size in pixels (standard is 256)
   const TILE_SIZE = 256
-
-  // Calculate the visible width of the extent
   const extentWidth = Math.abs(extent.xmax - extent.xmin)
-
-  // Meters per pixel at zoom level 0
   const initialResolution = MAX_EXTENT_WIDTH / TILE_SIZE
-
-  // Calculate resolution (meters per pixel) for this extent and screen width
   const resolution = extentWidth / mapWidthPx
-
-  // Estimate zoom level using formula:
   const zoom = Math.log2(initialResolution / resolution)
 
-  // Return a rounded zoom (or adjust precision as needed)
   return Math.round(zoom) / 2
 }
 
@@ -61,7 +49,6 @@ export const ArcgisChart: React.FC<ArcgisChartProps> = ({ element }) => {
 
   const mapData = JSON.parse(element.spec)
 
-  // Other non Arcgis json format data
   const config = JSON.parse(element.config)
   const extent: Extent = mapData.initialState.viewpoint.targetGeometry
 
@@ -86,7 +73,7 @@ export const ArcgisChart: React.FC<ArcgisChartProps> = ({ element }) => {
       viewRef.current?.destroy()
       viewRef.current = null
     }
-  }, [mapData, zoom]) // re-run if any of these change
+  }, [mapData, zoom])
 
   return (
     <div ref={mapRef} style={{ height, width }} data-testid="stArcgisChart" />
