@@ -25,14 +25,16 @@ const HTML = fs.readFileSync(path.resolve(__dirname, "../index.html"), "utf8")
 document.documentElement.innerHTML = HTML.toString()
 
 test("index.html preloads expected font with expected hash", () => {
-  const preloadedFonts = document.querySelectorAll("link[rel='preload']")
+  const preloadedFonts = document.querySelectorAll<HTMLLinkElement>(
+    "link[rel='preload']"
+  )
 
   // With variable font, we only preload one font
   // instead of 3 separate font weight files
   expect(preloadedFonts.length).toBe(1)
 
   // Get the preloaded font's href
-  const fontElement = preloadedFonts.item(0) as HTMLLinkElement
+  const fontElement = preloadedFonts.item(0)
   const fontHref = fontElement.href
 
   // 4 parts in full name split by "."
