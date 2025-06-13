@@ -43,7 +43,7 @@ class MarkdownMixin:
         unsafe_allow_html: bool = False,
         *,  # keyword-only arguments:
         help: str | None = None,
-        width: Width = "content",
+        width: Width = "stretch",
     ) -> DeltaGenerator:
         r"""Display string formatted as Markdown.
 
@@ -165,7 +165,7 @@ class MarkdownMixin:
         unsafe_allow_html: bool = False,
         *,  # keyword-only arguments:
         help: str | None = None,
-        width: Width = "content",
+        width: Width = "stretch",
     ) -> DeltaGenerator:
         """Display text in small font.
 
