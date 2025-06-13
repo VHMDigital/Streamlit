@@ -363,8 +363,8 @@ def test_multiselect_empty_options_with_accept_new_options(app: Page):
     # Get the multiselect with empty options but accept_new_options=True (index 15)
     multiselect_elem = app.get_by_test_id("stMultiSelect").nth(15)
 
-    # Verify the initial placeholder shows "Choose or add an option"
-    expect(multiselect_elem).to_contain_text("Choose or add an option")
+    # Verify the initial placeholder shows "Add options" (frontend now handles default placeholders)
+    expect(multiselect_elem).to_contain_text("Add options")
 
     # Click to open input field
     multiselect_elem.locator("input").click()
