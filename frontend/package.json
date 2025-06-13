@@ -34,8 +34,12 @@
   ],
   "packageManager": "yarn@4.5.3",
   "devDependencies": {
+    "@types/react-pdf": "^7.0.0",
     "@vitest/coverage-v8": "^3.2.3",
     "concurrently": "^9.1.2",
     "vitest": "^3.2.3"
+  },
+  "dependencies": {
+    "react-pdf": "^9.2.1"
   }
 }
