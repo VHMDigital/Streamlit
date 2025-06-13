@@ -247,10 +247,9 @@ class Credentials:
                     "`streamlit activate reset` then `streamlit activate`"
                 )
         else:
-            activated = False
-
             if not config.get_option("server.showEmailPrompt"):
                 return
+            activated = False
 
             while not activated:
                 import click
