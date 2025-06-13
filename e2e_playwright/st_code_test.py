@@ -106,7 +106,14 @@ def test_code_blocks_render_correctly(
     assert_snapshot(code_blocks.nth(20), name="st_code-height-short-code")
 
     # Test long single word string
+    long_string = "askldfjlweklrjweifjlsdfliwjlierjilsildfjlslfij" * 3
+    code_blocks.nth(23).scroll_into_view_if_needed()
+    expect(themed_app.get_by_text(long_string)).to_have_count(2)
+    expect(themed_app.get_by_text(long_string).nth(0)).to_be_attached()
     assert_snapshot(code_blocks.nth(23), name="st_code-long-single-word-string-no-wrap")
+
+    code_blocks.nth(24).scroll_into_view_if_needed()
+    expect(themed_app.get_by_text(long_string).nth(1)).to_be_attached()
     assert_snapshot(code_blocks.nth(24), name="st_code-long-single-word-string-wrap")
 
 
