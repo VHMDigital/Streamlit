@@ -4,11 +4,11 @@ exports[`CustomCodeTag Element > should trim leading and final newlines 1`] = `
 <body>
   <div>
     <div
-      class="stCode css-6ylavl e1jvl9dn4"
+      class="stCode css-1ydllgh e1mha0dk4"
       data-testid="stCode"
     >
       <pre
-        class="css-14drx84 e1jvl9dn2"
+        class="css-14drx84 e1mha0dk2"
       >
         <div
           style="background-color: transparent;"
@@ -25,10 +25,10 @@ exports[`CustomCodeTag Element > should trim leading and final newlines 1`] = `
         </div>
       </pre>
       <div
-        class="css-chk1w8 e1jvl9dn3"
+        class="css-chk1w8 e1mha0dk3"
       >
         <button
-          class="css-1dndcv1 e1jvl9dn5"
+          class="css-1ccyvjs e1mha0dk5"
           data-clipboard-text="      def hello():
           print("Hello, Streamlit!")"
           data-testid="stCodeCopyButton"
