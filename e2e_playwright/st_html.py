@@ -48,7 +48,7 @@ st.html(
     """
 )
 # Test that non-rendered HTML doesn't cause extra spacing
-with st.expander("HTML Elements for Spacing Test"):
+with st.expander("HTML Elements for Spacing Test", expanded=True):
     st.write("Before tag:")
     st.html(
         """
