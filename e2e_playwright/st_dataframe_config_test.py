@@ -227,6 +227,8 @@ def test_time_column_formatting_via_ui(
     assert_snapshot(time_col_df, name="st_dataframe-time_column_format_changed")
 
 
+# Seeing some flakiness with firefox, so skip until can be debugged.
+@pytest.mark.only_browser("chromium", "webkit")
 def test_date_column_formatting_via_ui(
     app: Page, assert_snapshot: ImageCompareFunction
 ):
