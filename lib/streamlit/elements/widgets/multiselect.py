@@ -231,47 +231,89 @@ class MultiSelectMixin:
         label_visibility: LabelVisibility = "visible",
         accept_new_options: Literal[False, True] | bool = False,
     ) -> list[T] | list[T | str]:
-        """Display a multiselect widget.
+        r"""Display a multiselect widget.
         The multiselect widget starts as empty.
 
         Parameters
         ----------
-        label : str
-            A short label explaining to the user what this input is for.
-            For accessibility reasons, you should never set an empty label (label="")
-            but hide it with label_visibility if needed. In the future, we may disallow
-            empty labels by raising an exception.
-        options : Sequence, numpy.ndarray, pandas.Series, pandas.DataFrame, or pandas.Index
-            Labels for the select options. This will be cast to str internally
-            by default. For pandas.DataFrame, the first column is selected.
-        default : [str] or None
+        label: str
+            A short label explaining to the user what this select widget is for.
+            The label can optionally contain GitHub-flavored Markdown of the
+            following types: Bold, Italics, Strikethroughs, Inline Code, Links,
+            and Images. Images display like icons, with a max height equal to
+            the font height.
+
+            Unsupported Markdown elements are unwrapped so only their children
+            (text contents) render. Display unsupported elements as literal
+            characters by backslash-escaping them. E.g.,
+            ``"1\. Not an ordered list"``.
+
+            See the ``body`` parameter of |st.markdown|_ for additional,
+            supported Markdown directives.
+
+            For accessibility reasons, you should never set an empty label, but
+            you can hide it with ``label_visibility`` if needed. In the future,
+            we may disallow empty labels by raising an exception.
+
+            .. |st.markdown| replace:: ``st.markdown``
+            .. _st.markdown: https://docs.streamlit.io/develop/api-reference/text/st.markdown
+
+        options: Iterable
+            Labels for the select options in an ``Iterable``. This can be a
+            ``list``, ``set``, or anything supported by ``st.dataframe``. If
+            ``options`` is dataframe-like, the first column will be used. Each
+            label will be cast to ``str`` internally by default.
+
+        default: Iterable of V, V, or None
             List of default values. Can also be a single value.
-        format_func : function
-            Function to modify the display of the labels. It receives the option
-            as an argument and its output will be cast to str.
-        key : str or int
+
+        format_func: function
+            Function to modify the display of the options. It receives
+            the raw option as an argument and should output the label to be
+            shown for that option. This has no impact on the return value of
+            the command.
+
+        key: str or int
             An optional string or integer to use as the unique key for the widget.
             If this is omitted, a key will be generated for the widget
-            based on its content. Multiple widgets of the same type may
-            not share the same key.
-        help : str
-            An optional tooltip that gets displayed next to the multiselect.
-        on_change : callable
-            An optional callback invoked when this multiselect's value changes.
-        args : tuple
+            based on its content. No two widgets may have the same key.
+
+        help: str or None
+            A tooltip that gets displayed next to the widget label. Streamlit
+            only displays the tooltip when ``label_visibility="visible"``. If
+            this is ``None`` (default), no tooltip is displayed.
+
+            The tooltip can optionally contain GitHub-flavored Markdown,
+            including the Markdown directives described in the ``body``
+            parameter of ``st.markdown``.
+
+        on_change: callable
+            An optional callback invoked when this widget's value changes.
+
+        args: tuple
             An optional tuple of args to pass to the callback.
-        kwargs : dict
+
+        kwargs: dict
             An optional dict of kwargs to pass to the callback.
-        max_selections : int or None
-            The max number of options that can be selected. If None,
-            there will be no limit.
-        placeholder : str or None
-            A string to display when no options are selected. If None,
-            a default placeholder will be used based on the widget state.
-        disabled : bool
-            An optional boolean, which disables the multiselect widget if set to
-            True. The default is False.
-        label_visibility : "visible", "hidden", or "collapsed"
+
+        max_selections: int
+            The max selections that can be selected at a time.
+
+        placeholder: str or  None
+            A string to display when no options are selected.
+            If this is ``None`` (default), the widget displays one of the two
+            following placeholder strings:
+
+            - "Choose an option" is displayed if you set
+              ``accept_new_options=False``.
+            - "Choose or add an option" is displayed if you set
+              ``accept_new_options=True``.
+
+        disabled: bool
+            An optional boolean that disables the multiselect widget if set
+            to ``True``. The default is ``False``.
+
+        label_visibility: "visible", "hidden", or "collapsed"
             The visibility of the label. The default is ``"visible"``. If this
             is ``"hidden"``, Streamlit displays an empty spacer instead of the
             label, which can help keep the widget aligned with other widgets.
@@ -395,9 +437,12 @@ class MultiSelectMixin:
 
         default_values = get_default_indices(indexable_options, default)
 
-        # Default placeholders are now handled on the frontend side
-        # Only pass through custom user-provided placeholders
-        # This improves internationalization and consistency
+        if placeholder is None:
+            placeholder = (
+                "Choose an option"
+                if not accept_new_options
+                else "Choose or add an option"
+            )
 
         form_id = current_form_id(self.dg)
         element_id = compute_and_register_element_id(
@@ -421,7 +466,8 @@ class MultiSelectMixin:
         proto.disabled = disabled
         proto.label = label
         proto.max_selections = max_selections or 0
-        # Map user's placeholder to the new proto field, keep old field for backwards compatibility
+        proto.placeholder = placeholder
+        # Map user's placeholder to the new proto field for the fix
         if placeholder is not None:
             proto.custom_placeholder = placeholder
         proto.label_visibility.value = get_label_visibility_proto_value(
