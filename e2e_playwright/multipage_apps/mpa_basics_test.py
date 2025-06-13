@@ -308,7 +308,7 @@ def test_renders_logos(app: Page, assert_snapshot: ImageCompareFunction):
     assert_snapshot(collapsed_logo_image, name="collapsed-header-logo")
 
 
-@pytest.mark.flakey(max_runs=4)
+@pytest.mark.flaky(max_runs=4)
 def test_renders_small_logos(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that small logos display properly in sidebar and main sections."""
 
