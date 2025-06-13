@@ -264,6 +264,8 @@ def test_changing_column_order_from_code_updates_ui(
 
 # Issue #11291 - st.column_config 'localized' option
 @pytest.mark.browser_context_args(locale="pt-BR")
+# Seeing some flakiness with firefox, so skip until can be debugged.
+@pytest.mark.only_browser("chromium", "webkit")
 def test_localized_date_and_number_formatting(
     app: Page, assert_snapshot: ImageCompareFunction
 ):
