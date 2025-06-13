@@ -106,7 +106,7 @@ export const StyledPre = styled.pre<StyledCodeProps>(
       fontSize: theme.fontSizes.twoSm,
 
       // Center-align number vertically, or they'll be positioned differently when
-      // wrapLinst=true. Even with this change, though, the position is still ~2px
+      // wrapLines=true. Even with this change, though, the position is still ~2px
       // off.
       // NOTE: The alignSelf below only apply applies when wrapLines=true, because
       // that option wraps this element in a flex container.
