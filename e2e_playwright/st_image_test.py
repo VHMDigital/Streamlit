@@ -98,7 +98,9 @@ def test_image_formats(app: Page):
 
 def test_use_column_width_parameter(app: Page, assert_snapshot: ImageCompareFunction):
     columns_container = (
-        get_element_by_key(app, "use_column_width").locator("stHorizontalBlock").first
+        get_element_by_key(app, "use_column_width")
+        .get_by_test_id("stHorizontalBlock")
+        .first
     )
     expect(columns_container).to_be_visible()
     columns_container.scroll_into_view_if_needed()
@@ -116,7 +118,7 @@ def test_st_image_use_container_width_parameter(
 ):
     columns_container = (
         get_element_by_key(app, "use_container_width")
-        .locator("stHorizontalBlock")
+        .get_by_test_id("stHorizontalBlock")
         .first
     )
     expect(columns_container).to_be_visible()

@@ -89,7 +89,7 @@ def test_text_input_shows_instructions_when_dirty(
     text_input_field = text_input.locator("input").first
     expect(text_input_field).to_be_visible()
     text_input_field.fill("123")
-    expect(text_input_field.locator("InputInstructions")).to_have_text(
+    expect(text_input.get_by_test_id("InputInstructions")).to_have_text(
         "Press Enter to apply"
     )
 
