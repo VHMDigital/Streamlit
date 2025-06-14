@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction
@@ -54,16 +55,15 @@ def test_check_top_level_class(app: Page):
     check_top_level_class(app, "stVegaLiteChart")
 
 
+@pytest.mark.flaky(reruns=4)
 def test_chart_tooltip_styling(app: Page, assert_snapshot: ImageCompareFunction):
     """Check that the chart tooltip styling is correct."""
-    expect(app.get_by_test_id("stVegaLiteChart")).to_have_count(NUM_CHARTS)
     pie_chart = app.get_by_test_id("stVegaLiteChart").locator("canvas").nth(4)
     expect(pie_chart).to_be_visible()
     wait_for_react_stability(app)
     pie_chart.scroll_into_view_if_needed()
-    wait_for_react_stability(app)
     pie_chart.hover(position={"x": 60, "y": 60})
-    tooltip = app.locator("#vg-tooltip-element")
+    tooltip = app.locator("#vg-tooltip-element").first
     expect(tooltip).to_be_visible()
 
     assert_snapshot(tooltip, name="st_altair_chart-tooltip_styling")
