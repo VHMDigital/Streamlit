@@ -119,3 +119,24 @@ def test_check_top_level_class(app: Page):
 def test_custom_css_class_via_key(app: Page):
     """Test that the container can have a custom css class via the key argument."""
     expect(get_element_by_key(app, "first container")).to_be_visible()
+
+
+def test_nested_containers(app: Page, assert_snapshot: ImageCompareFunction):
+    """Test that nested containers render correctly with different height configurations."""
+    # Test first nested container example (outer: height=200, inner: height=250)
+    nested_container_1 = app.get_by_test_id("stVerticalBlockBorderWrapper").nth(6)
+    nested_container_1.scroll_into_view_if_needed()
+    assert_snapshot(nested_container_1, name="st_container-nested_overflow")
+
+    # Test second nested container example (outer: height=200, inner: no height)
+    nested_container_2 = app.get_by_test_id("stVerticalBlockBorderWrapper").nth(7)
+    nested_container_2.scroll_into_view_if_needed()
+    assert_snapshot(nested_container_2, name="st_container-nested_content")
+
+
+def test_containers_in_columns(app: Page, assert_snapshot: ImageCompareFunction):
+    """Test that containers render correctly within columns."""
+    # Get the columns container and snapshot the entire columns layout
+    columns_container = app.get_by_test_id("stHorizontalBlock").last
+    columns_container.scroll_into_view_if_needed()
+    assert_snapshot(columns_container, name="st_container-columns")
