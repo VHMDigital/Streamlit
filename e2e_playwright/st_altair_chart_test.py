@@ -18,15 +18,17 @@ from e2e_playwright.conftest import ImageCompareFunction
 from e2e_playwright.shared.app_utils import check_top_level_class
 from e2e_playwright.shared.react18_utils import wait_for_react_stability
 
+NUM_CHARTS = 11
+
 
 def test_altair_chart_displays_correctly(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
     expect(
         themed_app.get_by_test_id("stVegaLiteChart").locator("canvas")
-    ).to_have_count(11)
+    ).to_have_count(NUM_CHARTS)
     charts = themed_app.get_by_test_id("stVegaLiteChart")
-    expect(charts).to_have_count(11)
+    expect(charts).to_have_count(NUM_CHARTS)
     snapshot_names = [
         "st_altair_chart-scatter_chart_default_theme",
         "st_altair_chart-scatter_chart_streamlit_theme",
@@ -54,11 +56,12 @@ def test_check_top_level_class(app: Page):
 
 def test_chart_tooltip_styling(app: Page, assert_snapshot: ImageCompareFunction):
     """Check that the chart tooltip styling is correct."""
-    pie_chart = app.get_by_test_id("stVegaLiteChart").nth(4)
+    pie_chart = app.get_by_test_id("stVegaLiteChart").locator("canvas").nth(4)
+    expect(pie_chart).to_be_visible()
     wait_for_react_stability(app)
     pie_chart.scroll_into_view_if_needed()
     wait_for_react_stability(app)
-    pie_chart.locator("canvas").hover(position={"x": 60, "y": 60}, force=True)
+    pie_chart.hover(position={"x": 60, "y": 60}, force=True)
     tooltip = app.locator("#vg-tooltip-element")
     expect(tooltip).to_be_visible()
 
@@ -68,6 +71,7 @@ def test_chart_tooltip_styling(app: Page, assert_snapshot: ImageCompareFunction)
 def test_chart_menu_styling(themed_app: Page, assert_snapshot: ImageCompareFunction):
     """Check that the chart menu styling is correct."""
     chart = themed_app.get_by_test_id("stVegaLiteChart").first
+    expect(chart).to_be_visible()
     chart.locator("summary").click()
     chart_menu = chart.locator(".vega-actions")
     expect(chart_menu).to_be_visible()
