@@ -55,13 +55,15 @@ def test_check_top_level_class(app: Page):
     check_top_level_class(app, "stVegaLiteChart")
 
 
-@pytest.mark.flaky(reruns=4)
+# This test seems to be a bit flaky in chromium, so we skip it for now.
+@pytest.mark.skip_browser("chromium")
 def test_chart_tooltip_styling(app: Page, assert_snapshot: ImageCompareFunction):
     """Check that the chart tooltip styling is correct."""
     pie_chart = app.get_by_test_id("stVegaLiteChart").locator("canvas").nth(4)
     expect(pie_chart).to_be_visible()
     wait_for_react_stability(app)
     pie_chart.scroll_into_view_if_needed()
+    wait_for_react_stability(app)
     pie_chart.hover(position={"x": 60, "y": 60})
     tooltip = app.locator("#vg-tooltip-element").first
     expect(tooltip).to_be_visible()
