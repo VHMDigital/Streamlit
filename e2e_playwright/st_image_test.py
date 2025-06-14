@@ -20,7 +20,6 @@ from playwright.sync_api import Locator, Page, expect
 from e2e_playwright.conftest import ImageCompareFunction, wait_until
 from e2e_playwright.shared.app_utils import (
     check_top_level_class,
-    expect_warning,
     get_element_by_key,
     get_image,
 )
@@ -106,10 +105,9 @@ def test_use_column_width_parameter(app: Page, assert_snapshot: ImageCompareFunc
     columns_container.scroll_into_view_if_needed()
     assert_snapshot(columns_container, name="st_image-use_column_width")
 
-    expect_warning(
-        app,
-        "The use_column_width parameter has been deprecated and will be removed in a future release. "
-        "Please utilize the use_container_width parameter instead.",
+    expect(app.get_by_test_id("stMainBlockContainer")).to_contain_text(
+        "The use_column_width parameter has been deprecated and will be removed in a "
+        "future release. Please utilize the use_container_width parameter instead."
     )
 
 
