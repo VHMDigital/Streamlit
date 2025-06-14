@@ -369,16 +369,23 @@ def test_file_upload_error_message_file_too_large(app: Page):
 @pytest.mark.flaky(reruns=4)
 def test_single_file_upload_button_tooltip(app: Page):
     """Test that the single file upload button tooltip renders correctly."""
-    chat_input = app.get_by_test_id("stChatInput").nth(3)
-    chat_input.get_by_role("button").nth(0).hover()
+    chat_input_upload_button = (
+        app.get_by_test_id("stChatInput").nth(3).get_by_role("button").first
+    )
+    chat_input_upload_button.scroll_into_view_if_needed()
+    chat_input_upload_button.hover()
     expect(app.get_by_text("Upload or drag and drop a file")).to_be_visible()
 
 
 @pytest.mark.flaky(reruns=4)
 def test_multi_file_upload_button_tooltip(app: Page):
     """Test that the single file upload button tooltip renders correctly."""
-    chat_input = app.get_by_test_id("stChatInput").nth(4)
-    chat_input.get_by_role("button").nth(0).hover()
+    chat_input_upload_button = (
+        app.get_by_test_id("stChatInput").nth(4).get_by_role("button").first
+    )
+    expect(chat_input_upload_button).to_be_visible()
+    chat_input_upload_button.scroll_into_view_if_needed()
+    chat_input_upload_button.hover()
     expect(app.get_by_text("Upload or drag and drop files")).to_be_visible()
 
 
@@ -389,12 +396,14 @@ def test_chat_input_adjusts_for_long_placeholder(
     app.set_viewport_size({"width": 750, "height": 2000})
 
     chat_input = app.get_by_test_id("stChatInput").nth(7)
-    chat_input_area = chat_input.locator("textarea")
+    expect(chat_input).to_be_visible()
 
     # Take a snapshot of the initial state with the long placeholder
     assert_snapshot(chat_input, name="st_chat_input-long_placeholder")
 
     # Type some text to verify the input maintains proper height
+    chat_input_area = chat_input.locator("textarea")
+    expect(chat_input_area).to_be_visible()
     chat_input_area.type("Some input text")
     assert_snapshot(chat_input, name="st_chat_input-long_placeholder_with_text")
 
