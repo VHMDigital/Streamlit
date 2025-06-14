@@ -467,6 +467,9 @@ class MultiSelectMixin:
         proto.label = label
         proto.max_selections = max_selections or 0
         proto.placeholder = placeholder
+        # Map user's placeholder to the new proto field for the fix
+        if placeholder is not None:
+            proto.custom_placeholder = placeholder
         proto.label_visibility.value = get_label_visibility_proto_value(
             label_visibility
         )

@@ -543,6 +543,9 @@ class SelectboxMixin:
         selectbox_proto.options[:] = formatted_options
         selectbox_proto.form_id = current_form_id(self.dg)
         selectbox_proto.placeholder = placeholder
+        # Map user's placeholder to the new proto field for the fix
+        if placeholder is not None:
+            selectbox_proto.custom_placeholder = placeholder
         selectbox_proto.disabled = disabled
         selectbox_proto.label_visibility.value = get_label_visibility_proto_value(
             label_visibility
