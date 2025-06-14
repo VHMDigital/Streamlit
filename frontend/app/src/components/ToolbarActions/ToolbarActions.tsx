@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { MouseEvent, ReactElement, useCallback } from "react"
 
 import {
   BaseButton,
@@ -41,9 +41,29 @@ export function ActionButton({
   icon,
   onClick,
 }: ActionButtonProps): ReactElement {
+  const handleClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>): void => {
+      // Call the onClick handler first
+      onClick()
+
+      // Prevent any default behavior that might interfere with hover state
+      event.preventDefault()
+
+      // Keep the button focused to maintain interactive appearance
+      // Use a small delay to ensure this happens after any host communication
+      setTimeout(() => {
+        const button = event.currentTarget
+        if (button && document.contains(button)) {
+          button.focus({ preventScroll: true })
+        }
+      }, 10)
+    },
+    [onClick]
+  )
+
   return (
     <div className="stToolbarActionButton" data-testid="stToolbarActionButton">
-      <BaseButton onClick={onClick} kind={BaseButtonKind.HEADER_BUTTON}>
+      <BaseButton onClick={handleClick} kind={BaseButtonKind.HEADER_BUTTON}>
         <StyledActionButtonContainer>
           {icon && (
             <StyledActionButtonIcon
@@ -81,10 +101,12 @@ function ToolbarActions({
           key={key}
           label={label}
           icon={icon}
-          onClick={() => {
+          onClick={(): void => {
             metricsMgr.enqueue("menuClick", {
               label: key,
             })
+
+            // Send the message to host immediately
             sendMessageToHost({
               type: "TOOLBAR_ITEM_CALLBACK",
               key,

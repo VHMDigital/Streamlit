@@ -36,8 +36,44 @@ export const StyledActionButtonIcon = styled.div<StyledActionButtonIconProps>(
   })
 )
 
-export const StyledToolbarActions = styled.div({
+export const StyledToolbarActions = styled.div(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   flexDirection: "row",
-})
+
+  // Ensure toolbar action buttons maintain hover state after click
+  "& .stToolbarActionButton button": {
+    // Ensure hover state persists after click when mouse is still over button
+    "&:hover": {
+      backgroundColor: `${theme.colors.darkenedBgMix25} !important`,
+      cursor: "pointer !important",
+    },
+
+    // Maintain hover state when button is focused (after click)
+    "&:focus:hover": {
+      backgroundColor: `${theme.colors.darkenedBgMix25} !important`,
+      cursor: "pointer !important",
+    },
+
+    // Maintain hover state when button is active (being clicked)
+    "&:active:hover": {
+      backgroundColor: `${theme.colors.darkenedBgMix25} !important`,
+      cursor: "pointer !important",
+    },
+
+    // Prevent focus outline from interfering with hover state
+    "&:focus": {
+      outline: "none",
+    },
+
+    // Only show focus-visible outline when navigating with keyboard
+    "&:focus-visible": {
+      boxShadow: `0 0 0 0.2rem ${theme.colors.primary}40`, // 40 is 25% opacity in hex
+    },
+
+    // Ensure the button maintains its interactive appearance
+    "&:not(:disabled)": {
+      cursor: "pointer",
+    },
+  },
+}))
