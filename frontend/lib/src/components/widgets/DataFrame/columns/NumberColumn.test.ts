@@ -310,9 +310,11 @@ describe("NumberColumn", () => {
     [-1234.567, "plain", "-1234.567"],
     [-1234.567, "scientific", "-1.235E3"],
     [-1234.567, "engineering", "-1.235E3"],
+    [1200000, "bytes", "1.2MB"],
+    [undefined, null, ""],
   ])(
     "formats %p with sprintf format %p to %p",
-    (input: number, format: string, displayValue: string) => {
+    (input: any, format: any, displayValue: string) => {
       const mockColumn = getNumberColumn(MOCK_FLOAT_ARROW_TYPE, {
         format,
       })
