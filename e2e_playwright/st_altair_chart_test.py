@@ -56,12 +56,13 @@ def test_check_top_level_class(app: Page):
 
 def test_chart_tooltip_styling(app: Page, assert_snapshot: ImageCompareFunction):
     """Check that the chart tooltip styling is correct."""
+    expect(app.get_by_test_id("stVegaLiteChart")).to_have_count(NUM_CHARTS)
     pie_chart = app.get_by_test_id("stVegaLiteChart").locator("canvas").nth(4)
     expect(pie_chart).to_be_visible()
     wait_for_react_stability(app)
     pie_chart.scroll_into_view_if_needed()
     wait_for_react_stability(app)
-    pie_chart.hover(position={"x": 60, "y": 60}, force=True)
+    pie_chart.hover(position={"x": 60, "y": 60})
     tooltip = app.locator("#vg-tooltip-element")
     expect(tooltip).to_be_visible()
 
