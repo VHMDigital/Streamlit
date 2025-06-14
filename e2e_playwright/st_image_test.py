@@ -17,7 +17,11 @@ import re
 import pytest
 from playwright.sync_api import Locator, Page, expect
 
-from e2e_playwright.conftest import ImageCompareFunction, wait_until
+from e2e_playwright.conftest import (
+    ImageCompareFunction,
+    wait_for_app_loaded,
+    wait_until,
+)
 from e2e_playwright.shared.app_utils import (
     check_top_level_class,
     get_element_by_key,
@@ -286,6 +290,7 @@ def test_image_source_error(app: Page, app_port: int):
 
     # Navigate to the app
     app.goto(f"http://localhost:{app_port}")
+    wait_for_app_loaded(app)
 
     # Wait until the expected error is logged, indicating CLIENT_ERROR was sent
     wait_until(
