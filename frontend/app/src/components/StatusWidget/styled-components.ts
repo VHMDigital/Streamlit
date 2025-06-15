@@ -16,7 +16,7 @@
 
 import styled from "@emotion/styled"
 
-import { hasLightBackgroundColor } from "@streamlit/lib"
+import { EmotionTheme } from "@streamlit/lib"
 
 /*
   "ConnectionStatus" styles are used for displaying
@@ -85,18 +85,14 @@ export interface StyledAppRunningIconProps {
   isNewYears: boolean
 }
 
-export const StyledAppRunningIcon = styled.img<StyledAppRunningIconProps>(
-  ({ isNewYears, theme }) => {
-    // Testing if current background color is light or dark to modify img:
-    const filter = hasLightBackgroundColor(theme) ? "" : "invert(1)"
-
+export const StyledAppRunningIcon = styled.div<StyledAppRunningIconProps>(
+  ({ isNewYears, theme }: { isNewYears: boolean; theme: EmotionTheme }) => {
     // New years gif has unique styling - regular running man unchanged
     return {
-      opacity: isNewYears ? 1 : 0.4,
+      opacity: 1,
       width: isNewYears ? "2.2rem" : theme.sizes.appRunningMen,
       height: isNewYears ? "2.2rem" : theme.sizes.appRunningMen,
       marginRight: `-${theme.spacing.sm}`,
-      filter: isNewYears ? "" : filter,
     }
   }
 )
