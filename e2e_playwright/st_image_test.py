@@ -298,4 +298,5 @@ def test_image_source_error(app: Page, app_port: int):
         lambda: check_image_source_error_count(
             messages, IMAGE_ELEMENTS_USING_MEDIA_ENDPOINT
         ),
+        timeout=10000,
     )

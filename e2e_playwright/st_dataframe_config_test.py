@@ -150,6 +150,7 @@ def test_number_column_formatting_via_ui(
     expect(formatting_menu).to_be_visible()
     assert_snapshot(formatting_menu, name="st_dataframe-number_column_formatting_menu")
     # Click on the dollar format option:
+    expect(formatting_menu.get_by_text("Dollar")).to_be_visible()
     formatting_menu.get_by_text("Dollar").click()
     # Add a quick timeout to wait for the column to be adjusted/autosized before
     # taking a snapshot:
