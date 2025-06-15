@@ -39,9 +39,11 @@ def extract_map_data(map_object: Map) -> dict[str, Any]:
     """Extract map configuration and data from ArcGIS map object."""
 
     if type_util.is_arcgis_version_less_than("2.4.0"):
+
         raise StreamlitAPIException(
-            "Streamlit does not currently support Arcgis version"
+            "Streamlit does not currently support Arcgis version "
             "older than 2.4. Please upgrade to Version 2.4"
+
         )
 
     return json.dumps(map_object._webmap_dict)
