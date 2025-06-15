@@ -121,7 +121,7 @@ export const StyledAppRunningIcon = styled.div<StyledAppRunningIconProps>(
   ({ isNewYears, theme }: { isNewYears: boolean; theme: EmotionTheme }) => {
     // New years gif has unique styling - regular running man unchanged
     return {
-      opacity: isNewYears ? 1 : 0.6,
+      opacity: 1,
       width: isNewYears ? "2.2rem" : theme.sizes.appRunningMen,
       height: isNewYears ? "2.2rem" : theme.sizes.appRunningMen,
       marginRight: `-${theme.spacing.sm}`,
