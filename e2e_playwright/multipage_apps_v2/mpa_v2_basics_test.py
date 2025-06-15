@@ -561,6 +561,7 @@ def test_logo_source_errors(app: Page, app_port: int):
 
     # Navigate to the app
     app.goto(f"http://localhost:{app_port}")
+    wait_for_app_loaded(app)
 
     # Wait until the expected error is logged, indicating CLIENT_ERROR was sent
     wait_until(
@@ -569,8 +570,11 @@ def test_logo_source_errors(app: Page, app_port: int):
             "Client Error: Sidebar Logo source error" in message for message in messages
         ),
     )
-
+    expect(app.get_by_test_id("stSidebarContent")).to_be_visible()
     app.get_by_test_id("stSidebarContent").hover()
+    expect(
+        app.get_by_test_id("stSidebarCollapseButton").locator("button")
+    ).to_be_visible()
     app.get_by_test_id("stSidebarCollapseButton").locator("button").click()
 
     # Wait until the expected error is logged, indicating CLIENT_ERROR was sent

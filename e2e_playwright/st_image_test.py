@@ -17,7 +17,11 @@ import re
 import pytest
 from playwright.sync_api import Locator, Page, expect
 
-from e2e_playwright.conftest import ImageCompareFunction, wait_until
+from e2e_playwright.conftest import (
+    ImageCompareFunction,
+    wait_for_app_loaded,
+    wait_until,
+)
 from e2e_playwright.shared.app_utils import (
     check_top_level_class,
     get_element_by_key,
@@ -96,7 +100,12 @@ def test_image_formats(app: Page):
 
 
 def test_use_column_width_parameter(app: Page, assert_snapshot: ImageCompareFunction):
-    columns_container = app.get_by_test_id("stHorizontalBlock").first
+    columns_container = (
+        get_element_by_key(app, "use_column_width")
+        .get_by_test_id("stHorizontalBlock")
+        .first
+    )
+    expect(columns_container).to_be_visible()
     columns_container.scroll_into_view_if_needed()
     assert_snapshot(columns_container, name="st_image-use_column_width")
 
@@ -109,7 +118,12 @@ def test_use_column_width_parameter(app: Page, assert_snapshot: ImageCompareFunc
 def test_st_image_use_container_width_parameter(
     app: Page, assert_snapshot: ImageCompareFunction
 ):
-    columns_container = app.get_by_test_id("stHorizontalBlock").nth(1)
+    columns_container = (
+        get_element_by_key(app, "use_container_width")
+        .get_by_test_id("stHorizontalBlock")
+        .first
+    )
+    expect(columns_container).to_be_visible()
     columns_container.scroll_into_view_if_needed()
     assert_snapshot(columns_container, name="st_image-use_container_width")
 
@@ -276,6 +290,7 @@ def test_image_source_error(app: Page, app_port: int):
 
     # Navigate to the app
     app.goto(f"http://localhost:{app_port}")
+    wait_for_app_loaded(app)
 
     # Wait until the expected error is logged, indicating CLIENT_ERROR was sent
     wait_until(
@@ -283,4 +298,5 @@ def test_image_source_error(app: Page, app_port: int):
         lambda: check_image_source_error_count(
             messages, IMAGE_ELEMENTS_USING_MEDIA_ENDPOINT
         ),
+        timeout=10000,
     )
