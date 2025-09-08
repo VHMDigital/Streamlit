@@ -85,7 +85,7 @@ jobs:
           submodules: "recursive"
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Setup virtual env
@@ -129,7 +129,7 @@ jobs:
           persist-credentials: false
           submodules: "recursive"
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Setup virtual env
@@ -183,7 +183,7 @@ jobs:
           submodules: "recursive"
           fetch-depth: 2
       - name: Set up Python ${{ needs.build_info.outputs.PYTHON_MIN_VERSION }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "${{ needs.build_info.outputs.PYTHON_MIN_VERSION }}"
       - name: Setup virtual env
@@ -247,7 +247,7 @@ jobs:
           submodules: "recursive"
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
